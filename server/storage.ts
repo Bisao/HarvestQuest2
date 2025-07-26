@@ -113,25 +113,25 @@ export class MemStorage implements IStorage {
       {
         name: "Floresta",
         emoji: "🌲",
-        requiredLevel: 1,
+        requiredLevel: 5,
         availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[3]], // Fibra, Pedra, Gravetos, Madeira
       },
       {
         name: "Deserto",
         emoji: "🏜️",
-        requiredLevel: 2,
+        requiredLevel: 20,
         availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[4]], // Fibra, Pedra, Gravetos, Areia
       },
       {
         name: "Montanha",
         emoji: "🏔️",
-        requiredLevel: 5,
+        requiredLevel: 50,
         availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[5]], // Fibra, Pedra, Gravetos, Cristais
       },
       {
         name: "Oceano",
         emoji: "🌊",
-        requiredLevel: 8,
+        requiredLevel: 75,
         availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[6]], // Fibra, Pedra, Gravetos, Conchas
       },
     ];
@@ -219,11 +219,11 @@ export class MemStorage implements IStorage {
     // Create default player
     await this.createPlayer({
       username: "Player1",
-      level: 1,
-      experience: 0,
+      level: 75,
+      experience: 5000,
       energy: 100,
       maxEnergy: 100,
-      coins: 0,
+      coins: 1000,
       inventoryWeight: 0,
       maxInventoryWeight: 50,
       autoStorage: false,
