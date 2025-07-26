@@ -209,16 +209,26 @@ export default function Game() {
 
   // Auto-repeat expedition logic - watch for countdown reaching 0 and start expedition
   useEffect(() => {
+    console.log('Auto-repeat useEffect triggered. autoRepeatSettings:', autoRepeatSettings, 'activeExpedition:', !!activeExpedition);
+    
     const enabledBiome = Object.entries(autoRepeatSettings).find(([_, settings]) => 
       settings.enabled && settings.countdown === 0 && !activeExpedition
     );
+    
+    console.log('Found enabled biome for auto-start:', enabledBiome);
     
     if (enabledBiome) {
       const [biomeId, settings] = enabledBiome;
       const biome = biomes?.find(b => b.id === biomeId);
       
+      console.log('Biome found:', biome?.name, 'Player stats:', { 
+        hunger: player?.hunger, 
+        thirst: player?.thirst,
+        canStart: biome && player && player.hunger < 90 && player.thirst < 90 
+      });
+      
       if (biome && player && player.hunger < 90 && player.thirst < 90) {
-        console.log('Auto-starting expedition for biome:', biomeId);
+        console.log('All conditions met - Auto-starting expedition for biome:', biomeId);
         
         // Get last expedition resources
         const lastExpeditions = typeof window !== 'undefined' 
@@ -226,26 +236,32 @@ export default function Game() {
           : {};
           
         if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
-          console.log('Starting auto expedition with resources:', lastExpeditions[biomeId]);
-          // Start expedition automatically
+          console.log('Auto-starting expedition for biome:', biomeId, 'with resources:', lastExpeditions[biomeId]);
+          
+          // Set selected biome first
           setSelectedBiome(biome);
-          setExpeditionModalOpen(true);
-          setExpeditionMinimized(false);
+          
+          // Then open modal and minimize it to show the expedition in progress
+          setTimeout(() => {
+            console.log('Opening expedition modal');
+            setExpeditionModalOpen(true);
+            setExpeditionMinimized(false);
+            
+            // Auto-start expedition with last resources after modal opens
+            setTimeout(() => {
+              console.log('Dispatching autoStartExpedition event');
+              const event = new CustomEvent('autoStartExpedition', { 
+                detail: { resources: lastExpeditions[biomeId] } 
+              });
+              window.dispatchEvent(event);
+            }, 500);
+          }, 100);
           
           // Reset the auto-repeat countdown for next cycle
           setAutoRepeatSettings(prev => ({
             ...prev,
             [biomeId]: { ...prev[biomeId], countdown: 10 }
           }));
-          
-          // Auto-start expedition with last resources after modal opens
-          setTimeout(() => {
-            console.log('Dispatching autoStartExpedition event');
-            const event = new CustomEvent('autoStartExpedition', { 
-              detail: { resources: lastExpeditions[biomeId] } 
-            });
-            window.dispatchEvent(event);
-          }, 1000); // Increased delay to ensure modal is fully loaded
         }
       } else {
         // Disable auto-repeat if conditions aren't met
