@@ -216,6 +216,7 @@ export class MemStorage implements IStorage {
       type: insertResource.type,
       rarity: insertResource.rarity ?? 'common',
       requiredTool: insertResource.requiredTool || null,
+      experienceValue: insertResource.experienceValue ?? 1,
     };
     this.resources.set(id, resource);
     return resource;

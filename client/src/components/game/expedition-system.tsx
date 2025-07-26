@@ -420,7 +420,7 @@ export default function ExpeditionSystem({
                         <div className="flex-1">
                           <h4 className="font-semibold">{resource.name}</h4>
                           <p className="text-sm text-gray-600">
-                            Peso: {resource.weight}kg • Valor: {resource.value} moedas
+                            Peso: {resource.weight}kg • Valor: {resource.value} moedas • XP: {resource.experienceValue || Math.floor(resource.value / 2)}
                           </p>
                           <div className="flex gap-2 mt-2">
                             <Badge variant={resource.rarity === "rare" ? "destructive" : resource.rarity === "uncommon" ? "secondary" : "outline"}>

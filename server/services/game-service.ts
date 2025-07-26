@@ -53,12 +53,27 @@ export class GameService {
     
     const equipment = await this.storage.getAllEquipment();
     
-    // Check equipped tool
+    // Special case for hunting: requires weapon AND knife
+    if (resource.requiredTool === "weapon_and_knife") {
+      const hasWeapon = equipment.some(eq => 
+        eq.id === player.equippedWeapon && eq.slot === "weapon"
+      );
+      const hasKnife = equipment.some(eq => 
+        eq.id === player.equippedTool && eq.toolType === "knife"
+      );
+      return hasWeapon && hasKnife;
+    }
+    
+    // Regular tool checks
     const equippedTool = equipment.find(eq => 
       eq.id === player.equippedTool && eq.toolType === resource.requiredTool
     );
     
-    return !!equippedTool;
+    const equippedWeapon = equipment.find(eq => 
+      eq.id === player.equippedWeapon && eq.toolType === resource.requiredTool
+    );
+    
+    return !!(equippedTool || equippedWeapon);
   }
 
   // Move item from inventory to storage
@@ -173,15 +188,16 @@ export class GameService {
     return rewards;
   }
 
-  // Experience calculation
+  // Experience calculation using experienceValue field
   calculateExperienceGain(resourcesCollected: Record<string, number>, resources: Resource[]): number {
     let totalExp = 0;
     
     for (const [resourceId, quantity] of Object.entries(resourcesCollected)) {
       const resource = resources.find(r => r.id === resourceId);
       if (resource) {
-        // Base experience is resource value / 2
-        totalExp += Math.floor(resource.value / 2) * quantity;
+        // Use experienceValue field if available, otherwise fallback to value / 2
+        const expPerItem = resource.experienceValue || Math.floor(resource.value / 2);
+        totalExp += expPerItem * quantity;
       }
     }
     

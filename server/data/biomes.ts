@@ -50,35 +50,36 @@ export function createBiomeData(resourceIds: string[]): InsertBiome[] {
       availableResources: [
         resourceIds[0], // Fibra
         resourceIds[1], // Pedra
-        resourceIds[2], // Gravetos
-        resourceIds[3], // Madeira
-        resourceIds[7], // Coelho
-        resourceIds[8], // Veado
-        resourceIds[9], // Javali
-        resourceIds[10], // Peixe Pequeno
-        resourceIds[11], // Peixe Grande
-        resourceIds[12], // Salmão
-        resourceIds[13], // Cogumelos
-        resourceIds[14], // Frutas Silvestres
+        resourceIds[2], // Pedras Soltas
+        resourceIds[3], // Gravetos
+        resourceIds[4], // Madeira
+        resourceIds[8], // Coelho
+        resourceIds[9], // Veado
+        resourceIds[10], // Javali
+        resourceIds[11], // Peixe Pequeno
+        resourceIds[12], // Peixe Grande
+        resourceIds[13], // Salmão
+        resourceIds[14], // Cogumelos
+        resourceIds[15], // Frutas Silvestres
       ],
     },
     {
       name: "Deserto",
       emoji: "🏜️",
       requiredLevel: 20,
-      availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[4]], // Fibra, Pedra, Gravetos, Areia
+      availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[3], resourceIds[5]], // Fibra, Pedra, Pedras Soltas, Gravetos, Areia
     },
     {
       name: "Montanha",
       emoji: "🏔️",
       requiredLevel: 50,
-      availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[5]], // Fibra, Pedra, Gravetos, Cristais
+      availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[3], resourceIds[6]], // Fibra, Pedra, Pedras Soltas, Gravetos, Cristais
     },
     {
       name: "Oceano",
       emoji: "🌊",
       requiredLevel: 75,
-      availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[6]], // Fibra, Pedra, Gravetos, Conchas
+      availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[3], resourceIds[7]], // Fibra, Pedra, Pedras Soltas, Gravetos, Conchas
     },
   ];
 }

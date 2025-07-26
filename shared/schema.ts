@@ -31,6 +31,7 @@ export const resources = pgTable("resources", {
   type: text("type").notNull(), // 'basic' or 'unique'
   rarity: text("rarity").notNull().default('common'), // 'common', 'uncommon', 'rare'
   requiredTool: text("required_tool"), // tool type needed to collect this resource
+  experienceValue: integer("experience_value").notNull().default(1), // XP gained per item collected
 });
 
 export const biomes = pgTable("biomes", {

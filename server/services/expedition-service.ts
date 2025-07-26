@@ -129,6 +129,7 @@ export class ExpeditionService {
     if (!player) return rewards;
 
     const allEquipment = await this.storage.getAllEquipment();
+    const allResources = await this.storage.getAllResources();
     const selectedEquipment = Array.isArray(expedition.selectedEquipment) ? expedition.selectedEquipment : [];
     const playerEquipment = allEquipment.filter(eq => 
       selectedEquipment.includes(eq.id) ||
@@ -141,6 +142,16 @@ export class ExpeditionService {
     for (const resourceId of selectedResources) {
       const baseQuantity = this.getBaseResourceQuantity(resourceId);
       rewards[resourceId] = baseQuantity;
+    }
+
+    // Check for pickaxe + stone mining -> add loose stones
+    const hasPickaxe = playerEquipment.some(eq => eq.toolType === "pickaxe");
+    const stoneResource = allResources.find(r => r.name === "Pedra");
+    const looseStoneResource = allResources.find(r => r.name === "Pedras Soltas");
+    
+    if (hasPickaxe && stoneResource && looseStoneResource && rewards[stoneResource.id]) {
+      // Add loose stones equal to the amount of stone mined
+      rewards[looseStoneResource.id] = (rewards[looseStoneResource.id] || 0) + rewards[stoneResource.id];
     }
 
     // Apply equipment bonuses

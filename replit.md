@@ -27,6 +27,16 @@ Preferred communication style: Simple, everyday language.
 - Added unequip functionality - clicking equipped items removes them from slots
 - Verified all game systems are fully functional: expeditions, inventory, storage, crafting
 
+**January 26, 2025 - Enhanced Game Mechanics Update**
+- **Added "Pedras Soltas" resource** - collectible without tools in all biomes
+- **Enhanced hunting system** - now requires both weapon AND knife for animal processing
+- **Implemented pickaxe bonus** - mining stone now also generates loose stones automatically
+- **Added XP display** - all resources now show experience points gained per item collected
+- **Added Faca (knife) equipment** - required for skinning hunted animals
+- **Updated resource experience values** - balanced XP rewards across all resource types
+- **Enhanced resource collection logic** - proper tool/weapon requirement checking with combined requirements
+- **Updated UI displays** - expedition system and biome views now show XP information
+
 **January 26, 2025 - Modular Architecture Update**
 - **Completely restructured backend into modular architecture** for better maintainability and content addition
 - Created separate data modules for resources, equipment, biomes, and recipes in `server/data/` directory

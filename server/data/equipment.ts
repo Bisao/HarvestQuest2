@@ -47,6 +47,15 @@ export const TOOLS: InsertEquipment[] = [
     toolType: "sickle",
     weight: 2,
   },
+  {
+    name: "Faca",
+    emoji: "🗡️",
+    effect: "Permite esfolar animais",
+    bonus: { type: "skinning", value: 1 },
+    slot: "tool",
+    toolType: "knife",
+    weight: 1,
+  },
 ];
 
 export const WEAPONS: InsertEquipment[] = [
