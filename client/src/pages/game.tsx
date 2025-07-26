@@ -226,18 +226,26 @@ export default function Game() {
           : {};
           
         if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
+          console.log('Starting auto expedition with resources:', lastExpeditions[biomeId]);
           // Start expedition automatically
           setSelectedBiome(biome);
           setExpeditionModalOpen(true);
           setExpeditionMinimized(false);
           
+          // Reset the auto-repeat countdown for next cycle
+          setAutoRepeatSettings(prev => ({
+            ...prev,
+            [biomeId]: { ...prev[biomeId], countdown: 10 }
+          }));
+          
           // Auto-start expedition with last resources after modal opens
           setTimeout(() => {
+            console.log('Dispatching autoStartExpedition event');
             const event = new CustomEvent('autoStartExpedition', { 
               detail: { resources: lastExpeditions[biomeId] } 
             });
             window.dispatchEvent(event);
-          }, 500);
+          }, 1000); // Increased delay to ensure modal is fully loaded
         }
       } else {
         // Disable auto-repeat if conditions aren't met
