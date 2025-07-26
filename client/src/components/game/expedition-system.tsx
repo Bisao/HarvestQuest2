@@ -54,7 +54,7 @@ export default function ExpeditionSystem({
   const [expeditionProgress, setExpeditionProgress] = useState(0);
   const [expeditionRewards, setExpeditionRewards] = useState<any>(null);
   const [autoCompleteTimer, setAutoCompleteTimer] = useState<number>(5);
-  
+
   // Use parent's activeExpedition if provided, otherwise use local state
   const activeExpedition = parentActiveExpedition || localActiveExpedition;
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -107,17 +107,17 @@ export default function ExpeditionSystem({
 
   const getCollectableResources = () => {
     const biomeResources = getBiomeResources();
-    
+
     // Get player's equipped tool and weapon
     const equippedTool = player.equippedTool ? 
       equipment.find(eq => eq.id === player.equippedTool) : null;
     const equippedWeapon = player.equippedWeapon ? 
       equipment.find(eq => eq.id === player.equippedWeapon) : null;
-    
+
     return biomeResources.filter(resource => {
       // If resource doesn't require a tool, it's always collectable
       if (!resource.requiredTool) return true;
-      
+
       // Special case for hunting large animals: requires weapon AND knife
       if (resource.requiredTool === "weapon_and_knife") {
         const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
@@ -125,11 +125,11 @@ export default function ExpeditionSystem({
                          (equippedWeapon && equippedWeapon.toolType === "knife");
         return !!(hasNonKnifeWeapon && hasKnife);
       }
-      
+
       // Regular tool checks - check both tool and weapon slots for the required tool
       const hasRequiredTool = (equippedTool && equippedTool.toolType === resource.requiredTool) ||
                              (equippedWeapon && equippedWeapon.toolType === resource.requiredTool);
-      
+
       return hasRequiredTool;
     });
   };
@@ -169,22 +169,22 @@ export default function ExpeditionSystem({
         startTime: Date.now(),
         estimatedDuration: duration * 1000 // Convert to milliseconds
       };
-      
+
       // Update parent state if callback is provided
       if (onExpeditionUpdate) {
         onExpeditionUpdate(newActiveExpedition);
       } else {
         setLocalActiveExpedition(newActiveExpedition);
       }
-      
+
       setPhase("in-progress");
       startProgressSimulation(newActiveExpedition);
-      
+
       // Store expedition state in parent component
       if (typeof window !== 'undefined' && (window as any).setActiveExpedition) {
         (window as any).setActiveExpedition(newActiveExpedition);
       }
-      
+
       toast({
         title: "Expedição Iniciada!",
         description: `Coletando recursos na ${biome?.name}. Duração estimada: ${Math.round(duration)}s`,
@@ -212,20 +212,20 @@ export default function ExpeditionSystem({
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      
+
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      
+
       toast({
         title: "Expedição Concluída!",
         description: `Recursos coletados com sucesso!`,
       });
-      
+
       // Force expand modal when expedition completes
       if (isMinimized) {
         onMinimize(); // This will expand the modal
       }
-      
+
       onExpeditionComplete();
     },
     onError: () => {
@@ -245,9 +245,9 @@ export default function ExpeditionSystem({
     intervalRef.current = setInterval(() => {
       const elapsed = Date.now() - expedition.startTime;
       const progress = Math.min((elapsed / expedition.estimatedDuration) * 100, 100);
-      
+
       setExpeditionProgress(progress);
-      
+
       if (progress >= 100) {
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
@@ -267,7 +267,7 @@ export default function ExpeditionSystem({
 
   const handleStartExpedition = () => {
     if (!biome) return;
-    
+
     startExpeditionMutation.mutate({
       playerId,
       biomeId: biome.id,
@@ -362,7 +362,7 @@ export default function ExpeditionSystem({
                 <p className="text-gray-600 mb-6">
                   Prepare-se para uma expedição de coleta de recursos. Você pode encontrar diversos materiais valiosos neste bioma.
                 </p>
-                
+
                 {/* Show available vs collectable resources */}
                 <div className="mb-6">
                   <h4 className="font-semibold mb-3">Recursos Disponíveis ({collectableResources.length}/{getBiomeResources().length} coletáveis)</h4>
@@ -390,7 +390,7 @@ export default function ExpeditionSystem({
                     })}
                   </div>
                 </div>
-                
+
                 <Button onClick={() => setPhase("resource-selection")} className="bg-forest hover:bg-forest/90">
                   Iniciar Planejamento
                 </Button>
@@ -422,7 +422,7 @@ export default function ExpeditionSystem({
                   </Badge>
                 </div>
               </div>
-              
+
               {/* Equipment Status */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-800 mb-2">⛏️ Status dos Equipamentos</h4>
@@ -459,12 +459,12 @@ export default function ExpeditionSystem({
                   )}
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {collectableResources.map(resource => {
                   const isSelected = selectedResources.includes(resource.id);
                   const requiresTool = !!resource.requiredTool;
-                  
+
                   return (
                     <label
                       key={resource.id}
@@ -503,7 +503,7 @@ export default function ExpeditionSystem({
                   );
                 })}
               </div>
-              
+
               {collectableResources.length === 0 && (
                 <div className="text-center p-8 bg-orange-50 border border-orange-200 rounded-lg">
                   <h4 className="font-semibold text-orange-800 mb-2">⚠️ Nenhum recurso coletável</h4>
@@ -513,7 +513,7 @@ export default function ExpeditionSystem({
                   </p>
                 </div>
               )}
-              
+
               <div className="flex justify-between">
                 <Button variant="outline" onClick={handleClose}>
                   Cancelar
@@ -533,7 +533,7 @@ export default function ExpeditionSystem({
           {phase === "confirmation" && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Confirme os detalhes da sua expedição:</h3>
-              
+
               <div className="bg-gray-50 p-6 rounded-lg space-y-4">
                 <div>
                   <h4 className="font-semibold mb-2">Destino:</h4>
@@ -582,22 +582,69 @@ export default function ExpeditionSystem({
 
           {/* In Progress Phase */}
           {phase === "in-progress" && activeExpedition && (
-            <div className="space-y-6 text-center">
-              <div className="bg-gradient-to-br from-blue-50 to-green-50 p-8 rounded-xl">
-                <h3 className="text-xl font-semibold mb-4">Expedição em Andamento</h3>
-                <div className="text-6xl mb-4">{biome.emoji}</div>
-                <p className="text-gray-600 mb-6">
-                  Coletando recursos na {biome.name}...
-                </p>
-                
-                <div className="space-y-4">
-                  <Progress value={expeditionProgress} className="w-full" />
-                  <p className="text-sm font-medium">
-                    Progresso: {Math.floor(expeditionProgress)}%
-                  </p>
-                  
-                  {expeditionProgress >= 100 && (
-                    <div className="space-y-3">
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-blue-50 to-green-50 p-6 rounded-xl">
+                {expeditionProgress < 100 ? (
+                  <>
+                    <h3 className="text-xl font-semibold mb-4 text-center">Expedição em Andamento</h3>
+                    <div className="text-6xl mb-4 text-center">{biome.emoji}</div>
+                    <p className="text-gray-600 mb-6 text-center">
+                      Coletando recursos na {biome.name}...
+                    </p>
+
+                    <div className="space-y-4">
+                      <Progress value={expeditionProgress} className="w-full" />
+                      <p className="text-sm font-medium text-center">
+                        Progresso: {Math.floor(expeditionProgress)}%
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-xl font-semibold mb-4 text-center">🎉 Expedição Concluída!</h3>
+
+                    {/* Recursos Coletados Simulados */}
+                    <div className="mb-6">
+                      <h4 className="font-semibold mb-3 text-center">📦 Recursos Coletados:</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {selectedResources.map(resourceId => {
+                          const resource = resources.find(r => r.id === resourceId);
+                          if (!resource) return null;
+
+                          // Simular quantidade coletada (1-3 por recurso)
+                          const quantity = Math.floor(Math.random() * 3) + 1;
+
+                          return (
+                            <div key={resourceId} className="bg-white p-3 rounded-lg border flex items-center gap-2">
+                              <span className="text-2xl">{resource.emoji}</span>
+                              <div className="flex-1">
+                                <div className="font-medium text-sm">{resource.name}</div>
+                                <div className="text-xs text-gray-600">x{quantity}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* XP e Moedas Ganhas */}
+                    <div className="bg-white p-4 rounded-lg border mb-6">
+                      <h4 className="font-semibold mb-2 text-center">⭐ Recompensas:</h4>
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div>
+                          <div className="text-2xl mb-1">🎯</div>
+                          <div className="font-semibold text-blue-600">+{selectedResources.length * 15} XP</div>
+                          <div className="text-xs text-gray-600">Experiência</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl mb-1">🪙</div>
+                          <div className="font-semibold text-yellow-600">+{selectedResources.length * 8}</div>
+                          <div className="text-xs text-gray-600">Moedas</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-center">
                       <Button 
                         onClick={handleCompleteExpedition}
                         disabled={completeExpeditionMutation.isPending}
@@ -605,12 +652,12 @@ export default function ExpeditionSystem({
                       >
                         {completeExpeditionMutation.isPending ? "Finalizando..." : "✅ Finalizar Expedição"}
                       </Button>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 mt-2">
                         Auto-finalização em {autoCompleteTimer} segundos...
                       </p>
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -620,7 +667,7 @@ export default function ExpeditionSystem({
             <div className="space-y-6">
               <div className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-xl">
                 <h3 className="text-xl font-semibold mb-4 text-center">🎉 Expedição Concluída!</h3>
-                
+
                 {/* Recursos Coletados */}
                 <div className="mb-6">
                   <h4 className="font-semibold mb-3 text-center">📦 Recursos Coletados:</h4>
