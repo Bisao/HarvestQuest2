@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import type { Biome, Resource, Equipment } from "@shared/schema";
@@ -12,6 +10,7 @@ interface ExpeditionModalProps {
   resources: Resource[];
   equipment: Equipment[];
   playerId: string;
+  onStartExpedition: (selectedResources: string[], equipment: string[]) => void;
 }
 
 type ExpeditionStep = "resource-selection" | "equipment-selection" | "expedition-progress";
@@ -22,92 +21,18 @@ export default function ExpeditionModal({
   biome, 
   resources, 
   equipment, 
-  playerId 
+  playerId,
+  onStartExpedition
 }: ExpeditionModalProps) {
   const [currentStep, setCurrentStep] = useState<ExpeditionStep>("resource-selection");
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
-  const [expeditionProgress, setExpeditionProgress] = useState(0);
-  const [currentExpeditionId, setCurrentExpeditionId] = useState<string | null>(null);
   const { toast } = useToast();
-
-  const startExpeditionMutation = useMutation({
-    mutationFn: () => apiRequest("POST", "/api/expeditions", {
-      playerId,
-      biomeId: biome?.id,
-      selectedResources,
-      selectedEquipment,
-    }),
-    onSuccess: (expedition: any) => {
-      console.log("Expedition created:", expedition);
-      setCurrentExpeditionId(expedition.id);
-      setCurrentStep("expedition-progress");
-      simulateExpedition(expedition.id);
-    },
-    onError: () => {
-      toast({
-        title: "Erro",
-        description: "Falha ao iniciar expedição.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const completeExpeditionMutation = useMutation({
-    mutationFn: (expeditionId: string) => apiRequest("POST", `/api/expeditions/${expeditionId}/complete`),
-    onSuccess: (result: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      
-      const resourceNames = Object.keys(result.collectedResources)
-        .map(id => resources.find(r => r.id === id)?.name)
-        .filter(Boolean)
-        .slice(0, 3)
-        .join(", ");
-      
-      toast({
-        title: "Expedição Completa!",
-        description: `Recursos coletados: ${resourceNames}`,
-      });
-      
-      handleClose();
-    },
-    onError: () => {
-      toast({
-        title: "Erro",
-        description: "Falha ao completar expedição.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const simulateExpedition = (expeditionId: string) => {
-    console.log("Starting simulation with ID:", expeditionId);
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      setExpeditionProgress(progress);
-      
-      if (progress >= 100) {
-        clearInterval(interval);
-        setTimeout(() => {
-          console.log("Completing expedition with ID:", expeditionId);
-          if (expeditionId) {
-            completeExpeditionMutation.mutate(expeditionId);
-          } else {
-            console.error("No expedition ID available!");
-          }
-        }, 1000);
-      }
-    }, 500);
-  };
 
   const handleClose = () => {
     setCurrentStep("resource-selection");
     setSelectedResources([]);
     setSelectedEquipment([]);
-    setExpeditionProgress(0);
-    setCurrentExpeditionId(null);
     onClose();
   };
 
@@ -237,9 +162,8 @@ export default function ExpeditionModal({
                 ⬅️ Voltar: Recursos
               </button>
               <button
-                onClick={() => startExpeditionMutation.mutate()}
-                disabled={startExpeditionMutation.isPending}
-                className="bg-forest hover:bg-adventure-600 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                onClick={() => onStartExpedition(selectedResources, selectedEquipment)}
+                className="bg-forest hover:bg-adventure-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
               >
                 🚀 Iniciar Expedição
               </button>
@@ -247,48 +171,7 @@ export default function ExpeditionModal({
           </div>
         )}
 
-        {/* Expedition Progress Step */}
-        {currentStep === "expedition-progress" && (
-          <div className="text-center space-y-6">
-            <div className="text-6xl mb-4">🏃‍♂️</div>
-            <h4 className="text-xl font-semibold text-gray-800">Expedição em Andamento</h4>
-            <p className="text-gray-600">Coletando recursos na {biome.name.toLowerCase()}...</p>
-            
-            {/* Progress Bar */}
-            <div className="space-y-2">
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div 
-                  className="bg-gradient-to-r from-forest to-adventure-600 h-4 rounded-full transition-all duration-1000"
-                  style={{ width: `${expeditionProgress}%` }}
-                />
-              </div>
-              <p className="text-sm text-gray-600">Progresso: {expeditionProgress}%</p>
-            </div>
-            
-            {/* Collected Resources Preview */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h5 className="font-semibold text-gray-800 mb-3">📦 Recursos Coletados:</h5>
-              <div className="flex justify-center space-x-6">
-                {selectedResources.slice(0, 3).map((resourceId) => {
-                  const resource = resources.find(r => r.id === resourceId);
-                  return (
-                    <div key={resourceId} className="text-center">
-                      <span className="text-2xl">{resource?.emoji}</span>
-                      <div className="text-sm font-semibold">+{Math.floor(Math.random() * 10) + 1}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            
-            <button
-              onClick={handleClose}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-            >
-              ❌ Cancelar Expedição
-            </button>
-          </div>
-        )}
+
       </DialogContent>
     </Dialog>
   );

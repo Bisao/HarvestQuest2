@@ -1,9 +1,17 @@
 import { useState } from "react";
 
+interface ActiveExpedition {
+  id: string;
+  biomeId: string;
+  progress: number;
+  selectedResources: string[];
+}
+
 interface GameState {
   activeTab: string;
   expeditionModalOpen: boolean;
   selectedBiome: string | null;
+  activeExpedition: ActiveExpedition | null;
 }
 
 export function useGameState() {
@@ -11,6 +19,7 @@ export function useGameState() {
     activeTab: "biomes",
     expeditionModalOpen: false,
     selectedBiome: null,
+    activeExpedition: null,
   });
 
   const updateGameState = (updates: Partial<GameState>) => {

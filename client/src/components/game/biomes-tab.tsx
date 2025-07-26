@@ -1,13 +1,22 @@
 import type { Biome, Resource } from "@shared/schema";
 
+interface ActiveExpedition {
+  id: string;
+  biomeId: string;
+  progress: number;
+  selectedResources: string[];
+}
+
 interface BiomesTabProps {
   biomes: Biome[];
   resources: Resource[];
   playerLevel: number;
+  activeExpedition: ActiveExpedition | null;
   onExploreBiome: (biome: Biome) => void;
+  onCompleteExpedition: (expeditionId: string) => void;
 }
 
-export default function BiomesTab({ biomes, resources, playerLevel, onExploreBiome }: BiomesTabProps) {
+export default function BiomesTab({ biomes, resources, playerLevel, activeExpedition, onExploreBiome, onCompleteExpedition }: BiomesTabProps) {
   const getResourcesForBiome = (biome: Biome) => {
     const resourceIds = biome.availableResources as string[];
     return resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
@@ -20,12 +29,15 @@ export default function BiomesTab({ biomes, resources, playerLevel, onExploreBio
       {biomes.map((biome) => {
         const biomeResources = getResourcesForBiome(biome);
         const unlocked = isUnlocked(biome);
+        const hasActiveExpedition = activeExpedition && activeExpedition.biomeId === biome.id;
 
         return (
           <div
             key={biome.id}
             className={`biome-card rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow ${
-              unlocked
+              hasActiveExpedition
+                ? "bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300"
+                : unlocked
                 ? "bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200"
                 : "bg-gradient-to-br from-gray-50 to-slate-100 border-2 border-gray-300 opacity-60"
             }`}
@@ -34,38 +46,94 @@ export default function BiomesTab({ biomes, resources, playerLevel, onExploreBio
               <div className={`text-6xl mb-2 ${!unlocked ? "grayscale" : ""}`}>
                 {biome.emoji}
               </div>
-              <h3 className={`text-xl font-bold ${unlocked ? "text-green-800" : "text-gray-600"}`}>
+              <h3 className={`text-xl font-bold ${
+                hasActiveExpedition ? "text-blue-800" : unlocked ? "text-green-800" : "text-gray-600"
+              }`}>
                 {biome.name}
               </h3>
-              <p className={`text-sm ${unlocked ? "text-green-600" : "text-red-500"}`}>
-                {unlocked ? `Nível necessário: ${biome.requiredLevel}` : `🔒 Nível necessário: ${biome.requiredLevel}`}
+              <p className={`text-sm ${
+                hasActiveExpedition ? "text-blue-600" : unlocked ? "text-green-600" : "text-red-500"
+              }`}>
+                {hasActiveExpedition 
+                  ? "🚀 Expedição em andamento" 
+                  : unlocked 
+                  ? `Nível necessário: ${biome.requiredLevel}` 
+                  : `🔒 Nível necessário: ${biome.requiredLevel}`
+                }
               </p>
             </div>
 
-            <div className="mb-4">
-              <h4 className={`font-semibold text-sm mb-2 ${unlocked ? "text-gray-700" : "text-gray-500"}`}>
-                Recursos Disponíveis:
-              </h4>
-              <div className={`grid grid-cols-2 gap-2 text-sm ${unlocked ? "" : "text-gray-500"}`}>
-                {biomeResources.map((resource) => (
-                  <div key={resource.id} className="flex items-center space-x-1">
-                    <span>{resource.emoji}</span>
-                    <span>{resource.name}</span>
+            {hasActiveExpedition ? (
+              <div className="mb-4">
+                <h4 className="font-semibold text-sm mb-2 text-blue-700">
+                  🎯 Coletando Recursos:
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                  {activeExpedition.selectedResources.map((resourceId) => {
+                    const resource = resources.find(r => r.id === resourceId);
+                    return resource ? (
+                      <div key={resourceId} className="flex items-center space-x-1 text-blue-700">
+                        <span>{resource.emoji}</span>
+                        <span>{resource.name}</span>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="space-y-2">
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
+                      style={{ width: `${activeExpedition.progress}%` }}
+                    />
                   </div>
-                ))}
+                  <p className="text-xs text-blue-600 text-center">Progresso: {activeExpedition.progress}%</p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="mb-4">
+                <h4 className={`font-semibold text-sm mb-2 ${unlocked ? "text-gray-700" : "text-gray-500"}`}>
+                  Recursos Disponíveis:
+                </h4>
+                <div className={`grid grid-cols-2 gap-2 text-sm ${unlocked ? "" : "text-gray-500"}`}>
+                  {biomeResources.map((resource) => (
+                    <div key={resource.id} className="flex items-center space-x-1">
+                      <span>{resource.emoji}</span>
+                      <span>{resource.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <button
-              onClick={() => unlocked && onExploreBiome(biome)}
-              disabled={!unlocked}
+              onClick={() => {
+                if (hasActiveExpedition && activeExpedition.progress >= 100) {
+                  onCompleteExpedition(activeExpedition.id);
+                } else if (unlocked && !hasActiveExpedition) {
+                  onExploreBiome(biome);
+                }
+              }}
+              disabled={!unlocked || (hasActiveExpedition && activeExpedition.progress < 100)}
               className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors ${
-                unlocked
+                hasActiveExpedition && activeExpedition.progress >= 100
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : hasActiveExpedition
+                  ? "bg-orange-500 text-white cursor-not-allowed"
+                  : unlocked
                   ? "bg-green-600 hover:bg-green-700 text-white"
                   : "bg-gray-400 text-gray-600 cursor-not-allowed"
               }`}
             >
-              {unlocked ? "🧭 Explorar Bioma" : "🔒 Bloqueado"}
+              {hasActiveExpedition && activeExpedition.progress >= 100
+                ? "✅ Finalizar Expedição"
+                : hasActiveExpedition
+                ? "⏳ Em Andamento..."
+                : unlocked
+                ? "🧭 Explorar Bioma"
+                : "🔒 Bloqueado"
+              }
             </button>
           </div>
         );

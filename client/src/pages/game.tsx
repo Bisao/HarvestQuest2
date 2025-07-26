@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useRef } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
 import InventoryTab from "@/components/game/inventory-tab";
@@ -7,12 +7,16 @@ import StorageTab from "@/components/game/storage-tab";
 import CraftingTab from "@/components/game/crafting-tab";
 import ExpeditionModal from "@/components/game/expedition-modal";
 import { useGameState } from "@/hooks/use-game-state";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema";
 
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { toast } = useToast();
 
   const { gameState, updateGameState } = useGameState();
 
@@ -43,9 +47,127 @@ export default function Game() {
     { id: "crafting", label: "Crafting", emoji: "🔨" },
   ];
 
+  // Expedição mutation
+  const startExpeditionMutation = useMutation({
+    mutationFn: async (expeditionData: { 
+      playerId: string; 
+      biomeId: string; 
+      selectedResources: string[]; 
+      equipment: string[] 
+    }) => {
+      const response = await apiRequest('POST', '/api/expeditions', expeditionData);
+      return response.json();
+    },
+    onSuccess: (expedition) => {
+      console.log('Expedition started:', expedition);
+      
+      // Define o estado da expedição ativa
+      updateGameState({ 
+        activeExpedition: {
+          id: expedition.id,
+          biomeId: expedition.biomeId,
+          progress: 0,
+          selectedResources: expedition.selectedResources
+        },
+        expeditionModalOpen: false
+      });
+
+      // Inicia a simulação de progresso
+      startProgressSimulation(expedition.id);
+      
+      toast({
+        title: "Expedição iniciada!",
+        description: "Sua expedição está em andamento. Aguarde a coleta dos recursos.",
+      });
+    },
+    onError: (error) => {
+      console.error('Error starting expedition:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível iniciar a expedição. Tente novamente.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const completeExpeditionMutation = useMutation({
+    mutationFn: async (expeditionId: string) => {
+      const response = await apiRequest('POST', `/api/expeditions/${expeditionId}/complete`);
+      return response.json();
+    },
+    onSuccess: () => {
+      // Limpar expedição ativa
+      updateGameState({ activeExpedition: null });
+      
+      // Limpar intervalo se existir
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+
+      // Atualizar dados do jogador
+      queryClient.invalidateQueries({ queryKey: ['/api/player', 'Player1'] });
+      
+      toast({
+        title: "Expedição concluída!",
+        description: "Os recursos foram adicionados ao seu inventário.",
+      });
+    },
+    onError: (error) => {
+      console.error('Error completing expedition:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível finalizar a expedição.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Função para simular progresso da expedição
+  const startProgressSimulation = (expeditionId: string) => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    let progress = 0;
+    intervalRef.current = setInterval(() => {
+      progress += Math.random() * 10 + 5; // Incremento aleatório entre 5-15%
+      
+      if (progress >= 100) {
+        progress = 100;
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      }
+
+      updateGameState({ 
+        activeExpedition: gameState.activeExpedition ? {
+          ...gameState.activeExpedition,
+          progress: Math.floor(progress)
+        } : null
+      });
+    }, 1000); // Atualiza a cada segundo
+  };
+
   const handleExploreBiome = (biome: Biome) => {
     setSelectedBiome(biome);
     setExpeditionModalOpen(true);
+  };
+
+  const handleStartExpedition = (selectedResources: string[], equipment: string[]) => {
+    if (!selectedBiome || !player) return;
+
+    startExpeditionMutation.mutate({
+      playerId: player.id,
+      biomeId: selectedBiome.id,
+      selectedResources,
+      equipment
+    });
+  };
+
+  const handleCompleteExpedition = (expeditionId: string) => {
+    completeExpeditionMutation.mutate(expeditionId);
   };
 
   if (!player) {
@@ -89,7 +211,9 @@ export default function Game() {
                 biomes={biomes}
                 resources={resources}
                 playerLevel={player.level}
+                activeExpedition={gameState.activeExpedition}
                 onExploreBiome={handleExploreBiome}
+                onCompleteExpedition={handleCompleteExpedition}
               />
             )}
 
@@ -128,6 +252,7 @@ export default function Game() {
         resources={resources}
         equipment={equipment}
         playerId={player.id}
+        onStartExpedition={handleStartExpedition}
       />
     </div>
   );
