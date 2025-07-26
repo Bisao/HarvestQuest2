@@ -25,4 +25,18 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Delete a save slot (player)
+router.delete("/:playerId", async (req, res) => {
+  try {
+    const { playerId } = req.params;
+    
+    await storage.deletePlayer(playerId);
+    
+    res.json({ message: "Jogo deletado com sucesso" });
+  } catch (error) {
+    console.error("Error deleting save:", error);
+    res.status(500).json({ message: "Falha ao deletar o jogo" });
+  }
+});
+
 export default router;
