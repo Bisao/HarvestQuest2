@@ -11,6 +11,10 @@ Preferred communication style: Simple, everyday language.
 **January 26, 2025**
 - Successfully migrated project from Replit Agent to Replit environment
 - **Project Migration Completed** - All systems verified and fully functional
+- **Enhanced Knife Detection System** - Fixed complete collection system to recognize knife as both tool and weapon
+- **Improved Equipment Verification** - Enhanced hasRequiredTool() function to check both tool and weapon slots
+- **Updated Expedition UI** - Frontend now shows both equipped tool and weapon status with knife detection
+- **Fixed TypeScript Errors** - Resolved all LSP diagnostics for production-ready code
 - **Fixed "Guardar Tudo" button** - Store all inventory items functionality working correctly
 - **Animal Processing System Verified** - Coelho, Javali, Veado correctly generate Carne, Couro, Ossos, Pelo resources
 - **Faca confirmed in Tools category** - Equipment properly categorized  

@@ -86,20 +86,29 @@ export default function ExpeditionSystem({
   const getCollectableResources = () => {
     const biomeResources = getBiomeResources();
     
-    // Get player's equipped tool
+    // Get player's equipped tool and weapon
     const equippedTool = player.equippedTool ? 
       equipment.find(eq => eq.id === player.equippedTool) : null;
+    const equippedWeapon = player.equippedWeapon ? 
+      equipment.find(eq => eq.id === player.equippedWeapon) : null;
     
     return biomeResources.filter(resource => {
       // If resource doesn't require a tool, it's always collectable
       if (!resource.requiredTool) return true;
       
-      // If resource requires a tool, check if player has the right tool equipped
-      if (equippedTool && equippedTool.toolType === resource.requiredTool) {
-        return true;
+      // Special case for hunting: requires weapon AND knife
+      if (resource.requiredTool === "weapon_and_knife") {
+        const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
+        const hasKnife = (equippedTool && equippedTool.toolType === "knife") || 
+                         (equippedWeapon && equippedWeapon.toolType === "knife");
+        return !!(hasNonKnifeWeapon && hasKnife);
       }
       
-      return false;
+      // Regular tool checks - check both tool and weapon slots for the required tool
+      const hasRequiredTool = (equippedTool && equippedTool.toolType === resource.requiredTool) ||
+                             (equippedWeapon && equippedWeapon.toolType === resource.requiredTool);
+      
+      return hasRequiredTool;
     });
   };
 
@@ -380,16 +389,35 @@ export default function ExpeditionSystem({
               {/* Equipment Status */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-800 mb-2">⛏️ Status dos Equipamentos</h4>
-                <div className="text-sm text-blue-600">
+                <div className="text-sm text-blue-600 space-y-1">
                   {player.equippedTool ? (
                     <div className="flex items-center gap-2">
                       <span className="text-green-600">✓</span>
-                      Ferramenta equipada: {equipment.find(eq => eq.id === player.equippedTool)?.name}
+                      Ferramenta: {equipment.find(eq => eq.id === player.equippedTool)?.name}
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <span className="text-orange-500">⚠️</span>
-                      Nenhuma ferramenta equipada - apenas recursos básicos disponíveis
+                      Nenhuma ferramenta equipada
+                    </div>
+                  )}
+                  {player.equippedWeapon ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600">✓</span>
+                      Arma: {equipment.find(eq => eq.id === player.equippedWeapon)?.name}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="text-orange-500">⚠️</span>
+                      Nenhuma arma equipada
+                    </div>
+                  )}
+                  {/* Special note about knife versatility */}
+                  {((player.equippedTool && equipment.find(eq => eq.id === player.equippedTool)?.toolType === "knife") ||
+                    (player.equippedWeapon && equipment.find(eq => eq.id === player.equippedWeapon)?.toolType === "knife")) && (
+                    <div className="flex items-center gap-2 text-green-700">
+                      <span>🗡️</span>
+                      Faca detectada - permite esfolar animais caçados
                     </div>
                   )}
                 </div>
