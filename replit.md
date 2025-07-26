@@ -10,8 +10,10 @@ Preferred communication style: Simple, everyday language.
 
 **January 26, 2025**
 - **✅ MIGRAÇÃO COMPLETADA COM SUCESSO**: Projeto totalmente migrado do Replit Agent para ambiente Replit
-- **✅ SISTEMA DE PERSISTÊNCIA IMPLEMENTADO**: Adicionado sistema de persistência em arquivo JSON para evitar perda de dados
+- **✅ SISTEMA DE PERSISTÊNCIA IMPLEMENTADO**: Migrado para banco de dados SQLite para melhor performance e estabilidade
 - **✅ TODAS AS FUNCIONALIDADES VERIFICADAS**: Criação, carregamento, deleção e persistência de players funcionando perfeitamente
+- **✅ DATABASE MIGRATION**: Successfully migrated from PostgreSQL to SQLite for Replit compatibility
+- **✅ SAVE SYSTEM VERIFIED**: All profile management functions working correctly with persistent storage
 - **Fixed Auto-Repeat Expedition System** - Completely rebuilt timer management to prevent stuck countdown and properly restart after expedition completion
 - **Energy System Completely Removed** - Removed all references to energy from codebase, now using only hunger and thirst
 - Updated expedition requirements to use minimum 30 hunger and thirst instead of energy checks
@@ -154,9 +156,9 @@ Preferred communication style: Simple, everyday language.
 
 ### Database Layer
 - **ORM**: Drizzle ORM for type-safe database operations
-- **Database**: PostgreSQL (configured for Neon serverless)
-- **Schema Management**: Drizzle Kit for migrations and schema generation
-- **Connection**: Neon serverless driver for PostgreSQL
+- **Database**: SQLite (using better-sqlite3 for Replit compatibility)
+- **Schema Management**: Manual table creation for SQLite compatibility
+- **Connection**: Local SQLite database file for persistent storage
 
 ## Key Components
 

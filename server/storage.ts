@@ -467,7 +467,7 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use MemStorage for Replit environment
-// import { DatabaseStorage } from "./storage-database";
+// Use SQLite database for better persistence
+import { SQLiteStorage } from "./storage-sqlite";
 
-export const storage = new MemStorage();
+export const storage = new SQLiteStorage();
