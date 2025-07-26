@@ -46,6 +46,15 @@ export default function EnhancedInventory({
     queryKey: ["/api/inventory", playerId],
   });
 
+  // Helper functions to get items by ID
+  const getResourceById = (resourceId: string) => {
+    return resources.find(r => r.id === resourceId);
+  };
+  
+  const getItemById = (itemId: string) => {
+    return resources.find(r => r.id === itemId) || equipment.find(e => e.id === itemId);
+  };
+
   // Filter out water from inventory since it goes to special compartment
   const inventory = inventoryData.filter(item => {
     const resource = getResourceById(item.resourceId);
@@ -103,7 +112,6 @@ export default function EnhancedInventory({
   const inventoryCols = 9;
   const totalSlots = inventoryRows * inventoryCols;
 
-  const getResourceById = (id: string) => resources.find(r => r.id === id);
   const getEquipmentById = (id: string) => equipment.find(e => e.id === id);
 
   const equipItemMutation = useMutation({
@@ -262,7 +270,7 @@ export default function EnhancedInventory({
 
   const renderInventorySlot = (slotIndex: number) => {
     const item = inventory[slotIndex];
-    const resource = item ? getResourceById(item.resourceId) : null;
+    const itemData = item ? getItemById(item.resourceId) : null;
     
     return (
       <TooltipProvider key={slotIndex}>
@@ -277,16 +285,16 @@ export default function EnhancedInventory({
                 ${item ? "bg-white border-solid" : "bg-gray-50 border-dashed"}
               `}
             >
-              {resource && item ? (
+              {itemData && item ? (
                 <>
-                  <span className="text-xl">{resource.emoji}</span>
+                  <span className="text-xl">{itemData.emoji}</span>
                   <span className="absolute bottom-1 right-1 text-xs font-bold bg-gray-800 text-white rounded px-1">
                     {item.quantity}
                   </span>
-                  {resource.rarity === "rare" && (
+                  {'rarity' in itemData && itemData.rarity === "rare" && (
                     <div className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full"></div>
                   )}
-                  {resource.rarity === "uncommon" && (
+                  {'rarity' in itemData && itemData.rarity === "uncommon" && (
                     <div className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></div>
                   )}
                 </>
@@ -296,18 +304,20 @@ export default function EnhancedInventory({
             </div>
           </TooltipTrigger>
           <TooltipContent>
-            {resource && item ? (
+            {itemData && item ? (
               <div>
-                <p className="font-semibold">{resource.name}</p>
+                <p className="font-semibold">{itemData.name}</p>
                 <p className="text-sm">Quantidade: {item.quantity}</p>
-                <p className="text-sm">Peso: {resource.weight * item.quantity}kg</p>
-                <Badge variant={
-                  resource.rarity === "rare" ? "destructive" : 
-                  resource.rarity === "uncommon" ? "secondary" : "outline"
-                } className="text-xs">
-                  {resource.rarity === "common" ? "Comum" : 
-                   resource.rarity === "uncommon" ? "Incomum" : "Raro"}
-                </Badge>
+                <p className="text-sm">Peso: {itemData.weight * item.quantity}kg</p>
+                {'rarity' in itemData && (
+                  <Badge variant={
+                    itemData.rarity === "rare" ? "destructive" : 
+                    itemData.rarity === "uncommon" ? "secondary" : "outline"
+                  } className="text-xs">
+                    {itemData.rarity === "common" ? "Comum" : 
+                     itemData.rarity === "uncommon" ? "Incomum" : "Raro"}
+                  </Badge>
+                )}
               </div>
             ) : (
               <p>Slot vazio</p>
@@ -466,44 +476,57 @@ export default function EnhancedInventory({
               <Card className="bg-gray-50">
                 <CardContent className="pt-4">
                   {(() => {
-                    const resource = getResourceById(selectedItem.resourceId);
-                    if (resource) {
+                    const itemData = getItemById(selectedItem.resourceId);
+                    if (itemData) {
+                      const isResource = 'rarity' in itemData;
+                      const isEquipment = 'slot' in itemData;
                       return (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <span className="text-3xl">{resource.emoji}</span>
+                            <span className="text-3xl">{itemData.emoji}</span>
                             <div>
-                              <h4 className="font-semibold text-lg">{resource.name}</h4>
+                              <h4 className="font-semibold text-lg">{itemData.name}</h4>
                               <p className="text-sm text-gray-600">
-                                Quantidade: {selectedItem.quantity} • Peso total: {resource.weight * selectedItem.quantity}kg
+                                Quantidade: {selectedItem.quantity} • Peso total: {itemData.weight * selectedItem.quantity}kg
                               </p>
-                              <p className="text-sm text-gray-600">
-                                Valor unitário: {resource.value} moedas
-                              </p>
+                              {isResource && 'value' in itemData && (
+                                <p className="text-sm text-gray-600">
+                                  Valor unitário: {itemData.value} moedas
+                                </p>
+                              )}
                               <div className="flex gap-2 mt-2">
-                                <Badge variant={
-                                  resource.rarity === "rare" ? "destructive" : 
-                                  resource.rarity === "uncommon" ? "secondary" : "outline"
-                                }>
-                                  {resource.rarity === "common" ? "Comum" : 
-                                   resource.rarity === "uncommon" ? "Incomum" : "Raro"}
-                                </Badge>
-                                <Badge variant="outline">
-                                  {resource.type === "basic" ? "Básico" : "Único"}
-                                </Badge>
+                                {isResource && 'rarity' in itemData && (
+                                  <Badge variant={
+                                    itemData.rarity === "rare" ? "destructive" : 
+                                    itemData.rarity === "uncommon" ? "secondary" : "outline"
+                                  }>
+                                    {itemData.rarity === "common" ? "Comum" : 
+                                     itemData.rarity === "uncommon" ? "Incomum" : "Raro"}
+                                  </Badge>
+                                )}
+                                {isResource && 'type' in itemData && (
+                                  <Badge variant="outline">
+                                    {itemData.type === "basic" ? "Básico" : "Único"}
+                                  </Badge>
+                                )}
+                                {isEquipment && (
+                                  <Badge variant="secondary">
+                                    Equipamento
+                                  </Badge>
+                                )}
                               </div>
                             </div>
                           </div>
                           <div className="flex flex-col gap-2">
                             {/* Show consume button for food items */}
-                            {resource && (resource.name === "Frutas Silvestres" || 
-                              resource.name === "Cogumelos" || 
-                              resource.name === "Suco de Frutas" ||
-                              resource.name === "Cogumelos Assados" ||
-                              resource.name === "Peixe Grelhado" ||
-                              resource.name === "Carne Assada" ||
-                              resource.name === "Ensopado de Carne" ||
-                              resource.name === "Água Fresca") && (
+                            {itemData && (itemData.name === "Frutas Silvestres" || 
+                              itemData.name === "Cogumelos" || 
+                              itemData.name === "Suco de Frutas" ||
+                              itemData.name === "Cogumelos Assados" ||
+                              itemData.name === "Peixe Grelhado" ||
+                              itemData.name === "Carne Assada" ||
+                              itemData.name === "Ensopado de Carne" ||
+                              itemData.name === "Água Fresca") && (
                               <Button
                                 variant="default"
                                 size="sm"

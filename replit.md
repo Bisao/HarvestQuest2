@@ -67,6 +67,8 @@ Preferred communication style: Simple, everyday language.
 - **Updated crafting system** to respect player's preferred destination for crafted items
 - Added settings button to game header for easy access to player preferences
 - Improved API with player settings endpoint for real-time configuration updates
+- **Fixed inventory TypeScript errors** - resolved issues with mixed resource/equipment types causing crashes
+- **Enhanced type safety** in inventory component with proper type checking for resources vs equipment
 
 ## System Architecture
 
