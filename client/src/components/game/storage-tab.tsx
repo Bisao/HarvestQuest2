@@ -25,17 +25,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
     queryKey: ["/api/storage", playerId],
   });
 
-  const updateAutoStorageMutation = useMutation({
-    mutationFn: (autoStorageEnabled: boolean) => 
-      apiRequest("PATCH", `/api/player/${playerId}/auto-storage`, { autoStorage: autoStorageEnabled }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      toast({
-        title: "Configuração atualizada",
-        description: `Armazenamento ${autoStorage ? "manual" : "automático"} ativado.`,
-      });
-    },
-  });
+
 
   const withdrawMutation = useMutation({
     mutationFn: ({ storageItemId, quantity }: { storageItemId: string; quantity: number }) =>
@@ -177,40 +167,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
 
   return (
     <div>
-      {/* Storage Configuration */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span className="text-2xl">⚙️</span>
-            <div>
-              <h3 className="font-semibold text-blue-800">Configurações de Armazenamento</h3>
-              <p className="text-sm text-blue-600">Escolha como gerenciar seus recursos</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="radio"
-                name="storage-mode"
-                checked={!autoStorage}
-                onChange={() => updateAutoStorageMutation.mutate(false)}
-                className="text-blue-600"
-              />
-              <span className="text-sm font-medium">Manual</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="radio"
-                name="storage-mode"
-                checked={autoStorage}
-                onChange={() => updateAutoStorageMutation.mutate(true)}
-                className="text-blue-600"
-              />
-              <span className="text-sm font-medium">Automático</span>
-            </label>
-          </div>
-        </div>
-      </div>
+
 
       {/* Water Storage Compartment */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
