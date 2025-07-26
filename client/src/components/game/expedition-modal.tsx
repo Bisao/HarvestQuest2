@@ -67,7 +67,7 @@ export default function ExpeditionModal({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogTitle className="sr-only">Expedição na {biome.name}</DialogTitle>
         <DialogDescription className="sr-only">Prepare-se para a coleta de recursos no bioma {biome.name}</DialogDescription>
-        
+
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-forest to-adventure-600 text-white p-6 rounded-t-xl -m-6 mb-6">
           <div className="flex items-center justify-between">

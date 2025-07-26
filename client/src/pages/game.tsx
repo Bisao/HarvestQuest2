@@ -53,7 +53,9 @@ export default function Game() {
       playerId: string; 
       biomeId: string; 
       selectedResources: string[]; 
-      equipment: string[] 
+      equipment: string[];
+      status: string;
+      startTime: number;
     }) => {
       const response = await apiRequest('POST', '/api/expeditions', expeditionData);
       return response.json();
@@ -162,7 +164,9 @@ export default function Game() {
       playerId: player.id,
       biomeId: selectedBiome.id,
       selectedResources,
-      equipment
+      equipment,
+      status: "active",
+      startTime: Date.now()
     });
   };
 
