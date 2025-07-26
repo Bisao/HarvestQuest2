@@ -17,7 +17,7 @@ interface StorageTabProps {
 export default function StorageTab({ playerId, resources, equipment, autoStorage, isBlocked = false }: StorageTabProps) {
   const { toast } = useToast();
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
-  const [selectedResource, setSelectedResource] = useState<{ id: string; name: string; available: number } | null>(null);
+  const [selectedResource, setSelectedResource] = useState<{ storageItemId: string; resourceId: string; name: string; available: number } | null>(null);
   const [withdrawAmount, setWithdrawAmount] = useState(1);
 
   const { data: storage = [] } = useQuery<StorageItem[]>({
@@ -37,8 +37,8 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
   });
 
   const withdrawMutation = useMutation({
-    mutationFn: ({ resourceId, quantity }: { resourceId: string; quantity: number }) =>
-      apiRequest("POST", "/api/storage/withdraw", { playerId, resourceId, quantity }),
+    mutationFn: ({ storageItemId, quantity }: { storageItemId: string; quantity: number }) =>
+      apiRequest("POST", "/api/storage/withdraw", { playerId, storageItemId, quantity }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
@@ -112,7 +112,8 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
     if (!itemData) return;
 
     setSelectedResource({
-      id: storageItem.resourceId,
+      storageItemId: storageItem.id,
+      resourceId: storageItem.resourceId,
       name: itemData.name,
       available: storageItem.quantity,
     });
@@ -123,7 +124,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
   const confirmWithdraw = () => {
     if (!selectedResource) return;
     withdrawMutation.mutate({
-      resourceId: selectedResource.id,
+      storageItemId: selectedResource.storageItemId,
       quantity: withdrawAmount,
     });
   };
