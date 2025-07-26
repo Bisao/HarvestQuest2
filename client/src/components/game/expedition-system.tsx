@@ -273,17 +273,17 @@ export default function ExpeditionSystem({
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="expedition-description">
+      <DialogContent className="max-w-4xl max-h-[95vh] w-[95vw] md:w-full overflow-y-auto" aria-describedby="expedition-description">
         <div id="expedition-description" className="sr-only">
           Modal para configurar e executar expedições de coleta de recursos
         </div>
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-4xl">{biome.emoji}</span>
+            <div className="flex items-center gap-2 md:gap-3">
+              <span className="text-2xl md:text-4xl">{biome.emoji}</span>
               <div>
-                <h2 className="text-2xl font-bold">Expedição na {biome.name}</h2>
-                <p className="text-sm text-muted-foreground">
+                <h2 className="text-lg md:text-2xl font-bold">Expedição na {biome.name}</h2>
+                <p className="text-xs md:text-sm text-muted-foreground">
                   {phase === "setup" && "Configure sua expedição"}
                   {phase === "resource-selection" && "Escolha os recursos para coletar"}
                   {phase === "confirmation" && "Confirme os detalhes da expedição"}
@@ -344,7 +344,7 @@ export default function ExpeditionSystem({
                 {/* Show available vs collectable resources */}
                 <div className="mb-6">
                   <h4 className="font-semibold mb-3">Recursos Disponíveis ({collectableResources.length}/{getBiomeResources().length} coletáveis)</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                     {getBiomeResources().map(resource => {
                       const isCollectable = collectableResources.some(cr => cr.id === resource.id);
                       return (

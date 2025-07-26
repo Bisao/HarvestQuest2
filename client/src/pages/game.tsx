@@ -118,30 +118,31 @@ export default function Game() {
     <div className="min-h-screen bg-gray-50 font-sans">
       <GameHeader player={player} />
       
-      <main className="container mx-auto px-4 py-6">
-        <div className="bg-white rounded-lg shadow-lg mb-6">
+      <main className="container mx-auto px-2 md:px-4 py-3 md:py-6">
+        <div className="bg-white rounded-lg shadow-lg mb-4 md:mb-6">
           {/* Tab Navigation */}
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-1">
+            <nav className="flex space-x-1 overflow-x-auto scrollbar-hide">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                  className={`flex items-center space-x-1 md:space-x-2 px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                     activeTab === tab.id
                       ? "border-forest text-forest"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                   }`}
                 >
-                  <span className="text-lg">{tab.emoji}</span>
-                  <span>{tab.label}</span>
+                  <span className="text-base md:text-lg">{tab.emoji}</span>
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.id === "biomes" ? "Biomas" : tab.id === "inventory" ? "Inv." : tab.id === "storage" ? "Arm." : "Craft"}</span>
                 </button>
               ))}
             </nav>
           </div>
 
           {/* Tab Content */}
-          <div className="p-6">
+          <div className="p-3 md:p-6">
             {activeTab === "biomes" && (
               <BiomesTab
                 biomes={biomes}

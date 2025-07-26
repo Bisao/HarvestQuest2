@@ -40,7 +40,7 @@ export default function BiomesTab({ biomes, resources, equipment, player, player
   const isUnlocked = (biome: Biome) => playerLevel >= biome.requiredLevel;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {biomes.map((biome) => {
         const biomeResources = getResourcesForBiome(biome);
         const unlocked = isUnlocked(biome);
@@ -49,7 +49,7 @@ export default function BiomesTab({ biomes, resources, equipment, player, player
         return (
           <div
             key={biome.id}
-            className={`biome-card rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow ${
+            className={`biome-card rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-shadow ${
               hasActiveExpedition
                 ? "bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300"
                 : unlocked
@@ -58,15 +58,15 @@ export default function BiomesTab({ biomes, resources, equipment, player, player
             }`}
           >
             <div className="text-center mb-4">
-              <div className={`text-6xl mb-2 ${!unlocked ? "grayscale" : ""}`}>
+              <div className={`text-4xl md:text-6xl mb-2 ${!unlocked ? "grayscale" : ""}`}>
                 {biome.emoji}
               </div>
-              <h3 className={`text-xl font-bold ${
+              <h3 className={`text-lg md:text-xl font-bold ${
                 hasActiveExpedition ? "text-blue-800" : unlocked ? "text-green-800" : "text-gray-600"
               }`}>
                 {biome.name}
               </h3>
-              <p className={`text-sm ${
+              <p className={`text-xs md:text-sm ${
                 hasActiveExpedition ? "text-blue-600" : unlocked ? "text-green-600" : "text-red-500"
               }`}>
                 {hasActiveExpedition 
@@ -83,7 +83,7 @@ export default function BiomesTab({ biomes, resources, equipment, player, player
                 <h4 className="font-semibold text-sm mb-2 text-blue-700">
                   🎯 Coletando Recursos:
                 </h4>
-                <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs md:text-sm mb-3">
                   {activeExpedition.selectedResources.map((resourceId) => {
                     const resource = resources.find(r => r.id === resourceId);
                     return resource ? (

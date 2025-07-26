@@ -414,7 +414,7 @@ export default function EnhancedInventory({
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
         {/* Equipment Panel */}
         <Card>
           <CardHeader>
@@ -425,7 +425,7 @@ export default function EnhancedInventory({
           </CardHeader>
           <CardContent>
             {/* Equipment Layout (Minecraft style) */}
-            <div className="grid grid-cols-3 gap-3 max-w-[180px] mx-auto">
+            <div className="grid grid-cols-3 gap-2 md:gap-3 max-w-[140px] md:max-w-[180px] mx-auto">
               {/* Row 0: Helmet */}
               <div></div>
               {renderEquipmentSlot(equipmentSlots[0])}
@@ -469,7 +469,7 @@ export default function EnhancedInventory({
         </Card>
 
         {/* Main Inventory */}
-        <Card className="xl:col-span-3">
+        <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -488,7 +488,7 @@ export default function EnhancedInventory({
           </CardHeader>
           <CardContent>
             {/* Inventory Grid */}
-            <div className="grid grid-cols-9 gap-2 mb-4">
+            <div className="grid grid-cols-6 md:grid-cols-9 gap-1 md:gap-2 mb-4">
               {Array.from({ length: totalSlots }, (_, i) => renderInventorySlot(i))}
             </div>
 
@@ -588,7 +588,7 @@ export default function EnhancedInventory({
           <CardTitle>⚡ Ações Rápidas</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3">
             <Button variant="outline" className="flex items-center gap-2">
               <span>🏪</span>
               Armazém
