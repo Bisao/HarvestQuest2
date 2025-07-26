@@ -22,6 +22,9 @@ Preferred communication style: Simple, everyday language.
 - Added equipment slot system for better item organization and character progression
 - Improved expedition UI with progress indicators, better visual feedback, and smoother user experience
 - Added real-time expedition progress simulation with automatic completion detection
+- **Enhanced crafting and equipment systems** - crafted items now go directly to storage for better item management
+- **Implemented equipment selection modal** - clicking equipment slots opens modal with storage-filtered items by category
+- Added unequip functionality - clicking equipped items removes them from slots
 - Verified all game systems are fully functional: expeditions, inventory, storage, crafting
 
 ## System Architecture

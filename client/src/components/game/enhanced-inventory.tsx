@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import EquipmentSelectorModal from "./equipment-selector-modal";
 import type { Resource, Equipment, Player } from "@shared/schema";
 
 interface InventoryItem {
@@ -31,6 +32,12 @@ export default function EnhancedInventory({
 }: EnhancedInventoryProps) {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [equipmentModalOpen, setEquipmentModalOpen] = useState(false);
+  const [selectedEquipmentSlot, setSelectedEquipmentSlot] = useState<{
+    id: string;
+    name: string;
+    equipped: string | null;
+  } | null>(null);
   const { toast } = useToast();
 
   const { data: inventory = [] } = useQuery<InventoryItem[]>({
@@ -145,8 +152,19 @@ export default function EnhancedInventory({
       const slotIndex = parseInt(slotId.replace('inv-', ''));
       const item = inventory[slotIndex];
       setSelectedItem(item || null);
+      setSelectedSlot(slotId);
+    } else if (slotType === "equipment") {
+      // Find the equipment slot data
+      const slot = equipmentSlots.find(s => s.id === slotId);
+      if (slot) {
+        setSelectedEquipmentSlot({
+          id: slot.id,
+          name: slot.name,
+          equipped: slot.equipped
+        });
+        setEquipmentModalOpen(true);
+      }
     }
-    setSelectedSlot(slotId);
   };
 
   const handleEquipItem = (slot: string, equipmentId: string | null) => {
@@ -164,9 +182,8 @@ export default function EnhancedInventory({
               onClick={() => handleSlotClick(slot.id, "equipment")}
               className={`
                 aspect-square border-2 rounded-lg flex flex-col items-center justify-center
-                cursor-pointer transition-all hover:scale-105
-                ${selectedSlot === slot.id ? "border-forest bg-green-50 shadow-lg" : "border-gray-300"}
-                ${equippedItem ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-dashed"}
+                cursor-pointer transition-all hover:scale-105 hover:border-blue-400
+                ${equippedItem ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-dashed border-gray-300"}
               `}
             >
               {equippedItem ? (
@@ -477,6 +494,22 @@ export default function EnhancedInventory({
           </div>
         </CardContent>
       </Card>
+
+      {/* Equipment Selector Modal */}
+      {selectedEquipmentSlot && (
+        <EquipmentSelectorModal
+          isOpen={equipmentModalOpen}
+          onClose={() => {
+            setEquipmentModalOpen(false);
+            setSelectedEquipmentSlot(null);
+          }}
+          playerId={playerId}
+          slotType={selectedEquipmentSlot.id}
+          slotName={selectedEquipmentSlot.name}
+          equipment={equipment}
+          currentEquipped={selectedEquipmentSlot.equipped}
+        />
+      )}
     </div>
   );
 }

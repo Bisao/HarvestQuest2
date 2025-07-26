@@ -175,12 +175,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Add crafted items to inventory
+      // Add crafted items to storage
       const outputEntries = Object.entries(recipe.output as Record<string, number>);
-      for (const [equipmentType, quantity] of outputEntries) {
-        // For now, we'll create equipment items as inventory items
-        // This is a simplified implementation - in a real game, you'd have proper equipment inventory
-        console.log(`Crafted ${quantity}x ${equipmentType} for player ${playerId}`);
+      for (const [equipmentId, quantity] of outputEntries) {
+        // Check if equipment item already exists in storage
+        const existingStorageItem = storageItems.find(item => item.resourceId === equipmentId);
+        
+        if (existingStorageItem) {
+          await storage.updateStorageItem(existingStorageItem.id, {
+            quantity: existingStorageItem.quantity + quantity
+          });
+        } else {
+          await storage.addStorageItem({
+            playerId,
+            resourceId: equipmentId,
+            quantity
+          });
+        }
       }
 
       res.json({ message: "Item crafted successfully!", recipe });
