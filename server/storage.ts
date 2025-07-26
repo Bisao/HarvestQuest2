@@ -143,22 +143,7 @@ export class MemStorage implements IStorage {
       equippedTool: null,
     });
 
-    // Add some initial resources to storage for testing crafting
-    await this.addStorageItem({
-      playerId: defaultPlayer.id,
-      resourceId: resourceIds[3], // Madeira
-      quantity: 5,
-    });
-    await this.addStorageItem({
-      playerId: defaultPlayer.id,
-      resourceId: resourceIds[1], // Pedra
-      quantity: 10,
-    });
-    await this.addStorageItem({
-      playerId: defaultPlayer.id,
-      resourceId: resourceIds[0], // Fibra
-      quantity: 8,
-    });
+    
   }
 
   // Player methods
