@@ -117,6 +117,7 @@ export default function Game() {
               <StorageTab
                 playerId={player.id}
                 resources={resources}
+                equipment={equipment}
                 autoStorage={player.autoStorage}
               />
             )}

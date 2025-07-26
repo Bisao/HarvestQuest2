@@ -4,15 +4,16 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import type { StorageItem, Resource } from "@shared/schema";
+import type { StorageItem, Resource, Equipment } from "@shared/schema";
 
 interface StorageTabProps {
   playerId: string;
   resources: Resource[];
+  equipment: Equipment[];
   autoStorage: boolean;
 }
 
-export default function StorageTab({ playerId, resources, autoStorage }: StorageTabProps) {
+export default function StorageTab({ playerId, resources, equipment, autoStorage }: StorageTabProps) {
   const { toast } = useToast();
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<{ id: string; name: string; available: number } | null>(null);
@@ -61,11 +62,44 @@ export default function StorageTab({ playerId, resources, autoStorage }: Storage
     return resources.find(r => r.id === resourceId);
   };
 
+  const getEquipmentData = (equipmentId: string) => {
+    return equipment.find(e => e.id === equipmentId);
+  };
+
+  const getItemData = (itemId: string) => {
+    const resource = getResourceData(itemId);
+    const equip = getEquipmentData(itemId);
+    
+    if (resource) {
+      return {
+        type: 'resource' as const,
+        name: resource.name,
+        emoji: resource.emoji,
+        value: resource.value,
+        rarity: resource.rarity,
+        weight: resource.weight
+      };
+    }
+    
+    if (equip) {
+      return {
+        type: 'equipment' as const,
+        name: equip.name,
+        emoji: equip.emoji,
+        value: 0, // Equipment doesn't have value for now
+        rarity: 'common' as const,
+        weight: equip.weight
+      };
+    }
+    
+    return null;
+  };
+
   const getStorageStats = () => {
     const totalItems = storage.reduce((sum, item) => sum + item.quantity, 0);
     const totalValue = storage.reduce((sum, item) => {
-      const resource = getResourceData(item.resourceId);
-      return sum + (resource ? resource.value * item.quantity : 0);
+      const itemData = getItemData(item.resourceId);
+      return sum + (itemData ? itemData.value * item.quantity : 0);
     }, 0);
     const uniqueTypes = storage.length;
 
@@ -73,12 +107,12 @@ export default function StorageTab({ playerId, resources, autoStorage }: Storage
   };
 
   const handleWithdraw = (storageItem: StorageItem) => {
-    const resource = getResourceData(storageItem.resourceId);
-    if (!resource) return;
+    const itemData = getItemData(storageItem.resourceId);
+    if (!itemData) return;
 
     setSelectedResource({
       id: storageItem.resourceId,
-      name: resource.name,
+      name: itemData.name,
       available: storageItem.quantity,
     });
     setWithdrawAmount(1);
@@ -135,8 +169,8 @@ export default function StorageTab({ playerId, resources, autoStorage }: Storage
       {/* Storage Items */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {storage.map((storageItem) => {
-          const resource = getResourceData(storageItem.resourceId);
-          if (!resource) return null;
+          const itemData = getItemData(storageItem.resourceId);
+          if (!itemData) return null;
 
           return (
             <div
@@ -145,17 +179,19 @@ export default function StorageTab({ playerId, resources, autoStorage }: Storage
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
-                  <span className="text-3xl">{resource.emoji}</span>
+                  <span className="text-3xl">{itemData.emoji}</span>
                   <div>
-                    <h4 className="font-semibold text-gray-800">{resource.name}</h4>
+                    <h4 className="font-semibold text-gray-800">{itemData.name}</h4>
                     <p className="text-sm text-gray-500">
-                      {resource.type === "basic" ? "Recurso básico" : "Recurso único"}
+                      {itemData.type === "equipment" ? "Equipamento" : 
+                       itemData.type === "basic" ? "Recurso básico" : "Recurso único"}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className={`text-2xl font-bold ${
-                    resource.type === "basic" ? "text-green-600" : "text-blue-600"
+                    itemData.type === "equipment" ? "text-purple-600" :
+                    itemData.type === "basic" ? "text-green-600" : "text-blue-600"
                   }`}>
                     {storageItem.quantity}
                   </div>
