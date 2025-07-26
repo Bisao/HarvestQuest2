@@ -88,12 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/expeditions", async (req, res) => {
     try {
       const expeditionData = insertExpeditionSchema.parse(req.body);
-      const expedition = await storage.createExpedition({
-        ...expeditionData,
-        status: "planning",
-        collectedResources: {},
-        progress: 0,
-      });
+      const expedition = await storage.createExpedition(expeditionData);
       res.json(expedition);
     } catch (error) {
       if (error instanceof z.ZodError) {

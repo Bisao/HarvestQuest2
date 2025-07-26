@@ -131,7 +131,7 @@ export default function Game() {
 
     let progress = 0;
     intervalRef.current = setInterval(() => {
-      progress += Math.random() * 10 + 5; // Incremento aleatório entre 5-15%
+      progress += Math.random() * 15 + 10; // Incremento aleatório entre 10-25%
       
       if (progress >= 100) {
         progress = 100;
@@ -147,7 +147,7 @@ export default function Game() {
           progress: Math.floor(progress)
         } : null
       });
-    }, 1000); // Atualiza a cada segundo
+    }, 800); // Atualiza a cada 800ms
   };
 
   const handleExploreBiome = (biome: Biome) => {

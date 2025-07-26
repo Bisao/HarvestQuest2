@@ -119,19 +119,19 @@ export class MemStorage implements IStorage {
       {
         name: "Deserto",
         emoji: "🏜️",
-        requiredLevel: 3,
+        requiredLevel: 2,
         availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[4]], // Fibra, Pedra, Gravetos, Areia
       },
       {
         name: "Montanha",
         emoji: "🏔️",
-        requiredLevel: 8,
+        requiredLevel: 5,
         availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[5]], // Fibra, Pedra, Gravetos, Cristais
       },
       {
         name: "Oceano",
         emoji: "🌊",
-        requiredLevel: 12,
+        requiredLevel: 8,
         availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[6]], // Fibra, Pedra, Gravetos, Conchas
       },
     ];
@@ -169,25 +169,46 @@ export class MemStorage implements IStorage {
     // Initialize recipes
     const recipesData = [
       {
-        name: "Corda",
-        emoji: "🧵",
-        requiredLevel: 1,
-        ingredients: { [resourceIds[0]]: 3, [resourceIds[1]]: 1 }, // 3 Fibra + 1 Pedra
-        output: { "rope": 1 },
-      },
-      {
-        name: "Machado Básico",
+        name: "Machado",
         emoji: "🪓",
         requiredLevel: 1,
-        ingredients: { [resourceIds[3]]: 2, [resourceIds[1]]: 3 }, // 2 Madeira + 3 Pedra
-        output: { "basic_axe": 1 },
+        ingredients: { [resourceIds[3]]: 2, [resourceIds[1]]: 2 }, // 2 Madeira + 2 Pedra
+        output: { "axe": 1 },
       },
       {
-        name: "Vidro",
-        emoji: "🔮",
-        requiredLevel: 8,
-        ingredients: { [resourceIds[4]]: 5 }, // 5 Areia
-        output: { "glass": 1 },
+        name: "Picareta",
+        emoji: "⛏️",
+        requiredLevel: 1,
+        ingredients: { [resourceIds[3]]: 1, [resourceIds[1]]: 3 }, // 1 Madeira + 3 Pedra
+        output: { "pickaxe": 1 },
+      },
+      {
+        name: "Foice",
+        emoji: "🔪",
+        requiredLevel: 1,
+        ingredients: { [resourceIds[3]]: 1, [resourceIds[1]]: 2 }, // 1 Madeira + 2 Pedra
+        output: { "sickle": 1 },
+      },
+      {
+        name: "Faca",
+        emoji: "🗡️",
+        requiredLevel: 1,
+        ingredients: { [resourceIds[3]]: 1, [resourceIds[1]]: 1 }, // 1 Madeira + 1 Pedra
+        output: { "knife": 1 },
+      },
+      {
+        name: "Vara de Pesca",
+        emoji: "🎣",
+        requiredLevel: 1,
+        ingredients: { [resourceIds[3]]: 2, [resourceIds[0]]: 3 }, // 2 Madeira + 3 Fibra
+        output: { "fishing_rod": 1 },
+      },
+      {
+        name: "Espada de Pedra",
+        emoji: "⚔️",
+        requiredLevel: 1,
+        ingredients: { [resourceIds[3]]: 1, [resourceIds[1]]: 4 }, // 1 Madeira + 4 Pedra
+        output: { "stone_sword": 1 },
       },
     ];
 
@@ -198,13 +219,13 @@ export class MemStorage implements IStorage {
     // Create default player
     await this.createPlayer({
       username: "Player1",
-      level: 5,
+      level: 1,
       experience: 0,
-      energy: 85,
+      energy: 100,
       maxEnergy: 100,
-      coins: 1245,
-      inventoryWeight: 45,
-      maxInventoryWeight: 100,
+      coins: 0,
+      inventoryWeight: 0,
+      maxInventoryWeight: 50,
       autoStorage: false,
     });
   }
@@ -374,13 +395,13 @@ export class MemStorage implements IStorage {
       id,
       playerId: insertExpedition.playerId,
       biomeId: insertExpedition.biomeId,
-      status: insertExpedition.status,
+      status: "planning",
       selectedResources: insertExpedition.selectedResources,
       selectedEquipment: insertExpedition.selectedEquipment,
-      collectedResources: insertExpedition.collectedResources ?? {},
-      startTime: insertExpedition.startTime ?? null,
-      endTime: insertExpedition.endTime ?? null,
-      progress: insertExpedition.progress ?? 0,
+      collectedResources: {},
+      startTime: null,
+      endTime: null,
+      progress: 0,
     };
     this.expeditions.set(id, expedition);
     return expedition;
