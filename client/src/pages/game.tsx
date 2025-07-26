@@ -118,6 +118,8 @@ export default function Game() {
   }, []);
 
   const handleToggleAutoRepeat = (biomeId: string) => {
+    console.log('Toggle auto-repeat for biome:', biomeId);
+    
     setAutoRepeatSettings(prev => {
       const newSettings = { ...prev };
       
@@ -126,94 +128,126 @@ export default function Game() {
         ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
         : {};
       
+      console.log('Last expeditions:', lastExpeditions);
+      console.log('Current settings:', newSettings[biomeId]);
+      
       if (newSettings[biomeId]) {
+        // Toggle the enabled state
         newSettings[biomeId].enabled = !newSettings[biomeId].enabled;
-        if (!newSettings[biomeId].enabled && autoRepeatTimer) {
-          clearTimeout(autoRepeatTimer);
-          setAutoRepeatTimer(null);
+        
+        // If we're enabling auto-repeat, start the countdown immediately
+        if (newSettings[biomeId].enabled) {
+          newSettings[biomeId].countdown = 10; // Start 10-second countdown
+          console.log('Starting countdown for biome:', biomeId);
+          
+          // Start the countdown timer immediately
+          const countdownInterval = setInterval(() => {
+            setAutoRepeatSettings(prevSettings => {
+              const currentCountdown = prevSettings[biomeId]?.countdown || 0;
+              if (currentCountdown <= 1) {
+                clearInterval(countdownInterval);
+                return {
+                  ...prevSettings,
+                  [biomeId]: { ...prevSettings[biomeId], countdown: 0 }
+                };
+              }
+              return {
+                ...prevSettings,
+                [biomeId]: { ...prevSettings[biomeId], countdown: currentCountdown - 1 }
+              };
+            });
+          }, 1000);
+          
+          setAutoRepeatTimer(countdownInterval);
+        } else {
+          // If disabling, clear any existing timer and countdown
+          if (autoRepeatTimer) {
+            clearTimeout(autoRepeatTimer);
+            setAutoRepeatTimer(null);
+          }
           newSettings[biomeId].countdown = 0;
+          console.log('Disabled auto-repeat for biome:', biomeId);
         }
       } else {
-        // Only enable if there are last expedition resources
+        // First time enabling - only if there are last expedition resources
         if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
           newSettings[biomeId] = { 
             enabled: true, 
             resources: lastExpeditions[biomeId], 
-            countdown: 0 
+            countdown: 10 // Start countdown immediately
           };
+          console.log('First time enabling auto-repeat for biome:', biomeId);
+          
+          // Start the countdown timer immediately
+          const countdownInterval = setInterval(() => {
+            setAutoRepeatSettings(prevSettings => {
+              const currentCountdown = prevSettings[biomeId]?.countdown || 0;
+              if (currentCountdown <= 1) {
+                clearInterval(countdownInterval);
+                return {
+                  ...prevSettings,
+                  [biomeId]: { ...prevSettings[biomeId], countdown: 0 }
+                };
+              }
+              return {
+                ...prevSettings,
+                [biomeId]: { ...prevSettings[biomeId], countdown: currentCountdown - 1 }
+              };
+            });
+          }, 1000);
+          
+          setAutoRepeatTimer(countdownInterval);
+        } else {
+          console.log('No last expedition resources found for biome:', biomeId);
         }
       }
+      
+      console.log('New settings:', newSettings);
       return newSettings;
     });
   };
 
-  // Auto-repeat expedition logic
+  // Auto-repeat expedition logic - watch for countdown reaching 0 and start expedition
   useEffect(() => {
-    if (!activeExpedition) {
-      // Check if there's any biome with auto-repeat enabled
-      const enabledBiome = Object.entries(autoRepeatSettings).find(([_, settings]) => settings.enabled && settings.countdown === 0);
+    const enabledBiome = Object.entries(autoRepeatSettings).find(([_, settings]) => 
+      settings.enabled && settings.countdown === 0 && !activeExpedition
+    );
+    
+    if (enabledBiome) {
+      const [biomeId, settings] = enabledBiome;
+      const biome = biomes?.find(b => b.id === biomeId);
       
-      if (enabledBiome) {
-        const [biomeId, settings] = enabledBiome;
-        const biome = biomes.find(b => b.id === biomeId);
+      if (biome && player && player.hunger < 90 && player.thirst < 90) {
+        console.log('Auto-starting expedition for biome:', biomeId);
         
-        // Check if player has enough energy and is not hungry/thirsty
-        if (biome && player && player.hunger < 80 && player.thirst < 80) {
-          // Get last expedition resources
-          const lastExpeditions = typeof window !== 'undefined' 
-            ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
-            : {};
+        // Get last expedition resources
+        const lastExpeditions = typeof window !== 'undefined' 
+          ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
+          : {};
           
-          if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
-            // Start countdown
-            setAutoRepeatSettings(prev => ({
-              ...prev,
-              [biomeId]: { ...prev[biomeId], countdown: 10 }
-            }));
-
-            const countdownInterval = setInterval(() => {
-              setAutoRepeatSettings(prev => {
-                const currentCountdown = prev[biomeId]?.countdown || 0;
-                if (currentCountdown <= 1) {
-                  clearInterval(countdownInterval);
-                  // Start expedition automatically with last resources
-                  setTimeout(() => {
-                    setSelectedBiome(biome);
-                    setExpeditionModalOpen(true);
-                    setExpeditionMinimized(false);
-                    
-                    // Auto-start expedition with last resources after modal opens
-                    setTimeout(() => {
-                      const event = new CustomEvent('autoStartExpedition', { 
-                        detail: { resources: lastExpeditions[biomeId] } 
-                      });
-                      window.dispatchEvent(event);
-                    }, 500);
-                  }, 100);
-                  return {
-                    ...prev,
-                    [biomeId]: { ...prev[biomeId], countdown: 0 }
-                  };
-                }
-                return {
-                  ...prev,
-                  [biomeId]: { ...prev[biomeId], countdown: currentCountdown - 1 }
-                };
-              });
-            }, 1000);
-
-            setAutoRepeatTimer(countdownInterval);
-          }
-        } else {
-          // Disable auto-repeat if conditions aren't met
-          setAutoRepeatSettings(prev => ({
-            ...prev,
-            [biomeId]: { ...prev[biomeId], enabled: false }
-          }));
+        if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
+          // Start expedition automatically
+          setSelectedBiome(biome);
+          setExpeditionModalOpen(true);
+          setExpeditionMinimized(false);
+          
+          // Auto-start expedition with last resources after modal opens
+          setTimeout(() => {
+            const event = new CustomEvent('autoStartExpedition', { 
+              detail: { resources: lastExpeditions[biomeId] } 
+            });
+            window.dispatchEvent(event);
+          }, 500);
         }
+      } else {
+        // Disable auto-repeat if conditions aren't met
+        setAutoRepeatSettings(prev => ({
+          ...prev,
+          [biomeId]: { ...prev[biomeId], enabled: false }
+        }));
       }
     }
-  }, [activeExpedition, autoRepeatSettings, biomes, player]);
+  }, [autoRepeatSettings, activeExpedition, biomes, player]);
 
   // Cleanup timer on unmount
   useEffect(() => {
