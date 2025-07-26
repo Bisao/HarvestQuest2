@@ -144,16 +144,25 @@ export default function BiomesTab({ biomes, resources, player, activeExpedition,
                   }
                 </button>
                 
-                {/* Repeat Expedition Button */}
-                {unlocked && !hasActiveExpedition && biome.lastExpeditionResources && biome.lastExpeditionResources.length > 0 && (
+                {/* Repeat Expedition Button - Always visible but conditionally enabled */}
+                {unlocked && !hasActiveExpedition && (
                   <button
                     onClick={() => onToggleAutoRepeat?.(biome.id)}
+                    disabled={!biome.lastExpeditionResources || biome.lastExpeditionResources.length === 0}
                     className={`px-3 py-3 rounded-lg transition-colors font-semibold ${
                       biome.autoRepeatEnabled
                         ? "bg-purple-600 hover:bg-purple-700 text-white"
-                        : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                        : biome.lastExpeditionResources && biome.lastExpeditionResources.length > 0
+                        ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }`}
-                    title={biome.autoRepeatEnabled ? "Desativar repetição automática" : "Repetir última expedição"}
+                    title={
+                      !biome.lastExpeditionResources || biome.lastExpeditionResources.length === 0
+                        ? "Faça uma expedição primeiro"
+                        : biome.autoRepeatEnabled 
+                        ? "Desativar repetição automática" 
+                        : "Repetir última expedição"
+                    }
                   >
                     🔄
                   </button>
@@ -162,9 +171,30 @@ export default function BiomesTab({ biomes, resources, player, activeExpedition,
               
               {/* Auto Repeat Countdown */}
               {biome.autoRepeatEnabled && biome.autoRepeatCountdown > 0 && (
-                <div className="text-center">
-                  <div className="text-sm text-purple-600 font-medium">
-                    Próxima expedição em {biome.autoRepeatCountdown}s
+                <div className="text-center bg-purple-50 border border-purple-200 rounded-lg p-2">
+                  <div className="text-sm text-purple-700 font-medium">
+                    ⏰ Próxima expedição em {biome.autoRepeatCountdown}s
+                  </div>
+                  <div className="w-full bg-purple-200 rounded-full h-1 mt-1">
+                    <div 
+                      className="bg-purple-600 h-1 rounded-full transition-all duration-1000"
+                      style={{ width: `${((10 - biome.autoRepeatCountdown) / 10) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {/* Show last expedition info when auto-repeat is enabled but not counting down */}
+              {biome.autoRepeatEnabled && biome.autoRepeatCountdown === 0 && biome.lastExpeditionResources && biome.lastExpeditionResources.length > 0 && (
+                <div className="text-center bg-purple-50 border border-purple-200 rounded-lg p-2">
+                  <div className="text-xs text-purple-700 font-medium mb-1">
+                    🔄 Repetição automática ativa
+                  </div>
+                  <div className="text-xs text-purple-600">
+                    Última expedição: {biome.lastExpeditionResources.map(resourceId => {
+                      const resource = resources.find(r => r.id === resourceId);
+                      return resource ? resource.emoji : '?';
+                    }).join(' ')}
                   </div>
                 </div>
               )}
