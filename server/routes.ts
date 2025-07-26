@@ -4,10 +4,16 @@ import { storage } from "./storage";
 import { insertExpeditionSchema } from "@shared/schema";
 import { z } from "zod";
 import type { Player } from "@shared/schema";
+import { GameService } from "./services/game-service";
+import { ExpeditionService } from "./services/expedition-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
   await storage.initializeGameData();
+
+  // Initialize services
+  const gameService = new GameService(storage);
+  const expeditionService = new ExpeditionService(storage);
 
   // Get player data
   app.get("/api/player/:username", async (req, res) => {
@@ -214,179 +220,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Start expedition
+  // Start expedition using service
   app.post("/api/expeditions", async (req, res) => {
     try {
-      console.log('Received expedition data:', req.body);
+      const { playerId, biomeId, selectedResources, selectedEquipment } = req.body;
       
-      // Validate the expedition data
-      const expeditionData = insertExpeditionSchema.parse(req.body);
-      console.log('Validated expedition data:', expeditionData);
-      
-      const expedition = await storage.createExpedition(expeditionData);
-      console.log('Created expedition:', expedition);
+      const expedition = await expeditionService.startExpedition(
+        playerId, 
+        biomeId, 
+        selectedResources || [], 
+        selectedEquipment || []
+      );
       
       res.json(expedition);
     } catch (error) {
       console.error('Expedition creation error:', error);
-      if (error instanceof z.ZodError) {
-        console.error('Zod validation errors:', error.errors);
-        return res.status(400).json({ 
-          message: "Invalid expedition data",
-          errors: error.errors
-        });
-      }
-      res.status(500).json({ message: "Failed to create expedition" });
+      res.status(400).json({ message: error instanceof Error ? error.message : "Failed to create expedition" });
     }
   });
 
-  // Update expedition
+  // Update expedition progress using service
   app.patch("/api/expeditions/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const updates = req.body;
-      const expedition = await storage.updateExpedition(id, updates);
+      const expedition = await expeditionService.updateExpeditionProgress(id);
       res.json(expedition);
     } catch (error) {
       res.status(500).json({ message: "Failed to update expedition" });
     }
   });
 
-  // Complete expedition and collect resources
+  // Complete expedition using service
   app.post("/api/expeditions/:id/complete", async (req, res) => {
     try {
       const { id } = req.params;
-      const expedition = await storage.getExpedition(id);
-      
-      if (!expedition) {
-        return res.status(404).json({ message: "Expedition not found" });
-      }
-
-      const player = await storage.getPlayer(expedition.playerId);
-      if (!player) {
-        return res.status(404).json({ message: "Player not found" });
-      }
-
-      // Simulate resource collection
-      const selectedResourceIds = expedition.selectedResources as string[];
-      const collectedResources: Record<string, number> = {};
-      let totalWeight = 0;
-
-      for (const resourceId of selectedResourceIds) {
-        const resource = await storage.getResource(resourceId);
-        if (!resource) continue;
-
-        // Generate random amount (1-8 based on resource type)
-        const baseAmount = resource.type === "basic" ? Math.floor(Math.random() * 6) + 3 : Math.floor(Math.random() * 4) + 1;
-        const amount = Math.min(baseAmount, Math.floor((player.maxInventoryWeight - player.inventoryWeight - totalWeight) / resource.weight));
-        
-        if (amount > 0) {
-          collectedResources[resourceId] = amount;
-          totalWeight += resource.weight * amount;
-        }
-      }
-
-      // Add resources to inventory
-      for (const [resourceId, quantity] of Object.entries(collectedResources)) {
-        const existingItem = (await storage.getPlayerInventory(expedition.playerId))
-          .find(item => item.resourceId === resourceId);
-
-        if (existingItem) {
-          await storage.updateInventoryItem(existingItem.id, {
-            quantity: existingItem.quantity + quantity
-          });
-        } else {
-          await storage.addInventoryItem({
-            playerId: expedition.playerId,
-            resourceId,
-            quantity
-          });
-        }
-      }
-
-      // Update player weight and energy
-      await storage.updatePlayer(expedition.playerId, {
-        inventoryWeight: player.inventoryWeight + totalWeight,
-        energy: Math.max(0, player.energy - 10)
-      });
-
-      // Mark expedition as completed
-      await storage.updateExpedition(id, {
-        status: "completed",
-        collectedResources,
-        endTime: Date.now()
-      });
-
-      res.json({ collectedResources, totalWeight });
+      const expedition = await expeditionService.completeExpedition(id);
+      res.json(expedition);
     } catch (error) {
-      res.status(500).json({ message: "Failed to complete expedition" });
+      console.error("Complete expedition error:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to complete expedition" });
     }
   });
 
-  // Store individual inventory item
+  // Store individual inventory item using service
   app.post("/api/storage/store/:inventoryItemId", async (req, res) => {
     try {
       const { inventoryItemId } = req.params;
       const { playerId, quantity } = req.body;
       
-      const inventory = await storage.getPlayerInventory(playerId);
-      const inventoryItem = inventory.find(item => item.id === inventoryItemId);
-      
-      if (!inventoryItem) {
-        return res.status(404).json({ message: "Inventory item not found" });
-      }
-      
-      if (quantity > inventoryItem.quantity) {
-        return res.status(400).json({ message: "Not enough items in inventory" });
-      }
-      
-      const resource = await storage.getResource(inventoryItem.resourceId);
-      if (!resource) {
-        return res.status(404).json({ message: "Resource not found" });
-      }
-      
-      const player = await storage.getPlayer(playerId);
-      if (!player) {
-        return res.status(404).json({ message: "Player not found" });
-      }
-      
-      // Check if resource already exists in storage
-      const storageItems = await storage.getPlayerStorage(playerId);
-      const existingStorageItem = storageItems.find(item => item.resourceId === inventoryItem.resourceId);
-      
-      if (existingStorageItem) {
-        // Update existing storage item
-        await storage.updateStorageItem(existingStorageItem.id, {
-          quantity: existingStorageItem.quantity + quantity
-        });
-      } else {
-        // Create new storage item
-        await storage.addStorageItem({
-          playerId,
-          resourceId: inventoryItem.resourceId,
-          quantity
-        });
-      }
-      
-      // Update or remove inventory item
-      if (quantity === inventoryItem.quantity) {
-        await storage.removeInventoryItem(inventoryItemId);
-      } else {
-        await storage.updateInventoryItem(inventoryItemId, {
-          quantity: inventoryItem.quantity - quantity
-        });
-      }
-      
-      // Update player inventory weight
-      const weightReduction = resource.weight * quantity;
-      await storage.updatePlayer(playerId, {
-        inventoryWeight: Math.max(0, player.inventoryWeight - weightReduction)
-      });
-      
+      await gameService.moveToStorage(playerId, inventoryItemId, quantity);
       res.json({ message: "Item stored successfully" });
     } catch (error) {
       console.error('Storage error:', error);
-      res.status(500).json({ message: "Failed to store item" });
+      res.status(400).json({ message: error instanceof Error ? error.message : "Failed to store item" });
     }
   });
 
@@ -426,66 +312,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Transfer from storage to inventory
+  // Transfer from storage to inventory using service
   app.post("/api/storage/withdraw", async (req, res) => {
     try {
-      const { playerId, resourceId, quantity } = req.body;
+      const { playerId, storageItemId, quantity } = req.body;
       
-      const storageItems = await storage.getPlayerStorage(playerId);
-      const storageItem = storageItems.find((s) => s.resourceId === resourceId);
-      
-      if (!storageItem || storageItem.quantity < quantity) {
-        return res.status(400).json({ message: "Insufficient resources in storage" });
-      }
-
-      const resource = await storage.getResource(resourceId);
-      if (!resource) {
-        return res.status(404).json({ message: "Resource not found" });
-      }
-
-      const player = await storage.getPlayer(playerId);
-      if (!player) {
-        return res.status(404).json({ message: "Player not found" });
-      }
-
-      const totalWeight = resource.weight * quantity;
-      if (player.inventoryWeight + totalWeight > player.maxInventoryWeight) {
-        return res.status(400).json({ message: "Not enough inventory space" });
-      }
-
-      // Update storage
-      if (storageItem.quantity === quantity) {
-        await storage.removeStorageItem(storageItem.id);
-      } else {
-        await storage.updateStorageItem(storageItem.id, {
-          quantity: storageItem.quantity - quantity,
-        });
-      }
-
-      // Add to inventory
-      const inventory = await storage.getPlayerInventory(playerId);
-      const existingInvItem = inventory.find((i) => i.resourceId === resourceId);
-
-      if (existingInvItem) {
-        await storage.updateInventoryItem(existingInvItem.id, {
-          quantity: existingInvItem.quantity + quantity,
-        });
-      } else {
-        await storage.addInventoryItem({
-          playerId,
-          resourceId,
-          quantity,
-        });
-      }
-
-      // Update player weight
-      await storage.updatePlayer(playerId, {
-        inventoryWeight: player.inventoryWeight + totalWeight,
-      });
-
+      await gameService.moveToInventory(playerId, storageItemId, quantity);
       res.json({ message: "Items withdrawn successfully" });
     } catch (error) {
-      res.status(500).json({ message: "Failed to withdraw items" });
+      console.error('Withdraw error:', error);
+      res.status(400).json({ message: error instanceof Error ? error.message : "Failed to withdraw items" });
     }
   });
 
@@ -498,6 +334,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(player);
     } catch (error) {
       res.status(500).json({ message: "Failed to update auto storage setting" });
+    }
+  });
+
+  // Get resources by category (hunting, fishing, etc.)
+  app.get("/api/resources/category/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const resources = await storage.getAllResources();
+      
+      let filteredResources = resources;
+      
+      switch (category) {
+        case "animals":
+          filteredResources = resources.filter(r => 
+            ["Coelho", "Veado", "Javali"].includes(r.name)
+          );
+          break;
+        case "fish":
+          filteredResources = resources.filter(r => 
+            ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(r.name)
+          );
+          break;
+        case "plants":
+          filteredResources = resources.filter(r => 
+            ["Cogumelos", "Frutas Silvestres", "Fibra"].includes(r.name)
+          );
+          break;
+        case "basic":
+          filteredResources = resources.filter(r => r.type === "basic");
+          break;
+        case "unique":
+          filteredResources = resources.filter(r => r.type === "unique");
+          break;
+        default:
+          filteredResources = resources;
+      }
+      
+      res.json(filteredResources);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get resources by category" });
+    }
+  });
+
+  // Get biome details with enhanced information
+  app.get("/api/biomes/:id/details", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const biome = await storage.getBiome(id);
+      
+      if (!biome) {
+        return res.status(404).json({ message: "Biome not found" });
+      }
+
+      const resources = await storage.getAllResources();
+      const availableResources = Array.isArray(biome.availableResources) 
+        ? biome.availableResources : [];
+      
+      const biomeResources = resources.filter(r => 
+        availableResources.includes(r.id)
+      );
+
+      // Categorize resources for better UI display
+      const categorizedResources = {
+        basic: biomeResources.filter(r => r.type === "basic"),
+        animals: biomeResources.filter(r => 
+          ["Coelho", "Veado", "Javali"].includes(r.name)
+        ),
+        fish: biomeResources.filter(r => 
+          ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(r.name)
+        ),
+        plants: biomeResources.filter(r => 
+          ["Cogumelos", "Frutas Silvestres"].includes(r.name)
+        ),
+        unique: biomeResources.filter(r => 
+          r.type === "unique" && !["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão", "Cogumelos", "Frutas Silvestres"].includes(r.name)
+        )
+      };
+
+      res.json({
+        ...biome,
+        resources: categorizedResources,
+        totalResources: biomeResources.length
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get biome details" });
+    }
+  });
+
+  // Check player equipment and ability to collect specific resources
+  app.get("/api/player/:playerId/can-collect/:resourceId", async (req, res) => {
+    try {
+      const { playerId, resourceId } = req.params;
+      
+      const canCollect = await gameService.hasRequiredTool(playerId, resourceId);
+      const resource = await storage.getResource(resourceId);
+      
+      res.json({
+        canCollect,
+        resource: resource ? {
+          name: resource.name,
+          emoji: resource.emoji,
+          requiredTool: resource.requiredTool
+        } : null
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to check collection ability" });
+    }
+  });
+
+  // Get player's active expedition
+  app.get("/api/player/:playerId/active-expedition", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
+      res.json(activeExpedition);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get active expedition" });
+    }
+  });
+
+  // Cancel expedition
+  app.post("/api/expeditions/:id/cancel", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await expeditionService.cancelExpedition(id);
+      res.json({ message: "Expedition cancelled successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to cancel expedition" });
     }
   });
 

@@ -27,6 +27,21 @@ Preferred communication style: Simple, everyday language.
 - Added unequip functionality - clicking equipped items removes them from slots
 - Verified all game systems are fully functional: expeditions, inventory, storage, crafting
 
+**January 26, 2025 - Modular Architecture Update**
+- **Completely restructured backend into modular architecture** for better maintainability and content addition
+- Created separate data modules for resources, equipment, biomes, and recipes in `server/data/` directory
+- **Added hunting and fishing mechanics** to the Floresta biome with new animal resources: Coelho, Veado, Javali
+- **Added fishing system** with new fish resources: Peixe Pequeno, Peixe Grande, Salmão
+- **Added plant gathering** with Cogumelos and Frutas Silvestres as collectible resources
+- **Created modular service layer** with GameService and ExpeditionService for business logic separation
+- **Enhanced equipment system** with new weapons (Arco e Flecha, Lança) and tools (Vara de Pesca, Foice)
+- **Improved API endpoints** using services for better error handling and data validation
+- Added resource categorization endpoints for better UI organization (animals, fish, plants, basic, unique)
+- Added biome details endpoint with categorized resource display
+- Added equipment requirement checking for resource collection
+- **Enhanced expedition system** with proper tool/weapon requirements for hunting and fishing
+- All game data now properly organized and easily extensible for future content additions
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -43,6 +58,9 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: RESTful endpoints under `/api` prefix
 - **Error Handling**: Centralized error middleware with structured responses
 - **Development Tools**: Hot reloading with Vite integration
+- **Modular Data Layer**: Separate data modules in `server/data/` for resources, equipment, biomes, and recipes
+- **Service Layer**: Business logic separated into GameService and ExpeditionService classes
+- **Game Mechanics**: Hunting, fishing, and plant gathering systems with tool/weapon requirements
 
 ### Database Layer
 - **ORM**: Drizzle ORM for type-safe database operations
@@ -54,12 +72,12 @@ Preferred communication style: Simple, everyday language.
 
 ### Game Data Models
 - **Players**: User profiles with level, experience, energy, and inventory limits
-- **Resources**: Collectible items with weight, value, and rarity properties
-- **Biomes**: Explorable areas with level requirements and available resources
-- **Inventory/Storage**: Player item management with weight restrictions
-- **Expeditions**: Time-based resource gathering missions
-- **Equipment**: Tools that enhance expedition effectiveness
-- **Recipes**: Crafting formulas for creating new items
+- **Resources**: Collectible items with weight, value, and rarity properties (basic, animals, fish, plants, unique)
+- **Biomes**: Explorable areas with level requirements and categorized available resources
+- **Inventory/Storage**: Player item management with weight restrictions and easy transfer systems
+- **Expeditions**: Time-based resource gathering missions with tool/weapon requirements
+- **Equipment**: Tools, weapons, and armor that enhance gameplay (hunting, fishing, mining, protection)
+- **Recipes**: Crafting formulas for creating tools, weapons, and consumables
 
 ### Frontend Components
 - **Game Header**: Displays player stats (level, energy, coins)
@@ -70,11 +88,14 @@ Preferred communication style: Simple, everyday language.
 
 ### API Endpoints
 - Player management (`/api/player/:username`)
-- Resource and biome data (`/api/resources`, `/api/biomes`)
+- Resource and biome data (`/api/resources`, `/api/biomes`, `/api/resources/category/:category`)
+- Enhanced biome details (`/api/biomes/:id/details`)
 - Inventory operations (`/api/inventory/:playerId`)
-- Storage management (`/api/storage/*`)
-- Expedition system (`/api/expeditions`)
+- Storage management with services (`/api/storage/*`)
+- Expedition system with services (`/api/expeditions`, `/api/expeditions/:id/complete`)
 - Equipment and crafting (`/api/equipment`, `/api/recipes`)
+- Player abilities (`/api/player/:playerId/can-collect/:resourceId`)
+- Active expedition tracking (`/api/player/:playerId/active-expedition`)
 
 ## Data Flow
 

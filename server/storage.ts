@@ -17,6 +17,10 @@ import {
   type InsertRecipe
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { ALL_RESOURCES } from "./data/resources";
+import { ALL_EQUIPMENT } from "./data/equipment";
+import { createBiomeData } from "./data/biomes";
+import { createRecipeData } from "./data/recipes";
 
 export interface IStorage {
   // Player methods
@@ -86,169 +90,27 @@ export class MemStorage implements IStorage {
   }
 
   async initializeGameData(): Promise<void> {
-    // Initialize basic resources
-    const basicResources = [
-      { name: "Fibra", emoji: "🌾", weight: 1, value: 2, type: "basic", rarity: "common", requiredTool: null },
-      { name: "Pedra", emoji: "🪨", weight: 3, value: 3, type: "basic", rarity: "common", requiredTool: "pickaxe" },
-      { name: "Gravetos", emoji: "🪵", weight: 2, value: 2, type: "basic", rarity: "common", requiredTool: null },
-    ];
-
-    // Initialize unique resources
-    const uniqueResources = [
-      { name: "Madeira", emoji: "🌳", weight: 5, value: 8, type: "unique", rarity: "common", requiredTool: "axe" },
-      { name: "Areia", emoji: "⏳", weight: 2, value: 5, type: "unique", rarity: "common", requiredTool: "shovel" },
-      { name: "Cristais", emoji: "💎", weight: 1, value: 20, type: "unique", rarity: "rare", requiredTool: "pickaxe" },
-      { name: "Conchas", emoji: "🐚", weight: 1, value: 12, type: "unique", rarity: "uncommon", requiredTool: null },
-    ];
-
-    const allResources = [...basicResources, ...uniqueResources];
+    // Initialize all resources using modular data
     const resourceIds: string[] = [];
 
-    for (const resource of allResources) {
+    for (const resource of ALL_RESOURCES) {
       const created = await this.createResource(resource);
       resourceIds.push(created.id);
     }
 
-    // Initialize biomes
-    const biomesData = [
-      {
-        name: "Floresta",
-        emoji: "🌲",
-        requiredLevel: 1,
-        availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[3]], // Fibra, Pedra, Gravetos, Madeira
-      },
-      {
-        name: "Deserto",
-        emoji: "🏜️",
-        requiredLevel: 20,
-        availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[4]], // Fibra, Pedra, Gravetos, Areia
-      },
-      {
-        name: "Montanha",
-        emoji: "🏔️",
-        requiredLevel: 50,
-        availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[5]], // Fibra, Pedra, Gravetos, Cristais
-      },
-      {
-        name: "Oceano",
-        emoji: "🌊",
-        requiredLevel: 75,
-        availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[6]], // Fibra, Pedra, Gravetos, Conchas
-      },
-    ];
-
+    // Initialize biomes using modular data
+    const biomesData = createBiomeData(resourceIds);
     for (const biome of biomesData) {
       await this.createBiome(biome);
     }
 
-    // Initialize equipment
-    const equipmentData = [
-      {
-        name: "Picareta",
-        emoji: "⛏️",
-        effect: "+20% pedra",
-        bonus: { type: "resource_boost", resource: "pedra", multiplier: 1.2 },
-        slot: "tool",
-        toolType: "pickaxe",
-        weight: 3,
-      },
-      {
-        name: "Machado",
-        emoji: "🪓",
-        effect: "+20% madeira",
-        bonus: { type: "resource_boost", resource: "madeira", multiplier: 1.2 },
-        slot: "tool",
-        toolType: "axe",
-        weight: 4,
-      },
-      {
-        name: "Pá",
-        emoji: "🛸",
-        effect: "+20% areia",
-        bonus: { type: "resource_boost", resource: "areia", multiplier: 1.2 },
-        slot: "tool",
-        toolType: "shovel",
-        weight: 2,
-      },
-      {
-        name: "Mochila",
-        emoji: "🎒",
-        effect: "+15 kg peso",
-        bonus: { type: "weight_boost", value: 15 },
-        slot: "chestplate",
-        toolType: null,
-        weight: 3,
-      },
-      {
-        name: "Capacete de Ferro",
-        emoji: "🪖",
-        effect: "+10% proteção",
-        bonus: { type: "protection", value: 10 },
-        slot: "helmet",
-        toolType: null,
-        weight: 2,
-      },
-      {
-        name: "Botas de Couro",
-        emoji: "🥾",
-        effect: "+5% velocidade",
-        bonus: { type: "speed_boost", value: 5 },
-        slot: "boots",
-        toolType: null,
-        weight: 1,
-      },
-    ];
-
-    for (const equip of equipmentData) {
+    // Initialize equipment using modular data
+    for (const equip of ALL_EQUIPMENT) {
       await this.createEquipment(equip);
     }
 
-    // Initialize recipes
-    const recipesData = [
-      {
-        name: "Machado",
-        emoji: "🪓",
-        requiredLevel: 1,
-        ingredients: { [resourceIds[3]]: 2, [resourceIds[1]]: 2 }, // 2 Madeira + 2 Pedra
-        output: { "axe": 1 },
-      },
-      {
-        name: "Picareta",
-        emoji: "⛏️",
-        requiredLevel: 1,
-        ingredients: { [resourceIds[3]]: 1, [resourceIds[1]]: 3 }, // 1 Madeira + 3 Pedra
-        output: { "pickaxe": 1 },
-      },
-      {
-        name: "Foice",
-        emoji: "🔪",
-        requiredLevel: 1,
-        ingredients: { [resourceIds[3]]: 1, [resourceIds[1]]: 2 }, // 1 Madeira + 2 Pedra
-        output: { "sickle": 1 },
-      },
-      {
-        name: "Faca",
-        emoji: "🗡️",
-        requiredLevel: 1,
-        ingredients: { [resourceIds[3]]: 1, [resourceIds[1]]: 1 }, // 1 Madeira + 1 Pedra
-        output: { "knife": 1 },
-      },
-      {
-        name: "Vara de Pesca",
-        emoji: "🎣",
-        requiredLevel: 1,
-        ingredients: { [resourceIds[3]]: 2, [resourceIds[0]]: 3 }, // 2 Madeira + 3 Fibra
-        output: { "fishing_rod": 1 },
-      },
-      {
-        name: "Espada de Pedra",
-        emoji: "⚔️",
-        requiredLevel: 1,
-        ingredients: { [resourceIds[3]]: 1, [resourceIds[1]]: 4 }, // 1 Madeira + 4 Pedra
-        output: { "stone_sword": 1 },
-      },
-    ];
-
+    // Initialize recipes using modular data
+    const recipesData = createRecipeData(resourceIds);
     for (const recipe of recipesData) {
       await this.createRecipe(recipe);
     }
