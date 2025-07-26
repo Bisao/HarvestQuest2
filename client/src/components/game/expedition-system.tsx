@@ -118,7 +118,7 @@ export default function ExpeditionSystem({
       console.error('Expedition error:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível iniciar a expedição. Verifique se você tem energia suficiente.",
+        description: "Não foi possível iniciar a expedição. Verifique se você tem fome e sede suficientes.",
         variant: "destructive"
       });
     }

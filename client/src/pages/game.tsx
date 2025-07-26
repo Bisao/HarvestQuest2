@@ -277,10 +277,10 @@ export default function Game() {
       console.log('Biome found:', biome?.name, 'Player stats:', { 
         hunger: player?.hunger, 
         thirst: player?.thirst,
-        canStart: biome && player && player.hunger > 10 && player.thirst > 10 
+        canStart: biome && player && player.hunger >= 30 && player.thirst >= 30 
       });
       
-      if (biome && player && player.hunger > 10 && player.thirst > 10) {
+      if (biome && player && player.hunger >= 30 && player.thirst >= 30) {
         console.log('All conditions met - Auto-starting expedition for biome:', biomeId);
         
         // Get last expedition resources

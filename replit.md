@@ -11,6 +11,8 @@ Preferred communication style: Simple, everyday language.
 **January 26, 2025**
 - Successfully migrated project from Replit Agent to Replit environment
 - **Fixed Auto-Repeat Expedition System** - Completely rebuilt timer management to prevent stuck countdown and properly restart after expedition completion
+- **Energy System Completely Removed** - Removed all references to energy from codebase, now using only hunger and thirst
+- Updated expedition requirements to use minimum 30 hunger and thirst instead of energy checks
 - **Project Migration Completed** - All systems verified and fully functional
 - **Enhanced Knife Detection System** - Fixed complete collection system to recognize knife as both tool and weapon
 - **Improved Equipment Verification** - Enhanced hasRequiredTool() function to check both tool and weapon slots
@@ -147,7 +149,7 @@ Preferred communication style: Simple, everyday language.
 ## Key Components
 
 ### Game Data Models
-- **Players**: User profiles with level, experience, energy, and inventory limits
+- **Players**: User profiles with level, experience, hunger, thirst, and inventory limits
 - **Resources**: Collectible items with weight, value, and rarity properties (basic, animals, fish, plants, unique)
 - **Biomes**: Explorable areas with level requirements and categorized available resources
 - **Inventory/Storage**: Player item management with weight restrictions and easy transfer systems
@@ -156,7 +158,7 @@ Preferred communication style: Simple, everyday language.
 - **Recipes**: Crafting formulas for creating tools, weapons, and consumables
 
 ### Frontend Components
-- **Game Header**: Displays player stats (level, energy, coins)
+- **Game Header**: Displays player stats (level, hunger, thirst, coins)
 - **Tab System**: Biomes, Inventory, Storage, and Crafting interfaces
 - **Expedition Modal**: Multi-step expedition planning and execution
 - **Resource Management**: Inventory and storage item manipulation
@@ -222,4 +224,4 @@ Preferred communication style: Simple, everyday language.
 - `npm run start`: Run production server
 - `npm run db:push`: Apply database schema changes
 
-The application follows a monorepo structure with shared TypeScript types between client and server, ensuring type safety across the full stack. The game mechanics are designed around energy-based expedition systems with inventory management and crafting progression.
+The application follows a monorepo structure with shared TypeScript types between client and server, ensuring type safety across the full stack. The game mechanics are designed around hunger and thirst-based expedition systems with inventory management and crafting progression.
