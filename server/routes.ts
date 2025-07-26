@@ -323,6 +323,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Store individual inventory item
+  app.post("/api/storage/store/:inventoryItemId", async (req, res) => {
+    try {
+      const { inventoryItemId } = req.params;
+      const { playerId, quantity } = req.body;
+      
+      const inventory = await storage.getPlayerInventory(playerId);
+      const inventoryItem = inventory.find(item => item.id === inventoryItemId);
+      
+      if (!inventoryItem) {
+        return res.status(404).json({ message: "Inventory item not found" });
+      }
+      
+      if (quantity > inventoryItem.quantity) {
+        return res.status(400).json({ message: "Not enough items in inventory" });
+      }
+      
+      const resource = await storage.getResource(inventoryItem.resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: "Resource not found" });
+      }
+      
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+      
+      // Check if resource already exists in storage
+      const storageItems = await storage.getPlayerStorage(playerId);
+      const existingStorageItem = storageItems.find(item => item.resourceId === inventoryItem.resourceId);
+      
+      if (existingStorageItem) {
+        // Update existing storage item
+        await storage.updateStorageItem(existingStorageItem.id, {
+          quantity: existingStorageItem.quantity + quantity
+        });
+      } else {
+        // Create new storage item
+        await storage.addStorageItem({
+          playerId,
+          resourceId: inventoryItem.resourceId,
+          quantity
+        });
+      }
+      
+      // Update or remove inventory item
+      if (quantity === inventoryItem.quantity) {
+        await storage.removeInventoryItem(inventoryItemId);
+      } else {
+        await storage.updateInventoryItem(inventoryItemId, {
+          quantity: inventoryItem.quantity - quantity
+        });
+      }
+      
+      // Update player inventory weight
+      const weightReduction = resource.weight * quantity;
+      await storage.updatePlayer(playerId, {
+        inventoryWeight: Math.max(0, player.inventoryWeight - weightReduction)
+      });
+      
+      res.json({ message: "Item stored successfully" });
+    } catch (error) {
+      console.error('Storage error:', error);
+      res.status(500).json({ message: "Failed to store item" });
+    }
+  });
+
   // Store all inventory items
   app.post("/api/storage/store-all/:playerId", async (req, res) => {
     try {

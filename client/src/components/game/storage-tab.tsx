@@ -184,14 +184,14 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
                     <h4 className="font-semibold text-gray-800">{itemData.name}</h4>
                     <p className="text-sm text-gray-500">
                       {itemData.type === "equipment" ? "Equipamento" : 
-                       itemData.type === "basic" ? "Recurso básico" : "Recurso único"}
+                       itemData.type === "resource" && itemData.data.type === "basic" ? "Recurso básico" : "Recurso único"}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className={`text-2xl font-bold ${
                     itemData.type === "equipment" ? "text-purple-600" :
-                    itemData.type === "basic" ? "text-green-600" : "text-blue-600"
+                    itemData.type === "resource" && itemData.data.type === "basic" ? "text-green-600" : "text-blue-600"
                   }`}>
                     {storageItem.quantity}
                   </div>

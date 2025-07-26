@@ -125,7 +125,13 @@ export default function EnhancedInventory({
 
   const moveToStorageMutation = useMutation({
     mutationFn: async (itemId: string) => {
-      const response = await apiRequest('POST', `/api/storage/store/${itemId}`);
+      const item = inventory.find(i => i.id === itemId);
+      if (!item) throw new Error("Item não encontrado");
+      
+      const response = await apiRequest('POST', `/api/storage/store/${itemId}`, {
+        playerId: player.id,
+        quantity: item.quantity
+      });
       return response.json();
     },
     onSuccess: () => {
