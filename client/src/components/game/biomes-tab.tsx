@@ -170,15 +170,15 @@ export default function BiomesTab({ biomes, resources, player, activeExpedition,
               </div>
               
               {/* Auto Repeat Countdown */}
-              {biome.autoRepeatEnabled && biome.autoRepeatCountdown > 0 && (
+              {biome.autoRepeatEnabled && (biome.autoRepeatCountdown || 0) > 0 && (
                 <div className="text-center bg-purple-50 border border-purple-200 rounded-lg p-2">
                   <div className="text-sm text-purple-700 font-medium">
-                    ⏰ Próxima expedição em {biome.autoRepeatCountdown}s
+                    ⏰ Próxima expedição em {biome.autoRepeatCountdown || 0}s
                   </div>
                   <div className="w-full bg-purple-200 rounded-full h-1 mt-1">
                     <div 
                       className="bg-purple-600 h-1 rounded-full transition-all duration-1000"
-                      style={{ width: `${((10 - biome.autoRepeatCountdown) / 10) * 100}%` }}
+                      style={{ width: `${((10 - (biome.autoRepeatCountdown || 0)) / 10) * 100}%` }}
                     />
                   </div>
                 </div>

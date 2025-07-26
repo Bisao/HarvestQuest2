@@ -113,7 +113,7 @@ export default function Game() {
     if (typeof window !== 'undefined') {
       const lastExpeditions = JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}');
       // This will be used in BiomesTab to show the repeat button
-      window.lastExpeditionResources = lastExpeditions;
+      (window as any).lastExpeditionResources = lastExpeditions;
     }
   }, []);
 
@@ -158,7 +158,7 @@ export default function Game() {
         const biome = biomes.find(b => b.id === biomeId);
         
         // Check if player has enough energy and is not hungry/thirsty
-        if (biome && player && player.energy >= 20 && player.hunger < 80 && player.thirst < 80) {
+        if (biome && player && player.hunger < 80 && player.thirst < 80) {
           // Get last expedition resources
           const lastExpeditions = typeof window !== 'undefined' 
             ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
