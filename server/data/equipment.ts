@@ -150,6 +150,15 @@ export const WEAPONS: InsertEquipment[] = [
     toolType: "spear",
     weight: 5,
   },
+  {
+    name: "Faca",
+    emoji: "🗡️",
+    effect: "Permite esfolar animais + caça pequena",
+    bonus: { type: "hunting", value: 1 },
+    slot: "weapon",
+    toolType: "knife",
+    weight: 1,
+  },
 ];
 
 export const ARMOR: InsertEquipment[] = [

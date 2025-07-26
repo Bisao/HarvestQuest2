@@ -58,13 +58,17 @@ export class GameService {
       const hasWeapon = equipment.some(eq => 
         eq.id === player.equippedWeapon && eq.slot === "weapon"
       );
+      
+      // Check for knife in both tool and weapon slots
       const hasKnife = equipment.some(eq => 
-        eq.id === player.equippedTool && eq.toolType === "knife"
+        (eq.id === player.equippedTool || eq.id === player.equippedWeapon) && 
+        eq.toolType === "knife"
       );
+      
       return hasWeapon && hasKnife;
     }
     
-    // Regular tool checks
+    // Regular tool checks - check both tool and weapon slots
     const equippedTool = equipment.find(eq => 
       eq.id === player.equippedTool && eq.toolType === resource.requiredTool
     );
