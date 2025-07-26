@@ -122,12 +122,85 @@ export default function Game() {
       const newSettings = { ...prev };
       if (newSettings[biomeId]) {
         newSettings[biomeId].enabled = !newSettings[biomeId].enabled;
+        if (!newSettings[biomeId].enabled && autoRepeatTimer) {
+          clearTimeout(autoRepeatTimer);
+          setAutoRepeatTimer(null);
+        }
       } else {
-        newSettings[biomeId] = { enabled: true, resources: [], countdown: 0 }; // resources will be populated after first expedition
+        newSettings[biomeId] = { enabled: true, resources: [], countdown: 0 };
       }
       return newSettings;
     });
   };
+
+  // Auto-repeat expedition logic
+  useEffect(() => {
+    if (!activeExpedition) {
+      // Check if there's any biome with auto-repeat enabled
+      const enabledBiome = Object.entries(autoRepeatSettings).find(([_, settings]) => settings.enabled);
+      
+      if (enabledBiome) {
+        const [biomeId, settings] = enabledBiome;
+        const biome = biomes.find(b => b.id === biomeId);
+        
+        // Check if player has enough energy and is not hungry/thirsty
+        if (biome && player && player.energy >= 20 && player.hunger < 80 && player.thirst < 80) {
+          // Get last expedition resources
+          const lastExpeditions = typeof window !== 'undefined' 
+            ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
+            : {};
+          
+          if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
+            // Start countdown
+            setAutoRepeatSettings(prev => ({
+              ...prev,
+              [biomeId]: { ...prev[biomeId], countdown: 10 }
+            }));
+
+            const countdownInterval = setInterval(() => {
+              setAutoRepeatSettings(prev => {
+                const currentCountdown = prev[biomeId]?.countdown || 0;
+                if (currentCountdown <= 1) {
+                  clearInterval(countdownInterval);
+                  // Start expedition
+                  setTimeout(() => {
+                    setSelectedBiome(biome);
+                    setExpeditionModalOpen(true);
+                    setExpeditionMinimized(false);
+                  }, 100);
+                  return {
+                    ...prev,
+                    [biomeId]: { ...prev[biomeId], countdown: 0 }
+                  };
+                }
+                return {
+                  ...prev,
+                  [biomeId]: { ...prev[biomeId], countdown: currentCountdown - 1 }
+                };
+              });
+            }, 1000);
+
+            setAutoRepeatTimer(countdownInterval);
+          }
+        } else {
+          // Disable auto-repeat if conditions aren't met
+          setAutoRepeatSettings(prev => ({
+            ...prev,
+            [biomeId]: { ...prev[biomeId], enabled: false }
+          }));
+        }
+      }
+    }
+  }, [activeExpedition, autoRepeatSettings, biomes, player]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoRepeatTimer) {
+        clearTimeout(autoRepeatTimer);
+      }
+    };
+  }, [autoRepeatTimer]);
 
   if (!player) {
     return (
@@ -168,12 +241,19 @@ export default function Game() {
           <div className="p-3 md:p-6">
             {activeTab === "biomes" && (
               <BiomesTab
-                biomes={biomes?.map(biome => ({
-                  ...biome,
-                  autoRepeatEnabled: autoRepeatSettings[biome.id]?.enabled || false,
-                  autoRepeatCountdown: autoRepeatSettings[biome.id]?.countdown || 0,
-                  lastExpeditionResources: autoRepeatSettings[biome.id]?.resources
-                }))}
+                biomes={biomes?.map(biome => {
+                  // Get last expedition resources from localStorage
+                  const lastExpeditions = typeof window !== 'undefined' 
+                    ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
+                    : {};
+                  
+                  return {
+                    ...biome,
+                    autoRepeatEnabled: autoRepeatSettings[biome.id]?.enabled || false,
+                    autoRepeatCountdown: autoRepeatSettings[biome.id]?.countdown || 0,
+                    lastExpeditionResources: lastExpeditions[biome.id] || []
+                  };
+                }) || []}
                 player={player}
                 resources={resources}
                 activeExpedition={activeExpedition ? {
@@ -184,7 +264,6 @@ export default function Game() {
                 onExploreBiome={handleExploreBiome}
                 onCompleteExpedition={(expeditionId) => {
                   if (activeExpedition) {
-                    // Complete the expedition via the expedition system
                     handleCompleteExpedition();
                   }
                 }}
