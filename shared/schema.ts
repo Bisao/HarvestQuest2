@@ -76,6 +76,7 @@ export const equipment = pgTable("equipment", {
   bonus: jsonb("bonus").notNull(), // object with bonus type and value
   slot: text("slot").notNull(), // helmet, chestplate, leggings, boots, weapon, tool
   toolType: text("tool_type"), // pickaxe, axe, shovel, etc. (for tools only)
+  weight: integer("weight").default(2).notNull(),
 });
 
 export const recipes = pgTable("recipes", {

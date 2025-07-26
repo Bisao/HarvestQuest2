@@ -188,7 +188,10 @@ export default function EnhancedInventory({
             <div className="text-center">
               <p className="font-semibold">{slot.name}</p>
               {equippedItem ? (
-                <p className="text-sm">{equippedItem.effect}</p>
+                <div>
+                  <p className="text-sm">{equippedItem.effect}</p>
+                  <p className="text-xs text-gray-500">Peso: {equippedItem.weight}kg</p>
+                </div>
               ) : (
                 <p className="text-sm text-gray-500">Slot vazio</p>
               )}

@@ -58,6 +58,7 @@ export interface IStorage {
 
   // Recipe methods
   getAllRecipes(): Promise<Recipe[]>;
+  getRecipe(id: string): Promise<Recipe | undefined>;
 
   // Game initialization
   initializeGameData(): Promise<void>;
@@ -149,6 +150,7 @@ export class MemStorage implements IStorage {
         bonus: { type: "resource_boost", resource: "pedra", multiplier: 1.2 },
         slot: "tool",
         toolType: "pickaxe",
+        weight: 3,
       },
       {
         name: "Machado",
@@ -157,6 +159,7 @@ export class MemStorage implements IStorage {
         bonus: { type: "resource_boost", resource: "madeira", multiplier: 1.2 },
         slot: "tool",
         toolType: "axe",
+        weight: 4,
       },
       {
         name: "Pá",
@@ -165,6 +168,7 @@ export class MemStorage implements IStorage {
         bonus: { type: "resource_boost", resource: "areia", multiplier: 1.2 },
         slot: "tool",
         toolType: "shovel",
+        weight: 2,
       },
       {
         name: "Mochila",
@@ -173,6 +177,7 @@ export class MemStorage implements IStorage {
         bonus: { type: "weight_boost", value: 15 },
         slot: "chestplate",
         toolType: null,
+        weight: 3,
       },
       {
         name: "Capacete de Ferro",
@@ -181,6 +186,7 @@ export class MemStorage implements IStorage {
         bonus: { type: "protection", value: 10 },
         slot: "helmet",
         toolType: null,
+        weight: 2,
       },
       {
         name: "Botas de Couro",
@@ -189,6 +195,7 @@ export class MemStorage implements IStorage {
         bonus: { type: "speed_boost", value: 5 },
         slot: "boots",
         toolType: null,
+        weight: 1,
       },
     ];
 
@@ -247,7 +254,7 @@ export class MemStorage implements IStorage {
     }
 
     // Create default player
-    await this.createPlayer({
+    const defaultPlayer = await this.createPlayer({
       username: "Player1",
       level: 1,
       experience: 0,
@@ -263,6 +270,23 @@ export class MemStorage implements IStorage {
       equippedBoots: null,
       equippedWeapon: null,
       equippedTool: null,
+    });
+
+    // Add some initial resources to storage for testing crafting
+    await this.addStorageItem({
+      playerId: defaultPlayer.id,
+      resourceId: resourceIds[3], // Madeira
+      quantity: 5,
+    });
+    await this.addStorageItem({
+      playerId: defaultPlayer.id,
+      resourceId: resourceIds[1], // Pedra
+      quantity: 10,
+    });
+    await this.addStorageItem({
+      playerId: defaultPlayer.id,
+      resourceId: resourceIds[0], // Fibra
+      quantity: 8,
     });
   }
 
@@ -476,6 +500,7 @@ export class MemStorage implements IStorage {
       bonus: insertEquipment.bonus,
       slot: insertEquipment.slot,
       toolType: insertEquipment.toolType || null,
+      weight: insertEquipment.weight || 2,
     };
     this.equipment.set(id, equipment);
     return equipment;
@@ -484,6 +509,10 @@ export class MemStorage implements IStorage {
   // Recipe methods
   async getAllRecipes(): Promise<Recipe[]> {
     return Array.from(this.recipes.values());
+  }
+
+  async getRecipe(id: string): Promise<Recipe | undefined> {
+    return this.recipes.get(id);
   }
 
   async createRecipe(insertRecipe: InsertRecipe): Promise<Recipe> {

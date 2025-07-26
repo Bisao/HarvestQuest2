@@ -4,7 +4,7 @@ import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
 import EnhancedInventory from "@/components/game/enhanced-inventory";
 import StorageTab from "@/components/game/storage-tab";
-import CraftingTab from "@/components/game/crafting-tab";
+import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 import ExpeditionSystem from "@/components/game/expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
 import { queryClient } from "@/lib/queryClient";
@@ -122,10 +122,11 @@ export default function Game() {
             )}
 
             {activeTab === "crafting" && (
-              <CraftingTab
+              <EnhancedCraftingTab
                 recipes={recipes}
                 resources={resources}
                 playerLevel={player.level}
+                playerId={player.id}
               />
             )}
           </div>

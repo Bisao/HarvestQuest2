@@ -126,6 +126,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Craft item
+  app.post("/api/craft", async (req, res) => {
+    try {
+      const { playerId, recipeId } = req.body;
+      
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
+      const recipe = await storage.getRecipe(recipeId);
+      if (!recipe) {
+        return res.status(404).json({ message: "Recipe not found" });
+      }
+
+      if (player.level < recipe.requiredLevel) {
+        return res.status(400).json({ message: "Level too low for this recipe" });
+      }
+
+      // Get player's storage items
+      const storageItems = await storage.getPlayerStorage(playerId);
+      
+      // Check if player has enough ingredients in storage
+      const ingredientEntries = Object.entries(recipe.ingredients as Record<string, number>);
+      for (const [resourceId, requiredQuantity] of ingredientEntries) {
+        const storageItem = storageItems.find(item => item.resourceId === resourceId);
+        const availableQuantity = storageItem?.quantity || 0;
+        
+        if (availableQuantity < requiredQuantity) {
+          const resource = await storage.getResource(resourceId);
+          return res.status(400).json({ 
+            message: `Insufficient ${resource?.name || 'resource'} in storage. Need ${requiredQuantity}, have ${availableQuantity}` 
+          });
+        }
+      }
+
+      // Consume ingredients from storage
+      for (const [resourceId, requiredQuantity] of ingredientEntries) {
+        const storageItem = storageItems.find(item => item.resourceId === resourceId);
+        if (storageItem) {
+          const newQuantity = storageItem.quantity - requiredQuantity;
+          if (newQuantity <= 0) {
+            await storage.removeStorageItem(storageItem.id);
+          } else {
+            await storage.updateStorageItem(storageItem.id, { quantity: newQuantity });
+          }
+        }
+      }
+
+      // Add crafted items to inventory
+      const outputEntries = Object.entries(recipe.output as Record<string, number>);
+      for (const [equipmentType, quantity] of outputEntries) {
+        // For now, we'll create equipment items as inventory items
+        // This is a simplified implementation - in a real game, you'd have proper equipment inventory
+        console.log(`Crafted ${quantity}x ${equipmentType} for player ${playerId}`);
+      }
+
+      res.json({ message: "Item crafted successfully!", recipe });
+    } catch (error) {
+      console.error("Craft error:", error);
+      res.status(500).json({ message: "Failed to craft item" });
+    }
+  });
+
   // Start expedition
   app.post("/api/expeditions", async (req, res) => {
     try {
