@@ -150,7 +150,17 @@ export default function ExpeditionSystem({
         onMinimize(); // This will expand the modal
       }
 
-      onExpeditionComplete();
+      // Clear parent expedition state
+      if (onExpeditionUpdate) {
+        onExpeditionUpdate(null);
+      } else {
+        setLocalActiveExpedition(null);
+      }
+
+      // Auto-close modal after 3 seconds to allow auto-repeat to work
+      setTimeout(() => {
+        onExpeditionComplete();
+      }, 3000);
     },
     onError: () => {
       toast({

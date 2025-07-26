@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 **January 26, 2025**
 - Successfully migrated project from Replit Agent to Replit environment
+- **Fixed Auto-Repeat Expedition System** - Completely rebuilt timer management to prevent stuck countdown and properly restart after expedition completion
 - **Project Migration Completed** - All systems verified and fully functional
 - **Enhanced Knife Detection System** - Fixed complete collection system to recognize knife as both tool and weapon
 - **Improved Equipment Verification** - Enhanced hasRequiredTool() function to check both tool and weapon slots

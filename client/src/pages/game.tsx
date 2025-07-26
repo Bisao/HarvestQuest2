@@ -17,7 +17,7 @@ export default function Game() {
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
   const [activeExpedition, setActiveExpedition] = useState<any>(null);
   const [autoRepeatSettings, setAutoRepeatSettings] = useState<{[biomeId: string]: {enabled: boolean, resources: string[], countdown: number}}>({});
-  const [autoRepeatTimer, setAutoRepeatTimer] = useState<NodeJS.Timeout | null>(null);
+  const [autoRepeatTimers, setAutoRepeatTimers] = useState<Record<string, NodeJS.Timeout>>({});
 
   const { gameState, updateGameState } = useGameState();
 
@@ -102,10 +102,54 @@ export default function Game() {
 
   // Handler for completing expeditions
   const handleCompleteExpedition = () => {
+    // Check if auto-repeat is enabled for current biome before clearing expedition
+    const currentBiomeId = activeExpedition?.biomeId;
+    const shouldRestartAutoRepeat = currentBiomeId && autoRepeatSettings[currentBiomeId]?.enabled;
+    
     setActiveExpedition(null);
     setExpeditionModalOpen(false);
     setExpeditionMinimized(false);
     queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+    
+    // Restart auto-repeat countdown if it was enabled
+    if (shouldRestartAutoRepeat && currentBiomeId) {
+      console.log('Expedition completed - restarting auto-repeat countdown for biome:', currentBiomeId);
+      
+      // Add small delay to allow expedition state to clear, then restart countdown
+      setTimeout(() => {
+        setAutoRepeatSettings(prev => ({
+          ...prev,
+          [currentBiomeId]: { 
+            ...prev[currentBiomeId], 
+            countdown: 10,
+            enabled: true 
+          }
+        }));
+        
+        // Start new countdown timer
+        const countdownInterval = setInterval(() => {
+          setAutoRepeatSettings(prevSettings => {
+            const currentCountdown = prevSettings[currentBiomeId]?.countdown || 0;
+            if (currentCountdown <= 1) {
+              clearInterval(countdownInterval);
+              return {
+                ...prevSettings,
+                [currentBiomeId]: { ...prevSettings[currentBiomeId], countdown: 0 }
+              };
+            }
+            return {
+              ...prevSettings,
+              [currentBiomeId]: { ...prevSettings[currentBiomeId], countdown: currentCountdown - 1 }
+            };
+          });
+        }, 1000);
+        
+        setAutoRepeatTimers(prev => ({
+          ...prev,
+          [currentBiomeId]: countdownInterval
+        }));
+      }, 1000);
+    }
   };
 
   // Load last expedition resources from localStorage
@@ -158,12 +202,18 @@ export default function Game() {
             });
           }, 1000);
           
-          setAutoRepeatTimer(countdownInterval);
+          setAutoRepeatTimers(prev => ({
+            ...prev,
+            [biomeId]: countdownInterval
+          }));
         } else {
           // If disabling, clear any existing timer and countdown
-          if (autoRepeatTimer) {
-            clearTimeout(autoRepeatTimer);
-            setAutoRepeatTimer(null);
+          if (autoRepeatTimers[biomeId]) {
+            clearTimeout(autoRepeatTimers[biomeId]);
+            setAutoRepeatTimers(prev => {
+              const { [biomeId]: _, ...rest } = prev;
+              return rest;
+            });
           }
           newSettings[biomeId].countdown = 0;
           console.log('Disabled auto-repeat for biome:', biomeId);
@@ -196,7 +246,10 @@ export default function Game() {
             });
           }, 1000);
           
-          setAutoRepeatTimer(countdownInterval);
+          setAutoRepeatTimers(prev => ({
+            ...prev,
+            [biomeId]: countdownInterval
+          }));
         } else {
           console.log('No last expedition resources found for biome:', biomeId);
         }
@@ -275,14 +328,16 @@ export default function Game() {
     }
   }, [autoRepeatSettings, activeExpedition, biomes, player]);
 
-  // Cleanup timer on unmount
+  // Cleanup timers on unmount
   useEffect(() => {
     return () => {
-      if (autoRepeatTimer) {
-        clearTimeout(autoRepeatTimer);
-      }
+      Object.values(autoRepeatTimers).forEach(timer => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+      });
     };
-  }, [autoRepeatTimer]);
+  }, [autoRepeatTimers]);
 
   if (!player) {
     return (
