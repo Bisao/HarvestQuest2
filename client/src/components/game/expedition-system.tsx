@@ -380,9 +380,24 @@ export default function ExpeditionSystem({
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Escolha os recursos que deseja coletar:</h3>
-                <Badge variant="secondary" className="text-xs">
-                  {selectedResources.length} selecionados
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const allResourceIds = collectableResources.map(r => r.id);
+                      setSelectedResources(
+                        selectedResources.length === allResourceIds.length ? [] : allResourceIds
+                      );
+                    }}
+                    className="text-xs"
+                  >
+                    {selectedResources.length === collectableResources.length ? "Desmarcar Todos" : "Selecionar Todos"}
+                  </Button>
+                  <Badge variant="secondary" className="text-xs">
+                    {selectedResources.length} selecionados
+                  </Badge>
+                </div>
               </div>
               
               {/* Equipment Status */}
