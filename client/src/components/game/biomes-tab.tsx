@@ -16,23 +16,24 @@ interface BiomesTabProps {
   activeExpedition: ActiveExpedition | null;
   onExploreBiome: (biome: Biome) => void;
   onCompleteExpedition: (expeditionId: string) => void;
+  onToggleAutoRepeat?: (biomeId: string) => void;
 }
 
-export default function BiomesTab({ biomes, resources, equipment, player, playerLevel, activeExpedition, onExploreBiome, onCompleteExpedition }: BiomesTabProps) {
+export default function BiomesTab({ biomes, resources, equipment, player, playerLevel, activeExpedition, onExploreBiome, onCompleteExpedition, onToggleAutoRepeat }: BiomesTabProps) {
   const getResourcesForBiome = (biome: Biome) => {
     const resourceIds = biome.availableResources as string[];
     const availableResources = resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
-    
+
     // Filter resources based on equipped tools
     return availableResources.filter(resource => {
       if (!resource.requiredTool) return true; // No tool required
-      
+
       // Check if player has the required tool equipped
       const equippedTool = equipment.find(eq => 
         eq.toolType === resource.requiredTool && 
         (eq.id === player?.equippedTool)
       );
-      
+
       return !!equippedTool;
     });
   };
@@ -94,7 +95,7 @@ export default function BiomesTab({ biomes, resources, equipment, player, player
                     ) : null;
                   })}
                 </div>
-                
+
                 {/* Progress Bar */}
                 <div className="space-y-2">
                   <div className="w-full bg-gray-200 rounded-full h-3">

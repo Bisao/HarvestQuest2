@@ -268,6 +268,13 @@ export default function ExpeditionSystem({
   const handleStartExpedition = () => {
     if (!biome) return;
 
+    // Save last expedition resources for auto-repeat
+    if (typeof window !== 'undefined') {
+      const lastExpeditions = JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}');
+      lastExpeditions[biome.id] = selectedResources;
+      localStorage.setItem('lastExpeditionResources', JSON.stringify(lastExpeditions));
+    }
+
     startExpeditionMutation.mutate({
       playerId,
       biomeId: biome.id,

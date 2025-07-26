@@ -16,6 +16,8 @@ export default function Game() {
   const [expeditionMinimized, setExpeditionMinimized] = useState(false);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
   const [activeExpedition, setActiveExpedition] = useState<any>(null);
+  const [autoRepeatSettings, setAutoRepeatSettings] = useState<{[biomeId: string]: {enabled: boolean, resources: string[], countdown: number}}>({});
+  const [autoRepeatTimer, setAutoRepeatTimer] = useState<NodeJS.Timeout | null>(null);
 
   const { gameState, updateGameState } = useGameState();
 
@@ -58,7 +60,7 @@ export default function Game() {
   const handleExploreBiome = (biome: Biome) => {
     // Don't allow new expeditions if one is already active
     if (activeExpedition) return;
-    
+
     setSelectedBiome(biome);
     setExpeditionModalOpen(true);
     setExpeditionMinimized(false);
@@ -83,9 +85,9 @@ export default function Game() {
         const now = Date.now();
         const elapsed = now - activeExpedition.startTime;
         const newProgress = Math.min(100, (elapsed / activeExpedition.estimatedDuration) * 100);
-        
+
         setActiveExpedition((prev: any) => prev ? { ...prev, progress: newProgress } : null);
-        
+
         // Auto-expand when expedition completes
         if (newProgress >= 100) {
           setExpeditionMinimized(false);
@@ -106,6 +108,27 @@ export default function Game() {
     queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
   };
 
+  // Load last expedition resources from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const lastExpeditions = JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}');
+      // This will be used in BiomesTab to show the repeat button
+      window.lastExpeditionResources = lastExpeditions;
+    }
+  }, []);
+
+  const handleToggleAutoRepeat = (biomeId: string) => {
+    setAutoRepeatSettings(prev => {
+      const newSettings = { ...prev };
+      if (newSettings[biomeId]) {
+        newSettings[biomeId].enabled = !newSettings[biomeId].enabled;
+      } else {
+        newSettings[biomeId] = { enabled: true, resources: [], countdown: 0 }; // resources will be populated after first expedition
+      }
+      return newSettings;
+    });
+  };
+
   if (!player) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -117,7 +140,7 @@ export default function Game() {
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
       <GameHeader player={player} />
-      
+
       <main className="container mx-auto px-2 md:px-4 py-3 md:py-6">
         <div className="bg-white rounded-lg shadow-lg mb-4 md:mb-6">
           {/* Tab Navigation */}
@@ -145,14 +168,27 @@ export default function Game() {
           <div className="p-3 md:p-6">
             {activeTab === "biomes" && (
               <BiomesTab
-                biomes={biomes}
-                resources={resources}
-                equipment={equipment}
+                biomes={biomes?.map(biome => ({
+                  ...biome,
+                  autoRepeatEnabled: autoRepeatSettings[biome.id]?.enabled || false,
+                  autoRepeatCountdown: autoRepeatSettings[biome.id]?.countdown || 0,
+                  lastExpeditionResources: autoRepeatSettings[biome.id]?.resources
+                }))}
                 player={player}
-                playerLevel={player.level}
-                activeExpedition={activeExpedition}
+                resources={resources}
+                activeExpedition={activeExpedition ? {
+                  biomeId: activeExpedition.biomeId,
+                  progress: activeExpedition.progress || 0,
+                  selectedResources: activeExpedition.selectedResources
+                } : null}
                 onExploreBiome={handleExploreBiome}
-                onCompleteExpedition={handleCompleteExpedition}
+                onCompleteExpedition={(expeditionId) => {
+                  if (activeExpedition) {
+                    // Complete the expedition via the expedition system
+                    handleCompleteExpedition();
+                  }
+                }}
+                onToggleAutoRepeat={handleToggleAutoRepeat}
               />
             )}
 
