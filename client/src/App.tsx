@@ -2,7 +2,7 @@ import { Router, Route, Switch } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import MainMenu from "@/pages/main-menu";
-import GameSimple from "@/pages/game-simple";
+import Game from "@/pages/game";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,7 +18,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Switch>
-          <Route path="/game" component={GameSimple} />
+          <Route path="/game" component={Game} />
           <Route path="/" component={MainMenu} />
           <Route>
             <div className="flex items-center justify-center min-h-screen">

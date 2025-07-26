@@ -32,6 +32,7 @@ export default function Game() {
   console.log("Game loading for player:", playerUsername);
   console.log("URL location:", location);
   console.log("URL params:", urlParams.toString());
+  
   const [activeTab, setActiveTab] = useState("biomes");
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [expeditionMinimized, setExpeditionMinimized] = useState(false);
@@ -42,15 +43,7 @@ export default function Game() {
 
   const { gameState, updateGameState } = useGameState();
 
-  // Make setActiveExpedition available globally for expedition system
-  useEffect(() => {
-    (window as any).setActiveExpedition = setActiveExpedition;
-    return () => {
-      delete (window as any).setActiveExpedition;
-    };
-  }, []);
-
-  // Always call all hooks in the same order
+  // Always call all hooks in the same order - no conditional hooks
   const { data: player, isLoading: playerLoading, error: playerError } = useQuery<Player>({
     queryKey: ["/api/player", playerUsername],
     enabled: !!playerUsername,
@@ -92,6 +85,14 @@ export default function Game() {
   const { data: recipes = [] } = useQuery<Recipe[]>({
     queryKey: ["/api/recipes"],
   });
+
+  // Make setActiveExpedition available globally for expedition system
+  useEffect(() => {
+    (window as any).setActiveExpedition = setActiveExpedition;
+    return () => {
+      delete (window as any).setActiveExpedition;
+    };
+  }, []);
 
   // Show loading state - moved after all hooks
   if (!playerUsername) {
