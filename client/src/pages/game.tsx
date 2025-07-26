@@ -144,6 +144,7 @@ export default function Game() {
         resources={resources}
         equipment={equipment}
         playerId={player.id}
+        player={player}
         onExpeditionComplete={() => {
           updateGameState({ activeExpedition: null });
           queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
