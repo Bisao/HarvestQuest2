@@ -50,6 +50,7 @@ export default function Game() {
     };
   }, []);
 
+  // Always call all hooks in the same order
   const { data: player, isLoading: playerLoading, error: playerError } = useQuery<Player>({
     queryKey: ["/api/player", playerUsername],
     enabled: !!playerUsername,
@@ -76,7 +77,23 @@ export default function Game() {
     }
   });
 
-  // Show loading state
+  const { data: biomes = [] } = useQuery<Biome[]>({
+    queryKey: ["/api/biomes"],
+  });
+
+  const { data: resources = [] } = useQuery<Resource[]>({
+    queryKey: ["/api/resources"],
+  });
+
+  const { data: equipment = [] } = useQuery<Equipment[]>({
+    queryKey: ["/api/equipment"],
+  });
+
+  const { data: recipes = [] } = useQuery<Recipe[]>({
+    queryKey: ["/api/recipes"],
+  });
+
+  // Show loading state - moved after all hooks
   if (!playerUsername) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -115,22 +132,6 @@ export default function Game() {
       </div>
     );
   }
-
-  const { data: biomes = [] } = useQuery<Biome[]>({
-    queryKey: ["/api/biomes"],
-  });
-
-  const { data: resources = [] } = useQuery<Resource[]>({
-    queryKey: ["/api/resources"],
-  });
-
-  const { data: equipment = [] } = useQuery<Equipment[]>({
-    queryKey: ["/api/equipment"],
-  });
-
-  const { data: recipes = [] } = useQuery<Recipe[]>({
-    queryKey: ["/api/recipes"],
-  });
 
   const tabs = [
     { id: "biomes", label: "Biomas", emoji: "🌍" },
