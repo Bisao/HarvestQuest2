@@ -24,10 +24,10 @@ export class ExpeditionService {
     if (!biome) throw new Error("Biome not found");
 
     // Check if player has enough hunger and thirst for expedition
-    if (player.hunger < 20) {
+    if (player.hunger < 30) {
       throw new Error("Jogador com muita fome para expedição");
     }
-    if (player.thirst < 20) {
+    if (player.thirst < 30) {
       throw new Error("Jogador com muita sede para expedição");
     }
 
@@ -56,8 +56,8 @@ export class ExpeditionService {
 
     // Deduct hunger and thirst for expedition
     await this.storage.updatePlayer(playerId, {
-      hunger: Math.max(0, player.hunger - 10),
-      thirst: Math.max(0, player.thirst - 8)
+      hunger: Math.max(0, player.hunger - 15),
+      thirst: Math.max(0, player.thirst - 10)
     });
 
     return expedition;
@@ -174,42 +174,53 @@ export class ExpeditionService {
     return ["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
   }
   
-  // Process animal into component resources (only meat and leather)
+  // Process animal into component resources
   private processAnimal(animalName: string, allResources: Resource[]): Record<string, number> {
     const parts: Record<string, number> = {};
     
     // Find resource IDs for animal parts
     const carneResource = allResources.find(r => r.name === "Carne");
     const couroResource = allResources.find(r => r.name === "Couro");
+    const ossosResource = allResources.find(r => r.name === "Ossos");
+    const peloResource = allResources.find(r => r.name === "Pelo");
     
-    // Different animals give different quantities - only meat and leather
+    // Different animals give different quantities
     switch (animalName) {
       case "Coelho":
-        if (carneResource) parts[carneResource.id] = 2;
+        if (carneResource) parts[carneResource.id] = 1;
         if (couroResource) parts[couroResource.id] = 1;
+        if (ossosResource) parts[ossosResource.id] = 2;
+        if (peloResource) parts[peloResource.id] = 2;
         break;
         
       case "Veado":
-        if (carneResource) parts[carneResource.id] = 4;
-        if (couroResource) parts[couroResource.id] = 3;
+        if (carneResource) parts[carneResource.id] = 3;
+        if (couroResource) parts[couroResource.id] = 2;
+        if (ossosResource) parts[ossosResource.id] = 4;
+        if (peloResource) parts[peloResource.id] = 1;
         break;
         
       case "Javali":
-        if (carneResource) parts[carneResource.id] = 6;
-        if (couroResource) parts[couroResource.id] = 4;
+        if (carneResource) parts[carneResource.id] = 4;
+        if (couroResource) parts[couroResource.id] = 3;
+        if (ossosResource) parts[ossosResource.id] = 6;
+        if (peloResource) parts[peloResource.id] = 1;
         break;
         
-      // Fish processing - fish give only meat
+      // Fish processing - fish give meat and bones
       case "Peixe Pequeno":
         if (carneResource) parts[carneResource.id] = 1;
+        if (ossosResource) parts[ossosResource.id] = 1;
         break;
         
       case "Peixe Grande":
-        if (carneResource) parts[carneResource.id] = 3;
+        if (carneResource) parts[carneResource.id] = 2;
+        if (ossosResource) parts[ossosResource.id] = 2;
         break;
         
       case "Salmão":
-        if (carneResource) parts[carneResource.id] = 4;
+        if (carneResource) parts[carneResource.id] = 3;
+        if (ossosResource) parts[ossosResource.id] = 2;
         break;
     }
     

@@ -15,45 +15,59 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     "ferro_fundido": resourceIds[8], // Ferro Fundido
     "couro": resourceIds[9],        // Couro
     "carne": resourceIds[10],       // Carne
-    "cogumelos": resourceIds[14],   // Cogumelos (updated index)
-    "frutas_silvestres": resourceIds[15], // Frutas Silvestres (updated index)
+    "ossos": resourceIds[11],       // Ossos
+    "pelo": resourceIds[12],        // Pelo
+    "barbante": resourceIds[13],    // Barbante (new resource)
+    "cogumelos": resourceIds[17],   // Cogumelos (updated index)
+    "frutas_silvestres": resourceIds[18], // Frutas Silvestres (updated index)
+    "peixe_pequeno": resourceIds[19], // Peixe Pequeno (updated index)
+    "peixe_grande": resourceIds[20], // Peixe Grande (updated index)
   };
 
   return [
-    // FERRAMENTAS SIMPLES
+    // MATERIAIS BÁSICOS
+    {
+      name: "Barbante",
+      emoji: "🧵",
+      requiredLevel: 1,
+      ingredients: { [resourceMap.fibra]: 5 },
+      output: { [resourceMap.barbante]: 1 }
+    },
+    
+    // FERRAMENTAS
     {
       name: "Machado",
       emoji: "🪓",
       requiredLevel: 1,
-      ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.fibra]: 2, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "axe": 1 }
     },
     {
       name: "Picareta",
       emoji: "⛏️",
       requiredLevel: 1,
-      ingredients: { [resourceMap.pedras_soltas]: 2, [resourceMap.fibra]: 2, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.pedras_soltas]: 2, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "pickaxe": 1 }
     },
     {
       name: "Foice",
       emoji: "🔪",
       requiredLevel: 2,
-      ingredients: { [resourceMap.pedra]: 1, [resourceMap.fibra]: 2, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.pedra]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "sickle": 1 }
     },
     {
       name: "Balde de Madeira",
       emoji: "🪣",
       requiredLevel: 2,
-      ingredients: { [resourceMap.madeira]: 1, [resourceMap.fibra]: 2 },
+      ingredients: { [resourceMap.madeira]: 1, [resourceMap.barbante]: 2 },
       output: { "bucket": 1 }
     },
     {
       name: "Faca",
       emoji: "🗡️",
       requiredLevel: 1,
-      ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.fibra]: 1, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 1, [resourceMap.gravetos]: 1 },
       output: { "knife": 1 }
     },
     {
@@ -69,14 +83,14 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Arco e Flecha",
       emoji: "🏹",
       requiredLevel: 5,
-      ingredients: { [resourceMap.gravetos]: 2, [resourceMap.fibra]: 3, [resourceMap.pedras_soltas]: 1 },
+      ingredients: { [resourceMap.gravetos]: 2, [resourceMap.barbante]: 2, [resourceMap.pedras_soltas]: 1 },
       output: { "bow": 1 }
     },
     {
       name: "Lança",
       emoji: "🔱",
       requiredLevel: 4,
-      ingredients: { [resourceMap.gravetos]: 2, [resourceMap.fibra]: 4, [resourceMap.pedras_soltas]: 1 },
+      ingredients: { [resourceMap.gravetos]: 2, [resourceMap.barbante]: 4, [resourceMap.pedras_soltas]: 1 },
       output: { "spear": 1 }
     },
     
@@ -85,7 +99,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Mochila",
       emoji: "🎒",
       requiredLevel: 5,
-      ingredients: { [resourceMap.couro]: 3, [resourceMap.fibra]: 5 },
+      ingredients: { [resourceMap.couro]: 2, [resourceMap.barbante]: 4 },
       output: { "backpack": 1 }
     },
     
