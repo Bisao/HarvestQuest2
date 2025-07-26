@@ -177,20 +177,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Add crafted items to storage
       const outputEntries = Object.entries(recipe.output as Record<string, number>);
-      for (const [equipmentId, quantity] of outputEntries) {
-        // Check if equipment item already exists in storage
-        const existingStorageItem = storageItems.find(item => item.resourceId === equipmentId);
+      for (const [equipmentType, quantity] of outputEntries) {
+        // Find the actual equipment by toolType or name matching
+        const allEquipment = await storage.getAllEquipment();
+        const equipmentItem = allEquipment.find(eq => 
+          eq.toolType === equipmentType || 
+          eq.name.toLowerCase().includes(equipmentType.toLowerCase())
+        );
         
-        if (existingStorageItem) {
-          await storage.updateStorageItem(existingStorageItem.id, {
-            quantity: existingStorageItem.quantity + quantity
-          });
+        if (equipmentItem) {
+          // Check if equipment item already exists in storage
+          const existingStorageItem = storageItems.find(item => item.resourceId === equipmentItem.id);
+          
+          if (existingStorageItem) {
+            await storage.updateStorageItem(existingStorageItem.id, {
+              quantity: existingStorageItem.quantity + quantity
+            });
+          } else {
+            await storage.addStorageItem({
+              playerId,
+              resourceId: equipmentItem.id,
+              quantity
+            });
+          }
+          
+          console.log(`Added ${quantity}x ${equipmentItem.name} (${equipmentItem.id}) to storage for player ${playerId}`);
         } else {
-          await storage.addStorageItem({
-            playerId,
-            resourceId: equipmentId,
-            quantity
-          });
+          console.error(`Equipment not found for type: ${equipmentType}`);
         }
       }
 

@@ -96,13 +96,16 @@ export default function EquipmentSelectorModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md" aria-describedby="equipment-modal-description">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <span className="text-2xl">{getSlotEmoji(slotType)}</span>
             Selecionar {slotName}
           </DialogTitle>
         </DialogHeader>
+        <div id="equipment-modal-description" className="sr-only">
+          Modal para selecionar equipamentos do armazém para equipar no slot {slotName}
+        </div>
 
         <div className="space-y-4">
           {/* Current equipped item */}
