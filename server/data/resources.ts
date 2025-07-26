@@ -60,13 +60,15 @@ export const RESOURCE_CATEGORIES = {
 export function getResourcesByCategory(category: string, resources: any[]): any[] {
   switch (category) {
     case RESOURCE_CATEGORIES.BASIC:
-      return resources.filter(r => BASIC_RESOURCES.some(br => br.name === r.name));
+      return resources.filter(r => 
+        ["Fibra", "Pedra", "Pedras Soltas", "Gravetos", "Água Fresca", "Bambu", "Madeira", "Argila", "Ferro Fundido", "Couro", "Carne", "Ossos", "Pelo", "Barbante"].includes(r.name)
+      );
     case RESOURCE_CATEGORIES.ANIMALS:
       return resources.filter(r => ["Coelho", "Veado", "Javali"].includes(r.name));
     case RESOURCE_CATEGORIES.FISH:
       return resources.filter(r => ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(r.name));
     case RESOURCE_CATEGORIES.PLANTS:
-      return resources.filter(r => ["Cogumelos", "Frutas Silvestres", "Fibra"].includes(r.name));
+      return resources.filter(r => ["Cogumelos", "Frutas Silvestres"].includes(r.name));
     default:
       return resources;
   }
