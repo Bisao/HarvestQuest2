@@ -1,12 +1,58 @@
-import type { Recipe, Resource } from "@shared/schema";
+import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import type { Recipe, Resource, Player } from "@shared/schema";
 
 interface CraftingTabProps {
   recipes: Recipe[];
   resources: Resource[];
   playerLevel: number;
+  playerId: string;
 }
 
-export default function CraftingTab({ recipes, resources, playerLevel }: CraftingTabProps) {
+export default function CraftingTab({ recipes, resources, playerLevel, playerId }: CraftingTabProps) {
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  // Get all resources including processed ones for storage checking
+  const { data: allResources = [] } = useQuery({
+    queryKey: ["/api/resources/all"],
+  });
+
+  // Get storage items to check availability
+  const { data: storageItems = [] } = useQuery({
+    queryKey: ["/api/storage", playerId],
+  });
+
+  const craftMutation = useMutation({
+    mutationFn: async (recipeId: string) => {
+      return apiRequest(`/api/craft`, {
+        method: "POST",
+        body: JSON.stringify({ playerId, recipeId }),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Item criado com sucesso!",
+        description: "O item foi adicionado ao seu armazém.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/storage"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player"] });
+      setIsDialogOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao criar item",
+        description: error.message || "Recursos insuficientes",
+        variant: "destructive",
+      });
+    },
+  });
   const getResourceData = (resourceId: string) => {
     return resources.find(r => r.id === resourceId);
   };
