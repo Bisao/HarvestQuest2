@@ -60,120 +60,6 @@ export default function ExpeditionSystem({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
-  // Reset state when modal opens/closes
-  useEffect(() => {
-    if (isOpen) {
-      setPhase("resource-selection");
-      setSelectedResources([]);
-      if (onExpeditionUpdate) {
-        onExpeditionUpdate(null);
-      } else {
-        setLocalActiveExpedition(null);
-      }
-      setExpeditionProgress(0);
-      setExpeditionRewards(null);
-      setAutoCompleteTimer(5);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-  }, [isOpen]);
-
-  // Auto-complete timer when progress reaches 100%
-  useEffect(() => {
-    if (expeditionProgress >= 100 && phase === "in-progress") {
-      const timerInterval = setInterval(() => {
-        setAutoCompleteTimer(prev => {
-          if (prev <= 1) {
-            clearInterval(timerInterval);
-            handleCompleteExpedition();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timerInterval);
-    }
-  }, [expeditionProgress, phase]);
-
-  // Auto-start expedition when modal opens with last resources
-  useEffect(() => {
-    if (isOpen && selectedResources.length === 0 && biome) {
-      // Check if this is an auto-repeat expedition
-      const lastExpeditions = typeof window !== 'undefined' 
-        ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
-        : {};
-
-      if (lastExpeditions[biome.id] && lastExpeditions[biome.id].length > 0) {
-        setSelectedResources(lastExpeditions[biome.id]);
-      }
-    }
-  }, [isOpen, biome]);
-
-  // Listen for auto-start expedition event
-  useEffect(() => {
-    const handleAutoStart = (event: CustomEvent) => {
-      if (event.detail.resources && biome) {
-        setSelectedResources(event.detail.resources);
-        // Auto-start the expedition after setting resources
-        setTimeout(() => {
-          if (event.detail.resources.length > 0) {
-            startExpeditionMutation.mutate({
-              playerId,
-              biomeId: biome.id,
-              selectedResources: event.detail.resources
-            });
-          }
-        }, 100);
-      }
-    };
-
-    window.addEventListener('autoStartExpedition', handleAutoStart as EventListener);
-    return () => {
-      window.removeEventListener('autoStartExpedition', handleAutoStart as EventListener);
-    };
-  }, [biome, playerId, startExpeditionMutation]);
-
-  const getBiomeResources = () => {
-    if (!biome) return [];
-    const resourceIds = biome.availableResources as string[];
-    return resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
-  };
-
-  const getCollectableResources = () => {
-    const biomeResources = getBiomeResources();
-
-    // Get player's equipped tool and weapon
-    const equippedTool = player.equippedTool ? 
-      equipment.find(eq => eq.id === player.equippedTool) : null;
-    const equippedWeapon = player.equippedWeapon ? 
-      equipment.find(eq => eq.id === player.equippedWeapon) : null;
-
-    return biomeResources.filter(resource => {
-      // If resource doesn't require a tool, it's always collectable
-      if (!resource.requiredTool) return true;
-
-      // Special case for hunting large animals: requires weapon AND knife
-      if (resource.requiredTool === "weapon_and_knife") {
-        const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
-        const hasKnife = (equippedTool && equippedTool.toolType === "knife") || 
-                         (equippedWeapon && equippedWeapon.toolType === "knife");
-        return !!(hasNonKnifeWeapon && hasKnife);
-      }
-
-      // Regular tool checks - check both tool and weapon slots for the required tool
-      const hasRequiredTool = (equippedTool && equippedTool.toolType === resource.requiredTool) ||
-                             (equippedWeapon && equippedWeapon.toolType === resource.requiredTool);
-
-      return hasRequiredTool;
-    });
-  };
-
-  const getResourceById = (id: string) => resources.find(r => r.id === id);
-
   const calculateExpeditionTime = () => {
     const baseTime = 30; // 30 seconds base
     const resourceMultiplier = selectedResources.length * 5; // 5 seconds per resource
@@ -294,6 +180,120 @@ export default function ExpeditionSystem({
       }
     }, 1000);
   };
+
+  // Reset state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setPhase("resource-selection");
+      setSelectedResources([]);
+      if (onExpeditionUpdate) {
+        onExpeditionUpdate(null);
+      } else {
+        setLocalActiveExpedition(null);
+      }
+      setExpeditionProgress(0);
+      setExpeditionRewards(null);
+      setAutoCompleteTimer(5);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+  }, [isOpen]);
+
+  // Auto-complete timer when progress reaches 100%
+  useEffect(() => {
+    if (expeditionProgress >= 100 && phase === "in-progress") {
+      const timerInterval = setInterval(() => {
+        setAutoCompleteTimer(prev => {
+          if (prev <= 1) {
+            clearInterval(timerInterval);
+            handleCompleteExpedition();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timerInterval);
+    }
+  }, [expeditionProgress, phase]);
+
+  // Auto-start expedition when modal opens with last resources
+  useEffect(() => {
+    if (isOpen && selectedResources.length === 0 && biome) {
+      // Check if this is an auto-repeat expedition
+      const lastExpeditions = typeof window !== 'undefined' 
+        ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
+        : {};
+
+      if (lastExpeditions[biome.id] && lastExpeditions[biome.id].length > 0) {
+        setSelectedResources(lastExpeditions[biome.id]);
+      }
+    }
+  }, [isOpen, biome]);
+
+  // Listen for auto-start expedition event
+  useEffect(() => {
+    const handleAutoStart = (event: CustomEvent) => {
+      if (event.detail.resources && biome) {
+        setSelectedResources(event.detail.resources);
+        // Auto-start the expedition after setting resources
+        setTimeout(() => {
+          if (event.detail.resources.length > 0) {
+            startExpeditionMutation.mutate({
+              playerId,
+              biomeId: biome.id,
+              selectedResources: event.detail.resources
+            });
+          }
+        }, 100);
+      }
+    };
+
+    window.addEventListener('autoStartExpedition', handleAutoStart as EventListener);
+    return () => {
+      window.removeEventListener('autoStartExpedition', handleAutoStart as EventListener);
+    };
+  }, [biome, playerId, startExpeditionMutation]);
+
+  const getBiomeResources = () => {
+    if (!biome) return [];
+    const resourceIds = biome.availableResources as string[];
+    return resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
+  };
+
+  const getCollectableResources = () => {
+    const biomeResources = getBiomeResources();
+
+    // Get player's equipped tool and weapon
+    const equippedTool = player.equippedTool ? 
+      equipment.find(eq => eq.id === player.equippedTool) : null;
+    const equippedWeapon = player.equippedWeapon ? 
+      equipment.find(eq => eq.id === player.equippedWeapon) : null;
+
+    return biomeResources.filter(resource => {
+      // If resource doesn't require a tool, it's always collectable
+      if (!resource.requiredTool) return true;
+
+      // Special case for hunting large animals: requires weapon AND knife
+      if (resource.requiredTool === "weapon_and_knife") {
+        const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
+        const hasKnife = (equippedTool && equippedTool.toolType === "knife") || 
+                         (equippedWeapon && equippedWeapon.toolType === "knife");
+        return !!(hasNonKnifeWeapon && hasKnife);
+      }
+
+      // Regular tool checks - check both tool and weapon slots for the required tool
+      const hasRequiredTool = (equippedTool && equippedTool.toolType === resource.requiredTool) ||
+                             (equippedWeapon && equippedWeapon.toolType === resource.requiredTool);
+
+      return hasRequiredTool;
+    });
+  };
+
+  const getResourceById = (id: string) => resources.find(r => r.id === id);
 
   const handleResourceToggle = (resourceId: string) => {
     setSelectedResources(prev => 
