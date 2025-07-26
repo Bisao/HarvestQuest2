@@ -432,7 +432,7 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Import DatabaseStorage for production use
-import { DatabaseStorage } from "./storage-database";
+// Use MemStorage for Replit environment
+// import { DatabaseStorage } from "./storage-database";
 
-export const storage = new DatabaseStorage();
+export const storage = new MemStorage();
