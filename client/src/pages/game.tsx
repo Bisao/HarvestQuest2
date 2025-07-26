@@ -14,7 +14,9 @@ import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema"
 export default function Game() {
   const [location] = useLocation();
   const urlParams = new URLSearchParams(location.split('?')[1] || '');
-  const playerUsername = urlParams.get('player') || 'Player1';
+  const playerUsername = urlParams.get('player') || '';
+  
+  console.log("Game loading for player:", playerUsername);
   const [activeTab, setActiveTab] = useState("biomes");
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [expeditionMinimized, setExpeditionMinimized] = useState(false);
@@ -33,21 +35,71 @@ export default function Game() {
     };
   }, []);
 
-  const { data: player } = useQuery<Player>({
+  const { data: player, isLoading: playerLoading, error: playerError } = useQuery<Player>({
     queryKey: ["/api/player", playerUsername],
+    enabled: !!playerUsername,
+    retry: 1,
     queryFn: async () => {
-      const response = await fetch(`/api/player/${playerUsername}`);
+      console.log("Fetching player data for:", playerUsername);
+      const response = await fetch(`/api/player/${encodeURIComponent(playerUsername)}`);
+      console.log("Player fetch response:", response.status, response.statusText);
+      
       if (!response.ok) {
         if (response.status === 404) {
-          // Player not found, redirect to main menu
-          window.location.href = '/';
-          return null;
+          console.error("Player not found:", playerUsername);
+          // Player not found, redirect to main menu after a short delay
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+          throw new Error('Player not found');
         }
         throw new Error('Failed to fetch player');
       }
-      return response.json();
+      const playerData = await response.json();
+      console.log("Player data loaded:", playerData);
+      return playerData;
     }
   });
+
+  // Show loading state
+  if (!playerUsername) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800">Erro</h2>
+          <p className="text-gray-600 mt-2">Nome do jogador não encontrado</p>
+          <a href="/" className="text-blue-600 hover:underline mt-4 inline-block">
+            Voltar ao menu principal
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  if (playerLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin text-4xl mb-4">⚡</div>
+          <h2 className="text-2xl font-bold text-gray-800">Carregando Jogo...</h2>
+          <p className="text-gray-600 mt-2">Preparando sua aventura, {playerUsername}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (playerError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-4xl mb-4">❌</div>
+          <h2 className="text-2xl font-bold text-gray-800">Erro ao Carregar</h2>
+          <p className="text-gray-600 mt-2">Jogador não encontrado ou erro no servidor</p>
+          <p className="text-sm text-gray-500 mt-1">Redirecionando para o menu principal...</p>
+        </div>
+      </div>
+    );
+  }
 
   const { data: biomes = [] } = useQuery<Biome[]>({
     queryKey: ["/api/biomes"],

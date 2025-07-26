@@ -33,7 +33,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player"] });
       setWithdrawDialogOpen(false);
       setWithdrawAmount(1);
       toast({
@@ -57,7 +57,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player"] });
       toast({
         title: "Item consumido!",
         description: `Fome: +${data.hungerRestored} | Sede: +${data.thirstRestored}`,
@@ -78,7 +78,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
       return response.json();
     },
     onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player"] });
       toast({
         title: "Água consumida!",
         description: `Sede: +${data.thirstRestored}`,

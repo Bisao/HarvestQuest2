@@ -57,6 +57,8 @@ export default function MainMenu() {
       
       if (response.ok) {
         const player = await response.json();
+        console.log("Player created successfully:", player);
+        
         // Store current player in localStorage for the game
         localStorage.setItem('currentPlayer', JSON.stringify(player));
         
@@ -65,9 +67,11 @@ export default function MainMenu() {
           description: `Bem-vindo, ${newPlayerName}! Sua aventura começou.`,
         });
         
-        setLocation(`/game?player=${player.username}`);
+        // Navigate to game with the player's username
+        setLocation(`/game?player=${encodeURIComponent(player.username)}`);
       } else {
         const error = await response.json();
+        console.error("Failed to create player:", error);
         toast({
           title: "Erro",
           description: error.message || "Falha ao criar jogador.",
@@ -86,13 +90,15 @@ export default function MainMenu() {
   };
 
   const handleLoadGame = (saveSlot: SaveSlot) => {
+    console.log("Loading game for player:", saveSlot.username);
+    
     // Store selected player in localStorage
     localStorage.setItem('currentPlayer', JSON.stringify({
       id: saveSlot.id,
       username: saveSlot.username
     }));
     
-    setLocation(`/game?player=${saveSlot.username}`);
+    setLocation(`/game?player=${encodeURIComponent(saveSlot.username)}`);
   };
 
   const handleContinueLastGame = () => {
