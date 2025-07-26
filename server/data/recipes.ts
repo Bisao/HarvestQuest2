@@ -163,7 +163,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Peixe Grelhado",
       emoji: "🐟",
       requiredLevel: 1,
-      ingredients: { [resourceMap.carne]: 1, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.peixe_pequeno]: 1, [resourceMap.gravetos]: 1 },
       output: { "grilled_fish": 1 }
     },
     {
