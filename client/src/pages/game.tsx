@@ -14,9 +14,24 @@ import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema"
 export default function Game() {
   const [location] = useLocation();
   const urlParams = new URLSearchParams(location.split('?')[1] || '');
-  const playerUsername = urlParams.get('player') || '';
+  let playerUsername = urlParams.get('player') || '';
+  
+  // Also try to get from localStorage as fallback
+  if (!playerUsername) {
+    try {
+      const storedPlayer = localStorage.getItem('currentPlayer');
+      if (storedPlayer) {
+        const parsed = JSON.parse(storedPlayer);
+        playerUsername = parsed.username || '';
+      }
+    } catch (e) {
+      console.error("Error parsing stored player:", e);
+    }
+  }
   
   console.log("Game loading for player:", playerUsername);
+  console.log("URL location:", location);
+  console.log("URL params:", urlParams.toString());
   const [activeTab, setActiveTab] = useState("biomes");
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [expeditionMinimized, setExpeditionMinimized] = useState(false);
