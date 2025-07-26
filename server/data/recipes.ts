@@ -53,7 +53,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Foice",
       emoji: "🔪",
       requiredLevel: 2,
-      ingredients: { [resourceMap.pedra]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "sickle": 1 }
     },
     {
