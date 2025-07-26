@@ -27,7 +27,7 @@ interface ActiveExpedition {
   estimatedDuration: number;
 }
 
-type ExpeditionPhase = "setup" | "resource-selection" | "equipment-selection" | "confirmation" | "in-progress" | "completed";
+type ExpeditionPhase = "setup" | "resource-selection" | "confirmation" | "in-progress" | "completed";
 
 export default function ExpeditionSystem({
   isOpen,
@@ -40,7 +40,7 @@ export default function ExpeditionSystem({
 }: ExpeditionSystemProps) {
   const [phase, setPhase] = useState<ExpeditionPhase>("setup");
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
-  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
+  // Equipment is now managed by player's equipped items
   const [activeExpedition, setActiveExpedition] = useState<ActiveExpedition | null>(null);
   const [expeditionProgress, setExpeditionProgress] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -51,7 +51,6 @@ export default function ExpeditionSystem({
     if (isOpen) {
       setPhase("setup");
       setSelectedResources([]);
-      setSelectedEquipment([]);
       setActiveExpedition(null);
       setExpeditionProgress(0);
     } else {
@@ -70,23 +69,12 @@ export default function ExpeditionSystem({
   };
 
   const getResourceById = (id: string) => resources.find(r => r.id === id);
-  const getEquipmentById = (id: string) => equipment.find(e => e.id === id);
+
 
   const calculateExpeditionTime = () => {
     const baseTime = 30; // 30 seconds base
     const resourceMultiplier = selectedResources.length * 5; // 5 seconds per resource
-    const equipmentReduction = selectedEquipment.reduce((reduction, equipId) => {
-      const equip = getEquipmentById(equipId);
-      if (equip && equip.bonus && typeof equip.bonus === 'object' && 'type' in equip.bonus) {
-        const bonus = equip.bonus as any;
-        if (bonus.type === 'time_reduction') {
-          return reduction + (bonus.multiplier ? (1 - bonus.multiplier) * 0.3 : 0);
-        }
-      }
-      return reduction;
-    }, 0);
-    
-    return Math.max(10, baseTime + resourceMultiplier - (baseTime * equipmentReduction));
+    return Math.max(10, baseTime + resourceMultiplier);
   };
 
   const startExpeditionMutation = useMutation({
@@ -94,7 +82,6 @@ export default function ExpeditionSystem({
       playerId: string;
       biomeId: string;
       selectedResources: string[];
-      selectedEquipment: string[];
     }) => {
       const response = await apiRequest('POST', '/api/expeditions', expeditionData);
       if (!response.ok) {
@@ -190,13 +177,7 @@ export default function ExpeditionSystem({
     );
   };
 
-  const handleEquipmentToggle = (equipmentId: string) => {
-    setSelectedEquipment(prev => 
-      prev.includes(equipmentId) 
-        ? prev.filter(id => id !== equipmentId)
-        : [...prev, equipmentId]
-    );
-  };
+
 
   const handleStartExpedition = () => {
     if (!biome) return;
@@ -204,8 +185,7 @@ export default function ExpeditionSystem({
     startExpeditionMutation.mutate({
       playerId,
       biomeId: biome.id,
-      selectedResources,
-      selectedEquipment
+      selectedResources
     });
   };
 
@@ -239,7 +219,6 @@ export default function ExpeditionSystem({
               <p className="text-sm text-muted-foreground">
                 {phase === "setup" && "Configure sua expedição"}
                 {phase === "resource-selection" && "Escolha os recursos para coletar"}
-                {phase === "equipment-selection" && "Selecione seus equipamentos"}
                 {phase === "confirmation" && "Confirme os detalhes da expedição"}
                 {phase === "in-progress" && "Expedição em andamento..."}
                 {phase === "completed" && "Expedição concluída!"}
@@ -251,16 +230,16 @@ export default function ExpeditionSystem({
         <div className="space-y-6">
           {/* Progress Indicator */}
           <div className="flex items-center justify-between">
-            {["setup", "resource-selection", "equipment-selection", "confirmation"].map((step, index) => (
-              <div key={step} className={`flex items-center ${index < 3 ? "flex-1" : ""}`}>
+            {["setup", "resource-selection", "confirmation"].map((step, index) => (
+              <div key={step} className={`flex items-center ${index < 2 ? "flex-1" : ""}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                   phase === step ? "bg-forest text-white" :
-                  ["setup", "resource-selection", "equipment-selection", "confirmation"].indexOf(phase) > index ? "bg-green-500 text-white" :
+                  ["setup", "resource-selection", "confirmation"].indexOf(phase) > index ? "bg-green-500 text-white" :
                   "bg-gray-200 text-gray-600"
                 }`}>
                   {index + 1}
                 </div>
-                {index < 3 && <div className="flex-1 h-0.5 bg-gray-200 mx-2" />}
+                {index < 2 && <div className="flex-1 h-0.5 bg-gray-200 mx-2" />}
               </div>
             ))}
           </div>
@@ -331,54 +310,17 @@ export default function ExpeditionSystem({
                   Voltar
                 </Button>
                 <Button 
-                  onClick={() => setPhase("equipment-selection")}
+                  onClick={() => setPhase("confirmation")}
                   disabled={selectedResources.length === 0}
                   className="bg-forest hover:bg-forest/90"
                 >
-                  Próximo: Equipamentos
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Equipment Selection Phase */}
-          {phase === "equipment-selection" && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold">Selecione seus equipamentos (opcional):</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {equipment.map(equip => (
-                  <label
-                    key={equip.id}
-                    className={`cursor-pointer p-4 border-2 rounded-lg transition-all ${
-                      selectedEquipment.includes(equip.id)
-                        ? "border-forest bg-green-50"
-                        : "border-gray-200 hover:border-forest/50"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedEquipment.includes(equip.id)}
-                      onChange={() => handleEquipmentToggle(equip.id)}
-                      className="sr-only"
-                    />
-                    <div className="text-center">
-                      <span className="text-4xl block mb-2">{equip.emoji}</span>
-                      <h4 className="font-semibold">{equip.name}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{equip.effect}</p>
-                    </div>
-                  </label>
-                ))}
-              </div>
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={() => setPhase("resource-selection")}>
-                  Voltar
-                </Button>
-                <Button onClick={() => setPhase("confirmation")} className="bg-forest hover:bg-forest/90">
                   Próximo: Confirmação
                 </Button>
               </div>
             </div>
           )}
+
+
 
           {/* Confirmation Phase */}
           {phase === "confirmation" && (
@@ -409,22 +351,7 @@ export default function ExpeditionSystem({
                   </div>
                 </div>
 
-                {selectedEquipment.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Equipamentos ({selectedEquipment.length}):</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedEquipment.map(equipId => {
-                        const equip = getEquipmentById(equipId);
-                        return equip ? (
-                          <Badge key={equipId} variant="outline" className="flex items-center gap-1">
-                            <span>{equip.emoji}</span>
-                            <span>{equip.name}</span>
-                          </Badge>
-                        ) : null;
-                      })}
-                    </div>
-                  </div>
-                )}
+
 
                 <div>
                   <h4 className="font-semibold mb-2">Duração Estimada:</h4>
@@ -433,7 +360,7 @@ export default function ExpeditionSystem({
               </div>
 
               <div className="flex justify-between">
-                <Button variant="outline" onClick={() => setPhase("equipment-selection")}>
+                <Button variant="outline" onClick={() => setPhase("resource-selection")}>
                   Voltar
                 </Button>
                 <Button 

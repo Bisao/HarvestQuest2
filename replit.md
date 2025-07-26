@@ -15,7 +15,11 @@ Preferred communication style: Simple, everyday language.
 - Fixed all TypeScript and CSS errors for production-ready code
 - Enhanced UI with custom animations and improved styling
 - **Completely rebuilt expedition system from scratch** with new ExpeditionSystem component
-- New multi-phase expedition flow: setup → resource selection → equipment selection → confirmation → progress → completion
+- New streamlined expedition flow: setup → resource selection → confirmation → progress → completion
+- Removed equipment selection from expeditions (equipment now managed through player inventory)
+- **Created Minecraft-style inventory system** with dedicated equipment slots (helmet, chestplate, leggings, boots, weapon, tool)
+- New 9x4 grid inventory layout similar to Minecraft with visual item management
+- Added equipment slot system for better item organization and character progression
 - Improved expedition UI with progress indicators, better visual feedback, and smoother user experience
 - Added real-time expedition progress simulation with automatic completion detection
 - Verified all game systems are fully functional: expeditions, inventory, storage, crafting
