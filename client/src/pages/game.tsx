@@ -224,10 +224,10 @@ export default function Game() {
       console.log('Biome found:', biome?.name, 'Player stats:', { 
         hunger: player?.hunger, 
         thirst: player?.thirst,
-        canStart: biome && player && player.hunger < 90 && player.thirst < 90 
+        canStart: biome && player && player.hunger > 10 && player.thirst > 10 
       });
       
-      if (biome && player && player.hunger < 90 && player.thirst < 90) {
+      if (biome && player && player.hunger > 10 && player.thirst > 10) {
         console.log('All conditions met - Auto-starting expedition for biome:', biomeId);
         
         // Get last expedition resources
@@ -243,9 +243,11 @@ export default function Game() {
           
           // Then open modal and minimize it to show the expedition in progress
           setTimeout(() => {
-            console.log('Opening expedition modal');
+            console.log('Opening expedition modal - setting states');
             setExpeditionModalOpen(true);
             setExpeditionMinimized(false);
+            
+            console.log('Modal states set - expeditionModalOpen: true, expeditionMinimized: false');
             
             // Auto-start expedition with last resources after modal opens
             setTimeout(() => {

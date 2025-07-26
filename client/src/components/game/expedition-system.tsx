@@ -334,7 +334,18 @@ export default function ExpeditionSystem({
     onClose();
   };
 
-  if (!biome) return null;
+  if (!biome) {
+    console.log('ExpeditionSystem: No biome provided, returning null');
+    return null;
+  }
+
+  console.log('ExpeditionSystem render:', { 
+    isOpen, 
+    biomeName: biome.name, 
+    phase, 
+    selectedResources: selectedResources.length,
+    activeExpedition: !!activeExpedition 
+  });
 
   const collectableResources = getCollectableResources();
   const estimatedTime = calculateExpeditionTime();
