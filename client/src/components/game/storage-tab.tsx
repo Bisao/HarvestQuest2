@@ -11,9 +11,10 @@ interface StorageTabProps {
   resources: Resource[];
   equipment: Equipment[];
   autoStorage: boolean;
+  isBlocked?: boolean;
 }
 
-export default function StorageTab({ playerId, resources, equipment, autoStorage }: StorageTabProps) {
+export default function StorageTab({ playerId, resources, equipment, autoStorage, isBlocked = false }: StorageTabProps) {
   const { toast } = useToast();
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<{ id: string; name: string; available: number } | null>(null);

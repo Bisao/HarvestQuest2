@@ -10,9 +10,10 @@ interface CraftingTabProps {
   resources: Resource[];
   playerLevel: number;
   playerId: string;
+  isBlocked?: boolean;
 }
 
-export default function EnhancedCraftingTab({ recipes, resources, playerLevel, playerId }: CraftingTabProps) {
+export default function EnhancedCraftingTab({ recipes, resources, playerLevel, playerId, isBlocked = false }: CraftingTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -180,7 +181,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
                 <Button
                   onClick={() => handleCraft(recipe)}
-                  disabled={!canCraft || craftMutation.isPending}
+                  disabled={!canCraft || craftMutation.isPending || isBlocked}
                   className={`w-full ${
                     canCraft 
                       ? "bg-green-600 hover:bg-green-700 text-white" 
@@ -189,6 +190,8 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
                 >
                   {craftMutation.isPending ? (
                     "Craftando..."
+                  ) : isBlocked ? (
+                    "🚫 Aguarde expedição"
                   ) : canCraft ? (
                     `🔨 Craftar ${recipe.name}`
                   ) : !unlocked ? (

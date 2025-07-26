@@ -22,13 +22,15 @@ interface EnhancedInventoryProps {
   resources: Resource[];
   equipment: Equipment[];
   player: Player;
+  isBlocked?: boolean;
 }
 
 export default function EnhancedInventory({
   playerId,
   resources,
   equipment,
-  player
+  player,
+  isBlocked = false
 }: EnhancedInventoryProps) {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
@@ -400,7 +402,7 @@ export default function EnhancedInventory({
                 variant="outline"
                 size="sm"
                 onClick={() => {/* TODO: Store all items */}}
-                disabled={inventory.length === 0}
+                disabled={inventory.length === 0 || isBlocked}
               >
                 📦 Guardar Tudo
               </Button>
@@ -450,9 +452,9 @@ export default function EnhancedInventory({
                               variant="outline"
                               size="sm"
                               onClick={() => moveToStorageMutation.mutate(selectedItem.id)}
-                              disabled={moveToStorageMutation.isPending}
+                              disabled={moveToStorageMutation.isPending || isBlocked}
                             >
-                              {moveToStorageMutation.isPending ? "Movendo..." : "→ Armazém"}
+                              {moveToStorageMutation.isPending ? "Movendo..." : isBlocked ? "🚫 Bloqueado" : "→ Armazém"}
                             </Button>
                             <Button variant="outline" size="sm" disabled>
                               🗑️ Descartar

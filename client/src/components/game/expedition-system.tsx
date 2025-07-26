@@ -11,12 +11,14 @@ import type { Biome, Resource, Equipment, Player } from "@shared/schema";
 interface ExpeditionSystemProps {
   isOpen: boolean;
   onClose: () => void;
+  onMinimize: () => void;
   biome: Biome | null;
   resources: Resource[];
   equipment: Equipment[];
   playerId: string;
   player: Player;
   onExpeditionComplete: () => void;
+  isMinimized?: boolean;
 }
 
 interface ActiveExpedition {
@@ -33,12 +35,14 @@ type ExpeditionPhase = "setup" | "resource-selection" | "confirmation" | "in-pro
 export default function ExpeditionSystem({
   isOpen,
   onClose,
+  onMinimize,
   biome,
   resources,
   equipment,
   playerId,
   player,
-  onExpeditionComplete
+  onExpeditionComplete,
+  isMinimized = false
 }: ExpeditionSystemProps) {
   const [phase, setPhase] = useState<ExpeditionPhase>("setup");
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
@@ -128,6 +132,11 @@ export default function ExpeditionSystem({
       setPhase("in-progress");
       startProgressSimulation(newActiveExpedition);
       
+      // Store expedition state in parent component
+      if (typeof window !== 'undefined' && (window as any).setActiveExpedition) {
+        (window as any).setActiveExpedition(newActiveExpedition);
+      }
+      
       toast({
         title: "Expedição Iniciada!",
         description: `Coletando recursos na ${biome?.name}. Duração estimada: ${Math.round(duration)}s`,
@@ -162,6 +171,11 @@ export default function ExpeditionSystem({
         title: "Expedição Concluída!",
         description: `Recursos coletados com sucesso!`,
       });
+      
+      // Force expand modal when expedition completes
+      if (isMinimized) {
+        onMinimize(); // This will expand the modal
+      }
       
       onExpeditionComplete();
     },
@@ -232,20 +246,44 @@ export default function ExpeditionSystem({
   const estimatedTime = calculateExpeditionTime();
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={false}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="expedition-description">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            <span className="text-4xl">{biome.emoji}</span>
-            <div>
-              <h2 className="text-2xl font-bold">Expedição na {biome.name}</h2>
-              <p className="text-sm text-muted-foreground">
-                {phase === "setup" && "Configure sua expedição"}
-                {phase === "resource-selection" && "Escolha os recursos para coletar"}
-                {phase === "confirmation" && "Confirme os detalhes da expedição"}
-                {phase === "in-progress" && "Expedição em andamento..."}
-                {phase === "completed" && "Expedição concluída!"}
-              </p>
+          <DialogTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl">{biome.emoji}</span>
+              <div>
+                <h2 className="text-2xl font-bold">Expedição na {biome.name}</h2>
+                <p className="text-sm text-muted-foreground">
+                  {phase === "setup" && "Configure sua expedição"}
+                  {phase === "resource-selection" && "Escolha os recursos para coletar"}
+                  {phase === "confirmation" && "Confirme os detalhes da expedição"}
+                  {phase === "in-progress" && "Expedição em andamento..."}
+                  {phase === "completed" && "Expedição concluída!"}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {(phase === "in-progress" || phase === "completed") && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onMinimize}
+                  className="p-2"
+                >
+                  −
+                </Button>
+              )}
+              {(phase === "setup" || phase === "resource-selection" || phase === "confirmation" || phase === "completed") && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClose}
+                  className="p-2"
+                >
+                  ✕
+                </Button>
+              )}
             </div>
           </DialogTitle>
         </DialogHeader>

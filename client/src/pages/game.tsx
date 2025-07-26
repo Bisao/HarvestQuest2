@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
@@ -13,9 +13,19 @@ import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema"
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
+  const [expeditionMinimized, setExpeditionMinimized] = useState(false);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
+  const [activeExpedition, setActiveExpedition] = useState<any>(null);
 
   const { gameState, updateGameState } = useGameState();
+
+  // Make setActiveExpedition available globally for expedition system
+  useEffect(() => {
+    (window as any).setActiveExpedition = setActiveExpedition;
+    return () => {
+      delete (window as any).setActiveExpedition;
+    };
+  }, []);
 
   const { data: player } = useQuery<Player>({
     queryKey: ["/api/player/Player1"],
@@ -46,13 +56,32 @@ export default function Game() {
 
   // Handler for exploring biomes
   const handleExploreBiome = (biome: Biome) => {
+    // Don't allow new expeditions if one is already active
+    if (activeExpedition) return;
+    
     setSelectedBiome(biome);
     setExpeditionModalOpen(true);
+    setExpeditionMinimized(false);
   };
 
-  // Handler for completing expeditions (placeholder - managed by ExpeditionSystem)
-  const handleCompleteExpedition = (expeditionId: string) => {
-    // This function is now managed by the ExpeditionSystem component
+  // Handler for minimizing expedition
+  const handleMinimizeExpedition = () => {
+    if (activeExpedition) {
+      setExpeditionMinimized(!expeditionMinimized);
+      if (expeditionMinimized) {
+        setExpeditionModalOpen(true);
+      } else {
+        setExpeditionModalOpen(false);
+      }
+    }
+  };
+
+  // Handler for completing expeditions
+  const handleCompleteExpedition = () => {
+    setActiveExpedition(null);
+    setExpeditionModalOpen(false);
+    setExpeditionMinimized(false);
+    queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
   };
 
   if (!player) {
@@ -98,7 +127,7 @@ export default function Game() {
                 equipment={equipment}
                 player={player}
                 playerLevel={player.level}
-                activeExpedition={gameState.activeExpedition}
+                activeExpedition={activeExpedition}
                 onExploreBiome={handleExploreBiome}
                 onCompleteExpedition={handleCompleteExpedition}
               />
@@ -110,6 +139,7 @@ export default function Game() {
                 resources={resources}
                 equipment={equipment}
                 player={player}
+                isBlocked={!!activeExpedition}
               />
             )}
 
@@ -119,6 +149,7 @@ export default function Game() {
                 resources={resources}
                 equipment={equipment}
                 autoStorage={player.autoStorage}
+                isBlocked={!!activeExpedition}
               />
             )}
 
@@ -128,6 +159,7 @@ export default function Game() {
                 resources={resources}
                 playerLevel={player.level}
                 playerId={player.id}
+                isBlocked={!!activeExpedition}
               />
             )}
           </div>
@@ -139,16 +171,16 @@ export default function Game() {
         onClose={() => {
           setExpeditionModalOpen(false);
           setSelectedBiome(null);
+          setActiveExpedition(null);
         }}
+        onMinimize={handleMinimizeExpedition}
         biome={selectedBiome}
         resources={resources}
         equipment={equipment}
         playerId={player.id}
         player={player}
-        onExpeditionComplete={() => {
-          updateGameState({ activeExpedition: null });
-          queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-        }}
+        isMinimized={expeditionMinimized}
+        onExpeditionComplete={handleCompleteExpedition}
       />
     </div>
   );

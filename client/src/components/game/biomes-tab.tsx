@@ -130,7 +130,7 @@ export default function BiomesTab({ biomes, resources, equipment, player, player
                   onExploreBiome(biome);
                 }
               }}
-              disabled={!unlocked || (hasActiveExpedition && activeExpedition.progress < 100) || false}
+              disabled={!unlocked || (hasActiveExpedition && activeExpedition.progress < 100) || (activeExpedition && !hasActiveExpedition)}
               className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors ${
                 hasActiveExpedition && activeExpedition.progress >= 100
                   ? "bg-blue-600 hover:bg-blue-700 text-white"
