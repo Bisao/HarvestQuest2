@@ -2,7 +2,6 @@
 import type { IStorage } from "../storage";
 import type { Player, Expedition, Resource, Equipment, Biome } from "@shared/schema";
 import { GameService } from "./game-service";
-import { ResourceService } from "./resource-service";
 
 export class ExpeditionService {
   private gameService: GameService;
@@ -152,62 +151,27 @@ export class ExpeditionService {
       
       // Check if this is an animal that needs processing
       if (this.isAnimal(resource.name)) {
-        // Process animal into component parts using ResourceService
-        const animalDrops = ResourceService.processAnimalDrops(resource.name);
-        
-        // Add processed materials to rewards
-        for (const [materialName, quantity] of Object.entries(animalDrops)) {
-          const materialResource = allResources.find(r => r.name === materialName);
-          if (materialResource) {
-            rewards[materialResource.id] = (rewards[materialResource.id] || 0) + quantity;
-          }
+        // Process animal into component parts
+        const animalParts = this.processAnimal(resource.name, allResources);
+        for (const [partResourceId, quantity] of Object.entries(animalParts)) {
+          rewards[partResourceId] = (rewards[partResourceId] || 0) + quantity;
         }
       } else {
-        // Calculate base quantity for non-animal resources
-        let baseQuantity = this.getBaseResourceQuantity(resource, playerEquipment);
-        
-        // Add base resource to rewards
-        rewards[resourceId] = (rewards[resourceId] || 0) + baseQuantity;
-        
-        // Check for rare drops (crystals from stone mining, loose stones, etc.)
-        const rareDrops = ResourceService.checkRareDrops(resource.name, baseQuantity);
-        for (const [dropName, dropQuantity] of Object.entries(rareDrops)) {
-          const dropResource = allResources.find(r => r.name === dropName);
-          if (dropResource) {
-            rewards[dropResource.id] = (rewards[dropResource.id] || 0) + dropQuantity;
-          }
-        }
+        // Regular resource collection
+        let baseQuantity = await this.getBaseResourceQuantity(resourceId);
+        rewards[resourceId] = (rewards[resourceId] || 0) + Math.max(1, baseQuantity);
       }
     }
-
+    
+    // Apply pickaxe bonus for stone mining
+    this.addPickaxeBonus(rewards, playerEquipment, allResources);
+    
     return rewards;
   }
-
-  // Check if a resource is an animal that should be processed
+  
+  // Check if a resource is an animal or fish
   private isAnimal(resourceName: string): boolean {
-    return ['Coelho', 'Veado', 'Javali', 'Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName);
-  }
-
-  // Get base quantity for resource collection based on equipment and rarity
-  private getBaseResourceQuantity(resource: any, playerEquipment: any[]): number {
-    let baseQuantity = 1;
-    
-    // Apply equipment bonuses
-    const relevantTool = playerEquipment.find(eq => 
-      (resource.requiredTool && eq.toolType === resource.requiredTool) ||
-      (resource.requiredTool === 'weapon_and_knife' && (eq.toolType === 'weapon' || eq.toolType === 'knife'))
-    );
-    
-    if (relevantTool) {
-      baseQuantity += Math.floor(relevantTool.efficiency || 0);
-    }
-    
-    // Apply rarity multipliers
-    if (resource.rarity === 'common') baseQuantity += Math.floor(Math.random() * 3) + 1; // 1-3 extra
-    if (resource.rarity === 'uncommon') baseQuantity += Math.floor(Math.random() * 2) + 1; // 1-2 extra
-    if (resource.rarity === 'rare') baseQuantity += Math.floor(Math.random() * 2); // 0-1 extra
-    
-    return Math.max(1, baseQuantity);
+    return ["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
   }
   
   // Process animal into component resources

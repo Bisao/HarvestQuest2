@@ -6,7 +6,6 @@ import { z } from "zod";
 import type { Player } from "@shared/schema";
 import { GameService } from "./services/game-service";
 import { ExpeditionService } from "./services/expedition-service";
-import { ResourceService } from "./services/resource-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -56,19 +55,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all resources (filtered for collectible ones)
+  // Get all resources
   app.get("/api/resources", async (req, res) => {
-    try {
-      const allResources = await storage.getAllResources();
-      const collectibleResources = ResourceService.getCollectibleResources(allResources);
-      res.json(collectibleResources);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to get resources" });
-    }
-  });
-
-  // Get all resources including processed ones (for crafting, storage, etc.)
-  app.get("/api/resources/all", async (req, res) => {
     try {
       const resources = await storage.getAllResources();
       res.json(resources);

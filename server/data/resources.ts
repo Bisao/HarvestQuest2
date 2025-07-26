@@ -11,17 +11,17 @@ export const BASIC_RESOURCES: InsertResource[] = [
   { name: "Madeira", emoji: "🪵", weight: 3, value: 5, type: "basic", rarity: "common", requiredTool: "axe", experienceValue: 6 },
   { name: "Argila", emoji: "🧱", weight: 2, value: 3, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2 },
   { name: "Ferro Fundido", emoji: "🔩", weight: 4, value: 15, type: "basic", rarity: "uncommon", requiredTool: "pickaxe", experienceValue: 5 },
-  { name: "Couro", emoji: "🦫", weight: 2, value: 8, type: "processed", rarity: "common", requiredTool: null, experienceValue: 3 },
-  { name: "Carne", emoji: "🥩", weight: 2, value: 12, type: "processed", rarity: "common", requiredTool: null, experienceValue: 4 },
-  { name: "Ossos", emoji: "🦴", weight: 1, value: 5, type: "processed", rarity: "common", requiredTool: null, experienceValue: 2 },
-  { name: "Pelo", emoji: "🧶", weight: 1, value: 3, type: "processed", rarity: "common", requiredTool: null, experienceValue: 1 },
-  { name: "Barbante", emoji: "🧵", weight: 0.1, value: 1, type: "crafted", rarity: "common", requiredTool: null, experienceValue: 1 },
+  { name: "Couro", emoji: "🦫", weight: 2, value: 8, type: "basic", rarity: "common", requiredTool: "knife", experienceValue: 3 },
+  { name: "Carne", emoji: "🥩", weight: 2, value: 12, type: "basic", rarity: "common", requiredTool: null, experienceValue: 4 },
+  { name: "Ossos", emoji: "🦴", weight: 1, value: 5, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2 },
+  { name: "Pelo", emoji: "🧶", weight: 1, value: 3, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
+  { name: "Barbante", emoji: "🧵", weight: 0.1, value: 1, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
 ];
 
 export const UNIQUE_RESOURCES: InsertResource[] = [
   { name: "Madeira", emoji: "🌳", weight: 5, value: 8, type: "unique", rarity: "common", requiredTool: "axe", experienceValue: 3 },
   { name: "Areia", emoji: "⏳", weight: 2, value: 5, type: "unique", rarity: "common", requiredTool: "shovel", experienceValue: 2 },
-  { name: "Cristais", emoji: "💎", weight: 1, value: 20, type: "rare_drop", rarity: "rare", requiredTool: null, experienceValue: 10 },
+  { name: "Cristais", emoji: "💎", weight: 1, value: 20, type: "unique", rarity: "rare", requiredTool: "pickaxe", experienceValue: 10 },
   { name: "Conchas", emoji: "🐚", weight: 1, value: 12, type: "unique", rarity: "uncommon", requiredTool: null, experienceValue: 4 },
 ];
 
