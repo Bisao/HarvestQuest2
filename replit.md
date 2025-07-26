@@ -53,13 +53,29 @@ Preferred communication style: Simple, everyday language.
 - All game data now properly organized and easily extensible for future content additions
 
 **January 26, 2025 - Recipe Updates and Storage Management**
-- **Updated crafting recipes** per user specifications:
-  - Balde: 1 Madeira + 1 Corda
-  - Faca: 1 Pedra + 1 Corda + 2 Gravetos
-  - Cogumelos Assados: 2 Cogumelos + 1 Graveto
-  - Carne Assada: 1 Carne + 1 Graveto
-  - Ensopado de Carne: 1 Carne + 2 Cogumelos + 3 Água Fresca + 1 Panela
-- **Added new equipment**: Panela (pot) for cooking complex recipes
+- **Completely overhauled crafting system** with new recipes per user specifications:
+  - **NEW: Barbante** - 5 Fibras (basic crafting material)
+  - **Machado** - 1 Pedra Solta + 2 Barbantes + 1 Graveto
+  - **Picareta** - 2 Pedras Soltas + 2 Barbantes + 1 Graveto  
+  - **Foice** - 1 Pedra + 2 Barbantes + 1 Graveto
+  - **Balde de Madeira** - 1 Madeira + 2 Barbantes (requer machado ou faca)
+  - **Arco e Flecha** - 2 Gravetos + 2 Barbantes + 1 Pedra Solta
+  - **Lança** - 2 Gravetos + 4 Barbantes + 1 Pedra Solta
+  - **Faca** - 1 Pedra Solta + 1 Barbante + 1 Graveto
+- **Added new resources**: Argila, Ferro Fundido, Couro for advanced crafting
+- **Enhanced equipment system** with new items:
+  - **Mochila** - 2 Couros + 4 Barbantes (aumenta inventário)
+  - **Isca para Pesca** - 1 Fibra + 1 Fruta Silvestre
+  - **Corda** - 2 Couros (requer machado ou faca)
+  - **Panela de Barro** - 10 Argilas
+  - **Panela** - 2 Ferro Fundido
+  - **Garrafa de Bambu** - 2 Bambus (requer machado ou faca)
+- **Updated food recipes**:
+  - **Suco de Frutas** - 1 Água Fresca + 1 Garrafa de Bambu (não consome garrafa)
+  - **Cogumelos Assados** - 3 Cogumelos + 1 Graveto
+  - **Peixe Grelhado** - 1 Peixe + 1 Graveto
+  - **Carne Assada** - 1 Carne + 1 Graveto
+  - **Ensopado de Carne** - 1 Panela de Barro + 2 Carnes + 3 Águas (não consome panela)
 - **Enhanced storage system configuration**: Added player preference for crafted items destination
 - **Created player settings interface** with storage management options:
   - Auto-storage toggle for expedition rewards
