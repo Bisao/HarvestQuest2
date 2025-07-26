@@ -99,6 +99,44 @@ export default function ExpeditionSystem({
     }
   }, [expeditionProgress, phase]);
 
+  // Auto-start expedition when modal opens with last resources
+  useEffect(() => {
+    if (isOpen && selectedResources.length === 0 && biome) {
+      // Check if this is an auto-repeat expedition
+      const lastExpeditions = typeof window !== 'undefined' 
+        ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
+        : {};
+
+      if (lastExpeditions[biome.id] && lastExpeditions[biome.id].length > 0) {
+        setSelectedResources(lastExpeditions[biome.id]);
+      }
+    }
+  }, [isOpen, biome]);
+
+  // Listen for auto-start expedition event
+  useEffect(() => {
+    const handleAutoStart = (event: CustomEvent) => {
+      if (event.detail.resources && biome) {
+        setSelectedResources(event.detail.resources);
+        // Auto-start the expedition after setting resources
+        setTimeout(() => {
+          if (event.detail.resources.length > 0) {
+            startExpeditionMutation.mutate({
+              playerId,
+              biomeId: biome.id,
+              selectedResources: event.detail.resources
+            });
+          }
+        }, 100);
+      }
+    };
+
+    window.addEventListener('autoStartExpedition', handleAutoStart as EventListener);
+    return () => {
+      window.removeEventListener('autoStartExpedition', handleAutoStart as EventListener);
+    };
+  }, [biome, playerId, startExpeditionMutation]);
+
   const getBiomeResources = () => {
     if (!biome) return [];
     const resourceIds = biome.availableResources as string[];
