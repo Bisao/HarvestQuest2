@@ -74,17 +74,24 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       output: { "rope": 1 },
     },
     {
+      name: "Panela",
+      emoji: "🫕",
+      requiredLevel: 2,
+      ingredients: { [resourceIds[1]]: 3, [resourceIds[6]]: 1 }, // 3 Pedra + 1 Madeira
+      output: { "pot": 1 },
+    },
+    {
       name: "Balde de Madeira",
       emoji: "🪣",
       requiredLevel: 1,
-      ingredients: { [resourceIds[4]]: 2, "rope": 1 }, // 2 Madeira + 1 Corda
+      ingredients: { [resourceIds[6]]: 1, "rope": 1 }, // 1 Madeira + 1 Corda
       output: { "bucket": 1 },
     },
     {
       name: "Faca",
       emoji: "🗡️",
       requiredLevel: 1,
-      ingredients: { [resourceIds[1]]: 1, [resourceIds[4]]: 1, [resourceIds[0]]: 1 }, // 1 Pedra + 1 Madeira + 1 Fibra
+      ingredients: { [resourceIds[1]]: 1, "rope": 1, [resourceIds[3]]: 2 }, // 1 Pedra + 1 Corda + 2 Gravetos
       output: { "knife": 1 },
     },
     {
@@ -106,7 +113,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Cogumelos Assados",
       emoji: "🍄‍🟫",
       requiredLevel: 1,
-      ingredients: { [resourceIds[14]]: 2 }, // 2 Cogumelos
+      ingredients: { [resourceIds[14]]: 2, [resourceIds[3]]: 1 }, // 2 Cogumelos + 1 Graveto
       output: { "roasted_mushrooms": 1 },
     },
     {
@@ -120,14 +127,14 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Carne Assada",
       emoji: "🍖",
       requiredLevel: 3,
-      ingredients: { [resourceIds[8]]: 1 }, // 1 Coelho
+      ingredients: { [resourceIds[8]]: 1, [resourceIds[3]]: 1 }, // 1 Carne + 1 Graveto
       output: { "roasted_meat": 1 },
     },
     {
       name: "Ensopado de Carne",
       emoji: "🍲",
       requiredLevel: 5,
-      ingredients: { [resourceIds[9]]: 1, [resourceIds[14]]: 2, [resourceIds[4]]: 1 }, // 1 Veado + 2 Cogumelos + 1 Água
+      ingredients: { [resourceIds[9]]: 1, [resourceIds[14]]: 2, [resourceIds[4]]: 3, "pot": 1 }, // 1 Carne + 2 Cogumelos + 3 Água Fresca + 1 Panela
       output: { "meat_stew": 1 },
     },
   ];

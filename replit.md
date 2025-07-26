@@ -52,6 +52,22 @@ Preferred communication style: Simple, everyday language.
 - **Enhanced expedition system** with proper tool/weapon requirements for hunting and fishing
 - All game data now properly organized and easily extensible for future content additions
 
+**January 26, 2025 - Recipe Updates and Storage Management**
+- **Updated crafting recipes** per user specifications:
+  - Balde: 1 Madeira + 1 Corda
+  - Faca: 1 Pedra + 1 Corda + 2 Gravetos
+  - Cogumelos Assados: 2 Cogumelos + 1 Graveto
+  - Carne Assada: 1 Carne + 1 Graveto
+  - Ensopado de Carne: 1 Carne + 2 Cogumelos + 3 Água Fresca + 1 Panela
+- **Added new equipment**: Panela (pot) for cooking complex recipes
+- **Enhanced storage system configuration**: Added player preference for crafted items destination
+- **Created player settings interface** with storage management options:
+  - Auto-storage toggle for expedition rewards
+  - Crafted items destination choice (inventory vs storage)
+- **Updated crafting system** to respect player's preferred destination for crafted items
+- Added settings button to game header for easy access to player preferences
+- Improved API with player settings endpoint for real-time configuration updates
+
 ## System Architecture
 
 ### Frontend Architecture

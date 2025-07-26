@@ -74,6 +74,15 @@ export const TOOLS: InsertEquipment[] = [
     toolType: "bamboo_bottle",
     weight: 1,
   },
+  {
+    name: "Panela",
+    emoji: "🫕",
+    effect: "Usada para cozinhar ensopados",
+    bonus: { type: "cooking", value: 1 },
+    slot: "tool",
+    toolType: "pot",
+    weight: 3,
+  },
 ];
 
 export const WEAPONS: InsertEquipment[] = [
