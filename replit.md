@@ -41,13 +41,14 @@ Preferred communication style: Simple, everyday language.
 
 **January 26, 2025 - Enhanced Game Mechanics Update**
 - **Added "Pedras Soltas" resource** - collectible without tools in all biomes
-- **Enhanced hunting system** - now requires both weapon AND knife for animal processing
+- **Enhanced hunting system** - coelhos can be hunted with knife only, larger animals require weapon + knife
 - **Implemented pickaxe bonus** - mining stone now also generates loose stones automatically
 - **Added XP display** - all resources now show experience points gained per item collected
 - **Added Faca (knife) equipment** - required for skinning hunted animals
 - **Updated resource experience values** - balanced XP rewards across all resource types
 - **Enhanced resource collection logic** - proper tool/weapon requirement checking with combined requirements
 - **Updated UI displays** - expedition system and biome views now show XP information
+- **Simplified rabbit hunting** - coelhos now require only knife (tool or weapon slot), not weapon + knife
 
 **January 26, 2025 - Modular Architecture Update**
 - **Completely restructured backend into modular architecture** for better maintainability and content addition

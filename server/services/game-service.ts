@@ -53,7 +53,7 @@ export class GameService {
     
     const equipment = await this.storage.getAllEquipment();
     
-    // Special case for hunting: requires weapon AND knife
+    // Special case for hunting large animals: requires weapon AND knife
     if (resource.requiredTool === "weapon_and_knife") {
       // Check if player has a weapon equipped (not a knife)
       const equippedWeapon = equipment.find(eq => 

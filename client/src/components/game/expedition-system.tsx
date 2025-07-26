@@ -96,7 +96,7 @@ export default function ExpeditionSystem({
       // If resource doesn't require a tool, it's always collectable
       if (!resource.requiredTool) return true;
       
-      // Special case for hunting: requires weapon AND knife
+      // Special case for hunting large animals: requires weapon AND knife
       if (resource.requiredTool === "weapon_and_knife") {
         const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
         const hasKnife = (equippedTool && equippedTool.toolType === "knife") || 
