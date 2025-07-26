@@ -42,8 +42,14 @@ export default function EnhancedInventory({
   } | null>(null);
   const { toast } = useToast();
 
-  const { data: inventory = [] } = useQuery<InventoryItem[]>({
+  const { data: inventoryData = [] } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory", playerId],
+  });
+
+  // Filter out water from inventory since it goes to special compartment
+  const inventory = inventoryData.filter(item => {
+    const resource = getResourceById(item.resourceId);
+    return resource && resource.name !== "Água Fresca";
   });
 
   // Equipment slots configuration

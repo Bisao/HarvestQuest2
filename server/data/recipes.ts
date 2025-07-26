@@ -77,22 +77,29 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Balde de Madeira",
       emoji: "🪣",
       requiredLevel: 1,
-      ingredients: { [resourceIds[4]]: 3, [resourceIds[0]]: 2 }, // 3 Madeira + 2 Fibra
+      ingredients: { [resourceIds[4]]: 2, "rope": 1 }, // 2 Madeira + 1 Corda
       output: { "bucket": 1 },
     },
     {
       name: "Faca",
       emoji: "🗡️",
       requiredLevel: 1,
-      ingredients: { [resourceIds[4]]: 1, [resourceIds[1]]: 2 }, // 1 Madeira + 2 Pedra
+      ingredients: { [resourceIds[1]]: 1, [resourceIds[4]]: 1, [resourceIds[0]]: 1 }, // 1 Pedra + 1 Madeira + 1 Fibra
       output: { "knife": 1 },
+    },
+    {
+      name: "Garrafa de Bambu",
+      emoji: "🎍",
+      requiredLevel: 1,
+      ingredients: { [resourceIds[5]]: 2 }, // 2 Bambu
+      output: { "bamboo_bottle": 1 },
     },
     // Receitas de Comida
     {
       name: "Suco de Frutas",
       emoji: "🧃",
       requiredLevel: 1,
-      ingredients: { [resourceIds[15]]: 3 }, // 3 Frutas Silvestres
+      ingredients: { "bamboo_bottle": 1, [resourceIds[4]]: 1, [resourceIds[15]]: 5 }, // 1 Garrafa de Bambu + 1 Água + 5 Frutas Silvestres
       output: { "fruit_juice": 1 },
     },
     {

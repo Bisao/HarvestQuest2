@@ -171,6 +171,7 @@ export default function Game() {
                 resources={resources}
                 equipment={equipment}
                 autoStorage={player.autoStorage}
+                player={player}
                 isBlocked={!!activeExpedition}
               />
             )}

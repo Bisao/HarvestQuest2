@@ -11,10 +11,11 @@ interface StorageTabProps {
   resources: Resource[];
   equipment: Equipment[];
   autoStorage: boolean;
+  player: any;
   isBlocked?: boolean;
 }
 
-export default function StorageTab({ playerId, resources, equipment, autoStorage, isBlocked = false }: StorageTabProps) {
+export default function StorageTab({ playerId, resources, equipment, autoStorage, player, isBlocked = false }: StorageTabProps) {
   const { toast } = useToast();
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<{ storageItemId: string; resourceId: string; name: string; available: number } | null>(null);
@@ -76,6 +77,27 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
       toast({
         title: "Erro",
         description: error.message || "Não foi possível consumir o item.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const consumeWaterMutation = useMutation({
+    mutationFn: async (quantity: number) => {
+      const response = await apiRequest("POST", `/api/player/${playerId}/consume-water`, { quantity });
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      toast({
+        title: "Água consumida!",
+        description: `Sede: +${data.thirstRestored}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Não foi possível consumir água.",
         variant: "destructive",
       });
     },
@@ -190,9 +212,53 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
         </div>
       </div>
 
+      {/* Water Storage Compartment */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <span className="text-3xl">💧</span>
+            <div>
+              <h3 className="font-semibold text-blue-800">Armazenamento de Água</h3>
+              <p className="text-sm text-blue-600">Compartimento especial para água coletada</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <div className="text-2xl font-bold text-blue-600">
+                {player?.waterStorage || 0} / {player?.maxWaterStorage || 500}
+              </div>
+              <div className="text-xs text-blue-500">unidades de água</div>
+            </div>
+            {player?.waterStorage > 0 && (
+              <button
+                onClick={() => consumeWaterMutation.mutate(1)}
+                disabled={consumeWaterMutation.isPending || isBlocked}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors disabled:bg-gray-400"
+              >
+                {consumeWaterMutation.isPending ? "Bebendo..." : "💧 Beber Água"}
+              </button>
+            )}
+          </div>
+        </div>
+        {/* Water storage progress bar */}
+        <div className="mt-3">
+          <div className="w-full bg-blue-200 rounded-full h-2">
+            <div 
+              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              style={{ 
+                width: `${Math.min(((player?.waterStorage || 0) / (player?.maxWaterStorage || 500)) * 100, 100)}%` 
+              }}
+            ></div>
+          </div>
+        </div>
+      </div>
+
       {/* Storage Items */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        {storage.map((storageItem) => {
+        {storage.filter(item => {
+          const itemData = getItemData(item.resourceId);
+          return itemData && itemData.name !== "Água Fresca"; // Don't show water in regular storage
+        }).map((storageItem) => {
           const itemData = getItemData(storageItem.resourceId);
           if (!itemData) return null;
 

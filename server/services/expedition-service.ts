@@ -144,7 +144,7 @@ export class ExpeditionService {
     // Base reward calculation for each selected resource
     const selectedResources = Array.isArray(expedition.selectedResources) ? expedition.selectedResources : [];
     for (const resourceId of selectedResources) {
-      const baseQuantity = this.getBaseResourceQuantity(resourceId);
+      const baseQuantity = await this.getBaseResourceQuantity(resourceId);
       rewards[resourceId] = baseQuantity;
     }
 
@@ -163,7 +163,15 @@ export class ExpeditionService {
   }
 
   // Get base quantity for a resource type
-  private getBaseResourceQuantity(resourceId: string): number {
+  private async getBaseResourceQuantity(resourceId: string): Promise<number> {
+    const allResources = await this.storage.getAllResources();
+    const resource = allResources.find(r => r.id === resourceId);
+    
+    // Special case for water - bucket collects 5 units
+    if (resource && resource.name === "Água Fresca") {
+      return 5;
+    }
+    
     // This could be made more sophisticated based on resource rarity
     return Math.floor(Math.random() * 5) + 1; // 1-5 items
   }
@@ -172,6 +180,23 @@ export class ExpeditionService {
   private async distributeRewards(playerId: string, rewards: Record<string, number>, autoStorage: boolean): Promise<void> {
     for (const [resourceId, quantity] of Object.entries(rewards)) {
       if (quantity <= 0) continue;
+
+      // Check if this is water - handle specially
+      const resource = await this.storage.getResource(resourceId);
+      if (resource && resource.name === "Água Fresca") {
+        try {
+          // Water goes directly to player's water storage compartment
+          const player = await this.storage.getPlayer(playerId);
+          if (player) {
+            const newWaterAmount = Math.min(player.waterStorage + quantity, player.maxWaterStorage);
+            await this.storage.updatePlayer(playerId, { waterStorage: newWaterAmount });
+          }
+          continue; // Skip normal storage/inventory logic for water
+        } catch (error) {
+          console.error(`Failed to add water to player: ${error}`);
+          continue;
+        }
+      }
 
       if (autoStorage) {
         // Add to storage
@@ -191,7 +216,6 @@ export class ExpeditionService {
         }
       } else {
         // Add to inventory (check weight limits)
-        const resource = await this.storage.getResource(resourceId);
         if (!resource) continue;
 
         const totalWeight = resource.weight * quantity;

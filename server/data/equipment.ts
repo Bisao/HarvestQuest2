@@ -65,6 +65,15 @@ export const TOOLS: InsertEquipment[] = [
     toolType: "bucket",
     weight: 2,
   },
+  {
+    name: "Garrafa de Bambu",
+    emoji: "🎍",
+    effect: "Usado para fazer bebidas",
+    bonus: { type: "crafting", value: 1 },
+    slot: "tool",
+    toolType: "bamboo_bottle",
+    weight: 1,
+  },
 ];
 
 export const WEAPONS: InsertEquipment[] = [

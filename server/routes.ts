@@ -387,6 +387,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Consume water from player's water compartment
+  app.post("/api/player/:playerId/consume-water", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const { quantity = 1 } = req.body;
+      
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ error: "Player not found" });
+      }
+
+      if (player.waterStorage < quantity) {
+        return res.status(400).json({ error: "Not enough water available" });
+      }
+
+      // Water restores thirst
+      const thirstRestore = 15; // Water restores 15 thirst per unit
+      const newThirst = Math.min(player.thirst + (thirstRestore * quantity), player.maxThirst);
+      const newWaterStorage = player.waterStorage - quantity;
+
+      await storage.updatePlayer(playerId, {
+        thirst: newThirst,
+        waterStorage: newWaterStorage
+      });
+
+      res.json({ 
+        success: true, 
+        thirstRestored: thirstRestore * quantity,
+        newThirst,
+        newWaterStorage,
+        hungerRestored: 0
+      });
+    } catch (error) {
+      console.error('Consume water error:', error);
+      res.status(500).json({ error: "Failed to consume water" });
+    }
+  });
+
   // Store individual inventory item using service
   app.post("/api/storage/store/:inventoryItemId", async (req, res) => {
     try {

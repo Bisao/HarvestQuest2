@@ -50,6 +50,10 @@ export interface IStorage {
   addStorageItem(item: InsertStorageItem): Promise<StorageItem>;
   updateStorageItem(id: string, updates: Partial<StorageItem>): Promise<StorageItem>;
   removeStorageItem(id: string): Promise<void>;
+  
+  // Water storage methods
+  addWaterToPlayer(playerId: string, quantity: number): Promise<Player>;
+  consumeWaterFromPlayer(playerId: string, quantity: number): Promise<Player>;
 
   // Expedition methods
   getPlayerExpeditions(playerId: string): Promise<Expedition[]>;
@@ -180,6 +184,8 @@ export class MemStorage implements IStorage {
       inventoryWeight: insertPlayer.inventoryWeight ?? 0,
       maxInventoryWeight: insertPlayer.maxInventoryWeight ?? 100,
       autoStorage: insertPlayer.autoStorage ?? false,
+      waterStorage: insertPlayer.waterStorage ?? 0,
+      maxWaterStorage: insertPlayer.maxWaterStorage ?? 500,
       equippedHelmet: insertPlayer.equippedHelmet || null,
       equippedChestplate: insertPlayer.equippedChestplate || null,
       equippedLeggings: insertPlayer.equippedLeggings || null,
@@ -310,6 +316,36 @@ export class MemStorage implements IStorage {
 
   async removeStorageItem(id: string): Promise<void> {
     this.storageItems.delete(id);
+  }
+
+  // Special method for handling water storage (goes to player's water compartment)
+  async addWaterToPlayer(playerId: string, quantity: number): Promise<Player> {
+    const player = await this.getPlayer(playerId);
+    if (!player) throw new Error("Player not found");
+
+    const newWaterAmount = Math.min(player.waterStorage + quantity, player.maxWaterStorage);
+    const actualAdded = newWaterAmount - player.waterStorage;
+
+    if (actualAdded < quantity) {
+      throw new Error(`Water storage is full! Can only add ${actualAdded} units.`);
+    }
+
+    return await this.updatePlayer(playerId, { 
+      waterStorage: newWaterAmount 
+    });
+  }
+
+  async consumeWaterFromPlayer(playerId: string, quantity: number): Promise<Player> {
+    const player = await this.getPlayer(playerId);
+    if (!player) throw new Error("Player not found");
+
+    if (player.waterStorage < quantity) {
+      throw new Error("Not enough water in storage!");
+    }
+
+    return await this.updatePlayer(playerId, { 
+      waterStorage: player.waterStorage - quantity 
+    });
   }
 
   // Expedition methods

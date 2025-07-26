@@ -16,6 +16,8 @@ export const players = pgTable("players", {
   inventoryWeight: integer("inventory_weight").notNull().default(0),
   maxInventoryWeight: integer("max_inventory_weight").notNull().default(100),
   autoStorage: boolean("auto_storage").notNull().default(false),
+  waterStorage: integer("water_storage").notNull().default(0),
+  maxWaterStorage: integer("max_water_storage").notNull().default(500),
   equippedHelmet: text("equipped_helmet"),
   equippedChestplate: text("equipped_chestplate"),
   equippedLeggings: text("equipped_leggings"),
