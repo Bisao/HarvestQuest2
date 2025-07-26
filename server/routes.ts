@@ -788,35 +788,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin endpoint to add resources directly to storage
-  app.post("/api/admin/add-resources", async (req, res) => {
-    try {
-      const { playerId, resources } = req.body;
-      
-      for (const { resourceId, quantity } of resources) {
-        const storageItems = await storage.getPlayerStorage(playerId);
-        const existingItem = storageItems.find(item => item.resourceId === resourceId);
-        
-        if (existingItem) {
-          await storage.updateStorageItem(existingItem.id, {
-            quantity: existingItem.quantity + quantity
-          });
-        } else {
-          await storage.addStorageItem({
-            playerId,
-            resourceId,
-            quantity
-          });
-        }
-      }
-      
-      res.json({ message: "Resources added successfully" });
-    } catch (error) {
-      console.error('Admin add resources error:', error);
-      res.status(500).json({ error: "Failed to add resources" });
-    }
-  });
-
   const httpServer = createServer(app);
   return httpServer;
 }
