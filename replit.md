@@ -6,6 +6,16 @@ This is a full-stack web application for a resource collection adventure game ca
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**January 26, 2025**
+- Successfully migrated project from Replit Agent to Replit environment
+- Updated biome level requirements: Floresta (1), Deserto (20), Montanha (50), Oceano (75) 
+- Reset player to start at level 1 with no items or resources for proper game progression
+- Fixed all TypeScript and CSS errors for production-ready code
+- Enhanced UI with custom animations and improved styling
+- Verified all game systems are fully functional: expeditions, inventory, storage, crafting
+
 ## System Architecture
 
 ### Frontend Architecture
