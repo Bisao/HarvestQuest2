@@ -18,10 +18,12 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
+    "Materiais": true,
     "Ferramentas": true,
+    "Armas": false,
     "Equipamentos": false,
+    "Utensílios": false,
     "Consumíveis": false,
-    "Itens Especiais": false,
   });
 
   // Get storage items to check available resources
@@ -62,12 +64,56 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   });
 
   const getResourceData = (resourceId: string) => {
-    return resources.find(r => r.id === resourceId);
+    // First try to find in resources
+    const resource = resources.find(r => r.id === resourceId);
+    if (resource) return resource;
+    
+    // If not found, it might be an equipment name (like "string", "bamboo_bottle", etc.)
+    // Return a placeholder with the resourceId as name for display
+    return {
+      id: resourceId,
+      name: resourceId === "string" ? "Barbante" :
+            resourceId === "bamboo_bottle" ? "Garrafa de Bambu" :
+            resourceId === "clay_pot" ? "Panela de Barro" :
+            resourceId === "rope" ? "Corda" :
+            resourceId,
+      emoji: resourceId === "string" ? "🧵" :
+             resourceId === "bamboo_bottle" ? "🎍" :
+             resourceId === "clay_pot" ? "🏺" :
+             resourceId === "rope" ? "🪢" :
+             "📦",
+      weight: 1,
+      value: 1,
+      type: "basic",
+      rarity: "common",
+      requiredTool: null,
+      experienceValue: 1
+    };
   };
 
   const getStorageQuantity = (resourceId: string) => {
+    // Check storage items for resources
     const storageItem = storageItems.find(item => item.resourceId === resourceId);
-    return storageItem?.quantity || 0;
+    if (storageItem) return storageItem.quantity;
+    
+    // For equipment items (like "string", "bamboo_bottle"), check by name match
+    const equipmentMappings: Record<string, string> = {
+      "string": "Barbante",
+      "bamboo_bottle": "Garrafa de Bambu",
+      "clay_pot": "Panela de Barro",
+      "rope": "Corda"
+    };
+    
+    if (equipmentMappings[resourceId]) {
+      const equipmentName = equipmentMappings[resourceId];
+      const equipmentInStorage = storageItems.find(item => {
+        const resource = resources.find(r => r.id === item.resourceId);
+        return resource?.name === equipmentName;
+      });
+      return equipmentInStorage?.quantity || 0;
+    }
+    
+    return 0;
   };
 
   const getRecipeIngredients = (recipe: Recipe) => {
@@ -105,23 +151,44 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
   const categorizeRecipes = (recipes: Recipe[]) => {
     const categories: Record<string, Recipe[]> = {
+      "Materiais": [],
       "Ferramentas": [],
+      "Armas": [],
       "Equipamentos": [],
-      "Consumíveis": [],
-      "Itens Especiais": []
+      "Utensílios": [],
+      "Consumíveis": []
     };
 
     recipes.forEach(recipe => {
       const name = recipe.name.toLowerCase();
       
-      if (name.includes("machado") || name.includes("picareta") || name.includes("vara") || name.includes("foice") || name.includes("pá") || name.includes("balde")) {
+      // Materiais básicos
+      if (name.includes("barbante") || name.includes("corda") || name.includes("isca")) {
+        categories["Materiais"].push(recipe);
+      }
+      // Ferramentas de trabalho
+      else if (name.includes("machado") || name.includes("picareta") || name.includes("foice") || name.includes("balde") || name.includes("vara")) {
         categories["Ferramentas"].push(recipe);
-      } else if (name.includes("capacete") || name.includes("peitoral") || name.includes("calças") || name.includes("botas") || name.includes("arco") || name.includes("lança") || name.includes("faca")) {
+      }
+      // Armas
+      else if (name.includes("arco") || name.includes("lança") || name.includes("faca")) {
+        categories["Armas"].push(recipe);
+      }
+      // Equipamentos pessoais
+      else if (name.includes("mochila") || name.includes("capacete") || name.includes("peitoral") || name.includes("calças") || name.includes("botas")) {
         categories["Equipamentos"].push(recipe);
-      } else if (name.includes("suco") || name.includes("assados") || name.includes("grelhado") || name.includes("assada") || name.includes("ensopado")) {
+      }
+      // Utensílios de cozinha
+      else if (name.includes("panela") || name.includes("garrafa")) {
+        categories["Utensílios"].push(recipe);
+      }
+      // Comidas e bebidas
+      else if (name.includes("suco") || name.includes("assados") || name.includes("grelhado") || name.includes("assada") || name.includes("ensopado")) {
         categories["Consumíveis"].push(recipe);
-      } else {
-        categories["Itens Especiais"].push(recipe);
+      }
+      // Fallback
+      else {
+        categories["Materiais"].push(recipe);
       }
     });
 
