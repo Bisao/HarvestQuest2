@@ -61,7 +61,7 @@ export default function ExpeditionSystem({
   // Reset state when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      setPhase("setup");
+      setPhase("resource-selection");
       setSelectedResources([]);
       if (onExpeditionUpdate) {
         onExpeditionUpdate(null);
@@ -284,7 +284,6 @@ export default function ExpeditionSystem({
               <div>
                 <h2 className="text-lg md:text-2xl font-bold">Expedição na {biome.name}</h2>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  {phase === "setup" && "Configure sua expedição"}
                   {phase === "resource-selection" && "Escolha os recursos para coletar"}
                   {phase === "confirmation" && "Confirme os detalhes da expedição"}
                   {phase === "in-progress" && "Expedição em andamento..."}
@@ -318,16 +317,16 @@ export default function ExpeditionSystem({
         <div className="space-y-6">
           {/* Progress Indicator */}
           <div className="flex items-center justify-between">
-            {["setup", "resource-selection", "confirmation"].map((step, index) => (
-              <div key={step} className={`flex items-center ${index < 2 ? "flex-1" : ""}`}>
+            {["resource-selection", "confirmation"].map((step, index) => (
+              <div key={step} className={`flex items-center ${index < 1 ? "flex-1" : ""}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                   phase === step ? "bg-forest text-white" :
-                  ["setup", "resource-selection", "confirmation"].indexOf(phase) > index ? "bg-green-500 text-white" :
+                  ["resource-selection", "confirmation"].indexOf(phase) > index ? "bg-green-500 text-white" :
                   "bg-gray-200 text-gray-600"
                 }`}>
                   {index + 1}
                 </div>
-                {index < 2 && <div className="flex-1 h-0.5 bg-gray-200 mx-2" />}
+                {index < 1 && <div className="flex-1 h-0.5 bg-gray-200 mx-2" />}
               </div>
             ))}
           </div>
@@ -478,8 +477,8 @@ export default function ExpeditionSystem({
               )}
               
               <div className="flex justify-between">
-                <Button variant="outline" onClick={() => setPhase("setup")}>
-                  Voltar
+                <Button variant="outline" onClick={handleClose}>
+                  Cancelar
                 </Button>
                 <Button 
                   onClick={() => setPhase("confirmation")}
