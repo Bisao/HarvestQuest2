@@ -34,7 +34,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId } = req.params;
       const { autoStorage, craftedItemsDestination } = req.body;
-      
+
       const player = await storage.getPlayer(playerId);
       if (!player) {
         return res.status(404).json({ message: "Player not found" });
@@ -117,17 +117,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Equip item
+  // Equip item endpoint
   app.post("/api/player/equip", async (req, res) => {
     try {
       const { playerId, slot, equipmentId } = req.body;
-      
-      const player = await storage.getPlayer(playerId);
-      if (!player) {
-        return res.status(404).json({ message: "Player not found" });
+
+      if (!playerId || !slot) {
+        return res.status(400).json({ error: "Missing required fields" });
       }
 
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ error: "Player not found" });
+      }
+
+      // Get current equipped item for this slot
+      let currentEquippedId: string | null = null;
+      switch (slot) {
+        case "helmet":
+          currentEquippedId = player.equippedHelmet;
+          break;
+        case "chestplate":
+          currentEquippedId = player.equippedChestplate;
+          break;
+        case "leggings":
+          currentEquippedId = player.equippedLeggings;
+          break;
+        case "boots":
+          currentEquippedId = player.equippedBoots;
+          break;
+        case "weapon":
+          currentEquippedId = player.equippedWeapon;
+          break;
+        case "tool":
+          currentEquippedId = player.equippedTool;
+          break;
+        default:
+          return res.status(400).json({ error: "Invalid slot" });
+      }
+
+      // If unequipping (equipmentId is null)
+      if (!equipmentId) {
+        // Return currently equipped item to storage
+        if (currentEquippedId) {
+          const storageItems = await storage.getPlayerStorage(playerId);
+          const existingStorageItem = storageItems.find(item => item.resourceId === currentEquippedId);
+
+          if (existingStorageItem) {
+            await storage.updateStorageItem(existingStorageItem.id, {
+              quantity: existingStorageItem.quantity + 1
+            });
+          } else {
+            await storage.addStorageItem({
+              playerId,
+              resourceId: currentEquippedId,
+              quantity: 1
+            });
+          }
+        }
+      } else {
+        // If equipping a new item
+        // Check if item is available in storage
+        const storageItems = await storage.getPlayerStorage(playerId);
+        const storageItem = storageItems.find(item => item.resourceId === equipmentId);
+
+        if (!storageItem || storageItem.quantity < 1) {
+          return res.status(400).json({ error: "Item not available in storage" });
+        }
+
+        // Return currently equipped item to storage (if any)
+        if (currentEquippedId) {
+          const existingCurrentItem = storageItems.find(item => item.resourceId === currentEquippedId);
+          if (existingCurrentItem) {
+            await storage.updateStorageItem(existingCurrentItem.id, {
+              quantity: existingCurrentItem.quantity + 1
+            });
+          } else {
+            await storage.addStorageItem({
+              playerId,
+              resourceId: currentEquippedId,
+              quantity: 1
+            });
+          }
+        }
+
+        // Consume 1 item from storage
+        if (storageItem.quantity === 1) {
+          await storage.removeStorageItem(storageItem.id);
+        } else {
+          await storage.updateStorageItem(storageItem.id, {
+            quantity: storageItem.quantity - 1
+          });
+        }
+      }
+
+      // Update the player's equipped item for the specific slot
       const updates: Partial<Player> = {};
+
       switch (slot) {
         case "helmet":
           updates.equippedHelmet = equipmentId;
@@ -147,14 +233,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         case "tool":
           updates.equippedTool = equipmentId;
           break;
-        default:
-          return res.status(400).json({ message: "Invalid equipment slot" });
       }
 
       const updatedPlayer = await storage.updatePlayer(playerId, updates);
       res.json(updatedPlayer);
     } catch (error) {
-      res.status(500).json({ message: "Failed to equip item" });
+      console.error("Error equipping item:", error);
+      res.status(500).json({ error: "Failed to equip item" });
     }
   });
 
@@ -162,7 +247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/craft", async (req, res) => {
     try {
       const { playerId, recipeId } = req.body;
-      
+
       const player = await storage.getPlayer(playerId);
       if (!player) {
         return res.status(404).json({ message: "Player not found" });
@@ -179,13 +264,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get player's storage items
       const storageItems = await storage.getPlayerStorage(playerId);
-      
+
       // Check if player has enough ingredients in storage
       const ingredientEntries = Object.entries(recipe.ingredients as Record<string, number>);
       for (const [resourceId, requiredQuantity] of ingredientEntries) {
         const storageItem = storageItems.find(item => item.resourceId === resourceId);
         const availableQuantity = storageItem?.quantity || 0;
-        
+
         if (availableQuantity < requiredQuantity) {
           const resource = await storage.getResource(resourceId);
           return res.status(400).json({ 
@@ -210,16 +295,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add crafted items to player's preferred destination (inventory or storage)
       const destination = player.craftedItemsDestination || 'storage';
       const outputEntries = Object.entries(recipe.output as Record<string, number>);
-      
+
       for (const [itemType, quantity] of outputEntries) {
         // First check if it's a resource (like Barbante)
         const allResources = await storage.getAllResources();
         const resourceItem = allResources.find(r => r.id === itemType);
-        
+
         if (resourceItem) {
           // Add resource to storage
           const existingStorageItem = storageItems.find(item => item.resourceId === resourceItem.id);
-          
+
           if (existingStorageItem) {
             await storage.updateStorageItem(existingStorageItem.id, {
               quantity: existingStorageItem.quantity + quantity
@@ -231,7 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               quantity
             });
           }
-          
+
           console.log(`Added ${quantity}x ${resourceItem.name} to storage for player ${playerId}`);
         } else {
           // Find the actual equipment by toolType or name matching
@@ -240,13 +325,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             eq.toolType === itemType || 
             eq.name.toLowerCase().includes(itemType.toLowerCase())
           );
-          
+
           if (equipmentItem) {
               if (destination === 'inventory') {
                 // Add to inventory
                 const inventoryItems = await storage.getPlayerInventory(playerId);
                 const existingInventoryItem = inventoryItems.find(item => item.resourceId === equipmentItem.id);
-                
+
                 if (existingInventoryItem) {
                   await storage.updateInventoryItem(existingInventoryItem.id, {
                     quantity: existingInventoryItem.quantity + quantity
@@ -258,16 +343,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     quantity
                   });
                 }
-                
+
                 // Update player inventory weight
                 const newWeight = player.inventoryWeight + (equipmentItem.weight * quantity);
                 await storage.updatePlayer(playerId, { inventoryWeight: newWeight });
-                
+
                 console.log(`Added ${quantity}x ${equipmentItem.name} to inventory for player ${playerId}`);
               } else {
                 // Add to storage (default behavior)
                 const existingStorageItem = storageItems.find(item => item.resourceId === equipmentItem.id);
-                
+
                 if (existingStorageItem) {
                   await storage.updateStorageItem(existingStorageItem.id, {
                     quantity: existingStorageItem.quantity + quantity
@@ -279,7 +364,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     quantity
                   });
                 }
-                
+
                 console.log(`Added ${quantity}x ${equipmentItem.name} to storage for player ${playerId}`);
               }
           } else {
@@ -299,14 +384,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/expeditions", async (req, res) => {
     try {
       const { playerId, biomeId, selectedResources, selectedEquipment } = req.body;
-      
+
       const expedition = await expeditionService.startExpedition(
         playerId, 
         biomeId, 
         selectedResources || [], 
         selectedEquipment || []
       );
-      
+
       res.json(expedition);
     } catch (error) {
       console.error('Expedition creation error:', error);
@@ -342,7 +427,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId } = req.params;
       const { itemId, quantity = 1 } = req.body;
-      
+
       const player = await storage.getPlayer(playerId);
       if (!player) {
         return res.status(404).json({ error: "Player not found" });
@@ -351,10 +436,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get item from inventory or storage
       const inventoryItems = await storage.getPlayerInventory(playerId);
       const storageItems = await storage.getPlayerStorage(playerId);
-      
+
       let itemSource: 'inventory' | 'storage' | null = null;
       let itemToConsume: any = null;
-      
+
       // Check inventory first
       const inventoryItem = inventoryItems.find(item => item.id === itemId);
       if (inventoryItem && inventoryItem.quantity >= quantity) {
@@ -467,7 +552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId } = req.params;
       const { quantity = 1 } = req.body;
-      
+
       const player = await storage.getPlayer(playerId);
       if (!player) {
         return res.status(404).json({ error: "Player not found" });
@@ -505,7 +590,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { inventoryItemId } = req.params;
       const { playerId, quantity } = req.body;
-      
+
       await gameService.moveToStorage(playerId, inventoryItemId, quantity);
       res.json({ message: "Item stored successfully" });
     } catch (error) {
@@ -554,7 +639,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/storage/withdraw", async (req, res) => {
     try {
       const { playerId, storageItemId, quantity } = req.body;
-      
+
       await gameService.moveToInventory(playerId, storageItemId, quantity);
       res.json({ message: "Items withdrawn successfully" });
     } catch (error) {
@@ -580,9 +665,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { category } = req.params;
       const resources = await storage.getAllResources();
-      
+
       let filteredResources = resources;
-      
+
       switch (category) {
         case "animals":
           filteredResources = resources.filter(r => 
@@ -608,7 +693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         default:
           filteredResources = resources;
       }
-      
+
       res.json(filteredResources);
     } catch (error) {
       res.status(500).json({ message: "Failed to get resources by category" });
@@ -620,7 +705,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const biome = await storage.getBiome(id);
-      
+
       if (!biome) {
         return res.status(404).json({ message: "Biome not found" });
       }
@@ -628,7 +713,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const resources = await storage.getAllResources();
       const availableResources = Array.isArray(biome.availableResources) 
         ? biome.availableResources : [];
-      
+
       const biomeResources = resources.filter(r => 
         availableResources.includes(r.id)
       );
@@ -664,10 +749,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/player/:playerId/can-collect/:resourceId", async (req, res) => {
     try {
       const { playerId, resourceId } = req.params;
-      
+
       const canCollect = await gameService.hasRequiredTool(playerId, resourceId);
       const resource = await storage.getResource(resourceId);
-      
+
       res.json({
         canCollect,
         resource: resource ? {
