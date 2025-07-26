@@ -39,6 +39,7 @@ export default function ExpeditionModal({
       selectedEquipment,
     }),
     onSuccess: (expedition: any) => {
+      console.log("Expedition created:", expedition);
       setCurrentExpeditionId(expedition.id);
       setCurrentStep("expedition-progress");
       simulateExpedition(expedition.id);
@@ -81,6 +82,7 @@ export default function ExpeditionModal({
   });
 
   const simulateExpedition = (expeditionId: string) => {
+    console.log("Starting simulation with ID:", expeditionId);
     let progress = 0;
     const interval = setInterval(() => {
       progress += 10;
@@ -89,7 +91,12 @@ export default function ExpeditionModal({
       if (progress >= 100) {
         clearInterval(interval);
         setTimeout(() => {
-          completeExpeditionMutation.mutate(expeditionId);
+          console.log("Completing expedition with ID:", expeditionId);
+          if (expeditionId) {
+            completeExpeditionMutation.mutate(expeditionId);
+          } else {
+            console.error("No expedition ID available!");
+          }
         }, 1000);
       }
     }, 500);
