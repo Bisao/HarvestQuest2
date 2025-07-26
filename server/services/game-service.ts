@@ -55,9 +55,11 @@ export class GameService {
     
     // Special case for hunting: requires weapon AND knife
     if (resource.requiredTool === "weapon_and_knife") {
-      const hasWeapon = equipment.some(eq => 
+      // Check if player has a weapon equipped (not a knife)
+      const equippedWeapon = equipment.find(eq => 
         eq.id === player.equippedWeapon && eq.slot === "weapon"
       );
+      const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
       
       // Check for knife in both tool and weapon slots
       const hasKnife = equipment.some(eq => 
@@ -65,7 +67,7 @@ export class GameService {
         eq.toolType === "knife"
       );
       
-      return hasWeapon && hasKnife;
+      return hasNonKnifeWeapon && hasKnife;
     }
     
     // Regular tool checks - check both tool and weapon slots
