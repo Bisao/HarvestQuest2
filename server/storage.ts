@@ -262,7 +262,7 @@ export class MemStorage implements IStorage {
   async updatePlayer(id: string, updates: Partial<Player>): Promise<Player> {
     const player = this.players.get(id);
     if (!player) throw new Error("Player not found");
-    
+
     const updated = { ...player, ...updates };
     this.players.set(id, updated);
     return updated;
@@ -336,7 +336,7 @@ export class MemStorage implements IStorage {
   async updateInventoryItem(id: string, updates: Partial<InventoryItem>): Promise<InventoryItem> {
     const item = this.inventoryItems.get(id);
     if (!item) throw new Error("Inventory item not found");
-    
+
     const updated = { ...item, ...updates };
     this.inventoryItems.set(id, updated);
     return updated;
@@ -368,7 +368,7 @@ export class MemStorage implements IStorage {
   async updateStorageItem(id: string, updates: Partial<StorageItem>): Promise<StorageItem> {
     const item = this.storageItems.get(id);
     if (!item) throw new Error("Storage item not found");
-    
+
     const updated = { ...item, ...updates };
     this.storageItems.set(id, updated);
     return updated;
@@ -395,14 +395,16 @@ export class MemStorage implements IStorage {
       id,
       playerId: insertExpedition.playerId,
       biomeId: insertExpedition.biomeId,
-      status: "planning",
+      status: "in_progress",
       selectedResources: insertExpedition.selectedResources,
       selectedEquipment: insertExpedition.selectedEquipment,
       collectedResources: {},
-      startTime: null,
+      startTime: Date.now(),
       endTime: null,
       progress: 0,
     };
+
+    console.log('Storing expedition with ID:', id);
     this.expeditions.set(id, expedition);
     return expedition;
   }
@@ -410,7 +412,7 @@ export class MemStorage implements IStorage {
   async updateExpedition(id: string, updates: Partial<Expedition>): Promise<Expedition> {
     const expedition = this.expeditions.get(id);
     if (!expedition) throw new Error("Expedition not found");
-    
+
     const updated = { ...expedition, ...updates };
     this.expeditions.set(id, updated);
     return updated;

@@ -87,12 +87,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Start expedition
   app.post("/api/expeditions", async (req, res) => {
     try {
+      console.log('Received expedition data:', req.body);
+      
+      // Validate the expedition data
       const expeditionData = insertExpeditionSchema.parse(req.body);
+      console.log('Validated expedition data:', expeditionData);
+      
       const expedition = await storage.createExpedition(expeditionData);
+      console.log('Created expedition:', expedition);
+      
       res.json(expedition);
     } catch (error) {
+      console.error('Expedition creation error:', error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid expedition data" });
+        console.error('Zod validation errors:', error.errors);
+        return res.status(400).json({ 
+          message: "Invalid expedition data",
+          errors: error.errors
+        });
       }
       res.status(500).json({ message: "Failed to create expedition" });
     }

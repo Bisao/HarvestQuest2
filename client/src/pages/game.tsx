@@ -53,15 +53,29 @@ export default function Game() {
       playerId: string; 
       biomeId: string; 
       selectedResources: string[]; 
-      equipment: string[];
-      status: string;
-      startTime: number;
+      selectedEquipment: string[];
     }) => {
+      console.log('Sending expedition data:', expeditionData);
       const response = await apiRequest('POST', '/api/expeditions', expeditionData);
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Server response:', errorData);
+        throw new Error(`Server error: ${response.status}`);
+      }
       return response.json();
     },
     onSuccess: (expedition) => {
-      console.log('Expedition started:', expedition);
+      console.log('Expedition created:', expedition);
+      
+      if (!expedition || !expedition.id) {
+        console.error('Invalid expedition data received:', expedition);
+        toast({
+          title: "Erro",
+          description: "Dados da expedição inválidos.",
+          variant: "destructive"
+        });
+        return;
+      }
       
       // Define o estado da expedição ativa
       updateGameState({ 
@@ -69,7 +83,9 @@ export default function Game() {
           id: expedition.id,
           biomeId: expedition.biomeId,
           progress: 0,
-          selectedResources: expedition.selectedResources
+          selectedResources: Array.isArray(expedition.selectedResources) 
+            ? expedition.selectedResources 
+            : []
         },
         expeditionModalOpen: false
       });
@@ -127,6 +143,13 @@ export default function Game() {
 
   // Função para simular progresso da expedição
   const startProgressSimulation = (expeditionId: string) => {
+    if (!expeditionId) {
+      console.error('No expedition ID provided for progress simulation');
+      return;
+    }
+
+    console.log('Starting simulation with ID:', expeditionId);
+    
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -160,17 +183,33 @@ export default function Game() {
   const handleStartExpedition = (selectedResources: string[], equipment: string[]) => {
     if (!selectedBiome || !player) return;
 
+    console.log('Creating expedition with:', {
+      playerId: player.id,
+      biomeId: selectedBiome.id,
+      selectedResources,
+      selectedEquipment: equipment
+    });
+
     startExpeditionMutation.mutate({
       playerId: player.id,
       biomeId: selectedBiome.id,
       selectedResources,
-      equipment,
-      status: "active",
-      startTime: Date.now()
+      selectedEquipment: equipment
     });
   };
 
   const handleCompleteExpedition = (expeditionId: string) => {
+    if (!expeditionId) {
+      console.error('No expedition ID available!');
+      toast({
+        title: "Erro",
+        description: "ID da expedição não encontrado.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    console.log('Completing expedition with ID:', expeditionId);
     completeExpeditionMutation.mutate(expeditionId);
   };
 
