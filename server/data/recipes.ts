@@ -53,21 +53,21 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Foice",
       emoji: "🔪",
       requiredLevel: 2,
-      ingredients: { [resourceMap.pedra]: 1, "string": 2, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.pedra]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "sickle": 1 }
     },
     {
       name: "Balde de Madeira",
       emoji: "🪣",
       requiredLevel: 2,
-      ingredients: { [resourceMap.madeira]: 1, "string": 2 },
+      ingredients: { [resourceMap.madeira]: 1, [resourceMap.barbante]: 2 },
       output: { "bucket": 1 }
     },
     {
       name: "Faca",
       emoji: "🗡️",
       requiredLevel: 1,
-      ingredients: { [resourceMap.pedras_soltas]: 1, "string": 1, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 1, [resourceMap.gravetos]: 1 },
       output: { "knife": 1 }
     },
     {
@@ -83,14 +83,14 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Arco e Flecha",
       emoji: "🏹",
       requiredLevel: 5,
-      ingredients: { [resourceMap.gravetos]: 2, "string": 2, [resourceMap.pedras_soltas]: 1 },
+      ingredients: { [resourceMap.gravetos]: 2, [resourceMap.barbante]: 2, [resourceMap.pedras_soltas]: 1 },
       output: { "bow": 1 }
     },
     {
       name: "Lança",
       emoji: "🔱",
       requiredLevel: 4,
-      ingredients: { [resourceMap.gravetos]: 2, "string": 4, [resourceMap.pedras_soltas]: 1 },
+      ingredients: { [resourceMap.gravetos]: 2, [resourceMap.barbante]: 4, [resourceMap.pedras_soltas]: 1 },
       output: { "spear": 1 }
     },
     
@@ -99,7 +99,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Mochila",
       emoji: "🎒",
       requiredLevel: 5,
-      ingredients: { [resourceMap.couro]: 2, "string": 4 },
+      ingredients: { [resourceMap.couro]: 2, [resourceMap.barbante]: 4 },
       output: { "backpack": 1 }
     },
     
@@ -163,21 +163,21 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Peixe Grelhado",
       emoji: "🐟",
       requiredLevel: 1,
-      ingredients: { "carne": 1, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.carne]: 1, [resourceMap.gravetos]: 1 },
       output: { "grilled_fish": 1 }
     },
     {
       name: "Carne Assada",
       emoji: "🍖",
       requiredLevel: 1,
-      ingredients: { "carne": 1, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.carne]: 1, [resourceMap.gravetos]: 1 },
       output: { "roasted_meat": 1 }
     },
     {
       name: "Ensopado de Carne",
       emoji: "🍲",
       requiredLevel: 3,
-      ingredients: { "clay_pot": 1, "carne": 2, [resourceMap.agua_fresca]: 3 },
+      ingredients: { "clay_pot": 1, [resourceMap.carne]: 2, [resourceMap.agua_fresca]: 3 },
       output: { "meat_stew": 1 },
 
     }
