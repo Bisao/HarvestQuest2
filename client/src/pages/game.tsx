@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
 import EnhancedInventory from "@/components/game/enhanced-inventory";
@@ -12,27 +11,6 @@ import { queryClient } from "@/lib/queryClient";
 import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema";
 
 export default function Game() {
-  const [location] = useLocation();
-  const urlParams = new URLSearchParams(location.split('?')[1] || '');
-  let playerUsername = urlParams.get('player') || '';
-  
-  // Also try to get from localStorage as fallback
-  if (!playerUsername) {
-    try {
-      const storedPlayer = localStorage.getItem('currentPlayer');
-      if (storedPlayer) {
-        const parsed = JSON.parse(storedPlayer);
-        playerUsername = parsed.username || '';
-      }
-    } catch (e) {
-      console.error("Error parsing stored player:", e);
-    }
-  }
-  
-  console.log("Game loading for player:", playerUsername);
-  console.log("URL location:", location);
-  console.log("URL params:", urlParams.toString());
-  
   const [activeTab, setActiveTab] = useState("biomes");
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [expeditionMinimized, setExpeditionMinimized] = useState(false);
@@ -43,31 +21,16 @@ export default function Game() {
 
   const { gameState, updateGameState } = useGameState();
 
-  // Always call all hooks in the same order - no conditional hooks
-  const { data: player, isLoading: playerLoading, error: playerError } = useQuery<Player>({
-    queryKey: ["/api/player", playerUsername],
-    enabled: !!playerUsername,
-    retry: 1,
-    queryFn: async () => {
-      console.log("Fetching player data for:", playerUsername);
-      const response = await fetch(`/api/player/${encodeURIComponent(playerUsername)}`);
-      console.log("Player fetch response:", response.status, response.statusText);
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          console.error("Player not found:", playerUsername);
-          // Player not found, redirect to main menu after a short delay
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 2000);
-          throw new Error('Player not found');
-        }
-        throw new Error('Failed to fetch player');
-      }
-      const playerData = await response.json();
-      console.log("Player data loaded:", playerData);
-      return playerData;
-    }
+  // Make setActiveExpedition available globally for expedition system
+  useEffect(() => {
+    (window as any).setActiveExpedition = setActiveExpedition;
+    return () => {
+      delete (window as any).setActiveExpedition;
+    };
+  }, []);
+
+  const { data: player } = useQuery<Player>({
+    queryKey: ["/api/player/Player1"],
   });
 
   const { data: biomes = [] } = useQuery<Biome[]>({
@@ -85,54 +48,6 @@ export default function Game() {
   const { data: recipes = [] } = useQuery<Recipe[]>({
     queryKey: ["/api/recipes"],
   });
-
-  // Make setActiveExpedition available globally for expedition system
-  useEffect(() => {
-    (window as any).setActiveExpedition = setActiveExpedition;
-    return () => {
-      delete (window as any).setActiveExpedition;
-    };
-  }, []);
-
-  // Show loading state - moved after all hooks
-  if (!playerUsername) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800">Erro</h2>
-          <p className="text-gray-600 mt-2">Nome do jogador não encontrado</p>
-          <a href="/" className="text-blue-600 hover:underline mt-4 inline-block">
-            Voltar ao menu principal
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  if (playerLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin text-4xl mb-4">⚡</div>
-          <h2 className="text-2xl font-bold text-gray-800">Carregando Jogo...</h2>
-          <p className="text-gray-600 mt-2">Preparando sua aventura, {playerUsername}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (playerError) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="text-4xl mb-4">❌</div>
-          <h2 className="text-2xl font-bold text-gray-800">Erro ao Carregar</h2>
-          <p className="text-gray-600 mt-2">Jogador não encontrado ou erro no servidor</p>
-          <p className="text-sm text-gray-500 mt-1">Redirecionando para o menu principal...</p>
-        </div>
-      </div>
-    );
-  }
 
   const tabs = [
     { id: "biomes", label: "Biomas", emoji: "🌍" },

@@ -6,7 +6,6 @@ import { z } from "zod";
 import type { Player } from "@shared/schema";
 import { GameService } from "./services/game-service";
 import { ExpeditionService } from "./services/expedition-service";
-import savesRouter from "./routes/saves";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -15,51 +14,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize services
   const gameService = new GameService(storage);
   const expeditionService = new ExpeditionService(storage);
-
-  // Create new player
-  app.post("/api/player", async (req, res) => {
-    try {
-      const { username } = req.body;
-      if (!username) {
-        return res.status(400).json({ message: "Username is required" });
-      }
-
-      // Check if player already exists
-      const existingPlayer = await storage.getPlayerByUsername(username);
-      if (existingPlayer) {
-        return res.status(409).json({ message: "Player already exists" });
-      }
-
-      // Create new player
-      const newPlayer = await storage.createPlayer({
-        username,
-        level: 1,
-        experience: 0,
-        hunger: 100,
-        maxHunger: 100,
-        thirst: 100,
-        maxThirst: 100,
-        coins: 0,
-        inventoryWeight: 0,
-        maxInventoryWeight: 100,
-        autoStorage: false,
-        craftedItemsDestination: 'storage',
-        waterStorage: 0,
-        maxWaterStorage: 500,
-        equippedHelmet: null,
-        equippedChestplate: null,
-        equippedLeggings: null,
-        equippedBoots: null,
-        equippedWeapon: null,
-        equippedTool: null,
-      });
-
-      res.json(newPlayer);
-    } catch (error) {
-      console.error("Error creating player:", error);
-      res.status(500).json({ message: "Failed to create player" });
-    }
-  });
 
   // Get player data
   app.get("/api/player/:username", async (req, res) => {
@@ -833,9 +787,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to cancel expedition" });
     }
   });
-
-  // Add saves routes
-  app.use("/api/saves", savesRouter);
 
   const httpServer = createServer(app);
   return httpServer;

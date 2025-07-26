@@ -9,11 +9,7 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes
 
 **January 26, 2025**
-- **✅ MIGRAÇÃO COMPLETADA COM SUCESSO**: Projeto totalmente migrado do Replit Agent para ambiente Replit
-- **✅ SISTEMA DE PERSISTÊNCIA IMPLEMENTADO**: Migrado para banco de dados SQLite para melhor performance e estabilidade
-- **✅ TODAS AS FUNCIONALIDADES VERIFICADAS**: Criação, carregamento, deleção e persistência de players funcionando perfeitamente
-- **✅ DATABASE MIGRATION**: Successfully migrated from PostgreSQL to SQLite for Replit compatibility
-- **✅ SAVE SYSTEM VERIFIED**: All profile management functions working correctly with persistent storage
+- Successfully migrated project from Replit Agent to Replit environment
 - **Fixed Auto-Repeat Expedition System** - Completely rebuilt timer management to prevent stuck countdown and properly restart after expedition completion
 - **Energy System Completely Removed** - Removed all references to energy from codebase, now using only hunger and thirst
 - Updated expedition requirements to use minimum 30 hunger and thirst instead of energy checks
@@ -46,9 +42,8 @@ Preferred communication style: Simple, everyday language.
 - Added unequip functionality - clicking equipped items removes them from slots
 - Verified all game systems are fully functional: expeditions, inventory, storage, crafting
 
-**January 26, 2025 - Database Migration and Main Menu System**
+**January 26, 2025 - Enhanced Game Mechanics Update**
 - **Added "Pedras Soltas" resource** - collectible without tools in all biomes
-- **Added "Argila" (clay) resource** - collectible without tools in Floresta biome for crafting
 - **Enhanced hunting system** - coelhos can be hunted with knife only, larger animals require weapon + knife
 - **Implemented pickaxe bonus** - mining stone now also generates loose stones automatically
 - **Added XP display** - all resources now show experience points gained per item collected
@@ -57,15 +52,6 @@ Preferred communication style: Simple, everyday language.
 - **Enhanced resource collection logic** - proper tool/weapon requirement checking with combined requirements
 - **Updated UI displays** - expedition system and biome views now show XP information
 - **Simplified rabbit hunting** - coelhos now require only knife (tool or weapon slot), not weapon + knife
-- **MAJOR: Migrated to PostgreSQL Database** - complete transition from in-memory to persistent database storage
-- **Created Main Menu System** - new game, continue game, and settings options with player profile management
-- **Implemented Auto-Save Functionality** - all game progress automatically saved to database
-- **Fixed Dynamic Player Loading** - game now properly handles different player usernames instead of hardcoded "Player1"
-- **Enhanced Error Handling** - better loading states and error messages for player authentication
-- **Removed Storage Configuration Panel** - simplified warehouse interface per user request
-- **Improved Player Conflict Handling** - when creating a player with existing name, automatically loads the existing game
-- **Added Save Management System** - implemented delete functionality with confirmation dialog to prevent database bloat
-- **Enhanced Save Slot Interface** - added delete buttons and improved user experience in load game screen
 
 **January 26, 2025 - Modular Architecture Update**
 - **Completely restructured backend into modular architecture** for better maintainability and content addition
@@ -156,9 +142,9 @@ Preferred communication style: Simple, everyday language.
 
 ### Database Layer
 - **ORM**: Drizzle ORM for type-safe database operations
-- **Database**: SQLite (using better-sqlite3 for Replit compatibility)
-- **Schema Management**: Manual table creation for SQLite compatibility
-- **Connection**: Local SQLite database file for persistent storage
+- **Database**: PostgreSQL (configured for Neon serverless)
+- **Schema Management**: Drizzle Kit for migrations and schema generation
+- **Connection**: Neon serverless driver for PostgreSQL
 
 ## Key Components
 

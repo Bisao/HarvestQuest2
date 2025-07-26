@@ -46,7 +46,7 @@ export function createBiomeData(resourceIds: string[]): InsertBiome[] {
       name: "Floresta",
       emoji: "🌲",
       requiredLevel: 1,
-      // Inclui recursos básicos + madeira + todos os novos recursos de caça/pesca + argila
+      // Inclui recursos básicos + madeira + todos os novos recursos de caça/pesca
       availableResources: [
         resourceIds[0], // Fibra
         resourceIds[1], // Pedra
@@ -55,7 +55,6 @@ export function createBiomeData(resourceIds: string[]): InsertBiome[] {
         resourceIds[4], // Água Fresca  
         resourceIds[5], // Bambu
         resourceIds[6], // Madeira
-        resourceIds[7], // Argila
         resourceIds[18], // Coelho (index correto)
         resourceIds[19], // Veado (index correto)
         resourceIds[20], // Javali (index correto)

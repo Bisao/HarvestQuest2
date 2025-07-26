@@ -17,8 +17,6 @@ import {
   type InsertRecipe
 } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { writeFileSync, readFileSync, existsSync } from "fs";
-import path from "path";
 import { ALL_RESOURCES } from "./data/resources";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
@@ -30,8 +28,6 @@ export interface IStorage {
   getPlayerByUsername(username: string): Promise<Player | undefined>;
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: string, updates: Partial<Player>): Promise<Player>;
-  deletePlayer(id: string): Promise<void>;
-  getAllPlayers(): Promise<Player[]>;
 
   // Resource methods
   getAllResources(): Promise<Resource[]>;
@@ -85,7 +81,6 @@ export class MemStorage implements IStorage {
   private expeditions: Map<string, Expedition>;
   private equipment: Map<string, Equipment>;
   private recipes: Map<string, Recipe>;
-  private persistenceFile = path.join(process.cwd(), 'data.json');
 
   constructor() {
     this.players = new Map();
@@ -96,38 +91,6 @@ export class MemStorage implements IStorage {
     this.expeditions = new Map();
     this.equipment = new Map();
     this.recipes = new Map();
-    
-    // Load persisted data on startup
-    this.loadFromFile();
-  }
-
-  private saveToFile(): void {
-    try {
-      const data = {
-        players: Array.from(this.players.entries()),
-        inventoryItems: Array.from(this.inventoryItems.entries()),
-        storageItems: Array.from(this.storageItems.entries()),
-        expeditions: Array.from(this.expeditions.entries())
-      };
-      writeFileSync(this.persistenceFile, JSON.stringify(data, null, 2));
-    } catch (error) {
-      console.error('Error saving data to file:', error);
-    }
-  }
-
-  private loadFromFile(): void {
-    try {
-      if (existsSync(this.persistenceFile)) {
-        const data = JSON.parse(readFileSync(this.persistenceFile, 'utf8'));
-        this.players = new Map(data.players || []);
-        this.inventoryItems = new Map(data.inventoryItems || []);
-        this.storageItems = new Map(data.storageItems || []);
-        this.expeditions = new Map(data.expeditions || []);
-        console.log(`Loaded ${this.players.size} players from persistent storage`);
-      }
-    } catch (error) {
-      console.error('Error loading data from file:', error);
-    }
   }
 
   async initializeGameData(): Promise<void> {
@@ -156,8 +119,30 @@ export class MemStorage implements IStorage {
       await this.createRecipe(recipe);
     }
 
-    // Don't create any default player - let users create their own
-    console.log("Game data initialized successfully!");
+    // Create default player
+    const defaultPlayer = await this.createPlayer({
+      username: "Player1",
+      level: 1,
+      experience: 0,
+      hunger: 100,
+      thirst: 100,
+      maxHunger: 100,
+      maxThirst: 100,
+      coins: 0,
+      inventoryWeight: 0,
+      maxInventoryWeight: 50,
+      autoStorage: false,
+      craftedItemsDestination: 'storage',
+      waterStorage: 0,
+      maxWaterStorage: 500,
+      equippedHelmet: null,
+      equippedChestplate: null,
+      equippedLeggings: null,
+      equippedBoots: null,
+      equippedWeapon: null,
+      equippedTool: null,
+    });
+
     
   }
 
@@ -198,7 +183,6 @@ export class MemStorage implements IStorage {
       equippedTool: insertPlayer.equippedTool || null,
     };
     this.players.set(id, player);
-    this.saveToFile();
     return player;
   }
 
@@ -208,36 +192,7 @@ export class MemStorage implements IStorage {
 
     const updated = { ...player, ...updates };
     this.players.set(id, updated);
-    this.saveToFile();
     return updated;
-  }
-
-  async deletePlayer(id: string): Promise<void> {
-    this.players.delete(id);
-    // Also delete all related data
-    Array.from(this.inventoryItems.keys()).forEach(itemId => {
-      const item = this.inventoryItems.get(itemId);
-      if (item && item.playerId === id) {
-        this.inventoryItems.delete(itemId);
-      }
-    });
-    Array.from(this.storageItems.keys()).forEach(itemId => {
-      const item = this.storageItems.get(itemId);
-      if (item && item.playerId === id) {
-        this.storageItems.delete(itemId);
-      }
-    });
-    Array.from(this.expeditions.keys()).forEach(expId => {
-      const exp = this.expeditions.get(expId);
-      if (exp && exp.playerId === id) {
-        this.expeditions.delete(expId);
-      }
-    });
-    this.saveToFile();
-  }
-
-  async getAllPlayers(): Promise<Player[]> {
-    return Array.from(this.players.values());
   }
 
   // Resource methods
@@ -467,7 +422,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use SQLite database for better persistence
-import { SQLiteStorage } from "./storage-sqlite";
-
-export const storage = new SQLiteStorage();
+export const storage = new MemStorage();
