@@ -52,15 +52,16 @@ export function createBiomeData(resourceIds: string[]): InsertBiome[] {
         resourceIds[1], // Pedra
         resourceIds[2], // Pedras Soltas
         resourceIds[3], // Gravetos
-        resourceIds[4], // Madeira
-        resourceIds[8], // Coelho
-        resourceIds[9], // Veado
-        resourceIds[10], // Javali
-        resourceIds[11], // Peixe Pequeno
-        resourceIds[12], // Peixe Grande
-        resourceIds[13], // Salmão
-        resourceIds[14], // Cogumelos
-        resourceIds[15], // Frutas Silvestres
+        resourceIds[4], // Água Fresca
+        resourceIds[5], // Madeira
+        resourceIds[10], // Coelho
+        resourceIds[11], // Veado
+        resourceIds[12], // Javali
+        resourceIds[13], // Peixe Pequeno
+        resourceIds[14], // Peixe Grande
+        resourceIds[15], // Salmão
+        resourceIds[16], // Cogumelos
+        resourceIds[17], // Frutas Silvestres
       ],
     },
     {

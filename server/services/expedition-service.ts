@@ -23,9 +23,12 @@ export class ExpeditionService {
     const biome = await this.storage.getBiome(biomeId);
     if (!biome) throw new Error("Biome not found");
 
-    // Check if player has enough energy
-    if (player.energy < 20) {
-      throw new Error("Not enough energy for expedition");
+    // Check if player has enough hunger and thirst for expedition
+    if (player.hunger < 30) {
+      throw new Error("Jogador com muita fome para expedição");
+    }
+    if (player.thirst < 30) {
+      throw new Error("Jogador com muita sede para expedição");
     }
 
     // Check if player has required level
@@ -51,9 +54,10 @@ export class ExpeditionService {
       selectedEquipment,
     });
 
-    // Deduct energy
+    // Deduct hunger and thirst for expedition
     await this.storage.updatePlayer(playerId, {
-      energy: Math.max(0, player.energy - 20)
+      hunger: Math.max(0, player.hunger - 15),
+      thirst: Math.max(0, player.thirst - 10)
     });
 
     return expedition;

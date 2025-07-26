@@ -59,6 +59,28 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
     },
   });
 
+  const consumeMutation = useMutation({
+    mutationFn: async (itemId: string) => {
+      const response = await apiRequest("POST", `/api/player/${playerId}/consume`, { itemId, quantity: 1 });
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      toast({
+        title: "Item consumido!",
+        description: `Fome: +${data.hungerRestored} | Sede: +${data.thirstRestored}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Não foi possível consumir o item.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const getResourceData = (resourceId: string) => {
     return resources.find(r => r.id === resourceId);
   };
@@ -201,6 +223,25 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
                 </div>
               </div>
               <div className="flex space-x-2">
+                {/* Show consume button for food items */}
+                {itemData.type === "resource" && (
+                  itemData.name === "Frutas Silvestres" || 
+                  itemData.name === "Cogumelos" || 
+                  itemData.name === "Suco de Frutas" ||
+                  itemData.name === "Cogumelos Assados" ||
+                  itemData.name === "Peixe Grelhado" ||
+                  itemData.name === "Carne Assada" ||
+                  itemData.name === "Ensopado de Carne" ||
+                  itemData.name === "Água Fresca"
+                ) && (
+                  <button
+                    onClick={() => consumeMutation.mutate(storageItem.id)}
+                    disabled={consumeMutation.isPending || isBlocked}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors disabled:bg-gray-400"
+                  >
+                    {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
+                  </button>
+                )}
                 <button
                   onClick={() => handleWithdraw(storageItem)}
                   className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 font-medium py-2 px-3 rounded text-sm transition-colors"

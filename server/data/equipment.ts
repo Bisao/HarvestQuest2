@@ -56,6 +56,15 @@ export const TOOLS: InsertEquipment[] = [
     toolType: "knife",
     weight: 1,
   },
+  {
+    name: "Balde de Madeira",
+    emoji: "🪣",
+    effect: "Permite coletar água",
+    bonus: { type: "water_collection", value: 1 },
+    slot: "tool",
+    toolType: "bucket",
+    weight: 2,
+  },
 ];
 
 export const WEAPONS: InsertEquipment[] = [

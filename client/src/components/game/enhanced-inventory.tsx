@@ -155,6 +155,33 @@ export default function EnhancedInventory({
     }
   });
 
+  const consumeMutation = useMutation({
+    mutationFn: async (itemId: string) => {
+      const response = await apiRequest('POST', `/api/player/${playerId}/consume`, {
+        itemId,
+        quantity: 1
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      setSelectedItem(null);
+      toast({
+        title: "Item consumido!",
+        description: `Fome: +${data.hungerRestored} | Sede: +${data.thirstRestored}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Não foi possível consumir o item.",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleSlotClick = (slotId: string, slotType: "inventory" | "equipment") => {
     if (slotType === "inventory") {
       const slotIndex = parseInt(slotId.replace('inv-', ''));
@@ -304,8 +331,12 @@ export default function EnhancedInventory({
                 <span className="font-bold">{player.coins}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-green-600">⚡</span>
-                <span className="font-bold">{player.energy}/{player.maxEnergy}</span>
+                <span className="text-red-600">🍖</span>
+                <span className="font-bold">{player.hunger}/{player.maxHunger}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600">💧</span>
+                <span className="font-bold">{player.thirst}/{player.maxThirst}</span>
               </div>
             </div>
           </CardTitle>
@@ -324,11 +355,21 @@ export default function EnhancedInventory({
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span>Energia:</span>
-                <span>{Math.round((player.energy / player.maxEnergy) * 100)}%</span>
+                <span>Fome:</span>
+                <span>{Math.round((player.hunger / player.maxHunger) * 100)}%</span>
               </div>
               <Progress 
-                value={(player.energy / player.maxEnergy) * 100} 
+                value={(player.hunger / player.maxHunger) * 100} 
+                className="w-full h-2"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span>Sede:</span>
+                <span>{Math.round((player.thirst / player.maxThirst) * 100)}%</span>
+              </div>
+              <Progress 
+                value={(player.thirst / player.maxThirst) * 100} 
                 className="w-full h-2"
               />
             </div>
@@ -448,6 +489,25 @@ export default function EnhancedInventory({
                             </div>
                           </div>
                           <div className="flex flex-col gap-2">
+                            {/* Show consume button for food items */}
+                            {resource && (resource.name === "Frutas Silvestres" || 
+                              resource.name === "Cogumelos" || 
+                              resource.name === "Suco de Frutas" ||
+                              resource.name === "Cogumelos Assados" ||
+                              resource.name === "Peixe Grelhado" ||
+                              resource.name === "Carne Assada" ||
+                              resource.name === "Ensopado de Carne" ||
+                              resource.name === "Água Fresca") && (
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => consumeMutation.mutate(selectedItem.id)}
+                                disabled={consumeMutation.isPending || isBlocked}
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
+                              </Button>
+                            )}
                             <Button
                               variant="outline"
                               size="sm"

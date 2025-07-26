@@ -19,8 +19,12 @@ export default function GameHeader({ player }: GameHeaderProps) {
               <span className="font-semibold">Nível {player.level}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="text-lg">⚡</span>
-              <span className="font-semibold">{player.energy}/{player.maxEnergy}</span>
+              <span className="text-lg">🍖</span>
+              <span className="font-semibold">{player.hunger}/{player.maxHunger}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-lg">💧</span>
+              <span className="font-semibold">{player.thirst}/{player.maxThirst}</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-lg">💰</span>

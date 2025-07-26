@@ -262,6 +262,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Consume food or drink
+  app.post("/api/player/:playerId/consume", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const { itemId, quantity = 1 } = req.body;
+      
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ error: "Player not found" });
+      }
+
+      // Get item from inventory or storage
+      const inventoryItems = await storage.getPlayerInventory(playerId);
+      const storageItems = await storage.getPlayerStorage(playerId);
+      
+      let itemSource: 'inventory' | 'storage' | null = null;
+      let itemToConsume: any = null;
+      
+      // Check inventory first
+      const inventoryItem = inventoryItems.find(item => item.id === itemId);
+      if (inventoryItem && inventoryItem.quantity >= quantity) {
+        itemSource = 'inventory';
+        itemToConsume = inventoryItem;
+      } else {
+        // Check storage
+        const storageItem = storageItems.find(item => item.id === itemId);
+        if (storageItem && storageItem.quantity >= quantity) {
+          itemSource = 'storage';
+          itemToConsume = storageItem;
+        }
+      }
+
+      if (!itemToConsume || !itemSource) {
+        return res.status(400).json({ error: "Item not found or insufficient quantity" });
+      }
+
+      // Get resource details to determine food effects
+      const resource = await storage.getResource(itemToConsume.resourceId);
+      if (!resource) {
+        return res.status(404).json({ error: "Resource not found" });
+      }
+
+      // Calculate hunger and thirst restoration based on food type
+      let hungerRestore = 0;
+      let thirstRestore = 0;
+
+      switch (resource.name) {
+        case "Frutas Silvestres":
+          hungerRestore = 10;
+          thirstRestore = 5;
+          break;
+        case "Cogumelos":
+          hungerRestore = 8;
+          break;
+        case "Suco de Frutas":
+          thirstRestore = 20;
+          hungerRestore = 5;
+          break;
+        case "Cogumelos Assados":
+          hungerRestore = 15;
+          break;
+        case "Peixe Grelhado":
+          hungerRestore = 25;
+          break;
+        case "Carne Assada":
+          hungerRestore = 30;
+          break;
+        case "Ensopado de Carne":
+          hungerRestore = 40;
+          thirstRestore = 10;
+          break;
+        case "Água Fresca":
+          thirstRestore = 30;
+          break;
+        default:
+          return res.status(400).json({ error: "Item is not consumable" });
+      }
+
+      // Update player stats
+      const newHunger = Math.min(player.maxHunger, player.hunger + (hungerRestore * quantity));
+      const newThirst = Math.min(player.maxThirst, player.thirst + (thirstRestore * quantity));
+
+      await storage.updatePlayer(playerId, {
+        hunger: newHunger,
+        thirst: newThirst
+      });
+
+      // Remove consumed items
+      if (itemToConsume.quantity === quantity) {
+        if (itemSource === 'inventory') {
+          await storage.removeInventoryItem(itemToConsume.id);
+        } else {
+          await storage.removeStorageItem(itemToConsume.id);
+        }
+      } else {
+        if (itemSource === 'inventory') {
+          await storage.updateInventoryItem(itemToConsume.id, {
+            quantity: itemToConsume.quantity - quantity
+          });
+        } else {
+          await storage.updateStorageItem(itemToConsume.id, {
+            quantity: itemToConsume.quantity - quantity
+          });
+        }
+      }
+
+      // Update inventory weight if consumed from inventory
+      if (itemSource === 'inventory') {
+        const newWeight = await gameService.calculateInventoryWeight(playerId);
+        await storage.updatePlayer(playerId, { inventoryWeight: newWeight });
+      }
+
+      res.json({ 
+        success: true, 
+        hungerRestored: hungerRestore * quantity,
+        thirstRestored: thirstRestore * quantity,
+        newHunger,
+        newThirst
+      });
+    } catch (error) {
+      console.error('Consume item error:', error);
+      res.status(500).json({ error: "Failed to consume item" });
+    }
+  });
+
   // Store individual inventory item using service
   app.post("/api/storage/store/:inventoryItemId", async (req, res) => {
     try {

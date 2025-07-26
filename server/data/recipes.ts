@@ -73,6 +73,56 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       ingredients: { [resourceIds[0]]: 4 }, // 4 Fibra
       output: { "rope": 1 },
     },
+    {
+      name: "Balde de Madeira",
+      emoji: "🪣",
+      requiredLevel: 1,
+      ingredients: { [resourceIds[4]]: 3, [resourceIds[0]]: 2 }, // 3 Madeira + 2 Fibra
+      output: { "bucket": 1 },
+    },
+    {
+      name: "Faca",
+      emoji: "🗡️",
+      requiredLevel: 1,
+      ingredients: { [resourceIds[4]]: 1, [resourceIds[1]]: 2 }, // 1 Madeira + 2 Pedra
+      output: { "knife": 1 },
+    },
+    // Receitas de Comida
+    {
+      name: "Suco de Frutas",
+      emoji: "🧃",
+      requiredLevel: 1,
+      ingredients: { [resourceIds[15]]: 3 }, // 3 Frutas Silvestres
+      output: { "fruit_juice": 1 },
+    },
+    {
+      name: "Cogumelos Assados",
+      emoji: "🍄‍🟫",
+      requiredLevel: 1,
+      ingredients: { [resourceIds[14]]: 2 }, // 2 Cogumelos
+      output: { "roasted_mushrooms": 1 },
+    },
+    {
+      name: "Peixe Grelhado",
+      emoji: "🐟",
+      requiredLevel: 2,
+      ingredients: { [resourceIds[11]]: 1 }, // 1 Peixe Pequeno
+      output: { "grilled_fish": 1 },
+    },
+    {
+      name: "Carne Assada",
+      emoji: "🍖",
+      requiredLevel: 3,
+      ingredients: { [resourceIds[8]]: 1 }, // 1 Coelho
+      output: { "roasted_meat": 1 },
+    },
+    {
+      name: "Ensopado de Carne",
+      emoji: "🍲",
+      requiredLevel: 5,
+      ingredients: { [resourceIds[9]]: 1, [resourceIds[14]]: 2, [resourceIds[4]]: 1 }, // 1 Veado + 2 Cogumelos + 1 Água
+      output: { "meat_stew": 1 },
+    },
   ];
 }
 
