@@ -14,12 +14,13 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     "argila": resourceIds[7],       // Argila
     "ferro_fundido": resourceIds[8], // Ferro Fundido
     "couro": resourceIds[9],        // Couro
-    "cogumelos": resourceIds[14],   // Cogumelos
-    "frutas_silvestres": resourceIds[15], // Frutas Silvestres
-    "peixe_pequeno": resourceIds[11], // Peixe Pequeno
-    "peixe_grande": resourceIds[12], // Peixe Grande
-    "coelho": resourceIds[10],      // Coelho (para carne)
-    "veado": resourceIds[11],       // Veado (para carne)
+    "carne": resourceIds[10],       // Carne
+    "ossos": resourceIds[11],       // Ossos
+    "pelo": resourceIds[12],        // Pelo
+    "cogumelos": resourceIds[16],   // Cogumelos (updated index)
+    "frutas_silvestres": resourceIds[17], // Frutas Silvestres (updated index)
+    "peixe_pequeno": resourceIds[18], // Peixe Pequeno (updated index)
+    "peixe_grande": resourceIds[19], // Peixe Grande (updated index)
   };
 
   return [
@@ -161,21 +162,21 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Peixe Grelhado",
       emoji: "🐟",
       requiredLevel: 1,
-      ingredients: { [resourceMap.peixe_pequeno]: 1, [resourceMap.gravetos]: 1 },
+      ingredients: { "carne": 1, [resourceMap.gravetos]: 1 },
       output: { "grilled_fish": 1 }
     },
     {
       name: "Carne Assada",
       emoji: "🍖",
       requiredLevel: 1,
-      ingredients: { [resourceMap.coelho]: 1, [resourceMap.gravetos]: 1 }, // Usando coelho como "carne"
+      ingredients: { "carne": 1, [resourceMap.gravetos]: 1 },
       output: { "roasted_meat": 1 }
     },
     {
       name: "Ensopado de Carne",
       emoji: "🍲",
       requiredLevel: 3,
-      ingredients: { "clay_pot": 1, [resourceMap.coelho]: 2, [resourceMap.agua_fresca]: 3 },
+      ingredients: { "clay_pot": 1, "carne": 2, [resourceMap.agua_fresca]: 3 },
       output: { "meat_stew": 1 },
 
     }

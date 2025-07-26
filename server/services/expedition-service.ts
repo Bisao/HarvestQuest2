@@ -143,12 +143,92 @@ export class ExpeditionService {
 
     // Base reward calculation for each selected resource
     const selectedResources = Array.isArray(expedition.selectedResources) ? expedition.selectedResources : [];
+    
+    // Process each selected resource
     for (const resourceId of selectedResources) {
-      const baseQuantity = await this.getBaseResourceQuantity(resourceId);
-      rewards[resourceId] = baseQuantity;
+      const resource = allResources.find(r => r.id === resourceId);
+      if (!resource) continue;
+      
+      // Check if this is an animal that needs processing
+      if (this.isAnimal(resource.name)) {
+        // Process animal into component parts
+        const animalParts = this.processAnimal(resource.name, allResources);
+        for (const [partResourceId, quantity] of Object.entries(animalParts)) {
+          rewards[partResourceId] = (rewards[partResourceId] || 0) + quantity;
+        }
+      } else {
+        // Regular resource collection
+        let baseQuantity = await this.getBaseResourceQuantity(resourceId);
+        rewards[resourceId] = (rewards[resourceId] || 0) + Math.max(1, baseQuantity);
+      }
     }
-
-    // Check for pickaxe + stone mining -> add loose stones
+    
+    // Apply pickaxe bonus for stone mining
+    this.addPickaxeBonus(rewards, playerEquipment, allResources);
+    
+    return rewards;
+  }
+  
+  // Check if a resource is an animal or fish
+  private isAnimal(resourceName: string): boolean {
+    return ["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
+  }
+  
+  // Process animal into component resources
+  private processAnimal(animalName: string, allResources: Resource[]): Record<string, number> {
+    const parts: Record<string, number> = {};
+    
+    // Find resource IDs for animal parts
+    const carneResource = allResources.find(r => r.name === "Carne");
+    const couroResource = allResources.find(r => r.name === "Couro");
+    const ossosResource = allResources.find(r => r.name === "Ossos");
+    const peloResource = allResources.find(r => r.name === "Pelo");
+    
+    // Different animals give different quantities
+    switch (animalName) {
+      case "Coelho":
+        if (carneResource) parts[carneResource.id] = 1;
+        if (couroResource) parts[couroResource.id] = 1;
+        if (ossosResource) parts[ossosResource.id] = 2;
+        if (peloResource) parts[peloResource.id] = 2;
+        break;
+        
+      case "Veado":
+        if (carneResource) parts[carneResource.id] = 3;
+        if (couroResource) parts[couroResource.id] = 2;
+        if (ossosResource) parts[ossosResource.id] = 4;
+        if (peloResource) parts[peloResource.id] = 1;
+        break;
+        
+      case "Javali":
+        if (carneResource) parts[carneResource.id] = 4;
+        if (couroResource) parts[couroResource.id] = 3;
+        if (ossosResource) parts[ossosResource.id] = 6;
+        if (peloResource) parts[peloResource.id] = 1;
+        break;
+        
+      // Fish processing - fish give meat and bones
+      case "Peixe Pequeno":
+        if (carneResource) parts[carneResource.id] = 1;
+        if (ossosResource) parts[ossosResource.id] = 1;
+        break;
+        
+      case "Peixe Grande":
+        if (carneResource) parts[carneResource.id] = 2;
+        if (ossosResource) parts[ossosResource.id] = 2;
+        break;
+        
+      case "Salmão":
+        if (carneResource) parts[carneResource.id] = 3;
+        if (ossosResource) parts[ossosResource.id] = 2;
+        break;
+    }
+    
+    return parts;
+  }
+  
+  // Check for pickaxe + stone mining -> add loose stones
+  private addPickaxeBonus(rewards: Record<string, number>, playerEquipment: Equipment[], allResources: Resource[]): void {
     const hasPickaxe = playerEquipment.some(eq => eq.toolType === "pickaxe");
     const stoneResource = allResources.find(r => r.name === "Pedra");
     const looseStoneResource = allResources.find(r => r.name === "Pedras Soltas");
@@ -157,9 +237,6 @@ export class ExpeditionService {
       // Add loose stones equal to the amount of stone mined
       rewards[looseStoneResource.id] = (rewards[looseStoneResource.id] || 0) + rewards[stoneResource.id];
     }
-
-    // Apply equipment bonuses
-    return this.gameService.calculateExpeditionRewards(rewards, player, playerEquipment);
   }
 
   // Get base quantity for a resource type

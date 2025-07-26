@@ -73,7 +73,7 @@ Preferred communication style: Simple, everyday language.
 - **Updated food recipes**:
   - **Suco de Frutas** - 1 Água Fresca + 1 Garrafa de Bambu (não consome garrafa)
   - **Cogumelos Assados** - 3 Cogumelos + 1 Graveto
-  - **Peixe Grelhado** - 1 Peixe + 1 Graveto
+  - **Peixe Grelhado** - 1 Carne + 1 Graveto
   - **Carne Assada** - 1 Carne + 1 Graveto
   - **Ensopado de Carne** - 1 Panela de Barro + 2 Carnes + 3 Águas (não consome panela)
 - **Enhanced storage system configuration**: Added player preference for crafted items destination
@@ -85,6 +85,24 @@ Preferred communication style: Simple, everyday language.
 - Improved API with player settings endpoint for real-time configuration updates
 - **Fixed inventory TypeScript errors** - resolved issues with mixed resource/equipment types causing crashes
 - **Enhanced type safety** in inventory component with proper type checking for resources vs equipment
+
+**January 26, 2025 - Animal Processing System Implementation**
+- **Implemented comprehensive animal processing system** - animals now yield multiple resources instead of single items
+- **Added new basic resources for animal processing**:
+  - **Carne** 🥩 - meat from all animals and fish (weight: 2, value: 12, XP: 4)
+  - **Ossos** 🦴 - bones from animals and fish (weight: 1, value: 5, XP: 2)  
+  - **Pelo** 🧶 - fur from land animals (weight: 1, value: 3, XP: 1)
+  - **Couro** 🦫 - leather from land animals (weight: 2, value: 8, XP: 3)
+- **Updated expedition system** with automatic animal processing logic:
+  - **Coelho**: 1 Carne + 1 Couro + 2 Ossos + 2 Pelos
+  - **Veado**: 3 Carnes + 2 Couros + 4 Ossos + 1 Pelo
+  - **Javali**: 4 Carnes + 3 Couros + 6 Ossos + 1 Pelo
+  - **Peixe Pequeno**: 1 Carne + 1 Osso
+  - **Peixe Grande**: 2 Carnes + 2 Ossos
+  - **Salmão**: 3 Carnes + 2 Ossos
+- **Updated food recipes** to use processed "Carne" instead of whole animals
+- **Enhanced expedition service** with intelligent resource processing for better gameplay mechanics
+- **Improved resource economy** with multiple uses for animal-derived materials in crafting and cooking
 
 ## System Architecture
 
