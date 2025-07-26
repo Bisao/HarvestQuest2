@@ -246,7 +246,7 @@ export default function ExpeditionSystem({
   const estimatedTime = calculateExpeditionTime();
 
   return (
-    <Dialog open={isOpen} onOpenChange={false}>
+    <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="expedition-description">
         <div id="expedition-description" className="sr-only">
           Modal para configurar e executar expedições de coleta de recursos
@@ -267,7 +267,7 @@ export default function ExpeditionSystem({
               </div>
             </div>
             <div className="flex gap-2">
-              {(phase === "in-progress" || phase === "completed") && (
+              {phase === "in-progress" && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -277,16 +277,14 @@ export default function ExpeditionSystem({
                   −
                 </Button>
               )}
-              {(phase === "setup" || phase === "resource-selection" || phase === "confirmation" || phase === "completed") && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleClose}
-                  className="p-2"
-                >
-                  ✕
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClose}
+                className="p-2"
+              >
+                ✕
+              </Button>
             </div>
           </DialogTitle>
         </DialogHeader>

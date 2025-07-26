@@ -182,6 +182,42 @@ export default function Game() {
         isMinimized={expeditionMinimized}
         onExpeditionComplete={handleCompleteExpedition}
       />
+
+      {/* Minimized Expedition Window */}
+      {expeditionMinimized && activeExpedition && selectedBiome && (
+        <div className="fixed bottom-4 left-4 z-50">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 min-w-[280px]">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{selectedBiome.emoji}</span>
+                <div>
+                  <h4 className="font-semibold text-sm">Expedição na {selectedBiome.name}</h4>
+                  <p className="text-xs text-gray-500">Em andamento...</p>
+                </div>
+              </div>
+              <button
+                onClick={handleMinimizeExpedition}
+                className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              </button>
+            </div>
+            <div className="space-y-2">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-forest h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${activeExpedition.progress || 0}%` }}
+                ></div>
+              </div>
+              <p className="text-xs text-gray-600 text-center">
+                Progresso: {Math.round(activeExpedition.progress || 0)}%
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
