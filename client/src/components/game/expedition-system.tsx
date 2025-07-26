@@ -248,6 +248,9 @@ export default function ExpeditionSystem({
   return (
     <Dialog open={isOpen} onOpenChange={false}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="expedition-description">
+        <div id="expedition-description" className="sr-only">
+          Modal para configurar e executar expedições de coleta de recursos
+        </div>
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -287,10 +290,6 @@ export default function ExpeditionSystem({
             </div>
           </DialogTitle>
         </DialogHeader>
-        
-        <div id="expedition-description" className="sr-only">
-          Modal para configurar e executar expedições de coleta de recursos
-        </div>
 
         <div className="space-y-6">
           {/* Progress Indicator */}
