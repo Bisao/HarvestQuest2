@@ -211,57 +211,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const destination = player.craftedItemsDestination || 'storage';
       const outputEntries = Object.entries(recipe.output as Record<string, number>);
       
-      for (const [equipmentType, quantity] of outputEntries) {
-        // Find the actual equipment by toolType or name matching
-        const allEquipment = await storage.getAllEquipment();
-        const equipmentItem = allEquipment.find(eq => 
-          eq.toolType === equipmentType || 
-          eq.name.toLowerCase().includes(equipmentType.toLowerCase())
-        );
+      for (const [itemType, quantity] of outputEntries) {
+        // First check if it's a resource (like Barbante)
+        const allResources = await storage.getAllResources();
+        const resourceItem = allResources.find(r => r.id === itemType);
         
-        if (equipmentItem) {
-          if (destination === 'inventory') {
-            // Add to inventory
-            const inventoryItems = await storage.getPlayerInventory(playerId);
-            const existingInventoryItem = inventoryItems.find(item => item.resourceId === equipmentItem.id);
-            
-            if (existingInventoryItem) {
-              await storage.updateInventoryItem(existingInventoryItem.id, {
-                quantity: existingInventoryItem.quantity + quantity
-              });
-            } else {
-              await storage.addInventoryItem({
-                playerId,
-                resourceId: equipmentItem.id,
-                quantity
-              });
-            }
-            
-            // Update player inventory weight
-            const newWeight = player.inventoryWeight + (equipmentItem.weight * quantity);
-            await storage.updatePlayer(playerId, { inventoryWeight: newWeight });
-            
-            console.log(`Added ${quantity}x ${equipmentItem.name} to inventory for player ${playerId}`);
+        if (resourceItem) {
+          // Add resource to storage
+          const existingStorageItem = storageItems.find(item => item.resourceId === resourceItem.id);
+          
+          if (existingStorageItem) {
+            await storage.updateStorageItem(existingStorageItem.id, {
+              quantity: existingStorageItem.quantity + quantity
+            });
           } else {
-            // Add to storage (default behavior)
-            const existingStorageItem = storageItems.find(item => item.resourceId === equipmentItem.id);
-            
-            if (existingStorageItem) {
-              await storage.updateStorageItem(existingStorageItem.id, {
-                quantity: existingStorageItem.quantity + quantity
-              });
-            } else {
-              await storage.addStorageItem({
-                playerId,
-                resourceId: equipmentItem.id,
-                quantity
-              });
-            }
-            
-            console.log(`Added ${quantity}x ${equipmentItem.name} to storage for player ${playerId}`);
+            await storage.addStorageItem({
+              playerId,
+              resourceId: resourceItem.id,
+              quantity
+            });
           }
+          
+          console.log(`Added ${quantity}x ${resourceItem.name} to storage for player ${playerId}`);
         } else {
-          console.error(`Equipment not found for type: ${equipmentType}`);
+          // Find the actual equipment by toolType or name matching
+          const allEquipment = await storage.getAllEquipment();
+          const equipmentItem = allEquipment.find(eq => 
+            eq.toolType === itemType || 
+            eq.name.toLowerCase().includes(itemType.toLowerCase())
+          );
+          
+          if (equipmentItem) {
+              if (destination === 'inventory') {
+                // Add to inventory
+                const inventoryItems = await storage.getPlayerInventory(playerId);
+                const existingInventoryItem = inventoryItems.find(item => item.resourceId === equipmentItem.id);
+                
+                if (existingInventoryItem) {
+                  await storage.updateInventoryItem(existingInventoryItem.id, {
+                    quantity: existingInventoryItem.quantity + quantity
+                  });
+                } else {
+                  await storage.addInventoryItem({
+                    playerId,
+                    resourceId: equipmentItem.id,
+                    quantity
+                  });
+                }
+                
+                // Update player inventory weight
+                const newWeight = player.inventoryWeight + (equipmentItem.weight * quantity);
+                await storage.updatePlayer(playerId, { inventoryWeight: newWeight });
+                
+                console.log(`Added ${quantity}x ${equipmentItem.name} to inventory for player ${playerId}`);
+              } else {
+                // Add to storage (default behavior)
+                const existingStorageItem = storageItems.find(item => item.resourceId === equipmentItem.id);
+                
+                if (existingStorageItem) {
+                  await storage.updateStorageItem(existingStorageItem.id, {
+                    quantity: existingStorageItem.quantity + quantity
+                  });
+                } else {
+                  await storage.addStorageItem({
+                    playerId,
+                    resourceId: equipmentItem.id,
+                    quantity
+                  });
+                }
+                
+                console.log(`Added ${quantity}x ${equipmentItem.name} to storage for player ${playerId}`);
+              }
+          } else {
+            console.error(`Item not found for type: ${itemType}`);
+          }
         }
       }
 

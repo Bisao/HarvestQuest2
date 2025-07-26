@@ -83,15 +83,7 @@ export const TOOLS: InsertEquipment[] = [
     toolType: "pot",
     weight: 3,
   },
-  {
-    name: "Barbante",
-    emoji: "🧵",
-    effect: "Material para crafting",
-    bonus: { type: "crafting", value: 1 },
-    slot: "tool",
-    toolType: "string",
-    weight: 0.1,
-  },
+
   {
     name: "Mochila",
     emoji: "🎒",

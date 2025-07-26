@@ -17,10 +17,11 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     "carne": resourceIds[10],       // Carne
     "ossos": resourceIds[11],       // Ossos
     "pelo": resourceIds[12],        // Pelo
-    "cogumelos": resourceIds[16],   // Cogumelos (updated index)
-    "frutas_silvestres": resourceIds[17], // Frutas Silvestres (updated index)
-    "peixe_pequeno": resourceIds[18], // Peixe Pequeno (updated index)
-    "peixe_grande": resourceIds[19], // Peixe Grande (updated index)
+    "barbante": resourceIds[13],    // Barbante (new resource)
+    "cogumelos": resourceIds[17],   // Cogumelos (updated index)
+    "frutas_silvestres": resourceIds[18], // Frutas Silvestres (updated index)
+    "peixe_pequeno": resourceIds[19], // Peixe Pequeno (updated index)
+    "peixe_grande": resourceIds[20], // Peixe Grande (updated index)
   };
 
   return [
@@ -30,7 +31,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       emoji: "🧵",
       requiredLevel: 1,
       ingredients: { [resourceMap.fibra]: 5 },
-      output: { "string": 1 }
+      output: { [resourceMap.barbante]: 1 }
     },
     
     // FERRAMENTAS
@@ -38,14 +39,14 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Machado",
       emoji: "🪓",
       requiredLevel: 1,
-      ingredients: { [resourceMap.pedras_soltas]: 1, "string": 2, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "axe": 1 }
     },
     {
       name: "Picareta",
       emoji: "⛏️",
       requiredLevel: 1,
-      ingredients: { [resourceMap.pedras_soltas]: 2, "string": 2, [resourceMap.gravetos]: 1 },
+      ingredients: { [resourceMap.pedras_soltas]: 2, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "pickaxe": 1 }
     },
     {

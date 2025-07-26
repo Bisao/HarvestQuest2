@@ -16,6 +16,8 @@ Preferred communication style: Simple, everyday language.
 - **Faca confirmed in Tools category** - Equipment properly categorized  
 - **Inventory/Storage transfers working** - Items can be moved between inventory and storage seamlessly
 - **Consumables system functional** - Food items can be consumed from both inventory and storage
+- **Fixed Barbante as Material** - Moved from equipment to resources for proper crafting material categorization
+- **Enhanced Crafting System** - Now properly handles both resources and equipment outputs, uses materials from storage
 - Updated biome level requirements: Floresta (1), Deserto (20), Montanha (50), Oceano (75) 
 - Reset player to start at level 1 with no items or resources for proper game progression
 - Fixed all TypeScript and CSS errors for production-ready code
