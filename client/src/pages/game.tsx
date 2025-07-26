@@ -76,6 +76,28 @@ export default function Game() {
     }
   };
 
+  // Progress tracker effect for minimized expeditions
+  useEffect(() => {
+    if (activeExpedition && expeditionMinimized) {
+      const interval = setInterval(() => {
+        const now = Date.now();
+        const elapsed = now - activeExpedition.startTime;
+        const newProgress = Math.min(100, (elapsed / activeExpedition.estimatedDuration) * 100);
+        
+        setActiveExpedition((prev: any) => prev ? { ...prev, progress: newProgress } : null);
+        
+        // Auto-expand when expedition completes
+        if (newProgress >= 100) {
+          setExpeditionMinimized(false);
+          setExpeditionModalOpen(true);
+          clearInterval(interval);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [activeExpedition, expeditionMinimized]);
+
   // Handler for completing expeditions
   const handleCompleteExpedition = () => {
     setActiveExpedition(null);
@@ -181,6 +203,8 @@ export default function Game() {
         player={player}
         isMinimized={expeditionMinimized}
         onExpeditionComplete={handleCompleteExpedition}
+        activeExpedition={activeExpedition}
+        onExpeditionUpdate={setActiveExpedition}
       />
 
       {/* Minimized Expedition Window */}

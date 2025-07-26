@@ -19,6 +19,8 @@ interface ExpeditionSystemProps {
   player: Player;
   onExpeditionComplete: () => void;
   isMinimized?: boolean;
+  activeExpedition?: ActiveExpedition | null;
+  onExpeditionUpdate?: (expedition: ActiveExpedition | null) => void;
 }
 
 interface ActiveExpedition {
@@ -42,12 +44,17 @@ export default function ExpeditionSystem({
   playerId,
   player,
   onExpeditionComplete,
-  isMinimized = false
+  isMinimized = false,
+  activeExpedition: parentActiveExpedition,
+  onExpeditionUpdate
 }: ExpeditionSystemProps) {
   const [phase, setPhase] = useState<ExpeditionPhase>("setup");
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
-  const [activeExpedition, setActiveExpedition] = useState<ActiveExpedition | null>(null);
+  const [localActiveExpedition, setLocalActiveExpedition] = useState<ActiveExpedition | null>(null);
   const [expeditionProgress, setExpeditionProgress] = useState(0);
+  
+  // Use parent's activeExpedition if provided, otherwise use local state
+  const activeExpedition = parentActiveExpedition || localActiveExpedition;
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
@@ -56,7 +63,11 @@ export default function ExpeditionSystem({
     if (isOpen) {
       setPhase("setup");
       setSelectedResources([]);
-      setActiveExpedition(null);
+      if (onExpeditionUpdate) {
+        onExpeditionUpdate(null);
+      } else {
+        setLocalActiveExpedition(null);
+      }
       setExpeditionProgress(0);
     } else {
       if (intervalRef.current) {
@@ -128,7 +139,13 @@ export default function ExpeditionSystem({
         estimatedDuration: duration * 1000 // Convert to milliseconds
       };
       
-      setActiveExpedition(newActiveExpedition);
+      // Update parent state if callback is provided
+      if (onExpeditionUpdate) {
+        onExpeditionUpdate(newActiveExpedition);
+      } else {
+        setLocalActiveExpedition(newActiveExpedition);
+      }
+      
       setPhase("in-progress");
       startProgressSimulation(newActiveExpedition);
       
