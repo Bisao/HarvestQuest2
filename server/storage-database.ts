@@ -73,6 +73,10 @@ export class DatabaseStorage implements IStorage {
     await db.delete(players).where(eq(players.id, id));
   }
 
+  async getAllPlayers(): Promise<Player[]> {
+    return await db.select().from(players);
+  }
+
   // Resource methods
   async getAllResources(): Promise<Resource[]> {
     return await db.select().from(resources);

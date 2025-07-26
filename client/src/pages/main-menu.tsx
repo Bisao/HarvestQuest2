@@ -69,6 +69,16 @@ export default function MainMenu() {
         
         // Navigate to game with the player's username
         setLocation(`/game?player=${encodeURIComponent(player.username)}`);
+      } else if (response.status === 409) {
+        // Player already exists, try to load existing player instead
+        console.log("Player already exists, loading existing player");
+        
+        toast({
+          title: "Jogador Encontrado!",
+          description: `${newPlayerName} já existe. Carregando jogo existente...`,
+        });
+        
+        setLocation(`/game?player=${encodeURIComponent(newPlayerName.trim())}`);
       } else {
         const error = await response.json();
         console.error("Failed to create player:", error);

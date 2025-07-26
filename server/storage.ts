@@ -28,6 +28,8 @@ export interface IStorage {
   getPlayerByUsername(username: string): Promise<Player | undefined>;
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: string, updates: Partial<Player>): Promise<Player>;
+  deletePlayer(id: string): Promise<void>;
+  getAllPlayers(): Promise<Player[]>;
 
   // Resource methods
   getAllResources(): Promise<Resource[]>;
@@ -193,6 +195,14 @@ export class MemStorage implements IStorage {
     const updated = { ...player, ...updates };
     this.players.set(id, updated);
     return updated;
+  }
+
+  async deletePlayer(id: string): Promise<void> {
+    this.players.delete(id);
+  }
+
+  async getAllPlayers(): Promise<Player[]> {
+    return Array.from(this.players.values());
   }
 
   // Resource methods
