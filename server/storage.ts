@@ -49,6 +49,7 @@ export interface IStorage {
 
   // Expedition methods
   getPlayerExpeditions(playerId: string): Promise<Expedition[]>;
+  getExpedition(id: string): Promise<Expedition | undefined>;
   createExpedition(expedition: InsertExpedition): Promise<Expedition>;
   updateExpedition(id: string, updates: Partial<Expedition>): Promise<Expedition>;
 
@@ -221,7 +222,18 @@ export class MemStorage implements IStorage {
 
   async createPlayer(insertPlayer: InsertPlayer): Promise<Player> {
     const id = randomUUID();
-    const player: Player = { ...insertPlayer, id };
+    const player: Player = { 
+      id,
+      username: insertPlayer.username,
+      level: insertPlayer.level ?? 1,
+      experience: insertPlayer.experience ?? 0,
+      energy: insertPlayer.energy ?? 100,
+      maxEnergy: insertPlayer.maxEnergy ?? 100,
+      coins: insertPlayer.coins ?? 0,
+      inventoryWeight: insertPlayer.inventoryWeight ?? 0,
+      maxInventoryWeight: insertPlayer.maxInventoryWeight ?? 100,
+      autoStorage: insertPlayer.autoStorage ?? false,
+    };
     this.players.set(id, player);
     return player;
   }
@@ -246,7 +258,15 @@ export class MemStorage implements IStorage {
 
   async createResource(insertResource: InsertResource): Promise<Resource> {
     const id = randomUUID();
-    const resource: Resource = { ...insertResource, id };
+    const resource: Resource = {
+      id,
+      name: insertResource.name,
+      emoji: insertResource.emoji,
+      weight: insertResource.weight ?? 1,
+      value: insertResource.value ?? 1,
+      type: insertResource.type,
+      rarity: insertResource.rarity ?? 'common',
+    };
     this.resources.set(id, resource);
     return resource;
   }
@@ -262,7 +282,13 @@ export class MemStorage implements IStorage {
 
   async createBiome(insertBiome: InsertBiome): Promise<Biome> {
     const id = randomUUID();
-    const biome: Biome = { ...insertBiome, id };
+    const biome: Biome = {
+      id,
+      name: insertBiome.name,
+      emoji: insertBiome.emoji,
+      requiredLevel: insertBiome.requiredLevel ?? 1,
+      availableResources: insertBiome.availableResources,
+    };
     this.biomes.set(id, biome);
     return biome;
   }
@@ -276,7 +302,12 @@ export class MemStorage implements IStorage {
 
   async addInventoryItem(insertItem: InsertInventoryItem): Promise<InventoryItem> {
     const id = randomUUID();
-    const item: InventoryItem = { ...insertItem, id };
+    const item: InventoryItem = {
+      id,
+      playerId: insertItem.playerId,
+      resourceId: insertItem.resourceId,
+      quantity: insertItem.quantity ?? 0,
+    };
     this.inventoryItems.set(id, item);
     return item;
   }
@@ -303,7 +334,12 @@ export class MemStorage implements IStorage {
 
   async addStorageItem(insertItem: InsertStorageItem): Promise<StorageItem> {
     const id = randomUUID();
-    const item: StorageItem = { ...insertItem, id };
+    const item: StorageItem = {
+      id,
+      playerId: insertItem.playerId,
+      resourceId: insertItem.resourceId,
+      quantity: insertItem.quantity ?? 0,
+    };
     this.storageItems.set(id, item);
     return item;
   }
@@ -328,9 +364,24 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getExpedition(id: string): Promise<Expedition | undefined> {
+    return this.expeditions.get(id);
+  }
+
   async createExpedition(insertExpedition: InsertExpedition): Promise<Expedition> {
     const id = randomUUID();
-    const expedition: Expedition = { ...insertExpedition, id };
+    const expedition: Expedition = {
+      id,
+      playerId: insertExpedition.playerId,
+      biomeId: insertExpedition.biomeId,
+      status: insertExpedition.status,
+      selectedResources: insertExpedition.selectedResources,
+      selectedEquipment: insertExpedition.selectedEquipment,
+      collectedResources: insertExpedition.collectedResources ?? {},
+      startTime: insertExpedition.startTime ?? null,
+      endTime: insertExpedition.endTime ?? null,
+      progress: insertExpedition.progress ?? 0,
+    };
     this.expeditions.set(id, expedition);
     return expedition;
   }
@@ -363,7 +414,14 @@ export class MemStorage implements IStorage {
 
   async createRecipe(insertRecipe: InsertRecipe): Promise<Recipe> {
     const id = randomUUID();
-    const recipe: Recipe = { ...insertRecipe, id };
+    const recipe: Recipe = {
+      id,
+      name: insertRecipe.name,
+      emoji: insertRecipe.emoji,
+      requiredLevel: insertRecipe.requiredLevel ?? 1,
+      ingredients: insertRecipe.ingredients,
+      output: insertRecipe.output,
+    };
     this.recipes.set(id, recipe);
     return recipe;
   }

@@ -101,6 +101,11 @@ export const insertStorageItemSchema = createInsertSchema(storageItems).omit({
 
 export const insertExpeditionSchema = createInsertSchema(expeditions).omit({
   id: true,
+  startTime: true,
+  endTime: true,
+  progress: true,
+  status: true,
+  collectedResources: true,
 });
 
 export const insertEquipmentSchema = createInsertSchema(equipment).omit({

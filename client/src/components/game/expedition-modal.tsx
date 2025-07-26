@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import type { Biome, Resource, Equipment } from "@shared/schema";
 
 interface ExpeditionModalProps {
@@ -28,6 +28,7 @@ export default function ExpeditionModal({
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
   const [expeditionProgress, setExpeditionProgress] = useState(0);
+  const [currentExpeditionId, setCurrentExpeditionId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const startExpeditionMutation = useMutation({
@@ -37,9 +38,10 @@ export default function ExpeditionModal({
       selectedResources,
       selectedEquipment,
     }),
-    onSuccess: () => {
+    onSuccess: (expedition: any) => {
+      setCurrentExpeditionId(expedition.id);
       setCurrentStep("expedition-progress");
-      simulateExpedition();
+      simulateExpedition(expedition.id);
     },
     onError: () => {
       toast({
@@ -50,7 +52,35 @@ export default function ExpeditionModal({
     },
   });
 
-  const simulateExpedition = () => {
+  const completeExpeditionMutation = useMutation({
+    mutationFn: (expeditionId: string) => apiRequest("POST", `/api/expeditions/${expeditionId}/complete`),
+    onSuccess: (result: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      
+      const resourceNames = Object.keys(result.collectedResources)
+        .map(id => resources.find(r => r.id === id)?.name)
+        .filter(Boolean)
+        .slice(0, 3)
+        .join(", ");
+      
+      toast({
+        title: "Expedição Completa!",
+        description: `Recursos coletados: ${resourceNames}`,
+      });
+      
+      handleClose();
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Falha ao completar expedição.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const simulateExpedition = (expeditionId: string) => {
     let progress = 0;
     const interval = setInterval(() => {
       progress += 10;
@@ -59,22 +89,10 @@ export default function ExpeditionModal({
       if (progress >= 100) {
         clearInterval(interval);
         setTimeout(() => {
-          handleExpeditionComplete();
+          completeExpeditionMutation.mutate(expeditionId);
         }, 1000);
       }
     }, 500);
-  };
-
-  const handleExpeditionComplete = () => {
-    queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-    queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-    
-    toast({
-      title: "Expedição Completa!",
-      description: "Recursos coletados com sucesso.",
-    });
-    
-    handleClose();
   };
 
   const handleClose = () => {
@@ -82,6 +100,7 @@ export default function ExpeditionModal({
     setSelectedResources([]);
     setSelectedEquipment([]);
     setExpeditionProgress(0);
+    setCurrentExpeditionId(null);
     onClose();
   };
 
@@ -114,6 +133,9 @@ export default function ExpeditionModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogTitle className="sr-only">Expedição na {biome.name}</DialogTitle>
+        <DialogDescription className="sr-only">Prepare-se para a coleta de recursos no bioma {biome.name}</DialogDescription>
+        
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-forest to-adventure-600 text-white p-6 rounded-t-xl -m-6 mb-6">
           <div className="flex items-center justify-between">

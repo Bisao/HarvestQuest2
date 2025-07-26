@@ -115,6 +115,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Complete expedition and collect resources
+  app.post("/api/expeditions/:id/complete", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const expedition = await storage.getExpedition(id);
+      
+      if (!expedition) {
+        return res.status(404).json({ message: "Expedition not found" });
+      }
+
+      const player = await storage.getPlayer(expedition.playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
+      // Simulate resource collection
+      const selectedResourceIds = expedition.selectedResources as string[];
+      const collectedResources: Record<string, number> = {};
+      let totalWeight = 0;
+
+      for (const resourceId of selectedResourceIds) {
+        const resource = await storage.getResource(resourceId);
+        if (!resource) continue;
+
+        // Generate random amount (1-8 based on resource type)
+        const baseAmount = resource.type === "basic" ? Math.floor(Math.random() * 6) + 3 : Math.floor(Math.random() * 4) + 1;
+        const amount = Math.min(baseAmount, Math.floor((player.maxInventoryWeight - player.inventoryWeight - totalWeight) / resource.weight));
+        
+        if (amount > 0) {
+          collectedResources[resourceId] = amount;
+          totalWeight += resource.weight * amount;
+        }
+      }
+
+      // Add resources to inventory
+      for (const [resourceId, quantity] of Object.entries(collectedResources)) {
+        const existingItem = (await storage.getPlayerInventory(expedition.playerId))
+          .find(item => item.resourceId === resourceId);
+
+        if (existingItem) {
+          await storage.updateInventoryItem(existingItem.id, {
+            quantity: existingItem.quantity + quantity
+          });
+        } else {
+          await storage.addInventoryItem({
+            playerId: expedition.playerId,
+            resourceId,
+            quantity
+          });
+        }
+      }
+
+      // Update player weight and energy
+      await storage.updatePlayer(expedition.playerId, {
+        inventoryWeight: player.inventoryWeight + totalWeight,
+        energy: Math.max(0, player.energy - 10)
+      });
+
+      // Mark expedition as completed
+      await storage.updateExpedition(id, {
+        status: "completed",
+        collectedResources,
+        endTime: Date.now()
+      });
+
+      res.json({ collectedResources, totalWeight });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to complete expedition" });
+    }
+  });
+
   // Store all inventory items
   app.post("/api/storage/store-all/:playerId", async (req, res) => {
     try {
