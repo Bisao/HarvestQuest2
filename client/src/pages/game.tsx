@@ -236,7 +236,7 @@ export default function Game() {
                 ></div>
               </div>
               <p className="text-xs text-gray-600 text-center">
-                Progresso: {Math.round(activeExpedition.progress || 0)}%
+                Progresso: {Math.floor(activeExpedition.progress || 0)}%
               </p>
             </div>
           </div>

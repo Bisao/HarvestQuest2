@@ -103,7 +103,7 @@ export default function BiomesTab({ biomes, resources, equipment, player, player
                       style={{ width: `${activeExpedition.progress}%` }}
                     />
                   </div>
-                  <p className="text-xs text-blue-600 text-center">Progresso: {activeExpedition.progress}%</p>
+                  <p className="text-xs text-blue-600 text-center">Progresso: {Math.floor(activeExpedition.progress || 0)}%</p>
                 </div>
               </div>
             ) : (

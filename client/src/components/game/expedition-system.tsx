@@ -528,7 +528,7 @@ export default function ExpeditionSystem({
                 <div className="space-y-4">
                   <Progress value={expeditionProgress} className="w-full" />
                   <p className="text-sm font-medium">
-                    Progresso: {Math.round(expeditionProgress)}%
+                    Progresso: {Math.floor(expeditionProgress)}%
                   </p>
                   
                   {expeditionProgress >= 100 && (
