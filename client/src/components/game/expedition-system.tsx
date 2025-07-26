@@ -52,6 +52,8 @@ export default function ExpeditionSystem({
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
   const [localActiveExpedition, setLocalActiveExpedition] = useState<ActiveExpedition | null>(null);
   const [expeditionProgress, setExpeditionProgress] = useState(0);
+  const [expeditionRewards, setExpeditionRewards] = useState<any>(null);
+  const [autoCompleteTimer, setAutoCompleteTimer] = useState<number>(5);
   
   // Use parent's activeExpedition if provided, otherwise use local state
   const activeExpedition = parentActiveExpedition || localActiveExpedition;
@@ -69,6 +71,8 @@ export default function ExpeditionSystem({
         setLocalActiveExpedition(null);
       }
       setExpeditionProgress(0);
+      setExpeditionRewards(null);
+      setAutoCompleteTimer(5);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -76,6 +80,24 @@ export default function ExpeditionSystem({
       }
     }
   }, [isOpen]);
+
+  // Auto-complete timer when progress reaches 100%
+  useEffect(() => {
+    if (expeditionProgress >= 100 && phase === "in-progress") {
+      const timerInterval = setInterval(() => {
+        setAutoCompleteTimer(prev => {
+          if (prev <= 1) {
+            clearInterval(timerInterval);
+            handleCompleteExpedition();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timerInterval);
+    }
+  }, [expeditionProgress, phase]);
 
   const getBiomeResources = () => {
     if (!biome) return [];
@@ -185,6 +207,7 @@ export default function ExpeditionSystem({
     },
     onSuccess: (result) => {
       setPhase("completed");
+      setExpeditionRewards(result);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -574,13 +597,18 @@ export default function ExpeditionSystem({
                   </p>
                   
                   {expeditionProgress >= 100 && (
-                    <Button 
-                      onClick={handleCompleteExpedition}
-                      disabled={completeExpeditionMutation.isPending}
-                      className="bg-forest hover:bg-forest/90"
-                    >
-                      {completeExpeditionMutation.isPending ? "Finalizando..." : "✅ Finalizar Expedição"}
-                    </Button>
+                    <div className="space-y-3">
+                      <Button 
+                        onClick={handleCompleteExpedition}
+                        disabled={completeExpeditionMutation.isPending}
+                        className="bg-forest hover:bg-forest/90"
+                      >
+                        {completeExpeditionMutation.isPending ? "Finalizando..." : "✅ Finalizar Expedição"}
+                      </Button>
+                      <p className="text-sm text-gray-600">
+                        Auto-finalização em {autoCompleteTimer} segundos...
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -588,17 +616,82 @@ export default function ExpeditionSystem({
           )}
 
           {/* Completed Phase */}
-          {phase === "completed" && (
-            <div className="space-y-6 text-center">
-              <div className="bg-gradient-to-br from-green-50 to-blue-50 p-8 rounded-xl">
-                <h3 className="text-xl font-semibold mb-4">🎉 Expedição Concluída!</h3>
-                <p className="text-gray-600 mb-6">
-                  Sua expedição na {biome.name} foi concluída com sucesso!
-                  Os recursos coletados foram adicionados ao seu inventário.
-                </p>
-                <Button onClick={handleClose} className="bg-forest hover:bg-forest/90">
-                  Fechar
-                </Button>
+          {phase === "completed" && expeditionRewards && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-xl">
+                <h3 className="text-xl font-semibold mb-4 text-center">🎉 Expedição Concluída!</h3>
+                
+                {/* Recursos Coletados */}
+                <div className="mb-6">
+                  <h4 className="font-semibold mb-3 text-center">📦 Recursos Coletados:</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {expeditionRewards.collectedResources && Object.entries(expeditionRewards.collectedResources).map(([resourceId, quantity]: [string, any]) => {
+                      const resource = resources.find(r => r.id === resourceId);
+                      if (!resource || quantity <= 0) return null;
+                      return (
+                        <div key={resourceId} className="bg-white p-3 rounded-lg border flex items-center gap-2">
+                          <span className="text-2xl">{resource.emoji}</span>
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">{resource.name}</div>
+                            <div className="text-xs text-gray-600">x{quantity}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* XP e Moedas Ganhas */}
+                <div className="bg-white p-4 rounded-lg border mb-6">
+                  <h4 className="font-semibold mb-2 text-center">⭐ Recompensas:</h4>
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl mb-1">🎯</div>
+                      <div className="font-semibold text-blue-600">+{expeditionRewards.experienceGained || 0} XP</div>
+                      <div className="text-xs text-gray-600">Experiência</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl mb-1">🪙</div>
+                      <div className="font-semibold text-yellow-600">+{expeditionRewards.coinsGained || 0}</div>
+                      <div className="text-xs text-gray-600">Moedas</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Log da Expedição */}
+                <div className="bg-gray-50 p-4 rounded-lg border mb-6">
+                  <h4 className="font-semibold mb-2 text-center">📋 Log da Expedição:</h4>
+                  <div className="text-sm space-y-1 text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Expedição iniciada na {biome.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Recursos selecionados para coleta: {selectedResources.length}</span>
+                    </div>
+                    {expeditionRewards.collectedResources && Object.keys(expeditionRewards.collectedResources).length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-green-600">✓</span>
+                        <span>Coletados {Object.keys(expeditionRewards.collectedResources).length} tipos de recursos diferentes</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Experiência e moedas adicionadas à conta</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Recursos {player.autoStorage ? 'armazenados automaticamente' : 'adicionados ao inventário'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <Button onClick={handleClose} className="bg-forest hover:bg-forest/90">
+                    Fechar
+                  </Button>
+                </div>
               </div>
             </div>
           )}
