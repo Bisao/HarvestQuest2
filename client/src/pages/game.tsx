@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
 import EnhancedInventory from "@/components/game/enhanced-inventory";
@@ -11,6 +12,9 @@ import { queryClient } from "@/lib/queryClient";
 import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema";
 
 export default function Game() {
+  const [location] = useLocation();
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const playerUsername = urlParams.get('player') || 'Player1';
   const [activeTab, setActiveTab] = useState("biomes");
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [expeditionMinimized, setExpeditionMinimized] = useState(false);
@@ -30,7 +34,19 @@ export default function Game() {
   }, []);
 
   const { data: player } = useQuery<Player>({
-    queryKey: ["/api/player/Player1"],
+    queryKey: ["/api/player", playerUsername],
+    queryFn: async () => {
+      const response = await fetch(`/api/player/${playerUsername}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Player not found, redirect to main menu
+          window.location.href = '/';
+          return null;
+        }
+        throw new Error('Failed to fetch player');
+      }
+      return response.json();
+    }
   });
 
   const { data: biomes = [] } = useQuery<Biome[]>({

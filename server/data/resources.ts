@@ -15,7 +15,7 @@ export const BASIC_RESOURCES: InsertResource[] = [
   { name: "Carne", emoji: "🥩", weight: 2, value: 12, type: "basic", rarity: "common", requiredTool: null, experienceValue: 4 },
   { name: "Ossos", emoji: "🦴", weight: 1, value: 5, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2 },
   { name: "Pelo", emoji: "🧶", weight: 1, value: 3, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
-  { name: "Barbante", emoji: "🧵", weight: 0.1, value: 1, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
+  { name: "Barbante", emoji: "🧵", weight: 1, value: 1, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
 ];
 
 export const UNIQUE_RESOURCES: InsertResource[] = [
