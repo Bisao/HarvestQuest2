@@ -582,69 +582,33 @@ export default function ExpeditionSystem({
 
           {/* In Progress Phase */}
           {phase === "in-progress" && activeExpedition && (
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-blue-50 to-green-50 p-6 rounded-xl">
-                <h3 className="text-xl font-semibold mb-4 text-center">📋 Log da Expedição</h3>
+            <div className="space-y-6 text-center">
+              <div className="bg-gradient-to-br from-blue-50 to-green-50 p-8 rounded-xl">
+                <h3 className="text-xl font-semibold mb-4">Expedição em Andamento</h3>
+                <div className="text-6xl mb-4">{biome.emoji}</div>
+                <p className="text-gray-600 mb-6">
+                  Coletando recursos na {biome.name}...
+                </p>
                 
-                {/* Log da Expedição */}
-                <div className="bg-white p-4 rounded-lg border space-y-3 text-left">
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-600">✓</span>
-                    <span className="text-sm">Expedição iniciada na {biome.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-600">✓</span>
-                    <span className="text-sm">Recursos selecionados para coleta: {selectedResources.length}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-blue-600">⏳</span>
-                    <span className="text-sm">Explorando o bioma em busca de recursos...</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-blue-600">🔍</span>
-                    <span className="text-sm">Analisando pontos de coleta disponíveis...</span>
-                  </div>
-                  {expeditionProgress > 25 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      <span className="text-sm">Primeiros recursos localizados</span>
-                    </div>
-                  )}
-                  {expeditionProgress > 50 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      <span className="text-sm">Coleta em andamento...</span>
-                    </div>
-                  )}
-                  {expeditionProgress > 75 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      <span className="text-sm">Finalizando coleta dos recursos</span>
-                    </div>
-                  )}
+                <div className="space-y-4">
+                  <Progress value={expeditionProgress} className="w-full" />
+                  <p className="text-sm font-medium">
+                    Progresso: {Math.floor(expeditionProgress)}%
+                  </p>
+                  
                   {expeditionProgress >= 100 && (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <span className="text-green-600">✓</span>
-                        <span className="text-sm">Expedição concluída com sucesso!</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-green-600">✓</span>
-                        <span className="text-sm">Recursos prontos para coleta</span>
-                      </div>
-                      <div className="text-center mt-4">
-                        <Button 
-                          onClick={handleCompleteExpedition}
-                          disabled={completeExpeditionMutation.isPending}
-                          className="bg-forest hover:bg-forest/90"
-                        >
-                          {completeExpeditionMutation.isPending ? "Finalizando..." : "✅ Finalizar Expedição"}
-                        </Button>
-                        <p className="text-sm text-gray-600 mt-2">
-                          Auto-finalização em {autoCompleteTimer} segundos...
-                        </p>
-                      </div>
-                    </>
+                    <div className="space-y-3">
+                      <Button 
+                        onClick={handleCompleteExpedition}
+                        disabled={completeExpeditionMutation.isPending}
+                        className="bg-forest hover:bg-forest/90"
+                      >
+                        {completeExpeditionMutation.isPending ? "Finalizando..." : "✅ Finalizar Expedição"}
+                      </Button>
+                      <p className="text-sm text-gray-600">
+                        Auto-finalização em {autoCompleteTimer} segundos...
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
