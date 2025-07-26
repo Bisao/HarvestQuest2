@@ -139,6 +139,27 @@ export default function EnhancedInventory({
     }
   });
 
+  const storeAllMutation = useMutation({
+    mutationFn: () => apiRequest("POST", `/api/storage/store-all/${playerId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      setSelectedItem(null);
+      toast({
+        title: "Sucesso!",
+        description: "Todos os itens foram armazenados.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Falha ao armazenar itens.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const moveToStorageMutation = useMutation({
     mutationFn: async (itemId: string) => {
       const item = inventory.find(i => i.id === itemId);
@@ -458,8 +479,8 @@ export default function EnhancedInventory({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {/* TODO: Store all items */}}
-                disabled={inventory.length === 0 || isBlocked}
+                onClick={() => storeAllMutation.mutate()}
+                disabled={inventory.length === 0 || isBlocked || storeAllMutation.isPending}
               >
                 📦 Guardar Tudo
               </Button>

@@ -57,6 +57,26 @@ export default function MinecraftInventory({
   const getResourceById = (id: string) => resources.find(r => r.id === id);
   const getEquipmentById = (id: string) => equipment.find(e => e.id === id);
 
+  const storeAllMutation = useMutation({
+    mutationFn: () => apiRequest("POST", `/api/storage/store-all/${playerId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      toast({
+        title: "Sucesso!",
+        description: "Todos os itens foram armazenados.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Falha ao armazenar itens.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const moveToStorageMutation = useMutation({
     mutationFn: async (itemId: string) => {
       const response = await apiRequest('POST', `/api/storage/store/${itemId}`);
@@ -153,8 +173,8 @@ export default function MinecraftInventory({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {/* TODO: Store all items */}}
-                disabled={inventory.length === 0}
+                onClick={() => storeAllMutation.mutate()}
+                disabled={inventory.length === 0 || storeAllMutation.isPending}
               >
                 Guardar Tudo
               </Button>
