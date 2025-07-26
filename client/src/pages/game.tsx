@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
-import MinecraftInventory from "@/components/game/minecraft-inventory";
+import EnhancedInventory from "@/components/game/enhanced-inventory";
 import StorageTab from "@/components/game/storage-tab";
 import CraftingTab from "@/components/game/crafting-tab";
 import ExpeditionSystem from "@/components/game/expedition-system";
@@ -95,6 +95,8 @@ export default function Game() {
               <BiomesTab
                 biomes={biomes}
                 resources={resources}
+                equipment={equipment}
+                player={player}
                 playerLevel={player.level}
                 activeExpedition={gameState.activeExpedition}
                 onExploreBiome={handleExploreBiome}
@@ -103,12 +105,11 @@ export default function Game() {
             )}
 
             {activeTab === "inventory" && (
-              <MinecraftInventory
+              <EnhancedInventory
                 playerId={player.id}
                 resources={resources}
                 equipment={equipment}
-                currentWeight={player.inventoryWeight}
-                maxWeight={player.maxInventoryWeight}
+                player={player}
               />
             )}
 

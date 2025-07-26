@@ -14,6 +14,12 @@ export const players = pgTable("players", {
   inventoryWeight: integer("inventory_weight").notNull().default(0),
   maxInventoryWeight: integer("max_inventory_weight").notNull().default(100),
   autoStorage: boolean("auto_storage").notNull().default(false),
+  equippedHelmet: text("equipped_helmet"),
+  equippedChestplate: text("equipped_chestplate"),
+  equippedLeggings: text("equipped_leggings"),
+  equippedBoots: text("equipped_boots"),
+  equippedWeapon: text("equipped_weapon"),
+  equippedTool: text("equipped_tool"),
 });
 
 export const resources = pgTable("resources", {
@@ -24,6 +30,7 @@ export const resources = pgTable("resources", {
   value: integer("value").notNull().default(1),
   type: text("type").notNull(), // 'basic' or 'unique'
   rarity: text("rarity").notNull().default('common'), // 'common', 'uncommon', 'rare'
+  requiredTool: text("required_tool"), // tool type needed to collect this resource
 });
 
 export const biomes = pgTable("biomes", {
@@ -67,6 +74,8 @@ export const equipment = pgTable("equipment", {
   emoji: text("emoji").notNull(),
   effect: text("effect").notNull(), // description of the effect
   bonus: jsonb("bonus").notNull(), // object with bonus type and value
+  slot: text("slot").notNull(), // helmet, chestplate, leggings, boots, weapon, tool
+  toolType: text("tool_type"), // pickaxe, axe, shovel, etc. (for tools only)
 });
 
 export const recipes = pgTable("recipes", {

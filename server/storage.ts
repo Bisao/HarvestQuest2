@@ -87,17 +87,17 @@ export class MemStorage implements IStorage {
   async initializeGameData(): Promise<void> {
     // Initialize basic resources
     const basicResources = [
-      { name: "Fibra", emoji: "🌾", weight: 1, value: 2, type: "basic", rarity: "common" },
-      { name: "Pedra", emoji: "🪨", weight: 3, value: 3, type: "basic", rarity: "common" },
-      { name: "Gravetos", emoji: "🪵", weight: 2, value: 2, type: "basic", rarity: "common" },
+      { name: "Fibra", emoji: "🌾", weight: 1, value: 2, type: "basic", rarity: "common", requiredTool: null },
+      { name: "Pedra", emoji: "🪨", weight: 3, value: 3, type: "basic", rarity: "common", requiredTool: "pickaxe" },
+      { name: "Gravetos", emoji: "🪵", weight: 2, value: 2, type: "basic", rarity: "common", requiredTool: null },
     ];
 
     // Initialize unique resources
     const uniqueResources = [
-      { name: "Madeira", emoji: "🌳", weight: 5, value: 8, type: "unique", rarity: "common" },
-      { name: "Areia", emoji: "⏳", weight: 2, value: 5, type: "unique", rarity: "common" },
-      { name: "Cristais", emoji: "💎", weight: 1, value: 20, type: "unique", rarity: "rare" },
-      { name: "Conchas", emoji: "🐚", weight: 1, value: 12, type: "unique", rarity: "uncommon" },
+      { name: "Madeira", emoji: "🌳", weight: 5, value: 8, type: "unique", rarity: "common", requiredTool: "axe" },
+      { name: "Areia", emoji: "⏳", weight: 2, value: 5, type: "unique", rarity: "common", requiredTool: "shovel" },
+      { name: "Cristais", emoji: "💎", weight: 1, value: 20, type: "unique", rarity: "rare", requiredTool: "pickaxe" },
+      { name: "Conchas", emoji: "🐚", weight: 1, value: 12, type: "unique", rarity: "uncommon", requiredTool: null },
     ];
 
     const allResources = [...basicResources, ...uniqueResources];
@@ -147,18 +147,48 @@ export class MemStorage implements IStorage {
         emoji: "⛏️",
         effect: "+20% pedra",
         bonus: { type: "resource_boost", resource: "pedra", multiplier: 1.2 },
+        slot: "tool",
+        toolType: "pickaxe",
+      },
+      {
+        name: "Machado",
+        emoji: "🪓",
+        effect: "+20% madeira",
+        bonus: { type: "resource_boost", resource: "madeira", multiplier: 1.2 },
+        slot: "tool",
+        toolType: "axe",
+      },
+      {
+        name: "Pá",
+        emoji: "🛸",
+        effect: "+20% areia",
+        bonus: { type: "resource_boost", resource: "areia", multiplier: 1.2 },
+        slot: "tool",
+        toolType: "shovel",
       },
       {
         name: "Mochila",
         emoji: "🎒",
         effect: "+15 kg peso",
         bonus: { type: "weight_boost", value: 15 },
+        slot: "chestplate",
+        toolType: null,
       },
       {
-        name: "Bússola",
-        emoji: "🧭",
-        effect: "-20% tempo",
-        bonus: { type: "time_reduction", multiplier: 0.8 },
+        name: "Capacete de Ferro",
+        emoji: "🪖",
+        effect: "+10% proteção",
+        bonus: { type: "protection", value: 10 },
+        slot: "helmet",
+        toolType: null,
+      },
+      {
+        name: "Botas de Couro",
+        emoji: "🥾",
+        effect: "+5% velocidade",
+        bonus: { type: "speed_boost", value: 5 },
+        slot: "boots",
+        toolType: null,
       },
     ];
 
@@ -227,6 +257,12 @@ export class MemStorage implements IStorage {
       inventoryWeight: 0,
       maxInventoryWeight: 50,
       autoStorage: false,
+      equippedHelmet: null,
+      equippedChestplate: null,
+      equippedLeggings: null,
+      equippedBoots: null,
+      equippedWeapon: null,
+      equippedTool: null,
     });
   }
 
@@ -254,6 +290,12 @@ export class MemStorage implements IStorage {
       inventoryWeight: insertPlayer.inventoryWeight ?? 0,
       maxInventoryWeight: insertPlayer.maxInventoryWeight ?? 100,
       autoStorage: insertPlayer.autoStorage ?? false,
+      equippedHelmet: insertPlayer.equippedHelmet || null,
+      equippedChestplate: insertPlayer.equippedChestplate || null,
+      equippedLeggings: insertPlayer.equippedLeggings || null,
+      equippedBoots: insertPlayer.equippedBoots || null,
+      equippedWeapon: insertPlayer.equippedWeapon || null,
+      equippedTool: insertPlayer.equippedTool || null,
     };
     this.players.set(id, player);
     return player;
@@ -287,6 +329,7 @@ export class MemStorage implements IStorage {
       value: insertResource.value ?? 1,
       type: insertResource.type,
       rarity: insertResource.rarity ?? 'common',
+      requiredTool: insertResource.requiredTool || null,
     };
     this.resources.set(id, resource);
     return resource;
@@ -425,7 +468,15 @@ export class MemStorage implements IStorage {
 
   async createEquipment(insertEquipment: InsertEquipment): Promise<Equipment> {
     const id = randomUUID();
-    const equipment: Equipment = { ...insertEquipment, id };
+    const equipment: Equipment = {
+      id,
+      name: insertEquipment.name,
+      emoji: insertEquipment.emoji,
+      effect: insertEquipment.effect,
+      bonus: insertEquipment.bonus,
+      slot: insertEquipment.slot,
+      toolType: insertEquipment.toolType || null,
+    };
     this.equipment.set(id, equipment);
     return equipment;
   }

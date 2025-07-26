@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertExpeditionSchema } from "@shared/schema";
 import { z } from "zod";
+import type { Player } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -81,6 +82,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(recipes);
     } catch (error) {
       res.status(500).json({ message: "Failed to get recipes" });
+    }
+  });
+
+  // Equip item
+  app.post("/api/player/equip", async (req, res) => {
+    try {
+      const { playerId, slot, equipmentId } = req.body;
+      
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
+      const updates: Partial<Player> = {};
+      switch (slot) {
+        case "helmet":
+          updates.equippedHelmet = equipmentId;
+          break;
+        case "chestplate":
+          updates.equippedChestplate = equipmentId;
+          break;
+        case "leggings":
+          updates.equippedLeggings = equipmentId;
+          break;
+        case "boots":
+          updates.equippedBoots = equipmentId;
+          break;
+        case "weapon":
+          updates.equippedWeapon = equipmentId;
+          break;
+        case "tool":
+          updates.equippedTool = equipmentId;
+          break;
+        default:
+          return res.status(400).json({ message: "Invalid equipment slot" });
+      }
+
+      const updatedPlayer = await storage.updatePlayer(playerId, updates);
+      res.json(updatedPlayer);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to equip item" });
     }
   });
 

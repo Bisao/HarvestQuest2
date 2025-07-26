@@ -1,4 +1,4 @@
-import type { Biome, Resource } from "@shared/schema";
+import type { Biome, Resource, Equipment, Player } from "@shared/schema";
 
 interface ActiveExpedition {
   id: string;
@@ -10,16 +10,31 @@ interface ActiveExpedition {
 interface BiomesTabProps {
   biomes: Biome[];
   resources: Resource[];
+  equipment: Equipment[];
+  player: Player | null;
   playerLevel: number;
   activeExpedition: ActiveExpedition | null;
   onExploreBiome: (biome: Biome) => void;
   onCompleteExpedition: (expeditionId: string) => void;
 }
 
-export default function BiomesTab({ biomes, resources, playerLevel, activeExpedition, onExploreBiome, onCompleteExpedition }: BiomesTabProps) {
+export default function BiomesTab({ biomes, resources, equipment, player, playerLevel, activeExpedition, onExploreBiome, onCompleteExpedition }: BiomesTabProps) {
   const getResourcesForBiome = (biome: Biome) => {
     const resourceIds = biome.availableResources as string[];
-    return resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
+    const availableResources = resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
+    
+    // Filter resources based on equipped tools
+    return availableResources.filter(resource => {
+      if (!resource.requiredTool) return true; // No tool required
+      
+      // Check if player has the required tool equipped
+      const equippedTool = equipment.find(eq => 
+        eq.toolType === resource.requiredTool && 
+        (eq.id === player?.equippedTool)
+      );
+      
+      return !!equippedTool;
+    });
   };
 
   const isUnlocked = (biome: Biome) => playerLevel >= biome.requiredLevel;
