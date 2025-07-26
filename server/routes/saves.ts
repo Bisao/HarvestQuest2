@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
       username: player.username,
       level: player.level,
       experience: player.experience,
-      last_played: Date.now() // Current timestamp for now
+      lastPlayed: Date.now() // Current timestamp for now
     }));
     
     res.json(saveSlots);

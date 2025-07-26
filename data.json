@@ -1,0 +1,59 @@
+{
+  "players": [
+    [
+      "3a0a577e-e85f-44f6-a8bc-78941f867b15",
+      {
+        "id": "3a0a577e-e85f-44f6-a8bc-78941f867b15",
+        "username": "NovoTeste",
+        "level": 1,
+        "experience": 0,
+        "hunger": 100,
+        "maxHunger": 100,
+        "thirst": 100,
+        "maxThirst": 100,
+        "coins": 0,
+        "inventoryWeight": 0,
+        "maxInventoryWeight": 100,
+        "autoStorage": false,
+        "craftedItemsDestination": "storage",
+        "waterStorage": 0,
+        "maxWaterStorage": 500,
+        "equippedHelmet": null,
+        "equippedChestplate": null,
+        "equippedLeggings": null,
+        "equippedBoots": null,
+        "equippedWeapon": null,
+        "equippedTool": null
+      }
+    ],
+    [
+      "1d5ca482-5a5e-431e-abae-770a3b11921a",
+      {
+        "id": "1d5ca482-5a5e-431e-abae-770a3b11921a",
+        "username": "OutroTeste",
+        "level": 1,
+        "experience": 0,
+        "hunger": 100,
+        "maxHunger": 100,
+        "thirst": 100,
+        "maxThirst": 100,
+        "coins": 0,
+        "inventoryWeight": 0,
+        "maxInventoryWeight": 100,
+        "autoStorage": false,
+        "craftedItemsDestination": "storage",
+        "waterStorage": 0,
+        "maxWaterStorage": 500,
+        "equippedHelmet": null,
+        "equippedChestplate": null,
+        "equippedLeggings": null,
+        "equippedBoots": null,
+        "equippedWeapon": null,
+        "equippedTool": null
+      }
+    ]
+  ],
+  "inventoryItems": [],
+  "storageItems": [],
+  "expeditions": []
+}
