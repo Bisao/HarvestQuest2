@@ -61,8 +61,15 @@ export default function EquipmentSelectorModal({
   });
 
   // Filter equipment by slot type and check if available in storage
+  // Special handling for knife - it can be equipped in both weapon and tool slots
   const availableEquipment = equipment
-    .filter(eq => eq.slot === slotType)
+    .filter(eq => {
+      // Allow knife to appear in both weapon and tool slots
+      if (eq.name === "Faca") {
+        return eq.slot === slotType || (slotType === "weapon" && eq.slot === "tool") || (slotType === "tool" && eq.slot === "weapon");
+      }
+      return eq.slot === slotType;
+    })
     .map(eq => {
       const storageItem = storageItems.find(item => item.resourceId === eq.id);
       return {
@@ -71,7 +78,11 @@ export default function EquipmentSelectorModal({
         available: (storageItem?.quantity || 0) > 0
       };
     })
-    .filter(eq => eq.available);
+    .filter(eq => eq.available)
+    // Remove duplicates if knife appears multiple times
+    .filter((eq, index, self) => 
+      index === self.findIndex(item => item.id === eq.id)
+    );
 
   const handleEquip = (equipmentId: string) => {
     equipItemMutation.mutate({ slot: slotType, equipmentId });
