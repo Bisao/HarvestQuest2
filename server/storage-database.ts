@@ -37,6 +37,7 @@ import { BASIC_RESOURCES, UNIQUE_RESOURCES, ANIMAL_RESOURCES, FOOD_RESOURCES } f
 import { createBiomeData } from "./data/biomes";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createRecipeData } from "./data/recipes";
+import { ALL_QUESTS } from "./data/quests";
 
 export class DatabaseStorage implements IStorage {
   async createResource(resource: InsertResource): Promise<Resource> {
@@ -337,6 +338,90 @@ export class DatabaseStorage implements IStorage {
       const recipeData = createRecipeData(resourceIds);
       await db.insert(recipes).values(recipeData);
       console.log("✅ Recipes initialized");
+    }
+
+    // Check and initialize quests
+    const existingQuests = await db.select().from(quests).limit(1);
+    if (existingQuests.length === 0) {
+      // Get current biome IDs to use in quest objectives
+      const allBiomes = await db.select().from(biomes);
+      const florestaBiome = allBiomes.find(b => b.name === "Floresta");
+      const deserToBiome = allBiomes.find(b => b.name === "Deserto");
+      
+      if (florestaBiome) {
+        // Create basic quests with correct biome IDs
+        const basicQuests = [
+          {
+            name: "Primeiro Explorador",
+            description: "Complete sua primeira expedição na Floresta",
+            emoji: "🏕️",
+            type: "explore" as const,
+            category: "exploracao",
+            requiredLevel: 1,
+            objectives: [
+              {
+                type: "expedition" as const,
+                biomeId: florestaBiome.id,
+                quantity: 1,
+                description: "Complete 1 expedição na Floresta"
+              }
+            ],
+            rewards: {
+              coins: 50,
+              experience: 25,
+              items: {}
+            },
+            isActive: true
+          },
+          {
+            name: "Coletor Iniciante", 
+            description: "Colete 10 Fibras para começar sua jornada",
+            emoji: "🌾",
+            type: "collect" as const,
+            category: "coleta",
+            requiredLevel: 1,
+            objectives: [
+              {
+                type: "collect" as const,
+                resourceId: "fibra",
+                quantity: 10,
+                description: "Colete 10 Fibras"
+              }
+            ],
+            rewards: {
+              coins: 25,
+              experience: 15,
+              items: {}
+            },
+            isActive: true
+          },
+          {
+            name: "Artesão Novato",
+            description: "Crafie seu primeiro Barbante",
+            emoji: "🧵", 
+            type: "craft" as const,
+            category: "crafting",
+            requiredLevel: 1,
+            objectives: [
+              {
+                type: "craft" as const,
+                recipeId: "barbante",
+                quantity: 1,
+                description: "Crafie 1 Barbante"
+              }
+            ],
+            rewards: {
+              coins: 30,
+              experience: 20,
+              items: {}
+            },
+            isActive: true
+          }
+        ];
+
+        await db.insert(quests).values(basicQuests);
+        console.log("✅ Quests initialized");
+      }
     }
 
     console.log("🚀 PostgreSQL database initialization completed!");
