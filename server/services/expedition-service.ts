@@ -171,10 +171,21 @@ export class ExpeditionService {
   
   // Check if a resource is an animal or fish
   private isAnimal(resourceName: string): boolean {
-    return ["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
+    return [
+      // Animais pequenos
+      "Coelho", "Esquilo", "Rato do Campo",
+      // Animais médios
+      "Veado", "Raposa", "Lobo",
+      // Animais grandes
+      "Javali", "Urso",
+      // Aves
+      "Pato Selvagem", "Faisão",
+      // Peixes
+      "Peixe Pequeno", "Peixe Grande", "Salmão", "Truta", "Enguia"
+    ].includes(resourceName);
   }
   
-  // Process animal into component resources
+  // Process animal into component resources with proper weight distribution
   private processAnimal(animalName: string, allResources: Resource[]): Record<string, number> {
     const parts: Record<string, number> = {};
     
@@ -183,9 +194,12 @@ export class ExpeditionService {
     const couroResource = allResources.find(r => r.name === "Couro");
     const ossosResource = allResources.find(r => r.name === "Ossos");
     const peloResource = allResources.find(r => r.name === "Pelo");
+    const penasResource = allResources.find(r => r.name === "Penas");
+    const banhaResource = allResources.find(r => r.name === "Banha");
     
-    // Different animals give different quantities
+    // Process animals according to their size and type
     switch (animalName) {
+      // ANIMAIS PEQUENOS
       case "Coelho":
         if (carneResource) parts[carneResource.id] = 1;
         if (couroResource) parts[couroResource.id] = 1;
@@ -193,6 +207,18 @@ export class ExpeditionService {
         if (peloResource) parts[peloResource.id] = 2;
         break;
         
+      case "Esquilo":
+        if (carneResource) parts[carneResource.id] = 1;
+        if (peloResource) parts[peloResource.id] = 1;
+        if (ossosResource) parts[ossosResource.id] = 1;
+        break;
+        
+      case "Rato do Campo":
+        if (carneResource) parts[carneResource.id] = 1;
+        if (peloResource) parts[peloResource.id] = 1;
+        break;
+        
+      // ANIMAIS MÉDIOS
       case "Veado":
         if (carneResource) parts[carneResource.id] = 3;
         if (couroResource) parts[couroResource.id] = 2;
@@ -200,14 +226,51 @@ export class ExpeditionService {
         if (peloResource) parts[peloResource.id] = 1;
         break;
         
+      case "Raposa":
+        if (carneResource) parts[carneResource.id] = 2;
+        if (couroResource) parts[couroResource.id] = 1;
+        if (ossosResource) parts[ossosResource.id] = 2;
+        if (peloResource) parts[peloResource.id] = 2;
+        break;
+        
+      case "Lobo":
+        if (carneResource) parts[carneResource.id] = 3;
+        if (couroResource) parts[couroResource.id] = 2;
+        if (ossosResource) parts[ossosResource.id] = 3;
+        if (peloResource) parts[peloResource.id] = 2;
+        break;
+        
+      // ANIMAIS GRANDES
       case "Javali":
         if (carneResource) parts[carneResource.id] = 4;
         if (couroResource) parts[couroResource.id] = 3;
         if (ossosResource) parts[ossosResource.id] = 6;
         if (peloResource) parts[peloResource.id] = 1;
+        if (banhaResource) parts[banhaResource.id] = 2;
         break;
         
-      // Fish processing - fish give meat and bones
+      case "Urso":
+        if (carneResource) parts[carneResource.id] = 8;
+        if (couroResource) parts[couroResource.id] = 4;
+        if (ossosResource) parts[ossosResource.id] = 8;
+        if (peloResource) parts[peloResource.id] = 3;
+        if (banhaResource) parts[banhaResource.id] = 3;
+        break;
+        
+      // AVES
+      case "Pato Selvagem":
+        if (carneResource) parts[carneResource.id] = 1;
+        if (penasResource) parts[penasResource.id] = 3;
+        if (ossosResource) parts[ossosResource.id] = 1;
+        break;
+        
+      case "Faisão":
+        if (carneResource) parts[carneResource.id] = 1;
+        if (penasResource) parts[penasResource.id] = 2;
+        if (ossosResource) parts[ossosResource.id] = 1;
+        break;
+        
+      // PEIXES - apenas carne e ossos
       case "Peixe Pequeno":
         if (carneResource) parts[carneResource.id] = 1;
         if (ossosResource) parts[ossosResource.id] = 1;
@@ -221,6 +284,16 @@ export class ExpeditionService {
       case "Salmão":
         if (carneResource) parts[carneResource.id] = 3;
         if (ossosResource) parts[ossosResource.id] = 2;
+        break;
+        
+      case "Truta":
+        if (carneResource) parts[carneResource.id] = 2;
+        if (ossosResource) parts[ossosResource.id] = 1;
+        break;
+        
+      case "Enguia":
+        if (carneResource) parts[carneResource.id] = 1;
+        if (ossosResource) parts[ossosResource.id] = 1;
         break;
     }
     

@@ -92,6 +92,18 @@ Preferred communication style: Simple, everyday language.
 - **Categorização expandida** - adicionada categoria "Alimentos Evolutivos" para comidas com variações
 - **Design totalmente simétrico** - usuário solicitou cards pequenos e uniformes em tamanho
 
+**January 27, 2025 - Sistema de Peso Realista Implementado**
+- **Atualizado sistema completo de pesos conforme especificação do usuário** - todos os recursos ajustados para valores realistas
+- **Recursos Básicos**: Fibra (0.1kg), Pedra (3.0kg), Pedras Soltas (1.0kg), Gravetos (2.0kg), Água Fresca (2.0kg), etc.
+- **Animais com pesos realistas**: Esquilo (1.0kg), Coelho (3.0kg), Raposa (4.0kg), Veado (8.0kg), Javali (12.0kg), Urso (20.0kg)
+- **Peixes balanceados**: Peixe Pequeno (1.0kg), Truta (2.0kg), Peixe Grande (3.0kg), Salmão (4.0kg)
+- **Plantas e recursos naturais**: Ervas Medicinais (0.5kg), Flores Silvestres (0.2kg), Nozes (0.8kg), Raízes (2.0kg), Mel Selvagem (3.0kg)
+- **Sistema de processamento animal expandido** - adicionados todos os novos animais com processamento realista
+- **Materiais processados têm peso equivalente** - Carne, Couro, Ossos, Pelo, Penas, Banha pesam 2.3kg cada (peso médio dos animais)
+- **Pedra não é mais processada** quando coletada - coletada diretamente conforme solicitado
+- **Sistema de capacidade de inventário** já implementado com verificação de peso para evitar sobrecarga
+- **Migração completada com sucesso** - todos os pesos atualizados e sistema de inventário funcionando corretamente
+
 **January 27, 2025 - Sistema Evolutivo Completo e Níveis Corrigidos**
 - **TODAS receitas "Improvisadas" ajustadas para nível 1** - solicitação específica do usuário
 - **Sistema de receitas completamente reorganizado** - eliminadas duplicatas e inconsistências
