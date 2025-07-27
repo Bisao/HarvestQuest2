@@ -14,6 +14,8 @@ Preferred communication style: Simple, everyday language.
 - **Smart Progress Display**: Progress bar only shows during active expeditions, automatically switches to results when complete
 - **Improved Completion Flow**: Players can finalize expeditions from both biome cards and minimized window
 - **Better Visual Feedback**: Completion status clearly indicated with green highlights and reward summaries
+- **Expandable Results Window**: Completed expeditions show compact results, expandable to detailed view without opening central modal
+- **Auto-Minimize on Completion**: Expeditions automatically switch to minimized mode when completed, avoiding modal popup
 
 **January 27, 2025 - EXPEDITION MODAL STATE FIX**
 - **Fixed Critical Expedition Bug**: Resolved issue where minimizing and reopening expeditions showed resource selection instead of progress
