@@ -78,15 +78,18 @@ Preferred communication style: Simple, everyday language.
 - Sistema anterior substituído pelo novo EvolutionaryCraftingSystem para melhor organização e experiência do usuário
 
 **January 27, 2025 - Cards Compactos e Simétricos**
-- **Padronizados todos os cards de crafting** com altura fixa de 160px (h-40) para total simetria visual
+- **Padronizados todos os cards de crafting** com altura fixa de 192px (h-48) para total simetria visual
 - **Layout compacto** - todos os equipamentos evolutivos e simples têm exatamente o mesmo tamanho
-- **Grid responsivo otimizado** - 4-5 colunas em telas grandes para melhor aproveitamento do espaço  
-- **Controles de carrossel reduzidos** - botões menores (6x6) e pontos indicadores compactos
-- **Textos otimizados** - tamanhos de fonte reduzidos mas mantendo legibilidade
+- **Grid responsivo otimizado** - 3-4 colunas em telas grandes com espaçamento adequado (gap-4)
+- **Controles de carrossel reduzidos** - botões menores (5x5) e pontos indicadores compactos
+- **Textos com truncate** para evitar overflow horizontal com layout flexbox
 - **Todas as ferramentas, armas e equipamentos são agora evolutivos** com 3 tiers cada:
   - Ferramentas: Machado, Picareta, Vara de Pesca, Pá, Foice, Faca, Balde
   - Armas: Espada, Arco, Lança, Besta
   - Armaduras: Capacete, Peitoral, Calças, Botas, Mochila, Bolsa de Comida
+  - **Alimentos Evolutivos**: Carne (Assada/Grelhada/Defumada), Ensopados, Cogumelos, Peixe, Bebidas
+- **Sistema de agrupamento inteligente** - todos os itens com nomes similares são agrupados evolutivamente
+- **Categorização expandida** - adicionada categoria "Alimentos Evolutivos" para comidas com variações
 - **Design totalmente simétrico** - usuário solicitou cards pequenos e uniformes em tamanho
 
 **January 27, 2025 - Enhanced Forest Biome Update**

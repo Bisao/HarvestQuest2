@@ -145,6 +145,43 @@ const EQUIPMENT_FAMILIES = {
     emoji: "🥘",
     category: "Armaduras Evolutivas",
     tiers: ["Normal", "Refrigerada", "Mágica"]
+  },
+  
+  // Alimentos evolutivos
+  cooked_meat: {
+    baseType: "cooked_meat",
+    name: "Carne",
+    emoji: "🥩",
+    category: "Alimentos Evolutivos",
+    tiers: ["Assada", "Grelhada", "Defumada"]
+  },
+  stew: {
+    baseType: "stew",
+    name: "Ensopado",
+    emoji: "🍲",
+    category: "Alimentos Evolutivos", 
+    tiers: ["Simples", "Nutritivo", "Especial"]
+  },
+  cooked_mushrooms: {
+    baseType: "cooked_mushrooms",
+    name: "Cogumelos",
+    emoji: "🍄",
+    category: "Alimentos Evolutivos",
+    tiers: ["Assados", "Grelhados", "Refogados"]
+  },
+  cooked_fish: {
+    baseType: "cooked_fish",
+    name: "Peixe",
+    emoji: "🐟",
+    category: "Alimentos Evolutivos",
+    tiers: ["Grelhado", "Assado", "Defumado"]
+  },
+  beverages: {
+    baseType: "beverages",
+    name: "Bebidas",
+    emoji: "🥤",
+    category: "Alimentos Evolutivos",
+    tiers: ["Suco", "Vitamina", "Elixir"]
   }
 };
 
@@ -161,10 +198,9 @@ export default function EvolutionaryCraftingSystem({
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
     "Materiais Básicos": true,
     "Ferramentas Evolutivas": true,
-    "Ferramentas Especializadas": false,
     "Armas Evolutivas": false,
-    "Armas Adicionais": false,
     "Armaduras Evolutivas": false,
+    "Alimentos Evolutivos": false,
     "Equipamentos Utilitários": false,
     "Utensílios de Cozinha": false,
     "Consumíveis": false,
@@ -285,6 +321,7 @@ export default function EvolutionaryCraftingSystem({
       "Ferramentas Evolutivas": [],
       "Armas Evolutivas": [],
       "Armaduras Evolutivas": [],
+      "Alimentos Evolutivos": [],
       "Equipamentos Utilitários": [],
       "Utensílios de Cozinha": [],
       "Consumíveis": []
@@ -299,9 +336,9 @@ export default function EvolutionaryCraftingSystem({
       }
       // Ferramentas evolutivas - TODAS as ferramentas com variações evolutivas
       else if (name.includes("machado") || name.includes("picareta") || 
-               name.includes("vara de pesca") || name.includes("pá") ||
-               name.includes("foice") || name.includes("faca") || 
-               name.includes("balde")) {
+               name.includes("vara de pesca") || name.includes("vara") ||
+               name.includes("pá") || name.includes("foice") || 
+               name.includes("faca") || name.includes("balde")) {
         categories["Ferramentas Evolutivas"].push(recipe);
       }
       // Armas evolutivas - TODAS as armas com variações evolutivas
@@ -314,6 +351,14 @@ export default function EvolutionaryCraftingSystem({
                name.includes("calças") || name.includes("botas") ||
                name.includes("mochila") || name.includes("bolsa")) {
         categories["Armaduras Evolutivas"].push(recipe);
+      }
+      // Alimentos evolutivos - TODOS os alimentos com variações
+      else if ((name.includes("carne") && (name.includes("assada") || name.includes("grelhada") || name.includes("defumada"))) ||
+               (name.includes("ensopado") || name.includes("sopa")) ||
+               (name.includes("cogumelos") && (name.includes("assados") || name.includes("grelhados") || name.includes("refogados"))) ||
+               (name.includes("peixe") && (name.includes("grelhado") || name.includes("assado") || name.includes("defumado"))) ||
+               (name.includes("suco") || name.includes("vitamina") || name.includes("elixir"))) {
+        categories["Alimentos Evolutivos"].push(recipe);
       }
       // Equipamentos utilitários
       else if (name.includes("corda") || name.includes("isca") || 
