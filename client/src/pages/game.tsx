@@ -491,24 +491,64 @@ export default function Game() {
               </button>
             </div>
             <div className="space-y-2">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    activeExpedition.progress >= 100 ? "bg-green-500" : "bg-forest"
-                  }`}
-                  style={{ width: `${activeExpedition.progress || 0}%` }}
-                ></div>
-              </div>
-              <p className="text-xs text-gray-600 text-center">
-                Progresso: {Math.floor(activeExpedition.progress || 0)}%
-              </p>
-              {activeExpedition.progress >= 100 && (
-                <button
-                  onClick={handleCompleteExpedition}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
-                >
-                  ✅ Finalizar Expedição
-                </button>
+              {activeExpedition.progress >= 100 ? (
+                // Show results when completed
+                <div className="space-y-3">
+                  {/* Collected Resources */}
+                  <div>
+                    <h4 className="font-semibold text-xs mb-2 text-blue-700">🎯 Coletando Recursos:</h4>
+                    <div className="space-y-1">
+                      {activeExpedition.selectedResources?.slice(0, 3).map((resourceId) => {
+                        const resource = resources?.find(r => r.id === resourceId);
+                        return resource ? (
+                          <div key={resourceId} className="flex items-center gap-2 text-xs">
+                            <span className="text-sm">{resource.emoji}</span>
+                            <span className="text-blue-700">{resource.name}</span>
+                          </div>
+                        ) : null;
+                      })}
+                      {activeExpedition.selectedResources?.length > 3 && (
+                        <div className="text-xs text-gray-500">
+                          +{activeExpedition.selectedResources.length - 3} mais...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Rewards Summary */}
+                  <div className="bg-green-50 p-2 rounded border">
+                    <div className="grid grid-cols-2 gap-2 text-center">
+                      <div>
+                        <div className="text-sm">🎯</div>
+                        <div className="text-xs font-semibold text-blue-600">+{(activeExpedition.selectedResources?.length || 0) * 15} XP</div>
+                      </div>
+                      <div>
+                        <div className="text-sm">🪙</div>
+                        <div className="text-xs font-semibold text-yellow-600">+{(activeExpedition.selectedResources?.length || 0) * 8}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleCompleteExpedition}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
+                  >
+                    ✅ Finalizar Expedição
+                  </button>
+                </div>
+              ) : (
+                // Show progress when in progress
+                <>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-forest h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${activeExpedition.progress || 0}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-gray-600 text-center">
+                    Progresso: {Math.floor(activeExpedition.progress || 0)}%
+                  </p>
+                </>
               )}
             </div>
           </div>

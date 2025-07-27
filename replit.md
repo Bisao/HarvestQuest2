@@ -8,6 +8,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 27, 2025 - EXPEDITION COMPLETION UI ENHANCED**
+- **Enhanced Minimized Window**: Completed expeditions now show resource collection summary and rewards (XP/coins) instead of progress bar
+- **Removed Step Indicators**: Progress steps "1" and "2" no longer appear in completed expedition modals for cleaner interface
+- **Smart Progress Display**: Progress bar only shows during active expeditions, automatically switches to results when complete
+- **Improved Completion Flow**: Players can finalize expeditions from both biome cards and minimized window
+- **Better Visual Feedback**: Completion status clearly indicated with green highlights and reward summaries
+
 **January 27, 2025 - EXPEDITION MODAL STATE FIX**
 - **Fixed Critical Expedition Bug**: Resolved issue where minimizing and reopening expeditions showed resource selection instead of progress
 - **Enhanced State Management**: Expedition system now properly maintains state when modal is reopened during active expeditions
