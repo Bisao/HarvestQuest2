@@ -18,7 +18,7 @@ import {
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { ALL_RESOURCES } from "./data/resources";
-import { createEquipmentData } from "./data/equipment";
+import { ALL_EQUIPMENT } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
 import { createRecipeData } from "./data/recipes";
 
@@ -109,8 +109,7 @@ export class MemStorage implements IStorage {
     }
 
     // Initialize equipment using modular data
-    const equipmentData = createEquipmentData();
-    for (const equip of equipmentData) {
+    for (const equip of ALL_EQUIPMENT) {
       await this.createEquipment(equip);
     }
 
@@ -137,10 +136,8 @@ export class MemStorage implements IStorage {
       waterStorage: 0,
       maxWaterStorage: 500,
       equippedHelmet: null,
-      equippedBackpack: null,
       equippedChestplate: null,
       equippedLeggings: null,
-      equippedFoodbag: null,
       equippedBoots: null,
       equippedWeapon: null,
       equippedTool: null,
@@ -179,10 +176,8 @@ export class MemStorage implements IStorage {
       waterStorage: insertPlayer.waterStorage ?? 0,
       maxWaterStorage: insertPlayer.maxWaterStorage ?? 500,
       equippedHelmet: insertPlayer.equippedHelmet || null,
-      equippedBackpack: insertPlayer.equippedBackpack || null,
       equippedChestplate: insertPlayer.equippedChestplate || null,
       equippedLeggings: insertPlayer.equippedLeggings || null,
-      equippedFoodbag: insertPlayer.equippedFoodbag || null,
       equippedBoots: insertPlayer.equippedBoots || null,
       equippedWeapon: insertPlayer.equippedWeapon || null,
       equippedTool: insertPlayer.equippedTool || null,
@@ -221,9 +216,6 @@ export class MemStorage implements IStorage {
       rarity: insertResource.rarity ?? 'common',
       requiredTool: insertResource.requiredTool || null,
       experienceValue: insertResource.experienceValue ?? 1,
-      distanceFromCamp: insertResource.distanceFromCamp ?? 10,
-      collectionTimeMinutes: insertResource.collectionTimeMinutes ?? 5,
-      collectionChance: insertResource.collectionChance ?? 50,
     };
     this.resources.set(id, resource);
     return resource;
@@ -369,9 +361,6 @@ export class MemStorage implements IStorage {
       startTime: Date.now(),
       endTime: null,
       progress: 0,
-      currentDistance: insertExpedition.currentDistance ?? 0,
-      autoReturnTrigger: insertExpedition.autoReturnTrigger ?? null,
-      maxDistanceFromCamp: insertExpedition.maxDistanceFromCamp ?? 50,
     };
 
     console.log('Storing expedition with ID:', id);

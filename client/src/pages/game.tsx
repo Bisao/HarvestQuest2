@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import GameHeader from "@/components/game/core/game-header";
-import BiomesTab from "@/components/game/tabs/biomes-tab";
-import InventoryTab from "@/components/game/tabs/inventory-tab";
-import StorageTab from "@/components/game/tabs/storage-tab";
-import CraftingTab from "@/components/game/tabs/crafting-tab";
-import ExpeditionSystem from "@/components/game/systems/expedition-system";
+import GameHeader from "@/components/game/game-header";
+import BiomesTab from "@/components/game/biomes-tab";
+import EnhancedInventory from "@/components/game/enhanced-inventory";
+import StorageTab from "@/components/game/storage-tab";
+import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
+import ExpeditionSystem from "@/components/game/expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
 import { queryClient } from "@/lib/queryClient";
 import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema";
@@ -409,10 +409,11 @@ export default function Game() {
             )}
 
             {activeTab === "inventory" && (
-              <InventoryTab
+              <EnhancedInventory
                 playerId={player.id}
                 resources={resources}
                 equipment={equipment}
+                player={player}
                 isBlocked={!!activeExpedition}
               />
             )}
@@ -429,7 +430,7 @@ export default function Game() {
             )}
 
             {activeTab === "crafting" && (
-              <CraftingTab
+              <EnhancedCraftingTab
                 recipes={recipes}
                 resources={resources}
                 playerLevel={player.level}
@@ -448,27 +449,16 @@ export default function Game() {
           setSelectedBiome(null);
           setActiveExpedition(null);
         }}
+        onMinimize={handleMinimizeExpedition}
         biome={selectedBiome}
         resources={resources}
         equipment={equipment}
         playerId={player.id}
         player={player}
-        onExpeditionComplete={(rewards: Record<string, number>) => {
-          console.log('Expedition completed with rewards:', rewards);
-          // Update localStorage with last expedition resources
-          if (selectedBiome) {
-            const lastExpeditions = JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}');
-            lastExpeditions[selectedBiome.id] = Object.keys(rewards);
-            localStorage.setItem('lastExpeditionResources', JSON.stringify(lastExpeditions));
-          }
-          
-          // Refresh queries
-          queryClient.invalidateQueries({ queryKey: ["/api/player"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/storage"] });
-          
-          setActiveExpedition(null);
-        }}
+        isMinimized={expeditionMinimized}
+        onExpeditionComplete={handleCompleteExpedition}
+        activeExpedition={activeExpedition}
+        onExpeditionUpdate={setActiveExpedition}
       />
 
       {/* Minimized Expedition Window */}

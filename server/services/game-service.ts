@@ -34,45 +34,13 @@ export class GameService {
     return (currentWeight + additionalWeight) <= maxWeight;
   }
 
-  // Calculate max inventory weight based on level ranges and equipment bonuses
+  // Calculate max inventory weight considering equipment bonuses
   calculateMaxInventoryWeight(player: Player): number {
-    // Base weight capacity by level ranges
-    let baseCapacity = this.getBaseWeightCapacityByLevel(player.level);
+    let maxWeight = player.maxInventoryWeight;
     
-    // TODO: Add equipment bonuses (backpack, etc.)
-    // For now, return base capacity
-    return baseCapacity;
-  }
-
-  // Get base weight capacity based on player level
-  private getBaseWeightCapacityByLevel(level: number): number {
-    if (level >= 1 && level <= 5) return 20;
-    if (level >= 6 && level <= 10) return 30;
-    if (level >= 11 && level <= 15) return 40;
-    if (level >= 16 && level <= 20) return 50;
-    if (level >= 21 && level <= 25) return 60;
-    if (level >= 26 && level <= 30) return 70;
-    if (level >= 31 && level <= 35) return 80;
-    if (level >= 36 && level <= 40) return 90;
-    if (level >= 41) return 100;
-    
-    // Fallback for level 0 or negative (shouldn't happen)
-    return 20;
-  }
-
-  // Get level range description for display purposes
-  getLevelRange(level: number): string {
-    if (level >= 1 && level <= 5) return "1-5";
-    if (level >= 6 && level <= 10) return "6-10";
-    if (level >= 11 && level <= 15) return "11-15";
-    if (level >= 16 && level <= 20) return "16-20";
-    if (level >= 21 && level <= 25) return "21-25";
-    if (level >= 26 && level <= 30) return "26-30";
-    if (level >= 31 && level <= 35) return "31-35";
-    if (level >= 36 && level <= 40) return "36-40";
-    if (level >= 41) return "41+";
-    
-    return "1-5"; // Fallback
+    // Add equipment bonuses (this would need equipment data)
+    // For now, return base weight
+    return maxWeight;
   }
 
   // Check if player has required tool for resource

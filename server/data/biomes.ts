@@ -46,9 +46,8 @@ export function createBiomeData(resourceIds: string[]): InsertBiome[] {
       name: "Floresta",
       emoji: "🌲",
       requiredLevel: 1,
-      // Recursos básicos da floresta
+      // Inclui recursos básicos + madeira + todos os novos recursos de caça/pesca
       availableResources: [
-        // RECURSOS BÁSICOS
         resourceIds[0], // Fibra
         resourceIds[1], // Pedra
         resourceIds[2], // Pedras Soltas
@@ -56,42 +55,14 @@ export function createBiomeData(resourceIds: string[]): InsertBiome[] {
         resourceIds[4], // Água Fresca  
         resourceIds[5], // Bambu
         resourceIds[6], // Madeira
-        resourceIds[7], // Argila
-        
-        // ANIMAIS PEQUENOS
-        resourceIds[18], // Coelho
-        resourceIds[19], // Esquilo
-        resourceIds[20], // Rato do Campo
-        
-        // ANIMAIS MÉDIOS
-        resourceIds[21], // Veado
-        resourceIds[22], // Raposa
-        resourceIds[23], // Lobo
-        
-        // ANIMAIS GRANDES
-        resourceIds[24], // Javali
-        resourceIds[25], // Urso
-        
-        // AVES
-        resourceIds[26], // Pato Selvagem
-        resourceIds[27], // Faisão
-        
-        // PEIXES
-        resourceIds[28], // Peixe Pequeno
-        resourceIds[29], // Peixe Grande
-        resourceIds[30], // Salmão
-        resourceIds[31], // Truta
-        resourceIds[32], // Enguia
-        
-        // PLANTAS E COLETA
-        resourceIds[33], // Cogumelos
-        resourceIds[34], // Frutas Silvestres
-        resourceIds[35], // Ervas Medicinais
-        resourceIds[36], // Nozes
-        resourceIds[37], // Flores Silvestres
-        resourceIds[38], // Raízes
-        resourceIds[39], // Mel Selvagem
-        resourceIds[40], // Resina de Árvore
+        resourceIds[18], // Coelho (index correto)
+        resourceIds[19], // Veado (index correto)
+        resourceIds[20], // Javali (index correto)
+        resourceIds[21], // Peixe Pequeno (index correto)
+        resourceIds[22], // Peixe Grande (index correto)
+        resourceIds[23], // Salmão (index correto)
+        resourceIds[24], // Cogumelos (index correto)
+        resourceIds[25], // Frutas Silvestres (index correto)
       ],
     },
     {

@@ -86,31 +86,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get player weight status
-  app.get("/api/player/:playerId/weight", async (req, res) => {
-    try {
-      const { playerId } = req.params;
-      
-      const player = await storage.getPlayer(playerId);
-      if (!player) {
-        return res.status(404).json({ message: "Player not found" });
-      }
-      
-      const currentWeight = await gameService.calculateInventoryWeight(playerId);
-      const maxWeight = gameService.calculateMaxInventoryWeight(player);
-      
-      res.json({
-        currentWeight,
-        maxWeight,
-        percentage: Math.round((currentWeight / maxWeight) * 100),
-        level: player.level,
-        levelRange: gameService.getLevelRange(player.level)
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to get weight status" });
-    }
-  });
-
   // Get player storage
   app.get("/api/storage/:playerId", async (req, res) => {
     try {
@@ -162,17 +137,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         case "helmet":
           currentEquippedId = player.equippedHelmet;
           break;
-        case "backpack":
-          currentEquippedId = player.equippedBackpack;
-          break;
         case "chestplate":
           currentEquippedId = player.equippedChestplate;
           break;
         case "leggings":
           currentEquippedId = player.equippedLeggings;
-          break;
-        case "foodbag":
-          currentEquippedId = player.equippedFoodbag;
           break;
         case "boots":
           currentEquippedId = player.equippedBoots;
@@ -249,17 +218,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         case "helmet":
           updates.equippedHelmet = equipmentId;
           break;
-        case "backpack":
-          updates.equippedBackpack = equipmentId;
-          break;
         case "chestplate":
           updates.equippedChestplate = equipmentId;
           break;
         case "leggings":
           updates.equippedLeggings = equipmentId;
-          break;
-        case "foodbag":
-          updates.equippedFoodbag = equipmentId;
           break;
         case "boots":
           updates.equippedBoots = equipmentId;
@@ -440,8 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/expeditions/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      await expeditionService.updateExpeditionProgress(id, 100);
-      const expedition = expeditionService.getExpedition(id);
+      const expedition = await expeditionService.updateExpeditionProgress(id);
       res.json(expedition);
     } catch (error) {
       res.status(500).json({ message: "Failed to update expedition" });
@@ -452,7 +414,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/expeditions/:id/complete", async (req, res) => {
     try {
       const { id } = req.params;
-      const expedition = await expeditionService.completeExpedition(id, "manual");
+      const expedition = await expeditionService.completeExpedition(id);
       res.json(expedition);
     } catch (error) {
       console.error("Complete expedition error:", error);
@@ -823,79 +785,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Expedition cancelled successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to cancel expedition" });
-    }
-  });
-
-  // Distance-based expedition routes
-  app.post("/api/expeditions/distance", async (req, res) => {
-    try {
-      const { playerId, biomeId, maxDistanceFromCamp, selectedResources } = req.body;
-      
-      if (!playerId || !biomeId || !maxDistanceFromCamp || !selectedResources) {
-        return res.status(400).json({ message: "Missing required expedition parameters" });
-      }
-
-      const { ExpeditionService } = await import("./services/expedition-service");
-      const expeditionService = new ExpeditionService(storage);
-      
-      const expedition = await expeditionService.startExpedition(
-        playerId, 
-        biomeId, 
-        maxDistanceFromCamp, 
-        selectedResources
-      );
-      
-      res.json(expedition);
-    } catch (error) {
-      console.error("Failed to start distance expedition:", error);
-      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to start expedition" });
-    }
-  });
-
-  app.post("/api/expeditions/distance/:id/simulate", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { currentDistance } = req.body;
-      
-      const { ExpeditionService } = await import("./services/expedition-service");
-      const expeditionService = new ExpeditionService(storage);
-      
-      const result = await expeditionService.simulateCollection(id, currentDistance);
-      res.json(result);
-    } catch (error) {
-      console.error("Failed to simulate collection:", error);
-      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to simulate collection" });
-    }
-  });
-
-  app.post("/api/expeditions/distance/:id/complete", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { autoReturnTrigger } = req.body;
-      
-      const { ExpeditionService } = await import("./services/expedition-service");
-      const expeditionService = new ExpeditionService(storage);
-      
-      const expedition = await expeditionService.completeExpedition(id, autoReturnTrigger);
-      res.json(expedition);
-    } catch (error) {
-      console.error("Failed to complete distance expedition:", error);
-      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to complete expedition" });
-    }
-  });
-
-  app.get("/api/player/:playerId/active-distance-expedition", async (req, res) => {
-    try {
-      const { playerId } = req.params;
-      
-      const { ExpeditionService } = await import("./services/expedition-service");
-      const expeditionService = new ExpeditionService(storage);
-      
-      const activeExpedition = expeditionService.getActiveExpedition(playerId);
-      res.json(activeExpedition);
-    } catch (error) {
-      console.error("Failed to get active distance expedition:", error);
-      res.status(500).json({ message: "Failed to get active expedition" });
     }
   });
 
