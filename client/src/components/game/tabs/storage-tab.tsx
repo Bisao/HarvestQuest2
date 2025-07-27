@@ -50,6 +50,32 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
     },
   });
 
+  const equipMutation = useMutation({
+    mutationFn: async ({ equipmentId, slot }: { equipmentId: string; slot: string }) => {
+      const response = await apiRequest('POST', '/api/player/equip', {
+        playerId,
+        equipmentId,
+        slot
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      toast({
+        title: "Item equipado!",
+        description: "Equipamento foi equipado com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Não foi possível equipar o item.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const consumeMutation = useMutation({
     mutationFn: async (itemId: string) => {
       const response = await apiRequest("POST", `/api/player/${playerId}/consume`, { itemId, quantity: 1 });
@@ -163,6 +189,38 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
     });
   };
 
+  const getEquipmentSlot = (equipment: Equipment) => {
+    // Map equipment slots to player equipment fields
+    switch (equipment.slot) {
+      case "helmet": return "helmet";
+      case "chestplate": return "chestplate";
+      case "leggings": return "leggings";
+      case "boots": return "boots";
+      case "weapon": return "weapon";
+      case "tool": return "tool";
+      default: return null;
+    }
+  };
+
+  const handleEquip = (equipmentId: string) => {
+    const equipmentItem = getEquipmentData(equipmentId);
+    if (!equipmentItem) return;
+    
+    const slot = getEquipmentSlot(equipmentItem);
+    if (!slot) return;
+    
+    equipMutation.mutate({ equipmentId, slot });
+  };
+
+  const isEquipped = (equipmentId: string) => {
+    return player?.equippedHelmet === equipmentId ||
+           player?.equippedChestplate === equipmentId ||
+           player?.equippedLeggings === equipmentId ||
+           player?.equippedBoots === equipmentId ||
+           player?.equippedWeapon === equipmentId ||
+           player?.equippedTool === equipmentId;
+  };
+
   const stats = getStorageStats();
 
   return (
@@ -265,12 +323,26 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
                     {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
                   </button>
                 )}
-                <button
-                  onClick={() => handleWithdraw(storageItem)}
-                  className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 font-medium py-2 px-3 rounded text-sm transition-colors"
-                >
-                  ⬅️ Retirar
-                </button>
+                {itemData.type === "equipment" ? (
+                  <button
+                    onClick={() => handleEquip(storageItem.resourceId)}
+                    disabled={equipMutation.isPending || isBlocked}
+                    className={`flex-1 font-medium py-2 px-3 rounded text-sm transition-colors ${
+                      isEquipped(storageItem.resourceId)
+                        ? "bg-blue-100 text-blue-700 cursor-not-allowed"
+                        : "bg-purple-100 hover:bg-purple-200 text-purple-700"
+                    }`}
+                  >
+                    {isEquipped(storageItem.resourceId) ? "✓ Equipado" : "⚔️ Equipar"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleWithdraw(storageItem)}
+                    className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 font-medium py-2 px-3 rounded text-sm transition-colors"
+                  >
+                    ⬅️ Retirar
+                  </button>
+                )}
                 <button
                   disabled
                   className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium py-2 px-3 rounded text-sm transition-colors cursor-not-allowed opacity-50"
