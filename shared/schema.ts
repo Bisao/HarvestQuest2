@@ -94,6 +94,28 @@ export const recipes = pgTable("recipes", {
   output: jsonb("output").notNull(), // object with resourceId: quantity
 });
 
+export const quests = pgTable("quests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  emoji: text("emoji").notNull(),
+  type: text("type").notNull(), // 'collect', 'craft', 'explore', 'level'
+  requiredLevel: integer("required_level").notNull().default(1),
+  objectives: jsonb("objectives").notNull(), // array of objectives with type, target, amount
+  rewards: jsonb("rewards").notNull(), // object with coins, experience, items (resourceId: quantity)
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const playerQuests = pgTable("player_quests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  playerId: varchar("player_id").notNull(),
+  questId: varchar("quest_id").notNull(),
+  status: text("status").notNull().default('available'), // 'available', 'active', 'completed', 'failed'
+  progress: jsonb("progress").notNull().default('{}'), // object tracking progress for each objective
+  startedAt: integer("started_at"),
+  completedAt: integer("completed_at"),
+});
+
 // Insert schemas
 export const insertPlayerSchema = createInsertSchema(players).omit({
   id: true,
@@ -132,6 +154,16 @@ export const insertRecipeSchema = createInsertSchema(recipes).omit({
   id: true,
 });
 
+export const insertQuestSchema = createInsertSchema(quests).omit({
+  id: true,
+});
+
+export const insertPlayerQuestSchema = createInsertSchema(playerQuests).omit({
+  id: true,
+  startedAt: true,
+  completedAt: true,
+});
+
 // Types
 export type Player = typeof players.$inferSelect;
 export type InsertPlayer = z.infer<typeof insertPlayerSchema>;
@@ -149,3 +181,7 @@ export type Equipment = typeof equipment.$inferSelect;
 export type InsertEquipment = z.infer<typeof insertEquipmentSchema>;
 export type Recipe = typeof recipes.$inferSelect;
 export type InsertRecipe = z.infer<typeof insertRecipeSchema>;
+export type Quest = typeof quests.$inferSelect;
+export type InsertQuest = z.infer<typeof insertQuestSchema>;
+export type PlayerQuest = typeof playerQuests.$inferSelect;
+export type InsertPlayerQuest = z.infer<typeof insertPlayerQuestSchema>;

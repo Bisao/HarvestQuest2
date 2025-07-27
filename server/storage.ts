@@ -14,13 +14,18 @@ import {
   type Equipment,
   type InsertEquipment,
   type Recipe,
-  type InsertRecipe
+  type InsertRecipe,
+  type Quest,
+  type InsertQuest,
+  type PlayerQuest,
+  type InsertPlayerQuest
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { ALL_RESOURCES } from "./data/resources";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
 import { createRecipeData } from "./data/recipes";
+import { ALL_QUESTS } from "./data/quests";
 
 export interface IStorage {
   // Player methods
@@ -68,6 +73,14 @@ export interface IStorage {
   getAllRecipes(): Promise<Recipe[]>;
   getRecipe(id: string): Promise<Recipe | undefined>;
 
+  // Quest methods
+  getAllQuests(): Promise<Quest[]>;
+  getQuest(id: string): Promise<Quest | undefined>;
+  getPlayerQuests(playerId: string): Promise<PlayerQuest[]>;
+  getPlayerQuest(playerId: string, questId: string): Promise<PlayerQuest | undefined>;
+  createPlayerQuest(playerQuest: InsertPlayerQuest): Promise<PlayerQuest>;
+  updatePlayerQuest(id: string, updates: Partial<PlayerQuest>): Promise<PlayerQuest>;
+
   // Game initialization
   initializeGameData(): Promise<void>;
 }
@@ -81,6 +94,8 @@ export class MemStorage implements IStorage {
   private expeditions: Map<string, Expedition>;
   private equipment: Map<string, Equipment>;
   private recipes: Map<string, Recipe>;
+  private quests: Map<string, Quest>;
+  private playerQuests: Map<string, PlayerQuest>;
 
   constructor() {
     this.players = new Map();
@@ -91,6 +106,8 @@ export class MemStorage implements IStorage {
     this.expeditions = new Map();
     this.equipment = new Map();
     this.recipes = new Map();
+    this.quests = new Map();
+    this.playerQuests = new Map();
   }
 
   async initializeGameData(): Promise<void> {
@@ -117,6 +134,11 @@ export class MemStorage implements IStorage {
     const recipesData = createRecipeData(resourceIds);
     for (const recipe of recipesData) {
       await this.createRecipe(recipe);
+    }
+
+    // Initialize quests using modular data
+    for (const quest of ALL_QUESTS) {
+      await this.createQuest(quest);
     }
 
     // Create default player
@@ -419,6 +441,68 @@ export class MemStorage implements IStorage {
     };
     this.recipes.set(id, recipe);
     return recipe;
+  }
+
+  // Quest methods
+  async getAllQuests(): Promise<Quest[]> {
+    return Array.from(this.quests.values());
+  }
+
+  async getQuest(id: string): Promise<Quest | undefined> {
+    return this.quests.get(id);
+  }
+
+  async createQuest(insertQuest: InsertQuest): Promise<Quest> {
+    const id = randomUUID();
+    const quest: Quest = {
+      id,
+      name: insertQuest.name,
+      description: insertQuest.description,
+      emoji: insertQuest.emoji,
+      type: insertQuest.type,
+      requiredLevel: insertQuest.requiredLevel ?? 1,
+      objectives: insertQuest.objectives,
+      rewards: insertQuest.rewards,
+      isActive: insertQuest.isActive ?? true,
+    };
+    this.quests.set(id, quest);
+    return quest;
+  }
+
+  async getPlayerQuests(playerId: string): Promise<PlayerQuest[]> {
+    return Array.from(this.playerQuests.values()).filter(
+      (playerQuest) => playerQuest.playerId === playerId,
+    );
+  }
+
+  async getPlayerQuest(playerId: string, questId: string): Promise<PlayerQuest | undefined> {
+    return Array.from(this.playerQuests.values()).find(
+      (playerQuest) => playerQuest.playerId === playerId && playerQuest.questId === questId,
+    );
+  }
+
+  async createPlayerQuest(insertPlayerQuest: InsertPlayerQuest): Promise<PlayerQuest> {
+    const id = randomUUID();
+    const playerQuest: PlayerQuest = {
+      id,
+      playerId: insertPlayerQuest.playerId,
+      questId: insertPlayerQuest.questId,
+      status: insertPlayerQuest.status ?? 'available',
+      progress: insertPlayerQuest.progress ?? {},
+      startedAt: null,
+      completedAt: null,
+    };
+    this.playerQuests.set(id, playerQuest);
+    return playerQuest;
+  }
+
+  async updatePlayerQuest(id: string, updates: Partial<PlayerQuest>): Promise<PlayerQuest> {
+    const playerQuest = this.playerQuests.get(id);
+    if (!playerQuest) throw new Error("Player quest not found");
+
+    const updated = { ...playerQuest, ...updates };
+    this.playerQuests.set(id, updated);
+    return updated;
   }
 }
 

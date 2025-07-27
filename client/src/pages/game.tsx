@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
+import QuestsTab from "@/components/game/quests-tab";
 import EnhancedInventory from "@/components/game/enhanced-inventory";
 import StorageTab from "@/components/game/storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
@@ -51,6 +52,7 @@ export default function Game() {
 
   const tabs = [
     { id: "biomes", label: "Biomas", emoji: "🌍" },
+    { id: "quests", label: "Quests", emoji: "📋" },
     { id: "inventory", label: "Inventário", emoji: "🎒" },
     { id: "storage", label: "Armazém", emoji: "🏪" },
     { id: "crafting", label: "Crafting", emoji: "🔨" },
@@ -368,7 +370,7 @@ export default function Game() {
                 >
                   <span className="text-base md:text-lg">{tab.emoji}</span>
                   <span className="hidden sm:inline">{tab.label}</span>
-                  <span className="sm:hidden">{tab.id === "biomes" ? "Biomas" : tab.id === "inventory" ? "Inv." : tab.id === "storage" ? "Arm." : "Craft"}</span>
+                  <span className="sm:hidden">{tab.id === "biomes" ? "Biomas" : tab.id === "quests" ? "Quests" : tab.id === "inventory" ? "Inv." : tab.id === "storage" ? "Arm." : "Craft"}</span>
                 </button>
               ))}
             </nav>
@@ -405,6 +407,12 @@ export default function Game() {
                   }
                 }}
                 onToggleAutoRepeat={handleToggleAutoRepeat}
+              />
+            )}
+
+            {activeTab === "quests" && (
+              <QuestsTab
+                player={player}
               />
             )}
 

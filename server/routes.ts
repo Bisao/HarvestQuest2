@@ -788,6 +788,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Quest endpoints
+  // Get all quests
+  app.get("/api/quests", async (req, res) => {
+    try {
+      const quests = await storage.getAllQuests();
+      res.json(quests);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get quests" });
+    }
+  });
+
+  // Get player's quests with progress
+  app.get("/api/player/:playerId/quests", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const allQuests = await storage.getAllQuests();
+      const playerQuests = await storage.getPlayerQuests(playerId);
+      
+      // Get player for level checking
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
+      // Combine quest data with player progress
+      const questsWithProgress = allQuests
+        .filter(quest => quest.isActive && quest.requiredLevel <= player.level)
+        .map(quest => {
+          const playerQuest = playerQuests.find(pq => pq.questId === quest.id);
+          return {
+            ...quest,
+            playerQuest: playerQuest || null,
+            status: playerQuest?.status || 'available',
+            progress: playerQuest?.progress || {}
+          };
+        });
+
+      res.json(questsWithProgress);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get player quests" });
+    }
+  });
+
+  // Start a quest
+  app.post("/api/player/:playerId/quests/:questId/start", async (req, res) => {
+    try {
+      const { playerId, questId } = req.params;
+      
+      // Check if player already has this quest
+      const existingPlayerQuest = await storage.getPlayerQuest(playerId, questId);
+      if (existingPlayerQuest) {
+        return res.status(400).json({ message: "Quest already started or completed" });
+      }
+
+      // Get quest to validate
+      const quest = await storage.getQuest(questId);
+      if (!quest) {
+        return res.status(404).json({ message: "Quest not found" });
+      }
+
+      // Get player to check level requirement
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
+      if (player.level < quest.requiredLevel) {
+        return res.status(400).json({ message: "Player level too low for this quest" });
+      }
+
+      // Create player quest
+      const playerQuest = await storage.createPlayerQuest({
+        playerId,
+        questId,
+        status: 'active',
+        progress: {}
+      });
+
+      // Update with start time
+      const updatedPlayerQuest = await storage.updatePlayerQuest(playerQuest.id, {
+        startedAt: Date.now()
+      });
+
+      res.json(updatedPlayerQuest);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to start quest" });
+    }
+  });
+
+  // Complete a quest
+  app.post("/api/player/:playerId/quests/:questId/complete", async (req, res) => {
+    try {
+      const { playerId, questId } = req.params;
+      
+      // Get player quest
+      const playerQuest = await storage.getPlayerQuest(playerId, questId);
+      if (!playerQuest || playerQuest.status !== 'active') {
+        return res.status(400).json({ message: "Quest not active" });
+      }
+
+      // Get quest to get rewards
+      const quest = await storage.getQuest(questId);
+      if (!quest) {
+        return res.status(404).json({ message: "Quest not found" });
+      }
+
+      // Get player to update with rewards
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
+      // Apply rewards
+      const rewards = quest.rewards as any;
+      const newCoins = player.coins + (rewards.coins || 0);
+      const newExperience = player.experience + (rewards.experience || 0);
+      
+      // Calculate new level if needed
+      let newLevel = player.level;
+      let experienceForLevel = newExperience;
+      while (experienceForLevel >= (newLevel * 100)) {
+        experienceForLevel -= (newLevel * 100);
+        newLevel++;
+      }
+
+      // Update player
+      await storage.updatePlayer(playerId, {
+        coins: newCoins,
+        experience: newExperience,
+        level: newLevel
+      });
+
+      // Add item rewards to storage if any
+      if (rewards.items) {
+        const storageItems = await storage.getPlayerStorage(playerId);
+        
+        for (const [resourceId, quantity] of Object.entries(rewards.items)) {
+          const existingItem = storageItems.find(item => item.resourceId === resourceId);
+          
+          if (existingItem) {
+            await storage.updateStorageItem(existingItem.id, {
+              quantity: existingItem.quantity + (quantity as number)
+            });
+          } else {
+            await storage.addStorageItem({
+              playerId,
+              resourceId,
+              quantity: quantity as number
+            });
+          }
+        }
+      }
+
+      // Mark quest as completed
+      const completedPlayerQuest = await storage.updatePlayerQuest(playerQuest.id, {
+        status: 'completed',
+        completedAt: Date.now()
+      });
+
+      res.json({
+        quest: completedPlayerQuest,
+        rewards: rewards,
+        newLevel: newLevel !== player.level ? newLevel : undefined
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to complete quest" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
