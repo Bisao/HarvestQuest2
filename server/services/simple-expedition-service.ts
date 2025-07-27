@@ -121,6 +121,11 @@ export class SimpleExpeditionService {
       expedition.collectedResources[resourceToTry.id] = (expedition.collectedResources[resourceToTry.id] || 0) + 1;
       expedition.currentDistance = currentDistance;
 
+      // Add resource directly to player's inventory using existing method
+      const inventory = await this.storage.getInventory(expedition.playerId);
+      inventory[resourceToTry.id] = (inventory[resourceToTry.id] || 0) + 1;
+      await this.storage.updateInventory(expedition.playerId, inventory);
+
       // Reduce hunger and thirst
       await this.storage.updatePlayer(expedition.playerId, {
         hunger: Math.max(0, player.hunger - 1),
@@ -155,13 +160,28 @@ export class SimpleExpeditionService {
     // Process collected resources (including animal processing)
     const processedResources = await this.processCollectedResources(expedition.collectedResources);
 
-    // Add rewards to storage or inventory
-    await this.distributeRewards(expedition.playerId, processedResources, player.autoStorage || false);
+    // Resources were already added during collection, no need to add again
+    // Just process any animal resources that need special handling
+    const finalProcessedResources = await this.processCollectedResources(expedition.collectedResources);
+    
+    // Only add the difference (processed animal parts) if any
+    const additionalResources: Record<string, number> = {};
+    for (const [resourceId, quantity] of Object.entries(finalProcessedResources)) {
+      const originalQuantity = expedition.collectedResources[resourceId] || 0;
+      if (quantity > originalQuantity) {
+        additionalResources[resourceId] = quantity - originalQuantity;
+      }
+    }
+    
+    if (Object.keys(additionalResources).length > 0) {
+      await this.distributeRewards(expedition.playerId, additionalResources, player.autoStorage || false);
+    }
 
-    // Calculate experience and coins
+    // Calculate experience and coins based on final processed resources
     const allResources = await this.storage.getAllResources();
-    const expGain = this.gameService.calculateExperienceGain(processedResources, allResources);
-    const coinReward = this.calculateCoinReward(processedResources, allResources);
+    const finalResources = { ...expedition.collectedResources, ...additionalResources };
+    const expGain = this.gameService.calculateExperienceGain(finalResources, allResources);
+    const coinReward = this.calculateCoinReward(finalResources, allResources);
     
     // Update player stats
     const levelData = this.gameService.calculateLevelUp(player.experience, expGain);
@@ -173,7 +193,7 @@ export class SimpleExpeditionService {
 
     // Update expedition status
     expedition.status = 'completed';
-    expedition.collectedResources = processedResources;
+    expedition.collectedResources = { ...expedition.collectedResources, ...additionalResources };
 
     // Clean up after 1 minute
     setTimeout(() => {
@@ -318,14 +338,18 @@ export class SimpleExpeditionService {
   private async distributeRewards(playerId: string, rewards: Record<string, number>, autoStorage: boolean): Promise<void> {
     if (autoStorage) {
       // Add to storage
+      const storage = await this.storage.getStorage(playerId);
       for (const [resourceId, quantity] of Object.entries(rewards)) {
-        await this.storage.addToStorage(playerId, resourceId, quantity);
+        storage[resourceId] = (storage[resourceId] || 0) + quantity;
       }
+      await this.storage.updateStorage(playerId, storage);
     } else {
       // Add to inventory
+      const inventory = await this.storage.getInventory(playerId);
       for (const [resourceId, quantity] of Object.entries(rewards)) {
-        await this.storage.addToInventory(playerId, resourceId, quantity);
+        inventory[resourceId] = (inventory[resourceId] || 0) + quantity;
       }
+      await this.storage.updateInventory(playerId, inventory);
     }
   }
 
@@ -345,7 +369,7 @@ export class SimpleExpeditionService {
 
   // Get active expedition for player
   getActiveExpedition(playerId: string): SimpleExpedition | null {
-    for (const expedition of activeExpeditions.values()) {
+    for (const expedition of Array.from(activeExpeditions.values())) {
       if (expedition.playerId === playerId && expedition.status === 'active') {
         return expedition;
       }
