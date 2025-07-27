@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight, Filter } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronLeft, ChevronRight as ChevronRightIcon } from "lucide-react";
 
 interface CraftingTabProps {
   recipes: Recipe[];
@@ -29,14 +29,8 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     "Consumíveis": false,
   });
 
-  // Sistema de filtros por tier para cada categoria
-  const [tierFilters, setTierFilters] = useState<Record<string, string>>({
-    "Ferramentas Evolutivas": "all",
-    "Ferramentas Especializadas": "all", 
-    "Armas Evolutivas": "all",
-    "Armas Adicionais": "all",
-    "Armaduras Evolutivas": "all",
-  });
+  // Sistema de carrossel para mostrar diferentes tiers do mesmo item
+  const [carouselIndices, setCarouselIndices] = useState<Record<string, number>>({});
 
   // Get storage items to check available resources
   const { data: storageItems = [] } = useQuery<StorageItem[]>({
@@ -161,47 +155,66 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     }));
   };
 
-  const setTierFilter = (category: string, tier: string) => {
-    setTierFilters(prev => ({
-      ...prev,
-      [category]: tier
-    }));
+  // Função para agrupar receitas por tipo base (ex: todas as variações de Machado)
+  const groupRecipesByBaseType = (recipes: Recipe[]): Record<string, Recipe[]> => {
+    const groups: Record<string, Recipe[]> = {};
+    
+    recipes.forEach(recipe => {
+      const name = recipe.name.toLowerCase();
+      let baseType = "";
+      
+      // Identificar tipo base removendo qualificadores
+      if (name.includes("machado")) baseType = "Machado";
+      else if (name.includes("picareta")) baseType = "Picareta";
+      else if (name.includes("pá")) baseType = "Pá";
+      else if (name.includes("vara")) baseType = "Vara de Pesca";
+      else if (name.includes("foice")) baseType = "Foice";
+      else if (name.includes("faca")) baseType = "Faca";
+      else if (name.includes("balde")) baseType = "Balde";
+      else if (name.includes("espada")) baseType = "Espada";
+      else if (name.includes("arco")) baseType = "Arco";
+      else if (name.includes("lança")) baseType = "Lança";
+      else if (name.includes("besta")) baseType = "Besta";
+      else if (name.includes("clava") || name.includes("martelo")) baseType = "Martelo";
+      else if (name.includes("capacete")) baseType = "Capacete";
+      else if (name.includes("peitoral")) baseType = "Peitoral";
+      else if (name.includes("calças")) baseType = "Calças";
+      else if (name.includes("botas")) baseType = "Botas";
+      else if (name.includes("mochila")) baseType = "Mochila";
+      else if (name.includes("bolsa")) baseType = "Bolsa";
+      else baseType = recipe.name; // fallback para itens únicos
+      
+      if (!groups[baseType]) {
+        groups[baseType] = [];
+      }
+      groups[baseType].push(recipe);
+    });
+    
+    // Ordenar cada grupo por tier (básico -> ferro -> avançado)
+    Object.keys(groups).forEach(baseType => {
+      groups[baseType].sort((a, b) => {
+        const getTierOrder = (name: string) => {
+          const n = name.toLowerCase();
+          if (n.includes("improvisad") || n.includes("simples") || n.includes("de pedra") || n.includes("de madeira") || n.includes("de couro")) return 1;
+          if (n.includes("de ferro") || n.includes("reforçad") || n.includes("composto") || n.includes("guerra")) return 2;
+          return 3; // avançado/elite/élfico
+        };
+        return getTierOrder(a.name) - getTierOrder(b.name);
+      });
+    });
+    
+    return groups;
   };
 
-  // Função para detectar o tier de um item baseado no nome
-  const getItemTier = (recipeName: string): string => {
-    const name = recipeName.toLowerCase();
-    
-    // Tier 1 - Básico/Improvisado/Simples
-    if (name.includes("improvisad") || name.includes("simples") || name.includes("de pedra") || 
-        name.includes("de madeira") || name.includes("de couro")) {
-      return "basic";
-    }
-    
-    // Tier 2 - Ferro/Reforçado/Composto
-    if (name.includes("de ferro") || name.includes("reforçad") || name.includes("composto") || 
-        name.includes("guerra")) {
-      return "iron";
-    }
-    
-    // Tier 3 - Avançado/Elite/Élfico/Mágico
-    if (name.includes("avançad") || name.includes("elite") || name.includes("élf") || 
-        name.includes("mágic") || name.includes("druíd") || name.includes("caçador") ||
-        name.includes("ancestral") || name.includes("titãs") || name.includes("dimensional")) {
-      return "advanced";
-    }
-    
-    return "basic"; // default
-  };
-
-  // Filtrar receitas por tier se aplicável
-  const filterRecipesByTier = (categoryRecipes: Recipe[], category: string): Recipe[] => {
-    const tierFilter = tierFilters[category];
-    if (!tierFilter || tierFilter === "all") {
-      return categoryRecipes;
-    }
-    
-    return categoryRecipes.filter(recipe => getItemTier(recipe.name) === tierFilter);
+  const navigateCarousel = (baseType: string, direction: number, maxIndex: number) => {
+    setCarouselIndices(prev => {
+      const currentIndex = prev[baseType] || 0;
+      const newIndex = currentIndex + direction;
+      return {
+        ...prev,
+        [baseType]: Math.max(0, Math.min(newIndex, maxIndex))
+      };
+    });
   };
 
   const categorizeRecipes = (recipes: Recipe[]) => {
@@ -280,22 +293,63 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
   const categorizedRecipes = categorizeRecipes(recipes);
 
-  const renderRecipeCard = (recipe: Recipe) => {
+  const renderCarouselCard = (baseType: string, recipeGroup: Recipe[]) => {
+    const currentIndex = carouselIndices[baseType] || 0;
+    const maxIndex = Math.min(recipeGroup.length - 1, Math.max(0, recipeGroup.length - 1));
+    const actualIndex = Math.min(currentIndex, maxIndex);
+    const recipe = recipeGroup[actualIndex];
+    
+    if (!recipe) return null;
+
     const ingredients = getRecipeIngredients(recipe);
     const unlocked = isRecipeUnlocked(recipe);
     const canCraft = canCraftRecipe(recipe);
 
+    // Determinar tier e cor
+    const getTierInfo = (recipeName: string) => {
+      const name = recipeName.toLowerCase();
+      if (name.includes("improvisad") || name.includes("simples") || name.includes("de pedra") || name.includes("de madeira") || name.includes("de couro")) {
+        return { tier: "IMPROVISADO", level: "Nível 1", color: "border-amber-300 bg-amber-50" };
+      }
+      if (name.includes("de ferro") || name.includes("reforçad") || name.includes("composto") || name.includes("guerra")) {
+        return { tier: "FERRO", level: "Nível 2", color: "border-blue-300 bg-blue-50" };
+      }
+      return { tier: "AVANÇADO", level: "Nível 3", color: "border-purple-300 bg-purple-50" };
+    };
+
+    const tierInfo = getTierInfo(recipe.name);
+
     return (
       <div
-        key={recipe.id}
-        className={`recipe-card bg-white border-2 rounded-xl p-6 hover:shadow-lg transition-all ${
+        key={`${baseType}-${actualIndex}`}
+        className={`recipe-card border-2 rounded-xl p-6 hover:shadow-lg transition-all relative ${tierInfo.color} ${
           canCraft 
-            ? "border-green-200 hover:border-green-300" 
+            ? "shadow-md" 
             : unlocked 
-            ? "border-gray-200" 
-            : "border-gray-300 opacity-60"
+            ? "" 
+            : "opacity-60"
         }`}
       >
+        {/* Navegação do carrossel */}
+        {recipeGroup.length > 1 && (
+          <>
+            <button
+              onClick={() => navigateCarousel(baseType, -1, maxIndex)}
+              disabled={actualIndex === 0}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              onClick={() => navigateCarousel(baseType, 1, maxIndex)}
+              disabled={actualIndex === maxIndex}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+            >
+              <ChevronRightIcon size={16} />
+            </button>
+          </>
+        )}
+
         <div className="text-center mb-4">
           <div className={`text-5xl mb-2 ${!unlocked ? "grayscale" : ""}`}>
             {recipe.emoji}
@@ -303,6 +357,24 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
           <h4 className={`text-lg font-bold ${unlocked ? "text-gray-800" : "text-gray-600"}`}>
             {recipe.name}
           </h4>
+          <div className="text-xs font-medium text-gray-600 mb-2">
+            {tierInfo.tier} • {tierInfo.level}
+          </div>
+          
+          {/* Indicadores de pontos do carrossel */}
+          {recipeGroup.length > 1 && (
+            <div className="flex justify-center space-x-1 mb-2">
+              {recipeGroup.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full ${
+                    index === actualIndex ? "bg-gray-600" : "bg-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
           <div className="flex items-center justify-center space-x-2 mt-1">
             {!unlocked && (
               <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
@@ -323,7 +395,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         </div>
 
         <div className="space-y-2 mb-4">
-          <h5 className="text-sm font-semibold text-gray-700">Ingredientes:</h5>
+          <h5 className="text-sm font-semibold text-gray-700">Materiais necessários:</h5>
           {ingredients.map(({ resource, quantity, available, hasEnough }) => (
             resource && (
               <div
@@ -372,9 +444,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         if (categoryRecipes.length === 0) return null;
         
         const isExpanded = expandedCategories[categoryName];
-        const hasTierFilter = tierFilters[categoryName] !== undefined;
-        const filteredRecipes = filterRecipesByTier(categoryRecipes, categoryName);
-        const currentTier = tierFilters[categoryName] || "all";
+        const shouldUseCarousel = ["Ferramentas Evolutivas", "Ferramentas Especializadas", "Armas Evolutivas", "Armas Adicionais", "Armaduras Evolutivas"].includes(categoryName);
         
         return (
           <div key={categoryName} className="mb-6">
@@ -396,66 +466,23 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
                 </span>
                 <h4 className="text-lg font-semibold text-gray-800">{categoryName}</h4>
                 <span className="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
-                  {filteredRecipes.length} {filteredRecipes.length === 1 ? 'receita' : 'receitas'}
+                  {shouldUseCarousel ? Object.keys(groupRecipesByBaseType(categoryRecipes)).length : categoryRecipes.length} {shouldUseCarousel ? 'tipos' : 'receitas'}
                 </span>
               </div>
               {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
             </button>
             
             {isExpanded && (
-              <div>
-                {/* Filtros de Tier para categorias evolutivas */}
-                {hasTierFilter && (
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    <span className="text-sm font-medium text-gray-600 flex items-center">
-                      <Filter size={16} className="mr-1" /> Filtrar por nível:
-                    </span>
-                    <button
-                      onClick={() => setTierFilter(categoryName, "all")}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                        currentTier === "all" 
-                          ? "bg-blue-500 text-white" 
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
-                    >
-                      Todos
-                    </button>
-                    <button
-                      onClick={() => setTierFilter(categoryName, "basic")}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                        currentTier === "basic" 
-                          ? "bg-amber-500 text-white" 
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
-                    >
-                      🥉 Básico
-                    </button>
-                    <button
-                      onClick={() => setTierFilter(categoryName, "iron")}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                        currentTier === "iron" 
-                          ? "bg-blue-600 text-white" 
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
-                    >
-                      🥈 Ferro
-                    </button>
-                    <button
-                      onClick={() => setTierFilter(categoryName, "advanced")}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                        currentTier === "advanced" 
-                          ? "bg-purple-600 text-white" 
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
-                    >
-                      🥇 Avançado
-                    </button>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {shouldUseCarousel ? (
+                  // Renderizar carrossel para categorias evolutivas
+                  Object.entries(groupRecipesByBaseType(categoryRecipes)).map(([baseType, recipeGroup]) => 
+                    renderCarouselCard(baseType, recipeGroup)
+                  )
+                ) : (
+                  // Renderizar cards normais para outras categorias
+                  categoryRecipes.map(recipe => renderCarouselCard(recipe.name, [recipe]))
                 )}
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredRecipes.map(renderRecipeCard)}
-                </div>
               </div>
             )}
           </div>
