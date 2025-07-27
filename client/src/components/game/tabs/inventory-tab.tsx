@@ -2,10 +2,8 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import type { Resource, Equipment } from "@shared/schema";
 
 interface InventoryItem {
@@ -127,241 +125,217 @@ export default function MinecraftInventory({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Player Stats */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>📊 Status do Jogador</span>
-            <div className="text-sm space-y-1">
-              <Badge variant="outline">
-                Peso: {weightStatus?.currentWeight || 0}kg / {weightStatus?.maxWeight || 20}kg
-              </Badge>
-              {weightStatus && (
-                <Badge variant="secondary" className="ml-2">
-                  Nível {weightStatus.level} (Faixa {weightStatus.levelRange})
-                </Badge>
-              )}
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span>Capacidade do Inventário:</span>
-              <span>{weightStatus?.percentage || 0}%</span>
-            </div>
-            <Progress value={weightStatus?.percentage || 0} className="w-full" />
+    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 p-4">
+      {/* Medieval Frame Border */}
+      <div className="relative w-full max-w-7xl mx-auto">
+        {/* Ornate Border */}
+        <div className="border-8 border-amber-600 rounded-lg bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 shadow-2xl">
+          <div className="border-4 border-amber-500 rounded bg-gradient-to-br from-slate-800 to-slate-900 p-6">
             
-            {weightStatus && (
-              <div className="text-xs text-muted-foreground">
-                <div className="flex justify-between">
-                  <span>Capacidade por nível:</span>
-                  <span>Nível {weightStatus.levelRange} → {weightStatus.maxWeight}kg</span>
+            {/* Main Layout Grid */}
+            <div className="grid grid-cols-4 gap-6 h-[800px]">
+              
+              {/* Left Side - Equipment Slots */}
+              <div className="space-y-4">
+                <div className="bg-gradient-to-br from-amber-700 to-amber-800 rounded-lg p-3 text-center border-2 border-amber-500">
+                  <h2 className="text-amber-100 font-bold text-lg tracking-wide">Equipment</h2>
                 </div>
-                <div className="mt-1 text-center">
-                  {weightStatus.level < 6 && "Próximo aumento: Nível 6 → 30kg"}
-                  {weightStatus.level >= 6 && weightStatus.level < 11 && "Próximo aumento: Nível 11 → 40kg"}
-                  {weightStatus.level >= 11 && weightStatus.level < 16 && "Próximo aumento: Nível 16 → 50kg"}
-                  {weightStatus.level >= 16 && weightStatus.level < 21 && "Próximo aumento: Nível 21 → 60kg"}
-                  {weightStatus.level >= 21 && weightStatus.level < 26 && "Próximo aumento: Nível 26 → 70kg"}
-                  {weightStatus.level >= 26 && weightStatus.level < 31 && "Próximo aumento: Nível 31 → 80kg"}
-                  {weightStatus.level >= 31 && weightStatus.level < 36 && "Próximo aumento: Nível 36 → 90kg"}
-                  {weightStatus.level >= 36 && weightStatus.level < 41 && "Próximo aumento: Nível 41 → 100kg"}
-                  {weightStatus.level >= 41 && "Capacidade máxima atingida!"}
-                </div>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Equipment Slots */}
-        <Card>
-          <CardHeader>
-            <CardTitle>⚔️ Equipamentos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {/* Armor Slots - 3x2 Grid Layout */}
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium mb-2 text-gray-700">🛡️ Armadura</h4>
-                <div className="grid grid-cols-3 gap-2">
-                  {armorSlots.map((slot) => (
-                    <div
-                      key={slot.id}
-                      onClick={() => handleSlotClick(slot.id, "equipment")}
-                      className={`
-                        aspect-square border-2 border-dashed border-gray-300 rounded-lg
-                        flex flex-col items-center justify-center cursor-pointer
-                        hover:border-forest hover:bg-green-50 transition-all
-                        ${selectedSlot === slot.id ? "border-forest bg-green-50" : ""}
-                      `}
-                    >
-                      <span className="text-xl mb-1">{slot.emoji}</span>
-                      <span className="text-xs text-gray-600 text-center">{slot.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Tool Slots */}
-              <div>
-                <h4 className="text-sm font-medium mb-2 text-gray-700">⚔️ Ferramentas</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {toolSlots.map((slot) => (
-                    <div
-                      key={slot.id}
-                      onClick={() => handleSlotClick(slot.id, "equipment")}
-                      className={`
-                        aspect-square border-2 border-dashed border-gray-300 rounded-lg
-                        flex flex-col items-center justify-center cursor-pointer
-                        hover:border-forest hover:bg-green-50 transition-all
-                        ${selectedSlot === slot.id ? "border-forest bg-green-50" : ""}
-                      `}
-                    >
-                      <span className="text-xl mb-1">{slot.emoji}</span>
-                      <span className="text-xs text-gray-600 text-center">{slot.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-700">
-                  💡 Dica: Equipe itens para melhorar suas expedições!
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Main Inventory */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>🎒 Inventário Principal</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => storeAllMutation.mutate()}
-                disabled={inventory.length === 0 || storeAllMutation.isPending}
-              >
-                Guardar Tudo
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-9 gap-2 mb-4">
-              {inventorySlots.map((slotIndex) => {
-                const item = inventory[slotIndex];
-                const resource = item ? getResourceById(item.resourceId) : null;
                 
-                return (
-                  <div
-                    key={slotIndex}
-                    onClick={() => handleSlotClick(`inv-${slotIndex}`, "inventory")}
-                    className={`
-                      aspect-square border-2 border-gray-300 rounded-lg
-                      flex flex-col items-center justify-center cursor-pointer
-                      hover:border-forest hover:bg-green-50 transition-all
-                      ${selectedSlot === `inv-${slotIndex}` ? "border-forest bg-green-50" : ""}
-                      ${item ? "bg-white" : "bg-gray-50 border-dashed"}
-                    `}
-                  >
-                    {resource && item ? (
-                      <>
-                        <span className="text-lg">{resource.emoji}</span>
-                        <span className="text-xs font-semibold text-center">
-                          {item.quantity}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-gray-400 text-xs">•</span>
-                    )}
+                {/* Vertical Equipment Slots */}
+                <div className="space-y-3">
+                  {[...armorSlots, ...toolSlots].map((slot, index) => (
+                    <div
+                      key={slot.id}
+                      onClick={() => handleSlotClick(slot.id, "equipment")}
+                      className={`
+                        w-16 h-16 border-4 border-amber-600 rounded bg-gradient-to-br from-slate-700 to-slate-800
+                        flex items-center justify-center cursor-pointer transition-all duration-200
+                        hover:border-amber-400 hover:shadow-lg hover:scale-105
+                        ${selectedSlot === slot.id ? "border-amber-300 shadow-amber-400/50 shadow-lg" : ""}
+                      `}
+                    >
+                      <span className="text-2xl">{slot.emoji}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Center - Character Display */}
+              <div className="col-span-2 flex flex-col">
+                {/* Character Avatar Area */}
+                <div className="flex-1 bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg border-4 border-amber-600 p-4 mb-4">
+                  <div className="h-full flex items-center justify-center relative">
+                    {/* Character Silhouette */}
+                    <div className="w-40 h-72 bg-gradient-to-b from-amber-600 to-amber-700 opacity-20 relative">
+                      <div className="absolute inset-0 bg-amber-500/10 rounded-lg border-2 border-amber-600/30"></div>
+                      {/* Character outline */}
+                      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-amber-600/40"></div>
+                      <div className="absolute top-12 left-1/2 transform -translate-x-1/2 w-12 h-20 bg-amber-600/40 rounded-t-lg"></div>
+                      <div className="absolute top-32 left-1/2 transform -translate-x-1/2 w-16 h-24 bg-amber-600/40"></div>
+                      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-6 h-16 bg-amber-600/40"></div>
+                      <div className="absolute bottom-8 right-6 w-6 h-16 bg-amber-600/40"></div>
+                    </div>
+                    
+                    {/* Character Stats Overlay */}
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <div className="bg-black/60 rounded-lg p-3 text-amber-100">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm">Peso:</span>
+                          <span className="text-sm font-bold">
+                            {weightStatus?.currentWeight || 0}kg / {weightStatus?.maxWeight || 20}kg
+                          </span>
+                        </div>
+                        <div className="w-full bg-slate-600 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              (weightStatus?.percentage || 0) > 90 ? 'bg-red-500' :
+                              (weightStatus?.percentage || 0) > 70 ? 'bg-yellow-500' : 'bg-green-500'
+                            }`}
+                            style={{ width: `${weightStatus?.percentage || 0}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                );
-              })}
+                </div>
+
+                {/* Item Details Panel */}
+                {selectedSlot && selectedSlot.startsWith('inv-') && (
+                  <div className="bg-gradient-to-br from-amber-700 to-amber-800 rounded-lg border-4 border-amber-500 p-4">
+                    {(() => {
+                      const slotIndex = parseInt(selectedSlot.replace('inv-', ''));
+                      const item = inventory[slotIndex];
+                      const resource = item ? getResourceById(item.resourceId) : null;
+                      
+                      if (resource && item) {
+                        return (
+                          <div className="text-amber-100">
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="text-3xl">{resource.emoji}</span>
+                              <div>
+                                <h3 className="font-bold text-lg">{resource.name}</h3>
+                                <p className="text-sm opacity-80">
+                                  Quantidade: {item.quantity} • Peso: {resource.weight * item.quantity}kg
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleMoveToStorage(item.id)}
+                              disabled={moveToStorageMutation.isPending}
+                              className="w-full bg-amber-600 border-amber-500 hover:bg-amber-500 text-white"
+                            >
+                              {moveToStorageMutation.isPending ? "Movendo..." : "→ Armazém"}
+                            </Button>
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <div className="text-center text-amber-200">
+                          <p>Slot vazio</p>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Right Side - Backpack */}
+              <div className="space-y-4">
+                <div className="bg-gradient-to-br from-amber-700 to-amber-800 rounded-lg p-3 text-center border-2 border-amber-500">
+                  <h2 className="text-amber-100 font-bold text-lg tracking-wide">Backpack</h2>
+                </div>
+                
+                {/* Inventory Grid */}
+                <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg border-4 border-amber-600 p-4">
+                  <div className="grid grid-cols-5 gap-2 mb-4">
+                    {inventorySlots.slice(0, 25).map((slotIndex) => {
+                      const item = inventory[slotIndex];
+                      const resource = item ? getResourceById(item.resourceId) : null;
+                      
+                      return (
+                        <div
+                          key={slotIndex}
+                          onClick={() => handleSlotClick(`inv-${slotIndex}`, "inventory")}
+                          className={`
+                            aspect-square border-2 border-amber-600 rounded bg-gradient-to-br from-slate-600 to-slate-700
+                            flex flex-col items-center justify-center cursor-pointer transition-all duration-200
+                            hover:border-amber-400 hover:shadow-lg hover:scale-105 relative
+                            ${selectedSlot === `inv-${slotIndex}` ? "border-amber-300 shadow-amber-400/50 shadow-lg" : ""}
+                          `}
+                        >
+                          {resource && item ? (
+                            <>
+                              <span className="text-lg">{resource.emoji}</span>
+                              <span className="text-xs font-bold text-amber-200 absolute bottom-0 right-0 bg-slate-800/80 rounded px-1">
+                                {item.quantity}
+                              </span>
+                            </>
+                          ) : (
+                            <div className="w-6 h-6 border border-amber-700/50 rounded bg-slate-800/30"></div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => storeAllMutation.mutate()}
+                    disabled={inventory.length === 0 || storeAllMutation.isPending}
+                    className="w-full bg-amber-600 border-amber-500 hover:bg-amber-500 text-white"
+                  >
+                    Guardar Tudo
+                  </Button>
+                </div>
+              </div>
             </div>
 
-            {/* Item Details */}
-            {selectedSlot && selectedSlot.startsWith('inv-') && (
-              <div className="border-t pt-4">
-                {(() => {
-                  const slotIndex = parseInt(selectedSlot.replace('inv-', ''));
-                  const item = inventory[slotIndex];
-                  const resource = item ? getResourceById(item.resourceId) : null;
-                  
-                  if (resource && item) {
+            {/* Bottom Belt Section */}
+            <div className="mt-6">
+              <div className="bg-gradient-to-br from-amber-700 to-amber-800 rounded-lg p-3 text-center border-2 border-amber-500 mb-4">
+                <h2 className="text-amber-100 font-bold text-lg tracking-wide">Belt</h2>
+              </div>
+              
+              <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg border-4 border-amber-600 p-4">
+                <div className="grid grid-cols-10 gap-3 justify-center">
+                  {inventorySlots.slice(25, 35).map((slotIndex) => {
+                    const item = inventory[slotIndex];
+                    const resource = item ? getResourceById(item.resourceId) : null;
+                    
                     return (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{resource.emoji}</span>
-                          <div>
-                            <h4 className="font-semibold">{resource.name}</h4>
-                            <p className="text-sm text-gray-600">
-                              Quantidade: {item.quantity} • Peso: {resource.weight * item.quantity}kg
-                            </p>
-                            <Badge variant={
-                              resource.rarity === "rare" ? "destructive" : 
-                              resource.rarity === "uncommon" ? "secondary" : "outline"
-                            }>
-                              {resource.rarity === "common" ? "Comum" : 
-                               resource.rarity === "uncommon" ? "Incomum" : "Raro"}
-                            </Badge>
-                          </div>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleMoveToStorage(item.id)}
-                          disabled={moveToStorageMutation.isPending}
-                        >
-                          {moveToStorageMutation.isPending ? "Movendo..." : "→ Armazém"}
-                        </Button>
+                      <div
+                        key={slotIndex}
+                        onClick={() => handleSlotClick(`inv-${slotIndex}`, "inventory")}
+                        className={`
+                          aspect-square border-2 border-amber-600 rounded bg-gradient-to-br from-slate-600 to-slate-700
+                          flex flex-col items-center justify-center cursor-pointer transition-all duration-200
+                          hover:border-amber-400 hover:shadow-lg hover:scale-105 relative
+                          ${selectedSlot === `inv-${slotIndex}` ? "border-amber-300 shadow-amber-400/50 shadow-lg" : ""}
+                        `}
+                      >
+                        {resource && item ? (
+                          <>
+                            <span className="text-lg">{resource.emoji}</span>
+                            <span className="text-xs font-bold text-amber-200 absolute bottom-0 right-0 bg-slate-800/80 rounded px-1">
+                              {item.quantity}
+                            </span>
+                          </>
+                        ) : (
+                          <div className="w-6 h-6 border border-amber-700/50 rounded bg-slate-800/30"></div>
+                        )}
                       </div>
                     );
-                  }
-                  
-                  return (
-                    <div className="text-center text-gray-500">
-                      <p>Slot vazio</p>
-                    </div>
-                  );
-                })()}
+                  })}
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>⚡ Ações Rápidas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button variant="outline" className="flex items-center gap-2">
-              <span>🏪</span>
-              Armazém
-            </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <span>🔨</span>
-              Crafting
-            </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <span>🛡️</span>
-              Equipar
-            </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <span>🗑️</span>
-              Descartar
-            </Button>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
