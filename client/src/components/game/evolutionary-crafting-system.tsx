@@ -419,14 +419,14 @@ export default function EvolutionaryCraftingSystem({
     };
 
     return (
-      <div className={`border-2 rounded-lg p-3 h-40 flex flex-col ${getTierColor(currentRecipe.name)}`}>
+      <div className={`border-2 rounded-lg p-2 h-48 flex flex-col ${getTierColor(currentRecipe.name)}`}>
         {/* Header compacto com navegação */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-1">
-            <span className="text-lg">{family.emoji}</span>
-            <div>
-              <h4 className="font-semibold text-xs">{currentRecipe.name}</h4>
-              <div className="flex items-center space-x-1 text-xs">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-start space-x-1 flex-1 min-w-0">
+            <span className="text-lg flex-shrink-0">{family.emoji}</span>
+            <div className="min-w-0 flex-1">
+              <h4 className="font-semibold text-xs leading-tight truncate">{currentRecipe.name}</h4>
+              <div className="flex items-center space-x-1 text-xs mt-0.5">
                 <span className="font-medium text-xs">{getTierLabel(currentRecipe.name)}</span>
                 <span>•</span>
                 <span>Nível {currentRecipe.requiredLevel}</span>
@@ -435,23 +435,23 @@ export default function EvolutionaryCraftingSystem({
           </div>
           
           {/* Controles compactos do carrossel */}
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-0.5 flex-shrink-0 ml-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigateCarousel('prev')}
               disabled={currentIndex === 0}
-              className="h-6 w-6 p-0"
+              className="h-5 w-5 p-0"
             >
               <ChevronLeft className="w-3 h-3" />
             </Button>
             
             {/* Indicadores de pontos menores */}
-            <div className="flex space-x-0.5 mx-1">
+            <div className="flex space-x-0.5">
               {sortedRecipes.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-1.5 h-1.5 rounded-full ${
+                  className={`w-1 h-1 rounded-full ${
                     index === currentIndex ? 'bg-current' : 'bg-current opacity-30'
                   }`}
                 />
@@ -463,7 +463,7 @@ export default function EvolutionaryCraftingSystem({
               size="sm"
               onClick={() => navigateCarousel('next')}
               disabled={currentIndex === sortedRecipes.length - 1}
-              className="h-6 w-6 p-0"
+              className="h-5 w-5 p-0"
             >
               <ChevronRightIcon className="w-3 h-3" />
             </Button>
@@ -471,7 +471,7 @@ export default function EvolutionaryCraftingSystem({
         </div>
 
         {/* Ingredientes compactos */}
-        <div className="flex-1 space-y-1 mb-2 overflow-y-auto">
+        <div className="flex-1 space-y-1 mb-2 overflow-y-auto min-h-0">
           <h5 className="text-xs font-semibold text-gray-700">Ingredientes:</h5>
           {ingredients.map(({ resource, quantity }, index) => {
             if (!resource) return null;
@@ -485,11 +485,11 @@ export default function EvolutionaryCraftingSystem({
                   hasEnough ? "text-green-600" : "text-red-600"
                 }`}
               >
-                <span className="flex items-center space-x-1">
-                  <span>{resource.emoji}</span>
-                  <span>{resource.name}</span>
+                <span className="flex items-center space-x-1 min-w-0 flex-1">
+                  <span className="flex-shrink-0">{resource.emoji}</span>
+                  <span className="truncate">{resource.name}</span>
                 </span>
-                <span className="font-semibold">
+                <span className="font-semibold flex-shrink-0 ml-1">
                   {available}/{quantity}
                 </span>
               </div>
@@ -501,7 +501,7 @@ export default function EvolutionaryCraftingSystem({
         <Button
           onClick={() => craftMutation.mutate({ recipeId: currentRecipe.id })}
           disabled={!canCraft || craftMutation.isPending || isBlocked}
-          className={`w-full text-xs h-8 ${
+          className={`w-full text-xs h-7 ${
             canCraft 
               ? "bg-green-600 hover:bg-green-700 text-white" 
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -521,16 +521,16 @@ export default function EvolutionaryCraftingSystem({
     const ingredients = getRecipeIngredients(recipe);
 
     return (
-      <div key={recipe.id} className="border rounded-lg p-3 bg-white shadow-sm h-40 flex flex-col">
-        <div className="flex items-center space-x-1 mb-2">
-          <span className="text-lg">{recipe.emoji || "🔧"}</span>
-          <div>
-            <h4 className="font-semibold text-xs">{recipe.name}</h4>
+      <div key={recipe.id} className="border rounded-lg p-2 bg-white shadow-sm h-48 flex flex-col">
+        <div className="flex items-start space-x-1 mb-2">
+          <span className="text-lg flex-shrink-0">{recipe.emoji || "🔧"}</span>
+          <div className="min-w-0 flex-1">
+            <h4 className="font-semibold text-xs leading-tight truncate">{recipe.name}</h4>
             <p className="text-xs text-gray-600">Nível {recipe.requiredLevel}</p>
           </div>
         </div>
 
-        <div className="flex-1 space-y-1 mb-2 overflow-y-auto">
+        <div className="flex-1 space-y-1 mb-2 overflow-y-auto min-h-0">
           <h5 className="text-xs font-semibold text-gray-700">Ingredientes:</h5>
           {ingredients.map(({ resource, quantity }, index) => {
             if (!resource) return null;
@@ -544,11 +544,11 @@ export default function EvolutionaryCraftingSystem({
                   hasEnough ? "text-green-600" : "text-red-600"
                 }`}
               >
-                <span className="flex items-center space-x-1">
-                  <span>{resource.emoji}</span>
-                  <span>{resource.name}</span>
+                <span className="flex items-center space-x-1 min-w-0 flex-1">
+                  <span className="flex-shrink-0">{resource.emoji}</span>
+                  <span className="truncate">{resource.name}</span>
                 </span>
-                <span className="font-semibold">
+                <span className="font-semibold flex-shrink-0 ml-1">
                   {available}/{quantity}
                 </span>
               </div>
@@ -559,7 +559,7 @@ export default function EvolutionaryCraftingSystem({
         <Button
           onClick={() => craftMutation.mutate({ recipeId: recipe.id })}
           disabled={!canCraft || craftMutation.isPending || isBlocked}
-          className={`w-full text-xs h-8 ${
+          className={`w-full text-xs h-7 ${
             canCraft 
               ? "bg-green-600 hover:bg-green-700 text-white" 
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -609,9 +609,9 @@ export default function EvolutionaryCraftingSystem({
 
               {isExpanded && (
                 <div className="p-4 space-y-4">
-                  {/* Grupos evolutivos com carrossel em grid compacto */}
+                  {/* Grupos evolutivos com carrossel em grid otimizado */}
                   {Object.keys(evolutionaryGroups).length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                       {Object.entries(evolutionaryGroups).map(([familyType, familyRecipes]) => (
                         <div key={familyType}>
                           {renderEvolutionaryCarousel(familyType, familyRecipes)}
@@ -620,9 +620,9 @@ export default function EvolutionaryCraftingSystem({
                     </div>
                   )}
                   
-                  {/* Receitas não evolutivas em grid compacto */}
+                  {/* Receitas não evolutivas em grid otimizado */}
                   {nonEvolutionary.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                       {nonEvolutionary.map(recipe => renderSimpleRecipe(recipe))}
                     </div>
                   )}
