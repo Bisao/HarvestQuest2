@@ -2,29 +2,29 @@
 import type { InsertResource } from "@shared/schema";
 
 export const BASIC_RESOURCES: InsertResource[] = [
-  // RECURSOS BÁSICOS
-  { name: "Fibra", emoji: "🌾", weight: 0.1, value: 2, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
-  { name: "Pedra", emoji: "🪨", weight: 3.0, value: 3, type: "basic", rarity: "common", requiredTool: "pickaxe", experienceValue: 2 },
-  { name: "Pedras Soltas", emoji: "🗿", weight: 1.0, value: 1, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
-  { name: "Gravetos", emoji: "🪵", weight: 2.0, value: 2, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
-  { name: "Água Fresca", emoji: "💧", weight: 2.0, value: 1, type: "basic", rarity: "common", requiredTool: "bucket", experienceValue: 1 },
-  { name: "Bambu", emoji: "🎋", weight: 2.0, value: 4, type: "basic", rarity: "common", requiredTool: "axe", experienceValue: 2 },
-  { name: "Madeira", emoji: "🪵", weight: 4.0, value: 5, type: "basic", rarity: "common", requiredTool: "axe", experienceValue: 6 },
-  { name: "Argila", emoji: "🧱", weight: 2.0, value: 3, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2 },
-  { name: "Ferro Fundido", emoji: "🔩", weight: 4.0, value: 15, type: "basic", rarity: "uncommon", requiredTool: "pickaxe", experienceValue: 5 },
+  // RECURSOS BÁSICOS - com distância, tempo e chance de coleta
+  { name: "Fibra", emoji: "🌾", weight: 1, value: 2, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1, distanceFromCamp: 10, collectionTimeMinutes: 2, collectionChance: 90 },
+  { name: "Pedra", emoji: "🪨", weight: 3, value: 3, type: "basic", rarity: "common", requiredTool: "pickaxe", experienceValue: 2, distanceFromCamp: 15, collectionTimeMinutes: 4, collectionChance: 80 },
+  { name: "Pedras Soltas", emoji: "🗿", weight: 1, value: 1, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1, distanceFromCamp: 10, collectionTimeMinutes: 2, collectionChance: 85 },
+  { name: "Gravetos", emoji: "🪵", weight: 2, value: 2, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1, distanceFromCamp: 10, collectionTimeMinutes: 3, collectionChance: 80 },
+  { name: "Água Fresca", emoji: "💧", weight: 1, value: 1, type: "basic", rarity: "common", requiredTool: "bucket", experienceValue: 1, distanceFromCamp: 20, collectionTimeMinutes: 3, collectionChance: 70 },
+  { name: "Bambu", emoji: "🎋", weight: 2, value: 4, type: "basic", rarity: "common", requiredTool: "axe", experienceValue: 2, distanceFromCamp: 15, collectionTimeMinutes: 4, collectionChance: 60 },
+  { name: "Madeira", emoji: "🪵", weight: 3, value: 5, type: "basic", rarity: "common", requiredTool: "axe", experienceValue: 6, distanceFromCamp: 15, collectionTimeMinutes: 5, collectionChance: 75 },
+  { name: "Argila", emoji: "🧱", weight: 2, value: 3, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2, distanceFromCamp: 20, collectionTimeMinutes: 4, collectionChance: 65 },
+  { name: "Ferro Fundido", emoji: "🔩", weight: 4, value: 15, type: "basic", rarity: "uncommon", requiredTool: "pickaxe", experienceValue: 5, distanceFromCamp: 30, collectionTimeMinutes: 8, collectionChance: 40 },
   
-  // MATERIAIS PROCESSADOS DE ANIMAIS (peso equivalente aos animais de origem)
-  { name: "Couro", emoji: "🦫", weight: 2.3, value: 8, type: "basic", rarity: "common", requiredTool: null, experienceValue: 3 },
-  { name: "Carne", emoji: "🥩", weight: 2.3, value: 12, type: "basic", rarity: "common", requiredTool: null, experienceValue: 4 },
-  { name: "Ossos", emoji: "🦴", weight: 2.3, value: 5, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2 },
-  { name: "Pelo", emoji: "🧶", weight: 2.3, value: 3, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
-  { name: "Penas", emoji: "🪶", weight: 2.3, value: 4, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2 },
-  { name: "Banha", emoji: "🟡", weight: 2.3, value: 6, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2 },
+  // MATERIAIS PROCESSADOS DE ANIMAIS (não coletáveis diretamente)
+  { name: "Couro", emoji: "🦫", weight: 2.3, value: 8, type: "basic", rarity: "common", requiredTool: null, experienceValue: 3, distanceFromCamp: 0, collectionTimeMinutes: 0, collectionChance: 0 },
+  { name: "Carne", emoji: "🥩", weight: 2.3, value: 12, type: "basic", rarity: "common", requiredTool: null, experienceValue: 4, distanceFromCamp: 0, collectionTimeMinutes: 0, collectionChance: 0 },
+  { name: "Ossos", emoji: "🦴", weight: 2.3, value: 5, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2, distanceFromCamp: 0, collectionTimeMinutes: 0, collectionChance: 0 },
+  { name: "Pelo", emoji: "🧶", weight: 2.3, value: 3, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1, distanceFromCamp: 0, collectionTimeMinutes: 0, collectionChance: 0 },
+  { name: "Penas", emoji: "🪶", weight: 2.3, value: 4, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2, distanceFromCamp: 0, collectionTimeMinutes: 0, collectionChance: 0 },
+  { name: "Banha", emoji: "🟡", weight: 2.3, value: 6, type: "basic", rarity: "common", requiredTool: null, experienceValue: 2, distanceFromCamp: 0, collectionTimeMinutes: 0, collectionChance: 0 },
   
-  // MATERIAIS CRAFTADOS
-  { name: "Barbante", emoji: "🧵", weight: 0.1, value: 1, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1 },
-  { name: "Corda", emoji: "🪢", weight: 0.5, value: 8, type: "basic", rarity: "common", requiredTool: null, experienceValue: 3 },
-  { name: "Cola Natural", emoji: "🧴", weight: 0.3, value: 10, type: "basic", rarity: "uncommon", requiredTool: null, experienceValue: 4 },
+  // MATERIAIS CRAFTADOS (não coletáveis diretamente)
+  { name: "Barbante", emoji: "🧵", weight: 0.1, value: 1, type: "basic", rarity: "common", requiredTool: null, experienceValue: 1, distanceFromCamp: 0, collectionTimeMinutes: 0, collectionChance: 0 },
+  { name: "Corda", emoji: "🪢", weight: 0.5, value: 8, type: "basic", rarity: "common", requiredTool: null, experienceValue: 3, distanceFromCamp: 0, collectionTimeMinutes: 0, collectionChance: 0 },
+  { name: "Cola Natural", emoji: "🧴", weight: 0.3, value: 10, type: "basic", rarity: "uncommon", requiredTool: null, experienceValue: 4, distanceFromCamp: 0, collectionTimeMinutes: 0, collectionChance: 0 },
 ];
 
 export const UNIQUE_RESOURCES: InsertResource[] = [
@@ -57,42 +57,42 @@ export const FOOD_RESOURCES: InsertResource[] = [
   { name: "Torta de Frutas", emoji: "🥧", weight: 2.5, value: 22, type: "food", rarity: "uncommon", requiredTool: null, experienceValue: 7 },
 ];
 
-// Recursos aprimorados para a floresta com pesos corrigidos conforme especificação
+// Recursos aprimorados para a floresta com sistema de distância, tempo e chance
 export const ANIMAL_RESOURCES: InsertResource[] = [
   // ANIMAIS PEQUENOS
-  { name: "Coelho", emoji: "🐰", weight: 3.0, value: 15, type: "unique", rarity: "common", requiredTool: "knife", experienceValue: 5 },
-  { name: "Esquilo", emoji: "🐿️", weight: 1.0, value: 8, type: "unique", rarity: "common", requiredTool: "knife", experienceValue: 3 },
-  { name: "Rato do Campo", emoji: "🐭", weight: 0.5, value: 5, type: "unique", rarity: "common", requiredTool: "knife", experienceValue: 2 },
+  { name: "Coelho", emoji: "🐰", weight: 3, value: 15, type: "unique", rarity: "common", requiredTool: "knife", experienceValue: 5, distanceFromCamp: 25, collectionTimeMinutes: 6, collectionChance: 50 },
+  { name: "Esquilo", emoji: "🐿️", weight: 1, value: 8, type: "unique", rarity: "common", requiredTool: "knife", experienceValue: 3, distanceFromCamp: 25, collectionTimeMinutes: 5, collectionChance: 45 },
+  { name: "Rato do Campo", emoji: "🐭", weight: 0.5, value: 5, type: "unique", rarity: "common", requiredTool: "knife", experienceValue: 2, distanceFromCamp: 25, collectionTimeMinutes: 4, collectionChance: 60 },
   
   // ANIMAIS MÉDIOS
-  { name: "Veado", emoji: "🦌", weight: 8.0, value: 35, type: "unique", rarity: "uncommon", requiredTool: "weapon_and_knife", experienceValue: 8 },
-  { name: "Raposa", emoji: "🦊", weight: 4.0, value: 25, type: "unique", rarity: "uncommon", requiredTool: "weapon_and_knife", experienceValue: 6 },
-  { name: "Lobo", emoji: "🐺", weight: 6.0, value: 40, type: "unique", rarity: "uncommon", requiredTool: "weapon_and_knife", experienceValue: 10 },
+  { name: "Veado", emoji: "🦌", weight: 8, value: 35, type: "unique", rarity: "uncommon", requiredTool: "weapon_and_knife", experienceValue: 8, distanceFromCamp: 40, collectionTimeMinutes: 8, collectionChance: 35 },
+  { name: "Raposa", emoji: "🦊", weight: 4, value: 25, type: "unique", rarity: "uncommon", requiredTool: "weapon_and_knife", experienceValue: 6, distanceFromCamp: 35, collectionTimeMinutes: 7, collectionChance: 30 },
+  { name: "Lobo", emoji: "🐺", weight: 6, value: 40, type: "unique", rarity: "uncommon", requiredTool: "weapon_and_knife", experienceValue: 10, distanceFromCamp: 45, collectionTimeMinutes: 9, collectionChance: 20 },
   
   // ANIMAIS GRANDES
-  { name: "Javali", emoji: "🐗", weight: 12.0, value: 50, type: "unique", rarity: "rare", requiredTool: "weapon_and_knife", experienceValue: 12 },
-  { name: "Urso", emoji: "🐻", weight: 20.0, value: 80, type: "unique", rarity: "rare", requiredTool: "weapon_and_knife", experienceValue: 15 },
+  { name: "Javali", emoji: "🐗", weight: 12, value: 50, type: "unique", rarity: "rare", requiredTool: "weapon_and_knife", experienceValue: 12, distanceFromCamp: 50, collectionTimeMinutes: 10, collectionChance: 15 },
+  { name: "Urso", emoji: "🐻", weight: 20, value: 80, type: "unique", rarity: "rare", requiredTool: "weapon_and_knife", experienceValue: 15, distanceFromCamp: 60, collectionTimeMinutes: 12, collectionChance: 5 },
   
   // AVES
-  { name: "Pato Selvagem", emoji: "🦆", weight: 2.0, value: 12, type: "unique", rarity: "common", requiredTool: "weapon_and_knife", experienceValue: 4 },
-  { name: "Faisão", emoji: "🐦", weight: 1.5, value: 18, type: "unique", rarity: "uncommon", requiredTool: "weapon_and_knife", experienceValue: 5 },
+  { name: "Pato Selvagem", emoji: "🦆", weight: 2, value: 12, type: "unique", rarity: "common", requiredTool: "weapon_and_knife", experienceValue: 4, distanceFromCamp: 30, collectionTimeMinutes: 5, collectionChance: 40 },
+  { name: "Faisão", emoji: "🐦", weight: 1.5, value: 18, type: "unique", rarity: "uncommon", requiredTool: "weapon_and_knife", experienceValue: 5, distanceFromCamp: 35, collectionTimeMinutes: 5, collectionChance: 25 },
   
   // PEIXES
-  { name: "Peixe Pequeno", emoji: "🐟", weight: 1.0, value: 8, type: "unique", rarity: "common", requiredTool: "fishing_rod", experienceValue: 2 },
-  { name: "Peixe Grande", emoji: "🐠", weight: 3.0, value: 18, type: "unique", rarity: "uncommon", requiredTool: "fishing_rod", experienceValue: 4 },
-  { name: "Salmão", emoji: "🍣", weight: 4.0, value: 25, type: "unique", rarity: "rare", requiredTool: "fishing_rod", experienceValue: 6 },
-  { name: "Truta", emoji: "🐸", weight: 2.0, value: 15, type: "unique", rarity: "common", requiredTool: "fishing_rod", experienceValue: 3 },
-  { name: "Enguia", emoji: "🐍", weight: 1.5, value: 20, type: "unique", rarity: "uncommon", requiredTool: "fishing_rod", experienceValue: 5 },
+  { name: "Peixe Pequeno", emoji: "🐟", weight: 1, value: 8, type: "unique", rarity: "common", requiredTool: "fishing_rod", experienceValue: 2, distanceFromCamp: 20, collectionTimeMinutes: 4, collectionChance: 50 },
+  { name: "Peixe Grande", emoji: "🐠", weight: 3, value: 18, type: "unique", rarity: "uncommon", requiredTool: "fishing_rod", experienceValue: 4, distanceFromCamp: 25, collectionTimeMinutes: 6, collectionChance: 35 },
+  { name: "Salmão", emoji: "🍣", weight: 4, value: 25, type: "unique", rarity: "rare", requiredTool: "fishing_rod", experienceValue: 6, distanceFromCamp: 30, collectionTimeMinutes: 7, collectionChance: 30 },
+  { name: "Truta", emoji: "🐸", weight: 2, value: 15, type: "unique", rarity: "common", requiredTool: "fishing_rod", experienceValue: 3, distanceFromCamp: 25, collectionTimeMinutes: 5, collectionChance: 40 },
+  { name: "Enguia", emoji: "🐍", weight: 1.5, value: 20, type: "unique", rarity: "uncommon", requiredTool: "fishing_rod", experienceValue: 5, distanceFromCamp: 30, collectionTimeMinutes: 6, collectionChance: 25 },
   
   // PLANTAS E COLETA
-  { name: "Cogumelos", emoji: "🍄", weight: 1.0, value: 6, type: "unique", rarity: "common", requiredTool: null, experienceValue: 2 },
-  { name: "Frutas Silvestres", emoji: "🫐", weight: 1.0, value: 4, type: "unique", rarity: "common", requiredTool: null, experienceValue: 1 },
-  { name: "Ervas Medicinais", emoji: "🌿", weight: 0.5, value: 8, type: "unique", rarity: "uncommon", requiredTool: null, experienceValue: 3 },
-  { name: "Nozes", emoji: "🌰", weight: 0.8, value: 6, type: "unique", rarity: "common", requiredTool: null, experienceValue: 2 },
-  { name: "Flores Silvestres", emoji: "🌸", weight: 0.2, value: 3, type: "unique", rarity: "common", requiredTool: null, experienceValue: 1 },
-  { name: "Raízes", emoji: "🫚", weight: 2.0, value: 5, type: "unique", rarity: "common", requiredTool: "shovel", experienceValue: 2 },
-  { name: "Mel Selvagem", emoji: "🍯", weight: 3.0, value: 15, type: "unique", rarity: "rare", requiredTool: null, experienceValue: 6 },
-  { name: "Resina de Árvore", emoji: "🟠", weight: 0.5, value: 10, type: "unique", rarity: "uncommon", requiredTool: "axe", experienceValue: 4 },
+  { name: "Cogumelos", emoji: "🍄", weight: 1, value: 6, type: "unique", rarity: "common", requiredTool: null, experienceValue: 2, distanceFromCamp: 10, collectionTimeMinutes: 3, collectionChance: 60 },
+  { name: "Frutas Silvestres", emoji: "🫐", weight: 1, value: 4, type: "unique", rarity: "common", requiredTool: null, experienceValue: 1, distanceFromCamp: 10, collectionTimeMinutes: 3, collectionChance: 70 },
+  { name: "Ervas Medicinais", emoji: "🌿", weight: 0.5, value: 8, type: "unique", rarity: "uncommon", requiredTool: null, experienceValue: 3, distanceFromCamp: 15, collectionTimeMinutes: 4, collectionChance: 50 },
+  { name: "Nozes", emoji: "🌰", weight: 0.8, value: 6, type: "unique", rarity: "common", requiredTool: null, experienceValue: 2, distanceFromCamp: 10, collectionTimeMinutes: 3, collectionChance: 55 },
+  { name: "Flores Silvestres", emoji: "🌸", weight: 0.2, value: 3, type: "unique", rarity: "common", requiredTool: null, experienceValue: 1, distanceFromCamp: 10, collectionTimeMinutes: 2, collectionChance: 75 },
+  { name: "Raízes", emoji: "🫚", weight: 1.5, value: 5, type: "unique", rarity: "common", requiredTool: "shovel", experienceValue: 2, distanceFromCamp: 15, collectionTimeMinutes: 4, collectionChance: 50 },
+  { name: "Mel Selvagem", emoji: "🍯", weight: 2, value: 15, type: "unique", rarity: "rare", requiredTool: null, experienceValue: 6, distanceFromCamp: 20, collectionTimeMinutes: 6, collectionChance: 20 },
+  { name: "Resina de Árvore", emoji: "🟠", weight: 0.5, value: 10, type: "unique", rarity: "uncommon", requiredTool: "axe", experienceValue: 4, distanceFromCamp: 15, collectionTimeMinutes: 3, collectionChance: 30 },
 ];
 
 export const ALL_RESOURCES = [...BASIC_RESOURCES, ...UNIQUE_RESOURCES, ...ANIMAL_RESOURCES, ...FOOD_RESOURCES];

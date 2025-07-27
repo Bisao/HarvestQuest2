@@ -5,7 +5,7 @@ import BiomesTab from "@/components/game/biomes-tab";
 import EnhancedInventory from "@/components/game/enhanced-inventory";
 import StorageTab from "@/components/game/storage-tab";
 import EvolutionaryCraftingSystem from "@/components/game/evolutionary-crafting-system";
-import ExpeditionSystem from "@/components/game/expedition-system";
+import DistanceExpeditionSystem from "@/components/game/distance-expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
 import { queryClient } from "@/lib/queryClient";
 import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema";
@@ -442,23 +442,17 @@ export default function Game() {
         </div>
       </main>
 
-      <ExpeditionSystem
+      <DistanceExpeditionSystem
         isOpen={expeditionModalOpen}
         onClose={() => {
           setExpeditionModalOpen(false);
           setSelectedBiome(null);
           setActiveExpedition(null);
         }}
-        onMinimize={handleMinimizeExpedition}
         biome={selectedBiome}
         resources={resources}
-        equipment={equipment}
         playerId={player.id}
         player={player}
-        isMinimized={expeditionMinimized}
-        onExpeditionComplete={handleCompleteExpedition}
-        activeExpedition={activeExpedition}
-        onExpeditionUpdate={setActiveExpedition}
       />
 
       {/* Minimized Expedition Window */}

@@ -39,6 +39,9 @@ export const resources = pgTable("resources", {
   rarity: text("rarity").notNull().default('common'), // 'common', 'uncommon', 'rare'
   requiredTool: text("required_tool"), // tool type needed to collect this resource
   experienceValue: integer("experience_value").notNull().default(1), // XP gained per item collected
+  distanceFromCamp: integer("distance_from_camp").notNull().default(10), // distance in meters from camp
+  collectionTimeMinutes: integer("collection_time_minutes").notNull().default(2), // time in minutes to collect
+  collectionChance: integer("collection_chance").notNull().default(50), // percentage chance of finding this resource (0-100)
 });
 
 export const biomes = pgTable("biomes", {
@@ -71,6 +74,9 @@ export const expeditions = pgTable("expeditions", {
   selectedResources: jsonb("selected_resources").notNull(), // array of resource IDs
   selectedEquipment: jsonb("selected_equipment").notNull(), // array of equipment IDs
   collectedResources: jsonb("collected_resources").notNull().default('{}'), // object with resourceId: quantity
+  maxDistanceFromCamp: integer("max_distance_from_camp").notNull().default(50), // maximum distance player will travel
+  currentDistance: integer("current_distance").notNull().default(0), // current distance from camp
+  autoReturnTrigger: text("auto_return_trigger"), // 'inventory_full', 'hunger_low', 'thirst_low', 'manual'
   startTime: integer("start_time"),
   endTime: integer("end_time"),
   progress: integer("progress").notNull().default(0),

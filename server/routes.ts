@@ -825,6 +825,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Distance-based expedition routes
+  app.post("/api/expeditions/distance", async (req, res) => {
+    try {
+      const { playerId, biomeId, maxDistanceFromCamp, selectedResources } = req.body;
+      
+      if (!playerId || !biomeId || !maxDistanceFromCamp || !selectedResources) {
+        return res.status(400).json({ message: "Missing required expedition parameters" });
+      }
+
+      const { DistanceExpeditionService } = await import("./services/distance-expedition-service");
+      const distanceExpeditionService = new DistanceExpeditionService(storage);
+      
+      const expedition = await distanceExpeditionService.startDistanceExpedition(
+        playerId, 
+        biomeId, 
+        maxDistanceFromCamp, 
+        selectedResources
+      );
+      
+      res.json(expedition);
+    } catch (error) {
+      console.error("Failed to start distance expedition:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to start expedition" });
+    }
+  });
+
+  app.post("/api/expeditions/distance/:id/simulate", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { currentDistance } = req.body;
+      
+      const { DistanceExpeditionService } = await import("./services/distance-expedition-service");
+      const distanceExpeditionService = new DistanceExpeditionService(storage);
+      
+      const result = await distanceExpeditionService.simulateCollectionAtDistance(id, currentDistance);
+      res.json(result);
+    } catch (error) {
+      console.error("Failed to simulate collection:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to simulate collection" });
+    }
+  });
+
+  app.post("/api/expeditions/distance/:id/complete", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { autoReturnTrigger } = req.body;
+      
+      const { DistanceExpeditionService } = await import("./services/distance-expedition-service");
+      const distanceExpeditionService = new DistanceExpeditionService(storage);
+      
+      const expedition = await distanceExpeditionService.completeDistanceExpedition(id, autoReturnTrigger);
+      res.json(expedition);
+    } catch (error) {
+      console.error("Failed to complete distance expedition:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to complete expedition" });
+    }
+  });
+
+  app.get("/api/player/:playerId/active-distance-expedition", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      
+      const { DistanceExpeditionService } = await import("./services/distance-expedition-service");
+      const distanceExpeditionService = new DistanceExpeditionService(storage);
+      
+      const activeExpedition = await distanceExpeditionService.getActiveDistanceExpedition(playerId);
+      res.json(activeExpedition);
+    } catch (error) {
+      console.error("Failed to get active distance expedition:", error);
+      res.status(500).json({ message: "Failed to get active expedition" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
