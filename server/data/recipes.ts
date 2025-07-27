@@ -34,19 +34,51 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       output: { [resourceMap.barbante]: 1 }
     },
     
-    // FERRAMENTAS
+    // FERRAMENTAS EVOLUTIVAS - NÍVEL IMPROVISADO
     {
-      name: "Machado",
+      name: "Machado Improvisado",
       emoji: "🪓",
       requiredLevel: 1,
       ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "axe": 1 }
     },
     {
-      name: "Picareta",
+      name: "Picareta Improvisada", 
       emoji: "⛏️",
       requiredLevel: 1,
       ingredients: { [resourceMap.pedras_soltas]: 2, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
+      output: { "pickaxe": 1 }
+    },
+    
+    // FERRAMENTAS EVOLUTIVAS - NÍVEL FERRO
+    {
+      name: "Machado de Ferro",
+      emoji: "🪓",
+      requiredLevel: 8,
+      ingredients: { [resourceMap.ferro_fundido]: 2, [resourceMap.madeira]: 1, [resourceMap.barbante]: 3 },
+      output: { "axe": 1 }
+    },
+    {
+      name: "Picareta de Ferro",
+      emoji: "⛏️", 
+      requiredLevel: 10,
+      ingredients: { [resourceMap.ferro_fundido]: 3, [resourceMap.madeira]: 1, [resourceMap.barbante]: 3 },
+      output: { "pickaxe": 1 }
+    },
+    
+    // FERRAMENTAS EVOLUTIVAS - NÍVEL AVANÇADO
+    {
+      name: "Machado Avançado",
+      emoji: "🪓",
+      requiredLevel: 15,
+      ingredients: { [resourceMap.ferro_fundido]: 2, "natural_glue": 1, [resourceMap.madeira]: 2 },
+      output: { "axe": 1 }
+    },
+    {
+      name: "Picareta Avançada",
+      emoji: "⛏️",
+      requiredLevel: 18,
+      ingredients: { [resourceMap.ferro_fundido]: 3, "natural_glue": 1, [resourceMap.madeira]: 2 },
       output: { "pickaxe": 1 }
     },
     {
