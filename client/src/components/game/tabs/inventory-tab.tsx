@@ -49,6 +49,7 @@ export default function MinecraftInventory({
 
   const { data: weightStatus } = useQuery<WeightStatus>({
     queryKey: ["/api/player", playerId, "weight"],
+    refetchInterval: 1000, // Refetch every second to ensure fresh data
   });
 
   // Equipment slots organized in a symmetrical layout
@@ -77,6 +78,7 @@ export default function MinecraftInventory({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       toast({
         title: "Sucesso!",
@@ -100,6 +102,7 @@ export default function MinecraftInventory({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       toast({
         title: "Item movido",
