@@ -302,28 +302,43 @@ export class DatabaseStorage implements IStorage {
 
   // Game initialization
   async initializeGameData(): Promise<void> {
-    // Check if data already exists
+    console.log("🔄 Initializing game data...");
+    
+    // Check and initialize resources
     const existingResources = await db.select().from(resources).limit(1);
-    if (existingResources.length > 0) {
-      return; // Data already initialized
+    if (existingResources.length === 0) {
+      const allResources = [...BASIC_RESOURCES, ...UNIQUE_RESOURCES, ...ANIMAL_RESOURCES, ...FOOD_RESOURCES];
+      await db.insert(resources).values(allResources);
+      console.log("✅ Resources initialized");
     }
 
-    // Insert resources
-    const allResources = [...BASIC_RESOURCES, ...UNIQUE_RESOURCES, ...ANIMAL_RESOURCES, ...FOOD_RESOURCES];
-    const insertedResources = await db.insert(resources).values(allResources).returning();
-    const resourceIds = insertedResources.map(r => r.id);
+    // Check and initialize biomes
+    const existingBiomes = await db.select().from(biomes).limit(1);
+    if (existingBiomes.length === 0) {
+      const allResources = await db.select().from(resources);
+      const resourceIds = allResources.map(r => r.id);
+      const biomeData = createBiomeData(resourceIds);
+      await db.insert(biomes).values(biomeData);
+      console.log("✅ Biomes initialized");
+    }
 
-    // Insert biomes with resource IDs
-    const biomeData = createBiomeData(resourceIds);
-    await db.insert(biomes).values(biomeData);
+    // Check and initialize equipment
+    const existingEquipment = await db.select().from(equipment).limit(1);
+    if (existingEquipment.length === 0) {
+      await db.insert(equipment).values(ALL_EQUIPMENT);
+      console.log("✅ Equipment initialized");
+    }
 
-    // Insert equipment
-    await db.insert(equipment).values(ALL_EQUIPMENT);
+    // Check and initialize recipes
+    const existingRecipes = await db.select().from(recipes).limit(1);
+    if (existingRecipes.length === 0) {
+      const allResources = await db.select().from(resources);
+      const resourceIds = allResources.map(r => r.id);
+      const recipeData = createRecipeData(resourceIds);
+      await db.insert(recipes).values(recipeData);
+      console.log("✅ Recipes initialized");
+    }
 
-    // Insert recipes
-    const recipeData = createRecipeData(resourceIds);
-    await db.insert(recipes).values(recipeData);
-
-    console.log("✅ PostgreSQL database initialized with game data successfully!");
+    console.log("🚀 PostgreSQL database initialization completed!");
   }
 }

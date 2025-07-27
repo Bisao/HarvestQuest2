@@ -29,16 +29,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register admin routes for development
   registerAdminRoutes(app);
 
-  // Get player data
+  // Get player data - create default player if not found
   app.get("/api/player/:username", async (req, res) => {
     try {
       const { username } = req.params;
-      const player = await storage.getPlayerByUsername(username);
+      let player = await storage.getPlayerByUsername(username);
+      
+      // Create default player if not found
       if (!player) {
-        return res.status(404).json({ message: "Player not found" });
+        const newPlayer = {
+          username,
+          level: 1,
+          experience: 0,
+          hunger: 100,
+          maxHunger: 100,
+          thirst: 100,
+          maxThirst: 100,
+          coins: 0,
+          inventoryWeight: 0,
+          maxInventoryWeight: 50,
+          autoStorage: false,
+          craftedItemsDestination: "inventory" as const,
+          waterStorage: 0,
+          maxWaterStorage: 100,
+          equippedHelmet: "",
+          equippedChestplate: "",
+          equippedLeggings: "",
+          equippedBoots: "",
+          equippedWeapon: "",
+          equippedTool: ""
+        };
+        
+        player = await storage.createPlayer(newPlayer);
+        console.log(`✅ Created new player: ${username}`);
       }
+      
       res.json(player);
     } catch (error) {
+      console.error("Get player error:", error);
       res.status(500).json({ message: "Failed to get player" });
     }
   });

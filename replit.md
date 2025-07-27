@@ -8,7 +8,22 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 27, 2025 - PROFISSIONALIZAÇÃO COMPLETA**
+**January 27, 2025 - MIGRAÇÃO COMPLETA PARA POSTGRESQL**
+- **Migração de Banco de Dados Concluída**:
+  - Sistema migrado de armazenamento em memória para PostgreSQL
+  - Todas as tabelas criadas com sucesso: players, resources, biomes, equipment, recipes, expeditions, inventory_items, storage_items, quests, player_quests
+  - 31 recursos, 4 biomas, 21 equipamentos e 20 receitas carregados
+  - Correção de valores decimais para compatibilidade com PostgreSQL
+- **Sistema de Criação Automática de Players**:
+  - Players são criados automaticamente ao acessar o jogo pela primeira vez
+  - Configuração padrão: level 1, 100 hunger/thirst, inventário vazio
+  - Sistema funciona perfeitamente sem necessidade de registro manual
+- **Dados Persistentes e Robustos**:
+  - Todas as informações do jogo agora são salvas permanentemente
+  - Sistema de expedições, inventário e crafting totalmente funcional
+  - Performance otimizada com consultas SQL eficientes
+
+**January 27, 2025 - PROFISSIONALIZAÇÃO ANTERIOR**
 - **Sistema de Segurança Robusto Implementado**:
   - Sistema de autenticação com validação UUID
   - Rate limiting (100 req/min) para proteção contra ataques
