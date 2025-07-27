@@ -255,13 +255,31 @@ export default function DistanceExpeditionSystem({
               </div>
             </div>
 
-            <Button 
-              onClick={() => setExpeditionState(prev => ({ ...prev, phase: 'resource-selection' }))}
-              className="w-full"
-              disabled={resourcesInRange.length === 0}
-            >
-              Continuar para Seleção de Recursos
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setExpeditionState(prev => ({ ...prev, phase: 'resource-selection' }))}
+                className="flex-1"
+                disabled={resourcesInRange.length === 0}
+              >
+                Selecionar Recursos
+              </Button>
+              <Button 
+                onClick={() => {
+                  // Start expedition without resource selection - collect whatever is found
+                  startExpeditionMutation.mutate({
+                    playerId,
+                    biomeId: biome!.id,
+                    maxDistanceFromCamp: expeditionState.maxDistance,
+                    selectedResources: resourcesInRange.map(r => r.id), // Include all available resources
+                  });
+                }}
+                variant="outline"
+                className="flex-1"
+                disabled={resourcesInRange.length === 0 || startExpeditionMutation.isPending}
+              >
+                {startExpeditionMutation.isPending ? 'Iniciando...' : 'Coletar Tudo'}
+              </Button>
+            </div>
           </div>
         )}
 

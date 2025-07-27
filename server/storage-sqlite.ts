@@ -30,7 +30,7 @@ import {
 import type { IStorage } from "./storage";
 import { ALL_RESOURCES } from "./data/resources";
 import { createBiomeData } from "./data/biomes";
-import { ALL_EQUIPMENT } from "./data/equipment";
+import { EVOLUTIONARY_EQUIPMENT } from "./data/equipment";
 import { createRecipeData } from "./data/recipes";
 
 export class SQLiteStorage implements IStorage {
@@ -62,7 +62,7 @@ export class SQLiteStorage implements IStorage {
     }
 
     // Initialize equipment using modular data
-    for (const equip of ALL_EQUIPMENT) {
+    for (const equip of EVOLUTIONARY_EQUIPMENT) {
       await this.createEquipment(equip);
     }
 
@@ -194,22 +194,16 @@ export class SQLiteStorage implements IStorage {
       .insert(players)
       .values({ 
         ...insertPlayer, 
-        id,
-        autoStorage: insertPlayer.autoStorage ? 1 : 0 // Convert boolean to integer for SQLite
+        id
       })
       .returning();
     return player;
   }
 
   async updatePlayer(id: string, updates: Partial<Player>): Promise<Player> {
-    const sqliteUpdates = { ...updates };
-    if ('autoStorage' in updates) {
-      sqliteUpdates.autoStorage = updates.autoStorage ? 1 : 0;
-    }
-    
     const [player] = await db
       .update(players)
-      .set(sqliteUpdates)
+      .set(updates)
       .where(eq(players.id, id))
       .returning();
     return player;
@@ -385,12 +379,7 @@ export class SQLiteStorage implements IStorage {
     const id = randomUUID();
     const [newExpedition] = await db.insert(expeditions).values({
       ...expedition,
-      id,
-      startTime: expedition.startTime || Date.now(),
-      endTime: expedition.endTime || null,
-      progress: expedition.progress || 0,
-      status: expedition.status || 'in_progress',
-      collectedResources: expedition.collectedResources || {}
+      id
     }).returning();
     return newExpedition;
   }
