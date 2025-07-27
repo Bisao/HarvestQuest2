@@ -96,8 +96,10 @@ export default function EquipmentSelectorModal({
   const getSlotEmoji = (slot: string) => {
     switch (slot) {
       case "helmet": return "🪖";
+      case "backpack": return "🎒";
       case "chestplate": return "🦺";
       case "leggings": return "👖";
+      case "foodbag": return "🥘";
       case "boots": return "🥾";
       case "weapon": return "⚔️";
       case "tool": return "⛏️";

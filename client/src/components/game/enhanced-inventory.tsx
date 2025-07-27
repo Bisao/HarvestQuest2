@@ -71,6 +71,13 @@ export default function EnhancedInventory({
       equipped: player.equippedHelmet
     },
     { 
+      id: "backpack", 
+      name: "Mochila", 
+      emoji: "🎒", 
+      position: { row: 0, col: 2 },
+      equipped: player.equippedBackpack
+    },
+    { 
       id: "chestplate", 
       name: "Peitoral", 
       emoji: "🦺", 
@@ -83,6 +90,13 @@ export default function EnhancedInventory({
       emoji: "👖", 
       position: { row: 2, col: 1 },
       equipped: player.equippedLeggings
+    },
+    { 
+      id: "foodbag", 
+      name: "Bolsa de Comida", 
+      emoji: "🥘", 
+      position: { row: 2, col: 2 },
+      equipped: player.equippedFoodbag
     },
     { 
       id: "boots", 
@@ -426,24 +440,24 @@ export default function EnhancedInventory({
           <CardContent>
             {/* Equipment Layout (Minecraft style) */}
             <div className="grid grid-cols-3 gap-2 md:gap-3 max-w-[140px] md:max-w-[180px] mx-auto">
-              {/* Row 0: Helmet */}
+              {/* Row 0: Empty, Helmet, Backpack */}
               <div></div>
-              {renderEquipmentSlot(equipmentSlots[0])}
-              <div></div>
+              {renderEquipmentSlot(equipmentSlots[0])} {/* Helmet */}
+              {renderEquipmentSlot(equipmentSlots[1])} {/* Backpack */}
               
               {/* Row 1: Weapon, Chestplate, Tool */}
-              {renderEquipmentSlot(equipmentSlots[4])}
-              {renderEquipmentSlot(equipmentSlots[1])}
-              {renderEquipmentSlot(equipmentSlots[5])}
+              {renderEquipmentSlot(equipmentSlots[6])} {/* Weapon */}
+              {renderEquipmentSlot(equipmentSlots[2])} {/* Chestplate */}
+              {renderEquipmentSlot(equipmentSlots[7])} {/* Tool */}
               
-              {/* Row 2: Leggings */}
+              {/* Row 2: Empty, Leggings, Foodbag */}
               <div></div>
-              {renderEquipmentSlot(equipmentSlots[2])}
-              <div></div>
+              {renderEquipmentSlot(equipmentSlots[3])} {/* Leggings */}
+              {renderEquipmentSlot(equipmentSlots[4])} {/* Foodbag */}
               
-              {/* Row 3: Boots */}
+              {/* Row 3: Empty, Boots, Empty */}
               <div></div>
-              {renderEquipmentSlot(equipmentSlots[3])}
+              {renderEquipmentSlot(equipmentSlots[5])} {/* Boots */}
               <div></div>
             </div>
             

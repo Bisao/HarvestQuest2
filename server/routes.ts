@@ -137,11 +137,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         case "helmet":
           currentEquippedId = player.equippedHelmet;
           break;
+        case "backpack":
+          currentEquippedId = player.equippedBackpack;
+          break;
         case "chestplate":
           currentEquippedId = player.equippedChestplate;
           break;
         case "leggings":
           currentEquippedId = player.equippedLeggings;
+          break;
+        case "foodbag":
+          currentEquippedId = player.equippedFoodbag;
           break;
         case "boots":
           currentEquippedId = player.equippedBoots;
@@ -218,11 +224,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         case "helmet":
           updates.equippedHelmet = equipmentId;
           break;
+        case "backpack":
+          updates.equippedBackpack = equipmentId;
+          break;
         case "chestplate":
           updates.equippedChestplate = equipmentId;
           break;
         case "leggings":
           updates.equippedLeggings = equipmentId;
+          break;
+        case "foodbag":
+          updates.equippedFoodbag = equipmentId;
           break;
         case "boots":
           updates.equippedBoots = equipmentId;
