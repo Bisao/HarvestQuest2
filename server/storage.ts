@@ -221,6 +221,9 @@ export class MemStorage implements IStorage {
       rarity: insertResource.rarity ?? 'common',
       requiredTool: insertResource.requiredTool || null,
       experienceValue: insertResource.experienceValue ?? 1,
+      distanceFromCamp: insertResource.distanceFromCamp ?? 10,
+      collectionTimeMinutes: insertResource.collectionTimeMinutes ?? 5,
+      collectionChance: insertResource.collectionChance ?? 50,
     };
     this.resources.set(id, resource);
     return resource;
@@ -366,6 +369,9 @@ export class MemStorage implements IStorage {
       startTime: Date.now(),
       endTime: null,
       progress: 0,
+      currentDistance: insertExpedition.currentDistance ?? 0,
+      autoReturnTrigger: insertExpedition.autoReturnTrigger ?? null,
+      maxDistanceFromCamp: insertExpedition.maxDistanceFromCamp ?? 50,
     };
 
     console.log('Storing expedition with ID:', id);
