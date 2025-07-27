@@ -56,9 +56,38 @@ export default function DistanceExpeditionSystem({
     ? resources.filter(r => Array.isArray(biome.availableResources) && biome.availableResources.includes(r.id))
     : [];
 
-  // Filter resources by distance
+  // Get player's equipped tool and weapon for collectability check
+  const equippedTool = player.equippedTool ? 
+    equipment.find(eq => eq.id === player.equippedTool) : null;
+  const equippedWeapon = player.equippedWeapon ? 
+    equipment.find(eq => eq.id === player.equippedWeapon) : null;
+
+  // Check if resource is collectable based on equipment
+  const isResourceCollectable = (resource: Resource) => {
+    // BASIC RESOURCES ARE ALWAYS COLLECTIBLE - they are known to all players
+    if (resource.type === "basic") return true;
+
+    // If resource doesn't require a tool, it's always collectable
+    if (!resource.requiredTool) return true;
+
+    // Special case for hunting large animals: requires weapon AND knife
+    if (resource.requiredTool === "weapon_and_knife") {
+      const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
+      const hasKnife = (equippedTool && equippedTool.toolType === "knife") || 
+                       (equippedWeapon && equippedWeapon.toolType === "knife");
+      return !!(hasNonKnifeWeapon && hasKnife);
+    }
+
+    // Regular tool checks - check both tool and weapon slots for the required tool
+    const hasRequiredTool = (equippedTool && equippedTool.toolType === resource.requiredTool) ||
+                           (equippedWeapon && equippedWeapon.toolType === resource.requiredTool);
+
+    return hasRequiredTool;
+  };
+
+  // Filter resources by distance and collectability
   const resourcesInRange = availableResources.filter(r => 
-    r.distanceFromCamp <= expeditionState.maxDistance
+    r.distanceFromCamp <= expeditionState.maxDistance && isResourceCollectable(r)
   );
 
   // Start distance-based expedition

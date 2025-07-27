@@ -117,6 +117,14 @@ Preferred communication style: Simple, everyday language.
 - **Alimentos Evolutivos Agrupados** - Carnes, Ensopados, Cogumelos, Peixes com nomenclatura padronizada
 - **Sistema de categorização expandido** - agora inclui Equipamentos Evolutivos e Utensílios Evolutivos
 
+**January 27, 2025 - Basic Resources Always Available Fix**
+- **Fixed basic resource availability in expeditions** - basic resources are now always selectable regardless of tool requirements
+- **Updated both regular and distance expedition systems** to recognize basic resources as known to all players
+- **Modified frontend expedition logic** to always show basic resources as collectable in both expedition interfaces
+- **Enhanced backend service logic** to allow basic resource collection without tool restrictions
+- **Basic resources include**: Fibra, Pedras Soltas, Gravetos, Argila, Barbante, Corda, animal-processed materials (Carne, Couro, Ossos, Pelo)
+- **Maintains tool requirements for unique resources** while ensuring basic survival materials are always accessible
+
 **January 27, 2025 - Enhanced Forest Biome Update**
 - **Vastly expanded Forest biome with realistic and diverse content** - added 15+ new animals, plants, and materials for balanced gameplay
 - **New Animals Added**:
