@@ -61,7 +61,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         
         player = await storage.createPlayer(newPlayer);
-        console.log(`✅ Created new player: ${username}`);
+        // Created new player successfully
       }
       
       res.json(player);
@@ -97,62 +97,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all resources
+  // Get all resources with caching
   app.get("/api/resources", async (req, res) => {
     try {
-      const resources = await storage.getAllResources();
+      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
+      const resources = await cacheGetOrSet(
+        CACHE_KEYS.ALL_RESOURCES,
+        () => storage.getAllResources(),
+        CACHE_TTL.STATIC_DATA
+      );
       res.json(resources);
     } catch (error) {
       res.status(500).json({ message: "Failed to get resources" });
     }
   });
 
-  // Get all biomes
+  // Get all biomes with caching
   app.get("/api/biomes", async (req, res) => {
     try {
-      const biomes = await storage.getAllBiomes();
+      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
+      const biomes = await cacheGetOrSet(
+        CACHE_KEYS.ALL_BIOMES,
+        () => storage.getAllBiomes(),
+        CACHE_TTL.STATIC_DATA
+      );
       res.json(biomes);
     } catch (error) {
       res.status(500).json({ message: "Failed to get biomes" });
     }
   });
 
-  // Get player inventory
+  // Get player inventory with caching
   app.get("/api/inventory/:playerId", async (req, res) => {
     try {
       const { playerId } = req.params;
-      const inventory = await storage.getPlayerInventory(playerId);
+      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
+      const inventory = await cacheGetOrSet(
+        CACHE_KEYS.PLAYER_INVENTORY(playerId),
+        () => storage.getPlayerInventory(playerId),
+        CACHE_TTL.INVENTORY
+      );
       res.json(inventory);
     } catch (error) {
       res.status(500).json({ message: "Failed to get inventory" });
     }
   });
 
-  // Get player storage
+  // Get player storage with caching
   app.get("/api/storage/:playerId", async (req, res) => {
     try {
       const { playerId } = req.params;
-      const storageItems = await storage.getPlayerStorage(playerId);
+      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
+      const storageItems = await cacheGetOrSet(
+        CACHE_KEYS.PLAYER_STORAGE(playerId),
+        () => storage.getPlayerStorage(playerId),
+        CACHE_TTL.INVENTORY
+      );
       res.json(storageItems);
     } catch (error) {
       res.status(500).json({ message: "Failed to get storage" });
     }
   });
 
-  // Get all equipment
+  // Get all equipment with caching
   app.get("/api/equipment", async (req, res) => {
     try {
-      const equipment = await storage.getAllEquipment();
+      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
+      const equipment = await cacheGetOrSet(
+        CACHE_KEYS.ALL_EQUIPMENT,
+        () => storage.getAllEquipment(),
+        CACHE_TTL.STATIC_DATA
+      );
       res.json(equipment);
     } catch (error) {
       res.status(500).json({ message: "Failed to get equipment" });
     }
   });
 
-  // Get all recipes
+  // Get all recipes with caching
   app.get("/api/recipes", async (req, res) => {
     try {
-      const recipes = await storage.getAllRecipes();
+      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
+      const recipes = await cacheGetOrSet(
+        CACHE_KEYS.ALL_RECIPES,
+        () => storage.getAllRecipes(),
+        CACHE_TTL.STATIC_DATA
+      );
       res.json(recipes);
     } catch (error) {
       res.status(500).json({ message: "Failed to get recipes" });
@@ -404,10 +434,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   });
                 }
 
-                console.log(`Added ${quantity}x ${equipmentItem.name} to storage for player ${playerId}`);
+                // Added crafted equipment to storage
               }
           } else {
-            console.error(`Equipment not found for ID: ${itemType}`);
+            // Equipment not found for the given ID
           }
         }
       }
@@ -415,7 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update quest progress for crafted items - using the item IDs from recipe outputs
       const outputs = recipe.output as Record<string, any>;
       for (const [itemId, quantity] of Object.entries(outputs)) {
-        console.log(`[CRAFT DEBUG] Updating quest progress for crafted item: ${itemId}, quantity: ${quantity}`);
+        // Updating quest progress for crafted item
         await questService.updateQuestProgress(playerId, 'craft', { itemId, quantity });
       }
       
@@ -894,6 +924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Combine quest data with player progress and check objectives
+      // Parallel loading of quest progress for better performance
       const questsWithProgress = await Promise.all(
         allQuests
           .filter(quest => quest.isActive && quest.requiredLevel <= player.level)
