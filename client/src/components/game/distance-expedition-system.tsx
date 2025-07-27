@@ -229,20 +229,21 @@ export default function DistanceExpeditionSystem({
           </DialogTitle>
         </DialogHeader>
 
-        {/* Distance Selection Phase */}
+        {/* Distance Selection and Resource Selection Combined */}
         {expeditionState.phase === 'distance-selection' && (
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">Selecione a Distância Máxima do Acampamento</h3>
+              <h3 className="text-lg font-semibold mb-2">Configurar Expedição</h3>
               <p className="text-gray-600 mb-4">
-                Quanto mais longe você for, mais recursos encontrará, mas gastará mais energia
+                Ajuste a distância e selecione os recursos para coletar
               </p>
             </div>
 
+            {/* Distance Slider */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span>Distância: {expeditionState.maxDistance}m</span>
-                <span className="text-sm text-gray-500">
+                <span className="font-medium">Distância: {expeditionState.maxDistance}m</span>
+                <span className="text-sm text-blue-600">
                   {resourcesInRange.length} recursos disponíveis
                 </span>
               </div>
@@ -257,54 +258,89 @@ export default function DistanceExpeditionSystem({
                 step={5}
                 className="w-full"
               />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>10m</span>
+                <span>100m</span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-semibold text-green-700 mb-2">Recursos Próximos (≤{expeditionState.maxDistance}m)</h4>
-                <div className="space-y-1">
-                  {resourcesInRange.slice(0, 5).map(resource => (
-                    <div key={resource.id} className="flex items-center gap-2 text-sm">
-                      <span>{resource.emoji}</span>
-                      <span>{resource.name}</span>
-                      <span className="text-gray-500">({resource.distanceFromCamp}m)</span>
-                    </div>
-                  ))}
-                  {resourcesInRange.length > 5 && (
-                    <p className="text-sm text-gray-500">+{resourcesInRange.length - 5} outros...</p>
-                  )}
+            {/* Resource Selection */}
+            <div>
+              <h4 className="font-semibold mb-3">
+                Selecionar Recursos ({expeditionState.selectedResources.length} selecionados)
+              </h4>
+              
+              {resourcesInRange.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <p>Nenhum recurso disponível nesta distância</p>
+                  <p className="text-sm">Aumente a distância para encontrar recursos</p>
                 </div>
-              </div>
-
-              <div className="p-4 bg-yellow-50 rounded-lg">
-                <h4 className="font-semibold text-yellow-700 mb-2">Recursos Distantes (&gt;{expeditionState.maxDistance}m)</h4>
-                <div className="space-y-1">
-                  {availableResources.filter(r => r.distanceFromCamp > expeditionState.maxDistance).slice(0, 3).map(resource => (
-                    <div key={resource.id} className="flex items-center gap-2 text-sm text-gray-500">
-                      <span>{resource.emoji}</span>
-                      <span>{resource.name}</span>
-                      <span>({resource.distanceFromCamp}m)</span>
-                    </div>
-                  ))}
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-60 overflow-y-auto">
+                  {resourcesInRange.map(resource => {
+                    const isSelected = expeditionState.selectedResources.includes(resource.id);
+                    const canCollect = isResourceCollectable(resource);
+                    const toolRequired = resource.requiredTool && resource.type !== 'basic';
+                    
+                    return (
+                      <button
+                        key={resource.id}
+                        onClick={() => {
+                          if (!canCollect) return;
+                          setExpeditionState(prev => ({
+                            ...prev,
+                            selectedResources: isSelected
+                              ? prev.selectedResources.filter(id => id !== resource.id)
+                              : [...prev.selectedResources, resource.id]
+                          }));
+                        }}
+                        disabled={!canCollect}
+                        className={`
+                          p-3 rounded-lg border text-left transition-all
+                          ${isSelected 
+                            ? 'bg-blue-50 border-blue-300 ring-2 ring-blue-200' 
+                            : canCollect
+                              ? 'bg-white border-gray-200 hover:bg-gray-50'
+                              : 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed'
+                          }
+                        `}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg">{resource.emoji}</span>
+                          <span className="font-medium text-sm">{resource.name}</span>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          <div>{resource.distanceFromCamp}m</div>
+                          {toolRequired && (
+                            <div className="text-red-600 mt-1">
+                              {resource.requiredTool === 'weapon_and_knife' 
+                                ? 'Requer arma + faca' 
+                                : `Requer ${resource.requiredTool}`}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
-              </div>
+              )}
             </div>
 
             <Button 
-              onClick={() => setExpeditionState(prev => ({ ...prev, phase: 'resource-selection' }))}
+              onClick={() => setExpeditionState(prev => ({ ...prev, phase: 'confirmation' }))}
               className="w-full"
-              disabled={resourcesInRange.length === 0}
+              disabled={expeditionState.selectedResources.length === 0}
             >
-              Continuar para Seleção de Recursos
+              Iniciar Expedição ({expeditionState.selectedResources.length} recursos)
             </Button>
           </div>
         )}
 
-        {/* Resource Selection Phase */}
-        {expeditionState.phase === 'resource-selection' && (
+        {/* Confirmation Phase */}
+        {expeditionState.phase === 'confirmation' && (
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">Selecione os Recursos para Coletar</h3>
+              <h3 className="text-lg font-semibold mb-2">Confirmar Expedição</h3>
               <p className="text-gray-600">
                 Distância máxima: {expeditionState.maxDistance}m
               </p>
