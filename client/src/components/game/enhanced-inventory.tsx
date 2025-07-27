@@ -544,7 +544,7 @@ export default function EnhancedInventory({
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
         {/* Equipment & Player Status Panel */}
         <Card>
           <CardHeader>
@@ -608,102 +608,15 @@ export default function EnhancedInventory({
           </CardContent>
         </Card>
 
-        {/* Resources Category */}
-        <Card>
+        {/* Main Inventory */}
+        <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span>📦</span>
-                Recursos
+                <span>🎒</span>
+                Inventário Principal
                 <Badge variant="outline" className="ml-2">
-                  {getFilteredAndSortedInventory().filter(item => {
-                    const itemData = getItemById(item.resourceId);
-                    return itemData && 'type' in itemData;
-                  }).length} itens
-                </Badge>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setFilterType("resources");
-                  setSortBy("name");
-                }}
-                className="text-xs px-2"
-              >
-                Filtrar
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {/* Resources Grid */}
-            <div className="grid grid-cols-6 md:grid-cols-8 gap-1 md:gap-2 mb-4">
-              {getFilteredAndSortedInventory()
-                .filter(item => {
-                  const itemData = getItemById(item.resourceId);
-                  return itemData && 'type' in itemData;
-                })
-                .slice(0, 24)
-                .map((item, index) => {
-                  const itemData = getItemById(item.resourceId);
-                  return (
-                    <TooltipProvider key={item.id}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div
-                            onClick={() => setSelectedItem(item)}
-                            className={`
-                              aspect-square border-2 rounded-lg flex flex-col items-center justify-center
-                              cursor-pointer transition-all hover:scale-105 relative
-                              ${selectedItem?.id === item.id ? "border-forest bg-green-50 shadow-lg" : "border-gray-300"}
-                              bg-white border-solid
-                            `}
-                          >
-                            {itemData && (
-                              <>
-                                <span className="text-lg">{itemData.emoji}</span>
-                                <span className="absolute bottom-0 right-0 text-xs font-bold bg-gray-800 text-white rounded px-1">
-                                  {item.quantity}
-                                </span>
-                                {'rarity' in itemData && itemData.rarity === "rare" && (
-                                  <div className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full"></div>
-                                )}
-                                {'rarity' in itemData && itemData.rarity === "uncommon" && (
-                                  <div className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></div>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {itemData && (
-                            <div>
-                              <p className="font-semibold">{itemData.name}</p>
-                              <p className="text-sm">Quantidade: {item.quantity}</p>
-                              <p className="text-sm">Peso: {itemData.weight * item.quantity}kg</p>
-                            </div>
-                          )}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  );
-                })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Equipment Category */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span>⚡</span>
-                Equipamentos & Itens
-                <Badge variant="outline" className="ml-2">
-                  {getFilteredAndSortedInventory().filter(item => {
-                    const itemData = getItemById(item.resourceId);
-                    return itemData && !('type' in itemData);
-                  }).length} itens
+                  {getFilteredAndSortedInventory().length} itens
                 </Badge>
               </div>
               <Button
@@ -711,69 +624,42 @@ export default function EnhancedInventory({
                 size="sm"
                 onClick={() => storeAllMutation.mutate()}
                 disabled={inventory.length === 0 || isBlocked || storeAllMutation.isPending}
-                className="text-xs px-2"
               >
-                📦 Guardar
+                📦 Guardar Tudo
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Equipment & Items Grid */}
-            <div className="grid grid-cols-6 md:grid-cols-8 gap-1 md:gap-2 mb-4">
-              {getFilteredAndSortedInventory()
-                .filter(item => {
-                  const itemData = getItemById(item.resourceId);
-                  return itemData && !('type' in itemData);
-                })
-                .slice(0, 24)
-                .map((item, index) => {
-                  const itemData = getItemById(item.resourceId);
-                  return (
-                    <TooltipProvider key={item.id}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div
-                            onClick={() => setSelectedItem(item)}
-                            className={`
-                              aspect-square border-2 rounded-lg flex flex-col items-center justify-center
-                              cursor-pointer transition-all hover:scale-105 relative
-                              ${selectedItem?.id === item.id ? "border-forest bg-green-50 shadow-lg" : "border-gray-300"}
-                              bg-white border-solid
-                            `}
-                          >
-                            {itemData && (
-                              <>
-                                <span className="text-lg">{itemData.emoji}</span>
-                                <span className="absolute bottom-0 right-0 text-xs font-bold bg-gray-800 text-white rounded px-1">
-                                  {item.quantity}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {itemData && (
-                            <div>
-                              <p className="font-semibold">{itemData.name}</p>
-                              <p className="text-sm">Quantidade: {item.quantity}</p>
-                              <p className="text-sm">Peso: {itemData.weight * item.quantity}kg</p>
-                            </div>
-                          )}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  );
-                })}
+            {/* Inventory Grid (Minecraft 9x4) */}
+            <div className="grid grid-cols-6 md:grid-cols-9 gap-1 md:gap-2 mb-4">
+              {Array.from({ length: totalSlots }, (_, i) => renderInventorySlot(i))}
             </div>
 
-            {/* Empty State for Equipment */}
-            {getFilteredAndSortedInventory().filter(item => {
-              const itemData = getItemById(item.resourceId);
-              return itemData && !('type' in itemData);
-            }).length === 0 && (
-              <div className="text-center py-4 text-gray-500">
-                <span className="text-3xl">⚔️</span>
-                <p className="text-sm mt-2">Nenhum equipamento no inventário</p>
+            {/* Empty State */}
+            {getFilteredAndSortedInventory().length === 0 && inventory.length > 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Nenhum item encontrado com os filtros aplicados</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setFilterType("all");
+                    setFilterRarity("all");
+                  }}
+                >
+                  Limpar filtros
+                </Button>
+              </div>
+            )}
+
+            {getFilteredAndSortedInventory().length === 0 && inventory.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Inventário vazio</p>
+                <p className="text-sm">Explore biomas para encontrar recursos!</p>
               </div>
             )}
 
