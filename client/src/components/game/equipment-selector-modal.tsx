@@ -107,6 +107,30 @@ export default function EquipmentSelectorModal({
     }
   };
 
+  // Get equipment tier color
+  const getTierColor = (equipmentName: string) => {
+    if (equipmentName.includes("Improvisado") || equipmentName.includes("Simples") || equipmentName.includes("Couro")) {
+      return "border-amber-300 bg-amber-50";
+    } else if (equipmentName.includes("Ferro") || equipmentName.includes("Composto") || equipmentName.includes("Reforçada")) {
+      return "border-blue-300 bg-blue-50";
+    } else if (equipmentName.includes("Élfico") || equipmentName.includes("Avançado") || equipmentName.includes("Dimensional") || equipmentName.includes("Mágica")) {
+      return "border-purple-300 bg-purple-50";
+    }
+    return "border-gray-300 bg-gray-50";
+  };
+
+  // Get tier badge
+  const getTierBadge = (equipmentName: string) => {
+    if (equipmentName.includes("Improvisado") || equipmentName.includes("Simples") || equipmentName.includes("Couro")) {
+      return <Badge className="bg-amber-100 text-amber-800">Básico</Badge>;
+    } else if (equipmentName.includes("Ferro") || equipmentName.includes("Composto") || equipmentName.includes("Reforçada")) {
+      return <Badge className="bg-blue-100 text-blue-800">Ferro</Badge>;
+    } else if (equipmentName.includes("Élfico") || equipmentName.includes("Avançado") || equipmentName.includes("Dimensional") || equipmentName.includes("Mágica")) {
+      return <Badge className="bg-purple-100 text-purple-800">Elite</Badge>;
+    }
+    return <Badge variant="outline">Normal</Badge>;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md" aria-describedby="equipment-modal-description">
@@ -163,24 +187,37 @@ export default function EquipmentSelectorModal({
                   availableEquipment.map((eq) => (
                     <div
                       key={eq.id}
-                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      className={`flex items-center justify-between p-4 border-2 rounded-lg transition-all hover:shadow-md ${getTierColor(eq.name)}`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-lg">{eq.emoji}</span>
-                        <div>
-                          <p className="font-medium">{eq.name}</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <span className="text-2xl">{eq.emoji}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-semibold">{eq.name}</p>
+                            {getTierBadge(eq.name)}
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                             {eq.effect}
                           </p>
-                          <Badge variant="secondary" className="text-xs">
-                            {eq.quantity}x disponível
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {eq.quantity}x disponível
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {eq.weight}kg
+                            </Badge>
+                          </div>
                         </div>
                       </div>
                       <Button
                         size="sm"
                         onClick={() => handleEquip(eq.id)}
                         disabled={equipItemMutation.isPending || eq.id === currentEquipped}
+                        className={
+                          eq.id === currentEquipped 
+                            ? "bg-green-500 hover:bg-green-600" 
+                            : ""
+                        }
                       >
                         {eq.id === currentEquipped ? "Equipado" : "Equipar"}
                       </Button>

@@ -110,14 +110,55 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       output: { "fishing_rod": 1 }
     },
     
-    // ARMAS
+    // ARMAS EVOLUTIVAS - NÍVEL IMPROVISADO
     {
-      name: "Arco e Flecha",
+      name: "Espada Improvisada",
+      emoji: "⚔️",
+      requiredLevel: 1,
+      ingredients: { [resourceMap.pedras_soltas]: 2, [resourceMap.gravetos]: 1, [resourceMap.barbante]: 2 },
+      output: { "sword": 1 }
+    },
+    {
+      name: "Arco Simples",
       emoji: "🏹",
       requiredLevel: 5,
       ingredients: { [resourceMap.gravetos]: 2, [resourceMap.barbante]: 2, [resourceMap.pedras_soltas]: 1 },
       output: { "bow": 1 }
     },
+    
+    // ARMAS EVOLUTIVAS - NÍVEL FERRO
+    {
+      name: "Espada de Ferro",
+      emoji: "⚔️",
+      requiredLevel: 12,
+      ingredients: { [resourceMap.ferro_fundido]: 2, [resourceMap.madeira]: 1, [resourceMap.barbante]: 3 },
+      output: { "sword": 1 }
+    },
+    {
+      name: "Arco Composto",
+      emoji: "🏹",
+      requiredLevel: 15,
+      ingredients: { [resourceMap.ferro_fundido]: 1, [resourceMap.madeira]: 2, [resourceMap.barbante]: 4 },
+      output: { "bow": 1 }
+    },
+    
+    // ARMAS EVOLUTIVAS - NÍVEL ÉLFICO
+    {
+      name: "Espada Élfica",
+      emoji: "⚔️",
+      requiredLevel: 25,
+      ingredients: { [resourceMap.ferro_fundido]: 2, "natural_glue": 1, [resourceMap.madeira]: 2, "mel_selvagem": 1 },
+      output: { "sword": 1 }
+    },
+    {
+      name: "Arco Élfico",
+      emoji: "🏹",
+      requiredLevel: 30,
+      ingredients: { [resourceMap.ferro_fundido]: 1, "natural_glue": 1, [resourceMap.madeira]: 3, "resina_de_arvore": 1 },
+      output: { "bow": 1 }
+    },
+    
+    // ARMAS ORIGINAIS
     {
       name: "Lança",
       emoji: "🔱",
@@ -126,13 +167,142 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       output: { "spear": 1 }
     },
     
-    // EQUIPAMENTOS
+    // ARMADURAS EVOLUTIVAS - CAPACETES
     {
-      name: "Mochila",
+      name: "Capacete de Couro",
+      emoji: "🎩",
+      requiredLevel: 1,
+      ingredients: { [resourceMap.couro]: 1, [resourceMap.barbante]: 2 },
+      output: { "helmet": 1 }
+    },
+    {
+      name: "Capacete de Ferro",
+      emoji: "🪖",
+      requiredLevel: 8,
+      ingredients: { [resourceMap.ferro_fundido]: 2, [resourceMap.barbante]: 2 },
+      output: { "helmet": 1 }
+    },
+    {
+      name: "Capacete Élfico",
+      emoji: "👑",
+      requiredLevel: 20,
+      ingredients: { [resourceMap.ferro_fundido]: 1, "natural_glue": 1, "mel_selvagem": 1 },
+      output: { "helmet": 1 }
+    },
+    
+    // ARMADURAS EVOLUTIVAS - PEITORAIS
+    {
+      name: "Peitoral de Couro",
+      emoji: "🦺",
+      requiredLevel: 3,
+      ingredients: { [resourceMap.couro]: 3, [resourceMap.barbante]: 4 },
+      output: { "chestplate": 1 }
+    },
+    {
+      name: "Peitoral de Ferro",
+      emoji: "🛡️",
+      requiredLevel: 10,
+      ingredients: { [resourceMap.ferro_fundido]: 4, [resourceMap.barbante]: 3 },
+      output: { "chestplate": 1 }
+    },
+    {
+      name: "Peitoral Élfico",
+      emoji: "✨",
+      requiredLevel: 22,
+      ingredients: { [resourceMap.ferro_fundido]: 3, "natural_glue": 2, "resina_de_arvore": 1 },
+      output: { "chestplate": 1 }
+    },
+    
+    // ARMADURAS EVOLUTIVAS - CALÇAS
+    {
+      name: "Calças de Couro",
+      emoji: "👖",
+      requiredLevel: 2,
+      ingredients: { [resourceMap.couro]: 2, [resourceMap.barbante]: 3 },
+      output: { "leggings": 1 }
+    },
+    {
+      name: "Calças de Ferro",
+      emoji: "🦵",
+      requiredLevel: 9,
+      ingredients: { [resourceMap.ferro_fundido]: 3, [resourceMap.barbante]: 3 },
+      output: { "leggings": 1 }
+    },
+    {
+      name: "Calças Élficas",
+      emoji: "🌟",
+      requiredLevel: 21,
+      ingredients: { [resourceMap.ferro_fundido]: 2, "natural_glue": 1, "ervas_medicinais": 2 },
+      output: { "leggings": 1 }
+    },
+    
+    // ARMADURAS EVOLUTIVAS - BOTAS
+    {
+      name: "Botas de Couro",
+      emoji: "🥾",
+      requiredLevel: 1,
+      ingredients: { [resourceMap.couro]: 1, [resourceMap.barbante]: 2 },
+      output: { "boots": 1 }
+    },
+    {
+      name: "Botas de Ferro",
+      emoji: "👢",
+      requiredLevel: 7,
+      ingredients: { [resourceMap.ferro_fundido]: 2, [resourceMap.barbante]: 2 },
+      output: { "boots": 1 }
+    },
+    {
+      name: "Botas Élficas",
+      emoji: "🌈",
+      requiredLevel: 18,
+      ingredients: { [resourceMap.ferro_fundido]: 1, "natural_glue": 1, "penas": 3 },
+      output: { "boots": 1 }
+    },
+    
+    // EQUIPAMENTOS EVOLUTIVOS - MOCHILAS
+    {
+      name: "Mochila Simples",
       emoji: "🎒",
-      requiredLevel: 5,
+      requiredLevel: 4,
       ingredients: { [resourceMap.couro]: 2, [resourceMap.barbante]: 4 },
       output: { "backpack": 1 }
+    },
+    {
+      name: "Mochila Reforçada",
+      emoji: "🎒",
+      requiredLevel: 11,
+      ingredients: { [resourceMap.ferro_fundido]: 2, [resourceMap.couro]: 3, [resourceMap.barbante]: 6 },
+      output: { "backpack": 1 }
+    },
+    {
+      name: "Mochila Dimensional",
+      emoji: "🎒",
+      requiredLevel: 25,
+      ingredients: { [resourceMap.ferro_fundido]: 1, "natural_glue": 2, [resourceMap.couro]: 2, "mel_selvagem": 2 },
+      output: { "backpack": 1 }
+    },
+    
+    // EQUIPAMENTOS EVOLUTIVOS - BOLSAS DE COMIDA
+    {
+      name: "Bolsa de Comida",
+      emoji: "🥘",
+      requiredLevel: 6,
+      ingredients: { [resourceMap.couro]: 1, [resourceMap.barbante]: 3, [resourceMap.pelo]: 2 },
+      output: { "foodbag": 1 }
+    },
+    {
+      name: "Bolsa Refrigerada",
+      emoji: "🧊",
+      requiredLevel: 13,
+      ingredients: { [resourceMap.ferro_fundido]: 1, [resourceMap.couro]: 2, [resourceMap.argila]: 3 },
+      output: { "foodbag": 1 }
+    },
+    {
+      name: "Bolsa Mágica",
+      emoji: "✨",
+      requiredLevel: 26,
+      ingredients: { "natural_glue": 1, [resourceMap.couro]: 1, "mel_selvagem": 1, "ervas_medicinais": 2 },
+      output: { "foodbag": 1 }
     },
     
     // MATERIAIS AVANÇADOS

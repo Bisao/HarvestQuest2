@@ -41,12 +41,17 @@ export default function MinecraftInventory({
     queryKey: ["/api/inventory", playerId],
   });
 
-  // Equipment slots: helmet, chestplate, leggings, boots, weapon, tool
-  const equipmentSlots = [
+  // Equipment slots organized in a symmetrical layout
+  const armorSlots = [
     { id: "helmet", name: "Capacete", emoji: "🪖", position: "head" },
+    { id: "backpack", name: "Mochila", emoji: "🎒", position: "back" },
     { id: "chestplate", name: "Peitoral", emoji: "🦺", position: "chest" },
     { id: "leggings", name: "Calças", emoji: "👖", position: "legs" },
+    { id: "foodbag", name: "Bolsa de Comida", emoji: "🥘", position: "side" },
     { id: "boots", name: "Botas", emoji: "🥾", position: "feet" },
+  ];
+
+  const toolSlots = [
     { id: "weapon", name: "Arma", emoji: "⚔️", position: "hand" },
     { id: "tool", name: "Ferramenta", emoji: "⛏️", position: "hand" },
   ];
@@ -140,27 +145,56 @@ export default function MinecraftInventory({
             <CardTitle>⚔️ Equipamentos</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              {equipmentSlots.map((slot) => (
-                <div
-                  key={slot.id}
-                  onClick={() => handleSlotClick(slot.id, "equipment")}
-                  className={`
-                    aspect-square border-2 border-dashed border-gray-300 rounded-lg
-                    flex flex-col items-center justify-center cursor-pointer
-                    hover:border-forest hover:bg-green-50 transition-all
-                    ${selectedSlot === slot.id ? "border-forest bg-green-50" : ""}
-                  `}
-                >
-                  <span className="text-2xl mb-1">{slot.emoji}</span>
-                  <span className="text-xs text-gray-600 text-center">{slot.name}</span>
+            {/* Armor Slots - 3x2 Grid Layout */}
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium mb-2 text-gray-700">🛡️ Armadura</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {armorSlots.map((slot) => (
+                    <div
+                      key={slot.id}
+                      onClick={() => handleSlotClick(slot.id, "equipment")}
+                      className={`
+                        aspect-square border-2 border-dashed border-gray-300 rounded-lg
+                        flex flex-col items-center justify-center cursor-pointer
+                        hover:border-forest hover:bg-green-50 transition-all
+                        ${selectedSlot === slot.id ? "border-forest bg-green-50" : ""}
+                      `}
+                    >
+                      <span className="text-xl mb-1">{slot.emoji}</span>
+                      <span className="text-xs text-gray-600 text-center">{slot.name}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-700">
-                💡 Dica: Equipe itens para melhorar suas expedições!
-              </p>
+              </div>
+
+              {/* Tool Slots */}
+              <div>
+                <h4 className="text-sm font-medium mb-2 text-gray-700">⚔️ Ferramentas</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {toolSlots.map((slot) => (
+                    <div
+                      key={slot.id}
+                      onClick={() => handleSlotClick(slot.id, "equipment")}
+                      className={`
+                        aspect-square border-2 border-dashed border-gray-300 rounded-lg
+                        flex flex-col items-center justify-center cursor-pointer
+                        hover:border-forest hover:bg-green-50 transition-all
+                        ${selectedSlot === slot.id ? "border-forest bg-green-50" : ""}
+                      `}
+                    >
+                      <span className="text-xl mb-1">{slot.emoji}</span>
+                      <span className="text-xs text-gray-600 text-center">{slot.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  💡 Dica: Equipe itens para melhorar suas expedições!
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>

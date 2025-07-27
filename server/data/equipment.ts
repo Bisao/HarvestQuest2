@@ -82,8 +82,272 @@ export const TOOL_EVOLUTIONS: EquipmentEvolution[] = [
   }
 ];
 
+// Evolução de armas
+export const WEAPON_EVOLUTIONS: EquipmentEvolution[] = [
+  {
+    baseType: "sword",
+    levels: [
+      {
+        name: "Espada Improvisada",
+        emoji: "⚔️",
+        level: 1,
+        effect: "Caça animais pequenos",
+        bonus: { type: "hunting", value: 1 },
+        weight: 3,
+        tier: 'improvisado'
+      },
+      {
+        name: "Espada de Ferro",
+        emoji: "⚔️",
+        level: 12,
+        effect: "Caça animais médios",
+        bonus: { type: "hunting", value: 2 },
+        weight: 5,
+        tier: 'ferro'
+      },
+      {
+        name: "Espada Élfica",
+        emoji: "⚔️",
+        level: 25,
+        effect: "Caça todos os animais",
+        bonus: { type: "hunting", value: 3 },
+        weight: 4,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "bow",
+    levels: [
+      {
+        name: "Arco Simples",
+        emoji: "🏹",
+        level: 5,
+        effect: "Caça à distância",
+        bonus: { type: "hunting", value: 2 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Arco Composto",
+        emoji: "🏹",
+        level: 15,
+        effect: "Caça avançada",
+        bonus: { type: "hunting", value: 3 },
+        weight: 3,
+        tier: 'ferro'
+      },
+      {
+        name: "Arco Élfico",
+        emoji: "🏹",
+        level: 30,
+        effect: "Caça de elite",
+        bonus: { type: "hunting", value: 4 },
+        weight: 2,
+        tier: 'avancado'
+      }
+    ]
+  }
+];
+
+// Evolução de armaduras
+export const ARMOR_EVOLUTIONS: EquipmentEvolution[] = [
+  {
+    baseType: "helmet",
+    levels: [
+      {
+        name: "Capacete de Couro",
+        emoji: "🎩",
+        level: 1,
+        effect: "+5% proteção",
+        bonus: { type: "protection", value: 5 },
+        weight: 1,
+        tier: 'improvisado'
+      },
+      {
+        name: "Capacete de Ferro",
+        emoji: "🪖",
+        level: 8,
+        effect: "+15% proteção",
+        bonus: { type: "protection", value: 15 },
+        weight: 2,
+        tier: 'ferro'
+      },
+      {
+        name: "Capacete Élfico",
+        emoji: "👑",
+        level: 20,
+        effect: "+25% proteção",
+        bonus: { type: "protection", value: 25 },
+        weight: 1,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "chestplate",
+    levels: [
+      {
+        name: "Peitoral de Couro",
+        emoji: "🦺",
+        level: 3,
+        effect: "+10% proteção",
+        bonus: { type: "protection", value: 10 },
+        weight: 3,
+        tier: 'improvisado'
+      },
+      {
+        name: "Peitoral de Ferro",
+        emoji: "🛡️",
+        level: 10,
+        effect: "+20% proteção",
+        bonus: { type: "protection", value: 20 },
+        weight: 5,
+        tier: 'ferro'
+      },
+      {
+        name: "Peitoral Élfico",
+        emoji: "✨",
+        level: 22,
+        effect: "+35% proteção",
+        bonus: { type: "protection", value: 35 },
+        weight: 4,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "leggings",
+    levels: [
+      {
+        name: "Calças de Couro",
+        emoji: "👖",
+        level: 2,
+        effect: "+8% proteção",
+        bonus: { type: "protection", value: 8 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Calças de Ferro",
+        emoji: "🦵",
+        level: 9,
+        effect: "+18% proteção",
+        bonus: { type: "protection", value: 18 },
+        weight: 4,
+        tier: 'ferro'
+      },
+      {
+        name: "Calças Élficas",
+        emoji: "🌟",
+        level: 21,
+        effect: "+30% proteção",
+        bonus: { type: "protection", value: 30 },
+        weight: 3,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "boots",
+    levels: [
+      {
+        name: "Botas de Couro",
+        emoji: "🥾",
+        level: 1,
+        effect: "+5% velocidade",
+        bonus: { type: "speed_boost", value: 5 },
+        weight: 1,
+        tier: 'improvisado'
+      },
+      {
+        name: "Botas de Ferro",
+        emoji: "👢",
+        level: 7,
+        effect: "+12% velocidade",
+        bonus: { type: "speed_boost", value: 12 },
+        weight: 2,
+        tier: 'ferro'
+      },
+      {
+        name: "Botas Élficas",
+        emoji: "🌈",
+        level: 18,
+        effect: "+20% velocidade",
+        bonus: { type: "speed_boost", value: 20 },
+        weight: 1,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "backpack",
+    levels: [
+      {
+        name: "Mochila Simples",
+        emoji: "🎒",
+        level: 4,
+        effect: "+15kg capacidade",
+        bonus: { type: "weight_boost", value: 15 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Mochila Reforçada",
+        emoji: "🎒",
+        level: 11,
+        effect: "+30kg capacidade",
+        bonus: { type: "weight_boost", value: 30 },
+        weight: 4,
+        tier: 'ferro'
+      },
+      {
+        name: "Mochila Dimensional",
+        emoji: "🎒",
+        level: 25,
+        effect: "+50kg capacidade",
+        bonus: { type: "weight_boost", value: 50 },
+        weight: 3,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "foodbag",
+    levels: [
+      {
+        name: "Bolsa de Comida",
+        emoji: "🥘",
+        level: 6,
+        effect: "Preserva alimentos",
+        bonus: { type: "food_preservation", value: 1 },
+        weight: 1,
+        tier: 'improvisado'
+      },
+      {
+        name: "Bolsa Refrigerada",
+        emoji: "🧊",
+        level: 13,
+        effect: "Preserva melhor",
+        bonus: { type: "food_preservation", value: 2 },
+        weight: 2,
+        tier: 'ferro'
+      },
+      {
+        name: "Bolsa Mágica",
+        emoji: "✨",
+        level: 26,
+        effect: "Preservação perfeita",
+        bonus: { type: "food_preservation", value: 3 },
+        weight: 1,
+        tier: 'avancado'
+      }
+    ]
+  }
+];
+
 // Função para gerar equipamentos evolutivos
-export const TOOLS: InsertEquipment[] = TOOL_EVOLUTIONS.flatMap(evolution => 
+export const EVOLUTIONARY_TOOLS: InsertEquipment[] = TOOL_EVOLUTIONS.flatMap(evolution => 
   evolution.levels.map(level => ({
     name: level.name,
     emoji: level.emoji,
@@ -91,6 +355,30 @@ export const TOOLS: InsertEquipment[] = TOOL_EVOLUTIONS.flatMap(evolution =>
     bonus: level.bonus,
     slot: "tool" as const,
     toolType: evolution.baseType,
+    weight: level.weight,
+  }))
+);
+
+export const EVOLUTIONARY_WEAPONS: InsertEquipment[] = WEAPON_EVOLUTIONS.flatMap(evolution => 
+  evolution.levels.map(level => ({
+    name: level.name,
+    emoji: level.emoji,
+    effect: level.effect,
+    bonus: level.bonus,
+    slot: "weapon" as const,
+    toolType: evolution.baseType,
+    weight: level.weight,
+  }))
+);
+
+export const EVOLUTIONARY_ARMOR: InsertEquipment[] = ARMOR_EVOLUTIONS.flatMap(evolution => 
+  evolution.levels.map(level => ({
+    name: level.name,
+    emoji: level.emoji,
+    effect: level.effect,
+    bonus: level.bonus,
+    slot: evolution.baseType as any,
+    toolType: null,
     weight: level.weight,
   }))
 );
@@ -300,23 +588,50 @@ export const ARMOR: InsertEquipment[] = [
   },
 ];
 
-export const ALL_EQUIPMENT = [...TOOLS, ...BASIC_TOOLS, ...UTILITY_TOOLS, ...WEAPONS, ...EQUIPMENT_ARMOR, ...ARMOR];
+export const ALL_EQUIPMENT = [
+  ...EVOLUTIONARY_TOOLS, 
+  ...BASIC_TOOLS, 
+  ...UTILITY_TOOLS, 
+  ...EVOLUTIONARY_WEAPONS, 
+  ...EVOLUTIONARY_ARMOR, 
+  ...WEAPONS, 
+  ...EQUIPMENT_ARMOR, 
+  ...ARMOR
+];
 
 // Equipment categories for better organization
 export const EQUIPMENT_CATEGORIES = {
   TOOLS: "tools",
-  WEAPONS: "weapons",
+  WEAPONS: "weapons", 
   ARMOR: "armor",
+  HELMET: "helmet",
+  CHESTPLATE: "chestplate",
+  LEGGINGS: "leggings",
+  BOOTS: "boots",
+  BACKPACK: "backpack",
+  FOODBAG: "foodbag"
 } as const;
 
 export function getEquipmentByCategory(category: string): InsertEquipment[] {
   switch (category) {
     case EQUIPMENT_CATEGORIES.TOOLS:
-      return TOOLS;
+      return [...EVOLUTIONARY_TOOLS, ...BASIC_TOOLS, ...UTILITY_TOOLS];
     case EQUIPMENT_CATEGORIES.WEAPONS:
-      return WEAPONS;
+      return [...EVOLUTIONARY_WEAPONS, ...WEAPONS];
     case EQUIPMENT_CATEGORIES.ARMOR:
-      return ARMOR;
+      return [...EVOLUTIONARY_ARMOR, ...ARMOR];
+    case EQUIPMENT_CATEGORIES.HELMET:
+      return ALL_EQUIPMENT.filter(eq => eq.slot === "helmet");
+    case EQUIPMENT_CATEGORIES.CHESTPLATE:
+      return ALL_EQUIPMENT.filter(eq => eq.slot === "chestplate");
+    case EQUIPMENT_CATEGORIES.LEGGINGS:
+      return ALL_EQUIPMENT.filter(eq => eq.slot === "leggings");
+    case EQUIPMENT_CATEGORIES.BOOTS:
+      return ALL_EQUIPMENT.filter(eq => eq.slot === "boots");
+    case EQUIPMENT_CATEGORIES.BACKPACK:
+      return ALL_EQUIPMENT.filter(eq => eq.slot === "backpack");
+    case EQUIPMENT_CATEGORIES.FOODBAG:
+      return ALL_EQUIPMENT.filter(eq => eq.slot === "foodbag");
     default:
       return ALL_EQUIPMENT;
   }
