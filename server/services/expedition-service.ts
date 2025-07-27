@@ -1,7 +1,22 @@
-// Expedition service for expedition-related business logic
+// Simplified expedition service that actually works
 import type { IStorage } from "../storage";
-import type { Player, Expedition, Resource, Equipment, Biome } from "@shared/schema";
+import type { Player, Resource, Equipment, Biome } from "@shared/schema";
 import { GameService } from "./game-service";
+
+interface SimpleExpedition {
+  id: string;
+  playerId: string;
+  biomeId: string;
+  selectedResources: string[];
+  maxDistance: number;
+  currentDistance: number;
+  collectedResources: Record<string, number>;
+  status: 'active' | 'completed';
+  startTime: number;
+}
+
+// In-memory store for active expeditions
+const activeExpeditions = new Map<string, SimpleExpedition>();
 
 export class ExpeditionService {
   private gameService: GameService;
@@ -12,18 +27,18 @@ export class ExpeditionService {
 
   // Start a new expedition
   async startExpedition(
-    playerId: string, 
-    biomeId: string, 
-    selectedResources: string[], 
-    selectedEquipment: string[]
-  ): Promise<Expedition> {
+    playerId: string,
+    biomeId: string,
+    maxDistance: number,
+    selectedResources: string[]
+  ): Promise<SimpleExpedition> {
     const player = await this.storage.getPlayer(playerId);
     if (!player) throw new Error("Player not found");
 
     const biome = await this.storage.getBiome(biomeId);
     if (!biome) throw new Error("Biome not found");
 
-    // Check if player has enough hunger and thirst for expedition
+    // Check hunger and thirst
     if (player.hunger < 30) {
       throw new Error("Jogador com muita fome para expedição");
     }
@@ -31,216 +46,255 @@ export class ExpeditionService {
       throw new Error("Jogador com muita sede para expedição");
     }
 
-    // Check if player has required level
-    if (player.level < biome.requiredLevel) {
-      throw new Error("Player level too low for this biome");
-    }
-
-    // Validate selected resources are available in biome
-    const availableResources = Array.isArray(biome.availableResources) ? biome.availableResources : [];
-    const validResources = selectedResources.filter(resourceId => 
-      availableResources.includes(resourceId)
-    );
-
-    if (validResources.length === 0) {
-      throw new Error("No valid resources selected for this biome");
-    }
-
     // Create expedition
-    const expedition = await this.storage.createExpedition({
+    const expeditionId = `exp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const expedition: SimpleExpedition = {
+      id: expeditionId,
       playerId,
       biomeId,
-      selectedResources: validResources,
-      selectedEquipment,
-    });
+      selectedResources,
+      maxDistance,
+      currentDistance: 0,
+      collectedResources: {},
+      status: 'active',
+      startTime: Date.now()
+    };
 
-    // Deduct hunger and thirst for expedition
-    await this.storage.updatePlayer(playerId, {
-      hunger: Math.max(0, player.hunger - 15),
-      thirst: Math.max(0, player.thirst - 10)
-    });
-
+    activeExpeditions.set(expeditionId, expedition);
+    console.log(`Storing expedition with ID: ${expeditionId}`);
+    
     return expedition;
   }
 
-  // Update expedition progress
-  async updateExpeditionProgress(expeditionId: string): Promise<Expedition> {
-    const expedition = await this.storage.getExpedition(expeditionId);
-    if (!expedition) throw new Error("Expedition not found");
-
-    if (expedition.status !== "in_progress") {
-      return expedition;
+  // Simulate collection at current distance
+  async simulateCollection(expeditionId: string, currentDistance: number): Promise<{
+    resourceCollected: string | null;
+    shouldReturn: boolean;
+    returnReason: string | null;
+    collectionTime: number;
+  }> {
+    const expedition = activeExpeditions.get(expeditionId);
+    if (!expedition) {
+      throw new Error("Expedition not found");
     }
 
-    const currentTime = Date.now();
-    const elapsedTime = currentTime - (expedition.startTime || currentTime);
-    const totalDuration = 30000; // 30 seconds for demo purposes
+    const player = await this.storage.getPlayer(expedition.playerId);
+    if (!player) throw new Error("Player not found");
+
+    const allResources = await this.storage.getAllResources();
+
+    // Check auto-return conditions - continue until hunger/thirst below 10% or inventory 90% full
+    const currentWeight = await this.gameService.calculateInventoryWeight(expedition.playerId);
+    const maxWeight = this.gameService.calculateMaxInventoryWeight(player);
+    const inventoryFull = currentWeight >= maxWeight * 0.9;
+    const hungerLow = player.hunger <= (player.maxHunger * 0.1); // 10% of max hunger
+    const thirstLow = player.thirst <= (player.maxThirst * 0.1); // 10% of max thirst
+
+    if (inventoryFull || hungerLow || thirstLow) {
+      const returnReason = inventoryFull ? 'inventory_full' : hungerLow ? 'hunger_low' : 'thirst_low';
+      return { resourceCollected: null, shouldReturn: true, returnReason, collectionTime: 0 };
+    }
+
+    // Get resources available at current distance
+    const availableResources = expedition.selectedResources
+      .map(id => allResources.find(r => r.id === id))
+      .filter((r): r is Resource => r !== undefined && r.distanceFromCamp <= currentDistance);
+
+    if (availableResources.length === 0) {
+      return { resourceCollected: null, shouldReturn: false, returnReason: null, collectionTime: 0.5 };
+    }
+
+    // Try to collect a random resource
+    const resourceToTry = availableResources[Math.floor(Math.random() * availableResources.length)];
     
-    const progress = Math.min(100, Math.floor((elapsedTime / totalDuration) * 100));
+    // Higher collection chance for better gameplay - 85% success rate
+    const success = Math.random() < 0.85;
+    
+    if (success) {
+      // Check if player can carry more
+      const canCarry = await this.gameService.canCarryMore(expedition.playerId, resourceToTry.weight);
+      if (!canCarry) {
+        return { resourceCollected: null, shouldReturn: true, returnReason: 'inventory_full', collectionTime: 0 };
+      }
 
-    // Update progress
-    const updatedExpedition = await this.storage.updateExpedition(expeditionId, {
-      progress
-    });
+      // Add to expedition collected resources
+      expedition.collectedResources[resourceToTry.id] = (expedition.collectedResources[resourceToTry.id] || 0) + 1;
+      expedition.currentDistance = currentDistance;
 
-    // Complete expedition if progress reaches 100%
-    if (progress >= 100) {
-      return await this.completeExpedition(expeditionId);
+      // Add resource directly to player's inventory using existing methods
+      const inventoryItems = await this.storage.getPlayerInventory(expedition.playerId);
+      const existingItem = inventoryItems.find(item => item.resourceId === resourceToTry.id);
+      
+      if (existingItem) {
+        await this.storage.updateInventoryItem(existingItem.id, {
+          quantity: existingItem.quantity + 1
+        });
+      } else {
+        await this.storage.addInventoryItem({
+          playerId: expedition.playerId,
+          resourceId: resourceToTry.id,
+          quantity: 1
+        });
+      }
+
+      // Reduce hunger and thirst slightly for each collection
+      await this.storage.updatePlayer(expedition.playerId, {
+        hunger: Math.max(0, player.hunger - 0.5), // Slower hunger reduction
+        thirst: Math.max(0, player.thirst - 0.5), // Slower thirst reduction
+      });
+
+      return {
+        resourceCollected: resourceToTry.id,
+        shouldReturn: false,
+        returnReason: null,
+        collectionTime: resourceToTry.collectionTimeMinutes || 2
+      };
+    } else {
+      // Failed to collect
+      return {
+        resourceCollected: null,
+        shouldReturn: false,
+        returnReason: null,
+        collectionTime: 1 // Search time
+      };
     }
-
-    return updatedExpedition;
   }
 
-  // Complete expedition and distribute rewards
-  async completeExpedition(expeditionId: string): Promise<Expedition> {
-    const expedition = await this.storage.getExpedition(expeditionId);
+  // Complete expedition
+  async completeExpedition(expeditionId: string, autoReturnTrigger: string): Promise<SimpleExpedition> {
+    const expedition = activeExpeditions.get(expeditionId);
     if (!expedition) throw new Error("Expedition not found");
 
     const player = await this.storage.getPlayer(expedition.playerId);
     if (!player) throw new Error("Player not found");
 
-    // Calculate rewards
-    const rewards = await this.calculateExpeditionRewards(expedition);
-    
-    // Add rewards to storage or inventory based on auto-storage setting
-    await this.distributeRewards(expedition.playerId, rewards, player.autoStorage);
+    // Process collected resources (including animal processing)
+    const processedResources = await this.processCollectedResources(expedition.collectedResources);
 
-    // Calculate experience gain
-    const resources = await this.storage.getAllResources();
-    const expGain = this.gameService.calculateExperienceGain(rewards, resources);
+    // Resources were already added during collection, no need to add again
+    // Just process any animal resources that need special handling
+    const finalProcessedResources = await this.processCollectedResources(expedition.collectedResources);
+    
+    // Only add the difference (processed animal parts) if any
+    const additionalResources: Record<string, number> = {};
+    for (const [resourceId, quantity] of Object.entries(finalProcessedResources)) {
+      const originalQuantity = expedition.collectedResources[resourceId] || 0;
+      if (quantity > originalQuantity) {
+        additionalResources[resourceId] = quantity - originalQuantity;
+      }
+    }
+    
+    if (Object.keys(additionalResources).length > 0) {
+      await this.distributeRewards(expedition.playerId, additionalResources, player.autoStorage || false);
+    }
+
+    // Calculate experience and coins based on final processed resources
+    const allResources = await this.storage.getAllResources();
+    const finalResources = { ...expedition.collectedResources, ...additionalResources };
+    const expGain = this.gameService.calculateExperienceGain(finalResources, allResources);
+    const coinReward = this.calculateCoinReward(finalResources, allResources);
     
     // Update player stats
     const levelData = this.gameService.calculateLevelUp(player.experience, expGain);
     await this.storage.updatePlayer(expedition.playerId, {
       experience: levelData.newExp,
       level: levelData.newLevel,
-      coins: player.coins + this.calculateCoinReward(rewards, resources)
+      coins: player.coins + coinReward
     });
 
-    // Mark expedition as completed
-    return await this.storage.updateExpedition(expeditionId, {
-      status: "completed",
-      endTime: Date.now(),
-      progress: 100,
-      collectedResources: rewards
-    });
+    // Update expedition status
+    expedition.status = 'completed';
+    expedition.collectedResources = { ...expedition.collectedResources, ...additionalResources };
+
+    // Clean up after 1 minute
+    setTimeout(() => {
+      activeExpeditions.delete(expeditionId);
+    }, 60000);
+
+    return expedition;
   }
 
-  // Calculate expedition rewards based on selected resources and equipment
-  private async calculateExpeditionRewards(expedition: Expedition): Promise<Record<string, number>> {
-    const rewards: Record<string, number> = {};
-    const player = await this.storage.getPlayer(expedition.playerId);
-    if (!player) return rewards;
-
-    const allEquipment = await this.storage.getAllEquipment();
+  // Process collected resources (animal processing)
+  private async processCollectedResources(collectedResources: Record<string, number>): Promise<Record<string, number>> {
     const allResources = await this.storage.getAllResources();
-    const selectedEquipment = Array.isArray(expedition.selectedEquipment) ? expedition.selectedEquipment : [];
-    const playerEquipment = allEquipment.filter(eq => 
-      selectedEquipment.includes(eq.id) ||
-      eq.id === player.equippedTool ||
-      eq.id === player.equippedWeapon
-    );
+    const processedResources: Record<string, number> = {};
 
-    // Base reward calculation for each selected resource
-    const selectedResources = Array.isArray(expedition.selectedResources) ? expedition.selectedResources : [];
-    
-    // Process each selected resource
-    for (const resourceId of selectedResources) {
+    for (const [resourceId, quantity] of Object.entries(collectedResources)) {
       const resource = allResources.find(r => r.id === resourceId);
       if (!resource) continue;
-      
+
       // Check if this is an animal that needs processing
       if (this.isAnimal(resource.name)) {
         // Process animal into component parts
         const animalParts = this.processAnimal(resource.name, allResources);
-        for (const [partResourceId, quantity] of Object.entries(animalParts)) {
-          rewards[partResourceId] = (rewards[partResourceId] || 0) + quantity;
+        for (const [partResourceId, partQuantity] of Object.entries(animalParts)) {
+          processedResources[partResourceId] = (processedResources[partResourceId] || 0) + (partQuantity * quantity);
         }
       } else {
-        // Regular resource collection
-        let baseQuantity = await this.getBaseResourceQuantity(resourceId);
-        rewards[resourceId] = (rewards[resourceId] || 0) + Math.max(1, baseQuantity);
+        // Regular resource - keep as is
+        processedResources[resourceId] = quantity;
       }
     }
-    
-    // Apply pickaxe bonus for stone mining
-    this.addPickaxeBonus(rewards, playerEquipment, allResources);
-    
-    return rewards;
+
+    return processedResources;
   }
-  
-  // Check if a resource is an animal or fish
+
+  // Check if a resource is an animal
   private isAnimal(resourceName: string): boolean {
     return [
-      // Animais pequenos
       "Coelho", "Esquilo", "Rato do Campo",
-      // Animais médios
       "Veado", "Raposa", "Lobo",
-      // Animais grandes
       "Javali", "Urso",
-      // Aves
       "Pato Selvagem", "Faisão",
-      // Peixes
       "Peixe Pequeno", "Peixe Grande", "Salmão", "Truta", "Enguia"
     ].includes(resourceName);
   }
-  
-  // Process animal into component resources with proper weight distribution
+
+  // Process animal into component resources
   private processAnimal(animalName: string, allResources: Resource[]): Record<string, number> {
     const parts: Record<string, number> = {};
     
-    // Find resource IDs for animal parts
     const carneResource = allResources.find(r => r.name === "Carne");
     const couroResource = allResources.find(r => r.name === "Couro");
     const ossosResource = allResources.find(r => r.name === "Ossos");
     const peloResource = allResources.find(r => r.name === "Pelo");
     const penasResource = allResources.find(r => r.name === "Penas");
     const banhaResource = allResources.find(r => r.name === "Banha");
-    
-    // Process animals according to their size and type
+
     switch (animalName) {
-      // ANIMAIS PEQUENOS
       case "Coelho":
         if (carneResource) parts[carneResource.id] = 1;
         if (couroResource) parts[couroResource.id] = 1;
         if (ossosResource) parts[ossosResource.id] = 2;
         if (peloResource) parts[peloResource.id] = 2;
         break;
-        
       case "Esquilo":
         if (carneResource) parts[carneResource.id] = 1;
         if (peloResource) parts[peloResource.id] = 1;
         if (ossosResource) parts[ossosResource.id] = 1;
         break;
-        
       case "Rato do Campo":
         if (carneResource) parts[carneResource.id] = 1;
         if (peloResource) parts[peloResource.id] = 1;
         break;
-        
-      // ANIMAIS MÉDIOS
       case "Veado":
         if (carneResource) parts[carneResource.id] = 3;
         if (couroResource) parts[couroResource.id] = 2;
         if (ossosResource) parts[ossosResource.id] = 4;
         if (peloResource) parts[peloResource.id] = 1;
         break;
-        
       case "Raposa":
         if (carneResource) parts[carneResource.id] = 2;
         if (couroResource) parts[couroResource.id] = 1;
         if (ossosResource) parts[ossosResource.id] = 2;
         if (peloResource) parts[peloResource.id] = 2;
         break;
-        
       case "Lobo":
         if (carneResource) parts[carneResource.id] = 3;
         if (couroResource) parts[couroResource.id] = 2;
         if (ossosResource) parts[ossosResource.id] = 3;
         if (peloResource) parts[peloResource.id] = 2;
         break;
-        
-      // ANIMAIS GRANDES
       case "Javali":
         if (carneResource) parts[carneResource.id] = 4;
         if (couroResource) parts[couroResource.id] = 3;
@@ -248,7 +302,6 @@ export class ExpeditionService {
         if (peloResource) parts[peloResource.id] = 1;
         if (banhaResource) parts[banhaResource.id] = 2;
         break;
-        
       case "Urso":
         if (carneResource) parts[carneResource.id] = 8;
         if (couroResource) parts[couroResource.id] = 4;
@@ -256,156 +309,76 @@ export class ExpeditionService {
         if (peloResource) parts[peloResource.id] = 3;
         if (banhaResource) parts[banhaResource.id] = 3;
         break;
-        
-      // AVES
       case "Pato Selvagem":
         if (carneResource) parts[carneResource.id] = 1;
         if (penasResource) parts[penasResource.id] = 3;
         if (ossosResource) parts[ossosResource.id] = 1;
         break;
-        
       case "Faisão":
         if (carneResource) parts[carneResource.id] = 1;
         if (penasResource) parts[penasResource.id] = 2;
         if (ossosResource) parts[ossosResource.id] = 1;
         break;
-        
-      // PEIXES - apenas carne e ossos
+      // Fish processing
       case "Peixe Pequeno":
         if (carneResource) parts[carneResource.id] = 1;
         if (ossosResource) parts[ossosResource.id] = 1;
         break;
-        
       case "Peixe Grande":
         if (carneResource) parts[carneResource.id] = 2;
         if (ossosResource) parts[ossosResource.id] = 2;
         break;
-        
       case "Salmão":
         if (carneResource) parts[carneResource.id] = 3;
         if (ossosResource) parts[ossosResource.id] = 2;
         break;
-        
       case "Truta":
         if (carneResource) parts[carneResource.id] = 2;
         if (ossosResource) parts[ossosResource.id] = 1;
         break;
-        
       case "Enguia":
         if (carneResource) parts[carneResource.id] = 1;
         if (ossosResource) parts[ossosResource.id] = 1;
         break;
     }
-    
+
     return parts;
   }
-  
-  // Check for pickaxe + stone mining -> add loose stones
-  private addPickaxeBonus(rewards: Record<string, number>, playerEquipment: Equipment[], allResources: Resource[]): void {
-    const hasPickaxe = playerEquipment.some(eq => eq.toolType === "pickaxe");
-    const stoneResource = allResources.find(r => r.name === "Pedra");
-    const looseStoneResource = allResources.find(r => r.name === "Pedras Soltas");
-    
-    if (hasPickaxe && stoneResource && looseStoneResource && rewards[stoneResource.id]) {
-      // Add loose stones equal to the amount of stone mined
-      rewards[looseStoneResource.id] = (rewards[looseStoneResource.id] || 0) + rewards[stoneResource.id];
-    }
-  }
 
-  // Get base quantity for a resource type
-  private async getBaseResourceQuantity(resourceId: string): Promise<number> {
-    const allResources = await this.storage.getAllResources();
-    const resource = allResources.find(r => r.id === resourceId);
-    
-    // Special case for water - bucket collects 5 units
-    if (resource && resource.name === "Água Fresca") {
-      return 5;
-    }
-    
-    // This could be made more sophisticated based on resource rarity
-    return Math.floor(Math.random() * 5) + 1; // 1-5 items
-  }
-
-  // Distribute rewards to player storage or inventory
+  // Distribute rewards to inventory or storage
   private async distributeRewards(playerId: string, rewards: Record<string, number>, autoStorage: boolean): Promise<void> {
     for (const [resourceId, quantity] of Object.entries(rewards)) {
-      if (quantity <= 0) continue;
-
-      // Check if this is water - handle specially
-      const resource = await this.storage.getResource(resourceId);
-      if (resource && resource.name === "Água Fresca") {
-        try {
-          // Water goes directly to player's water storage compartment
-          const player = await this.storage.getPlayer(playerId);
-          if (player) {
-            const newWaterAmount = Math.min(player.waterStorage + quantity, player.maxWaterStorage);
-            await this.storage.updatePlayer(playerId, { waterStorage: newWaterAmount });
-          }
-          continue; // Skip normal storage/inventory logic for water
-        } catch (error) {
-          console.error(`Failed to add water to player: ${error}`);
-          continue;
-        }
-      }
-
       if (autoStorage) {
         // Add to storage
         const storageItems = await this.storage.getPlayerStorage(playerId);
-        const existingItem = storageItems.find(item => item.resourceId === resourceId);
+        const existingStorageItem = storageItems.find(item => item.resourceId === resourceId);
         
-        if (existingItem) {
-          await this.storage.updateStorageItem(existingItem.id, {
-            quantity: existingItem.quantity + quantity
+        if (existingStorageItem) {
+          await this.storage.updateStorageItem(existingStorageItem.id, {
+            quantity: existingStorageItem.quantity + quantity
           });
         } else {
           await this.storage.addStorageItem({
-            playerId,
-            resourceId,
-            quantity
+            playerId: playerId,
+            resourceId: resourceId,
+            quantity: quantity
           });
         }
       } else {
-        // Add to inventory (check weight limits)
-        if (!resource) continue;
-
-        const totalWeight = resource.weight * quantity;
-        const canCarry = await this.gameService.canCarryMore(playerId, totalWeight);
-
-        if (canCarry) {
-          const inventoryItems = await this.storage.getPlayerInventory(playerId);
-          const existingItem = inventoryItems.find(item => item.resourceId === resourceId);
-          
-          if (existingItem) {
-            await this.storage.updateInventoryItem(existingItem.id, {
-              quantity: existingItem.quantity + quantity
-            });
-          } else {
-            await this.storage.addInventoryItem({
-              playerId,
-              resourceId,
-              quantity
-            });
-          }
-
-          // Update player weight
-          const newWeight = await this.gameService.calculateInventoryWeight(playerId);
-          await this.storage.updatePlayer(playerId, { inventoryWeight: newWeight });
+        // Add to inventory
+        const inventoryItems = await this.storage.getPlayerInventory(playerId);
+        const existingInventoryItem = inventoryItems.find(item => item.resourceId === resourceId);
+        
+        if (existingInventoryItem) {
+          await this.storage.updateInventoryItem(existingInventoryItem.id, {
+            quantity: existingInventoryItem.quantity + quantity
+          });
         } else {
-          // Auto-move to storage if inventory is full
-          const storageItems = await this.storage.getPlayerStorage(playerId);
-          const existingStorage = storageItems.find(item => item.resourceId === resourceId);
-          
-          if (existingStorage) {
-            await this.storage.updateStorageItem(existingStorage.id, {
-              quantity: existingStorage.quantity + quantity
-            });
-          } else {
-            await this.storage.addStorageItem({
-              playerId,
-              resourceId,
-              quantity
-            });
-          }
+          await this.storage.addInventoryItem({
+            playerId: playerId,
+            resourceId: resourceId,
+            quantity: quantity
+          });
         }
       }
     }
@@ -425,17 +398,18 @@ export class ExpeditionService {
     return Math.floor(totalValue * 0.1); // 10% of resource value as coins
   }
 
-  // Cancel expedition
-  async cancelExpedition(expeditionId: string): Promise<void> {
-    await this.storage.updateExpedition(expeditionId, {
-      status: "cancelled",
-      endTime: Date.now()
-    });
+  // Get active expedition for player
+  getActiveExpedition(playerId: string): SimpleExpedition | null {
+    for (const expedition of Array.from(activeExpeditions.values())) {
+      if (expedition.playerId === playerId && expedition.status === 'active') {
+        return expedition;
+      }
+    }
+    return null;
   }
 
-  // Get active expedition for player
-  async getActiveExpedition(playerId: string): Promise<Expedition | null> {
-    const expeditions = await this.storage.getPlayerExpeditions(playerId);
-    return expeditions.find(exp => exp.status === "in_progress") || null;
+  // Get expedition by ID
+  getExpedition(expeditionId: string): SimpleExpedition | null {
+    return activeExpeditions.get(expeditionId) || null;
   }
 }

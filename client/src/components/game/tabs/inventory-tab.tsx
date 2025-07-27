@@ -23,6 +23,7 @@ interface MinecraftInventoryProps {
   playerId: string;
   resources: Resource[];
   equipment: Equipment[];
+  isBlocked?: boolean;
 }
 
 interface WeightStatus {
@@ -36,7 +37,8 @@ interface WeightStatus {
 export default function MinecraftInventory({
   playerId,
   resources,
-  equipment
+  equipment,
+  isBlocked = false
 }: MinecraftInventoryProps) {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const { toast } = useToast();

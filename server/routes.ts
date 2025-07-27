@@ -834,8 +834,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required expedition parameters" });
       }
 
-      const { SimpleExpeditionService } = await import("./services/simple-expedition-service");
-      const expeditionService = new SimpleExpeditionService(storage);
+      const { ExpeditionService } = await import("./services/simple-expedition-service");
+      const expeditionService = new ExpeditionService(storage);
       
       const expedition = await expeditionService.startExpedition(
         playerId, 
@@ -856,8 +856,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { currentDistance } = req.body;
       
-      const { SimpleExpeditionService } = await import("./services/simple-expedition-service");
-      const expeditionService = new SimpleExpeditionService(storage);
+      const { ExpeditionService } = await import("./services/simple-expedition-service");
+      const expeditionService = new ExpeditionService(storage);
       
       const result = await expeditionService.simulateCollection(id, currentDistance);
       res.json(result);
@@ -872,8 +872,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { autoReturnTrigger } = req.body;
       
-      const { SimpleExpeditionService } = await import("./services/simple-expedition-service");
-      const expeditionService = new SimpleExpeditionService(storage);
+      const { ExpeditionService } = await import("./services/simple-expedition-service");
+      const expeditionService = new ExpeditionService(storage);
       
       const expedition = await expeditionService.completeExpedition(id, autoReturnTrigger);
       res.json(expedition);
@@ -887,8 +887,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId } = req.params;
       
-      const { SimpleExpeditionService } = await import("./services/simple-expedition-service");
-      const expeditionService = new SimpleExpeditionService(storage);
+      const { ExpeditionService } = await import("./services/simple-expedition-service");
+      const expeditionService = new ExpeditionService(storage);
       
       const activeExpedition = expeditionService.getActiveExpedition(playerId);
       res.json(activeExpedition);

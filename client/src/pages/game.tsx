@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import GameHeader from "@/components/game/game-header";
-import BiomesTab from "@/components/game/biomes-tab";
-import EnhancedInventory from "@/components/game/enhanced-inventory";
-import StorageTab from "@/components/game/storage-tab";
-import EvolutionaryCraftingSystem from "@/components/game/evolutionary-crafting-system";
-import SimpleExpeditionSystem from "@/components/game/simple-expedition-system";
+import GameHeader from "@/components/game/core/game-header";
+import BiomesTab from "@/components/game/tabs/biomes-tab";
+import InventoryTab from "@/components/game/tabs/inventory-tab";
+import StorageTab from "@/components/game/tabs/storage-tab";
+import CraftingTab from "@/components/game/tabs/crafting-tab";
+import ExpeditionSystem from "@/components/game/systems/expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
 import { queryClient } from "@/lib/queryClient";
 import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema";
@@ -409,11 +409,10 @@ export default function Game() {
             )}
 
             {activeTab === "inventory" && (
-              <EnhancedInventory
+              <InventoryTab
                 playerId={player.id}
                 resources={resources}
                 equipment={equipment}
-                player={player}
                 isBlocked={!!activeExpedition}
               />
             )}
@@ -430,7 +429,7 @@ export default function Game() {
             )}
 
             {activeTab === "crafting" && (
-              <EvolutionaryCraftingSystem
+              <CraftingTab
                 recipes={recipes}
                 resources={resources}
                 playerLevel={player.level}
@@ -442,7 +441,7 @@ export default function Game() {
         </div>
       </main>
 
-      <SimpleExpeditionSystem
+      <ExpeditionSystem
         isOpen={expeditionModalOpen}
         onClose={() => {
           setExpeditionModalOpen(false);
@@ -454,7 +453,7 @@ export default function Game() {
         equipment={equipment}
         playerId={player.id}
         player={player}
-        onExpeditionComplete={(rewards) => {
+        onExpeditionComplete={(rewards: Record<string, number>) => {
           console.log('Expedition completed with rewards:', rewards);
           // Update localStorage with last expedition resources
           if (selectedBiome) {
