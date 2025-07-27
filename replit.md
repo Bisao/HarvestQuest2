@@ -64,6 +64,19 @@ Preferred communication style: Simple, everyday language.
 - **Progressive Difficulty** - Higher tier equipment requires rare materials like natural glue and honey
 - **Migration Completed Successfully** - All TypeScript errors resolved, application fully functional
 
+**January 27, 2025 - Sistema de Crafting Evolutivo Implementado**
+- **Implementado sistema de crafting completamente reorganizado** com UI melhorada por solicitação do usuário
+- **Carrossel com navegação esquerda/direita** para itens evolutivos com setas de controle
+- **Agrupamento inteligente por tipo base** - todas as variações do mesmo equipamento (ex: Machado Improvisado, de Ferro, Avançado)
+- **Cores diferenciadas por tier**: Âmbar (Improvisado), Azul (Ferro), Roxo (Avançado)  
+- **Indicadores visuais de nível e tipo** (ex: "IMPROVISADO • Nível 1")
+- **Pontos indicadores** mostrando quantas variações existem de cada equipamento
+- **Navegação fluida** entre os diferentes tiers do mesmo equipamento
+- **Aplicado a todas as categorias evolutivas**: Ferramentas, Armas, Armaduras
+- **Categorização inteligente**: Materiais Básicos, Ferramentas Evolutivas, Armas Evolutivas, Armaduras Evolutivas, etc.
+- **Sistema de carrossel por família** - cada tipo de equipamento (machado, espada, capacete) tem seu próprio carrossel
+- Sistema anterior substituído pelo novo EvolutionaryCraftingSystem para melhor organização e experiência do usuário
+
 **January 27, 2025 - Enhanced Forest Biome Update**
 - **Vastly expanded Forest biome with realistic and diverse content** - added 15+ new animals, plants, and materials for balanced gameplay
 - **New Animals Added**:
