@@ -8,6 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 27, 2025 - QUEST SYSTEM DEBUGGED & FIXED**
+- **Fixed Quest Progress Tracking System**: Resolved issue where quests for collecting fibra and crafting barbante weren't registering progress
+- **Database Schema Corrections**: Fixed quest objectives to use proper resource IDs instead of names
+- **Enhanced Quest Debugging**: Added comprehensive logging to track quest progress updates in real-time
+- **TypeScript Error Resolution**: Fixed all LSP diagnostics and schema issues for production-ready code
+- **Migration Completed Successfully**: Project fully migrated from Replit Agent to Replit environment
+- **Quest System Fully Operational**: Collection and crafting quest progress now properly tracked and updated
+
 **January 27, 2025 - JOGO COMPLETO E TOTALMENTE FUNCIONAL**
 - **Migração PostgreSQL 100% Completa e Testada**:
   - Todas as 10 tabelas do jogo funcionando perfeitamente: players, resources, biomes, equipment, recipes, expeditions, inventory_items, storage_items, quests, player_quests

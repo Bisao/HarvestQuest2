@@ -100,6 +100,7 @@ export const quests = pgTable("quests", {
   description: text("description").notNull(),
   emoji: text("emoji").notNull(),
   type: text("type").notNull(), // 'collect', 'craft', 'explore', 'level'
+  category: text("category"), // optional category field
   requiredLevel: integer("required_level").notNull().default(1),
   objectives: jsonb("objectives").notNull(), // array of objectives with type, target, amount
   rewards: jsonb("rewards").notNull(), // object with coins, experience, items (resourceId: quantity)

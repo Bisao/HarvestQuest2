@@ -1031,7 +1031,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Complete quest error:", error);
-      res.status(500).json({ message: "Failed to complete quest", error: error.message });
+      res.status(500).json({ message: "Failed to complete quest", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 

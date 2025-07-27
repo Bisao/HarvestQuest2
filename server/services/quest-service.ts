@@ -119,12 +119,18 @@ export class QuestService {
   }
 
   async updateQuestProgress(playerId: string, action: string, data: any): Promise<void> {
+    console.log(`[QUEST DEBUG] Updating quest progress: playerId=${playerId}, action=${action}, data=`, data);
+    
     const activeQuests = await this.storage.getPlayerQuests(playerId);
     const activePlayerQuests = activeQuests.filter(pq => pq.status === 'active');
+
+    console.log(`[QUEST DEBUG] Found ${activePlayerQuests.length} active quests for player`);
 
     for (const playerQuest of activePlayerQuests) {
       const quest = await this.storage.getQuest(playerQuest.questId);
       if (!quest) continue;
+
+      console.log(`[QUEST DEBUG] Processing quest: ${quest.name}`);
 
       const objectives = quest.objectives as any[];
       let progressUpdated = false;
@@ -136,28 +142,34 @@ export class QuestService {
         switch (action) {
           case 'collect':
             if (objective.type === 'collect' && objective.resourceId === data.resourceId) {
+              console.log(`[QUEST DEBUG] Found matching collect objective: ${objective.resourceId}, quantity: ${data.quantity}`);
               if (!currentProgress[progressKey]) {
                 currentProgress[progressKey] = { current: 0, required: objective.quantity };
               }
+              const previousCurrent = currentProgress[progressKey].current;
               currentProgress[progressKey].current = Math.min(
                 currentProgress[progressKey].current + (data.quantity || 1), 
                 objective.quantity
               );
               currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
+              console.log(`[QUEST DEBUG] Progress updated: ${previousCurrent} → ${currentProgress[progressKey].current}/${objective.quantity}`);
               progressUpdated = true;
             }
             break;
             
           case 'craft':
             if (objective.type === 'craft' && objective.itemId === data.itemId) {
+              console.log(`[QUEST DEBUG] Found matching craft objective: ${objective.itemId}, quantity: ${data.quantity}`);
               if (!currentProgress[progressKey]) {
                 currentProgress[progressKey] = { current: 0, required: objective.quantity };
               }
+              const previousCurrent = currentProgress[progressKey].current;
               currentProgress[progressKey].current = Math.min(
                 currentProgress[progressKey].current + (data.quantity || 1),
                 objective.quantity
               );
               currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
+              console.log(`[QUEST DEBUG] Craft progress updated: ${previousCurrent} → ${currentProgress[progressKey].current}/${objective.quantity}`);
               progressUpdated = true;
             }
             break;
@@ -179,19 +191,13 @@ export class QuestService {
           case 'kill':
             if (objective.type === 'kill' && objective.creatureId === data.creatureId) {
               if (!currentProgress[progressKey]) {
-                currentProgress[progressKey] = { current: 0 };
+                currentProgress[progressKey] = { current: 0, required: objective.quantity };
               }
-              currentProgress[progressKey].current += data.quantity || 1;
-              progressUpdated = true;
-            }
-            break;
-            
-          case 'expedition':
-            if (objective.type === 'expedition' && objective.biomeId === data.biomeId) {
-              if (!currentProgress[progressKey]) {
-                currentProgress[progressKey] = { current: 0 };
-              }
-              currentProgress[progressKey].current += 1;
+              currentProgress[progressKey].current = Math.min(
+                currentProgress[progressKey].current + (data.quantity || 1),
+                objective.quantity
+              );
+              currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
               progressUpdated = true;
             }
             break;
@@ -199,6 +205,7 @@ export class QuestService {
       }
 
       if (progressUpdated) {
+        console.log(`[QUEST DEBUG] Saving progress for quest ${quest.name}:`, currentProgress);
         await this.storage.updatePlayerQuest(playerQuest.id, { progress: currentProgress });
       }
     }
