@@ -1,4 +1,7 @@
 import type { Biome, Resource, Equipment, Player } from "@shared/schema";
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ActiveExpedition {
   biomeId: string;
@@ -20,6 +23,84 @@ interface BiomesTabProps {
   onExploreBiome: (biome: Biome) => void;
   onCompleteExpedition: (expeditionId: string) => void;
   onToggleAutoRepeat?: (biomeId: string) => void;
+}
+
+// Componente para organizar recursos em categorias com abas
+function BiomeResourceTabs({ biomeResources, unlocked }: { biomeResources: Resource[], unlocked: boolean }) {
+  const [activeTab, setActiveTab] = useState("animais");
+
+  // Categorizar recursos
+  const categorizeResources = (resources: Resource[]) => {
+    const categories = {
+      animais: resources.filter(r => 
+        ["Coelho", "Esquilo", "Rato do Campo", "Veado", "Raposa", "Lobo", "Javali", "Urso", "Pato Selvagem", "Faisão"].includes(r.name)
+      ),
+      peixes: resources.filter(r => 
+        ["Peixe Pequeno", "Peixe Grande", "Salmão", "Truta", "Enguia"].includes(r.name)
+      ),
+      plantas: resources.filter(r => 
+        ["Cogumelos", "Frutas Silvestres", "Ervas Medicinais", "Nozes", "Flores Silvestres", "Raízes", "Mel Selvagem", "Resina de Árvore"].includes(r.name)
+      ),
+      basicos: resources.filter(r => 
+        ["Fibra", "Pedra", "Pedras Soltas", "Gravetos", "Água Fresca", "Bambu", "Madeira", "Argila"].includes(r.name)
+      )
+    };
+    return categories;
+  };
+
+  const categories = categorizeResources(biomeResources);
+
+  const tabsData = [
+    { id: "animais", name: "🐰 Animais", resources: categories.animais },
+    { id: "peixes", name: "🐟 Peixes", resources: categories.peixes },
+    { id: "plantas", name: "🌿 Plantas", resources: categories.plantas },
+    { id: "basicos", name: "🪨 Básicos", resources: categories.basicos }
+  ];
+
+  return (
+    <div className="mb-4">
+      <h4 className={`font-semibold text-sm mb-3 ${unlocked ? "text-gray-700" : "text-gray-500"}`}>
+        Recursos Disponíveis:
+      </h4>
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4 mb-3">
+          {tabsData.map((tab) => (
+            <TabsTrigger 
+              key={tab.id} 
+              value={tab.id}
+              className="text-xs px-1 py-1"
+              disabled={!unlocked}
+            >
+              {tab.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        
+        {tabsData.map((tab) => (
+          <TabsContent key={tab.id} value={tab.id} className="mt-0">
+            <ScrollArea className="h-32 w-full rounded-md border p-2">
+              <div className={`grid grid-cols-1 gap-1 text-xs ${unlocked ? "" : "text-gray-500"}`}>
+                {tab.resources.length > 0 ? (
+                  tab.resources.map((resource) => (
+                    <div key={resource.id} className="flex items-center space-x-2 p-1 rounded hover:bg-gray-50">
+                      <span className="text-sm">{resource.emoji}</span>
+                      <span className="flex-1">{resource.name}</span>
+                      <span className="text-gray-400 text-xs">XP: {resource.experienceValue}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-400 py-4">
+                    Nenhum recurso desta categoria
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  );
 }
 
 export default function BiomesTab({ biomes, resources, player, activeExpedition, onExploreBiome, onCompleteExpedition, onToggleAutoRepeat }: BiomesTabProps) {
@@ -98,19 +179,7 @@ export default function BiomesTab({ biomes, resources, player, activeExpedition,
                 </div>
               </div>
             ) : (
-              <div className="mb-4">
-                <h4 className={`font-semibold text-sm mb-2 ${unlocked ? "text-gray-700" : "text-gray-500"}`}>
-                  Recursos Disponíveis:
-                </h4>
-                <div className={`grid grid-cols-2 gap-2 text-sm ${unlocked ? "" : "text-gray-500"}`}>
-                  {biomeResources.map((resource) => (
-                    <div key={resource.id} className="flex items-center space-x-1">
-                      <span>{resource.emoji}</span>
-                      <span>{resource.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <BiomeResourceTabs biomeResources={biomeResources} unlocked={unlocked} />
             )}
 
             <div className="space-y-2">
