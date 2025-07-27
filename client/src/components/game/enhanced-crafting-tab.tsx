@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Filter } from "lucide-react";
 
 interface CraftingTabProps {
   recipes: Recipe[];
@@ -27,6 +27,15 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     "Equipamentos Utilitários": false,
     "Utensílios de Cozinha": false,
     "Consumíveis": false,
+  });
+
+  // Sistema de filtros por tier para cada categoria
+  const [tierFilters, setTierFilters] = useState<Record<string, string>>({
+    "Ferramentas Evolutivas": "all",
+    "Ferramentas Especializadas": "all", 
+    "Armas Evolutivas": "all",
+    "Armas Adicionais": "all",
+    "Armaduras Evolutivas": "all",
   });
 
   // Get storage items to check available resources
@@ -152,6 +161,49 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     }));
   };
 
+  const setTierFilter = (category: string, tier: string) => {
+    setTierFilters(prev => ({
+      ...prev,
+      [category]: tier
+    }));
+  };
+
+  // Função para detectar o tier de um item baseado no nome
+  const getItemTier = (recipeName: string): string => {
+    const name = recipeName.toLowerCase();
+    
+    // Tier 1 - Básico/Improvisado/Simples
+    if (name.includes("improvisad") || name.includes("simples") || name.includes("de pedra") || 
+        name.includes("de madeira") || name.includes("de couro")) {
+      return "basic";
+    }
+    
+    // Tier 2 - Ferro/Reforçado/Composto
+    if (name.includes("de ferro") || name.includes("reforçad") || name.includes("composto") || 
+        name.includes("guerra")) {
+      return "iron";
+    }
+    
+    // Tier 3 - Avançado/Elite/Élfico/Mágico
+    if (name.includes("avançad") || name.includes("elite") || name.includes("élf") || 
+        name.includes("mágic") || name.includes("druíd") || name.includes("caçador") ||
+        name.includes("ancestral") || name.includes("titãs") || name.includes("dimensional")) {
+      return "advanced";
+    }
+    
+    return "basic"; // default
+  };
+
+  // Filtrar receitas por tier se aplicável
+  const filterRecipesByTier = (categoryRecipes: Recipe[], category: string): Recipe[] => {
+    const tierFilter = tierFilters[category];
+    if (!tierFilter || tierFilter === "all") {
+      return categoryRecipes;
+    }
+    
+    return categoryRecipes.filter(recipe => getItemTier(recipe.name) === tierFilter);
+  };
+
   const categorizeRecipes = (recipes: Recipe[]) => {
     const categories: Record<string, Recipe[]> = {
       "Materiais Básicos": [],
@@ -172,12 +224,12 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       if (name.includes("barbante") || name.includes("cola natural")) {
         categories["Materiais Básicos"].push(recipe);
       }
-      // Ferramentas evolutivas principais (3 tiers cada)
+      // Ferramentas evolutivas principais
       else if (name.includes("machado") || name.includes("picareta")) {
         categories["Ferramentas Evolutivas"].push(recipe);
       }
-      // Ferramentas especializadas (3 tiers cada)
-      else if (name.includes("pá") || name.includes("vara de pesca") || 
+      // Ferramentas especializadas
+      else if (name.includes("pá") || name.includes("vara") || 
                name.includes("foice") || name.includes("faca") || 
                name.includes("balde")) {
         categories["Ferramentas Especializadas"].push(recipe);
@@ -186,7 +238,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       else if (name.includes("espada") || name.includes("arco")) {
         categories["Armas Evolutivas"].push(recipe);
       }
-      // Armas adicionais (lanças, bestas, martelos)
+      // Armas adicionais
       else if (name.includes("lança") || name.includes("besta") || 
                name.includes("clava") || name.includes("martelo")) {
         categories["Armas Adicionais"].push(recipe);
@@ -218,6 +270,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       }
       // Fallback para itens não categorizados
       else {
+        console.log(`Recipe não categorizada: ${recipe.name}`);
         categories["Materiais Básicos"].push(recipe);
       }
     });
@@ -319,6 +372,9 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         if (categoryRecipes.length === 0) return null;
         
         const isExpanded = expandedCategories[categoryName];
+        const hasTierFilter = tierFilters[categoryName] !== undefined;
+        const filteredRecipes = filterRecipesByTier(categoryRecipes, categoryName);
+        const currentTier = tierFilters[categoryName] || "all";
         
         return (
           <div key={categoryName} className="mb-6">
@@ -340,15 +396,66 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
                 </span>
                 <h4 className="text-lg font-semibold text-gray-800">{categoryName}</h4>
                 <span className="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
-                  {categoryRecipes.length} {categoryRecipes.length === 1 ? 'receita' : 'receitas'}
+                  {filteredRecipes.length} {filteredRecipes.length === 1 ? 'receita' : 'receitas'}
                 </span>
               </div>
               {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
             </button>
             
             {isExpanded && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categoryRecipes.map(renderRecipeCard)}
+              <div>
+                {/* Filtros de Tier para categorias evolutivas */}
+                {hasTierFilter && (
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="text-sm font-medium text-gray-600 flex items-center">
+                      <Filter size={16} className="mr-1" /> Filtrar por nível:
+                    </span>
+                    <button
+                      onClick={() => setTierFilter(categoryName, "all")}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        currentTier === "all" 
+                          ? "bg-blue-500 text-white" 
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      Todos
+                    </button>
+                    <button
+                      onClick={() => setTierFilter(categoryName, "basic")}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        currentTier === "basic" 
+                          ? "bg-amber-500 text-white" 
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      🥉 Básico
+                    </button>
+                    <button
+                      onClick={() => setTierFilter(categoryName, "iron")}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        currentTier === "iron" 
+                          ? "bg-blue-600 text-white" 
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      🥈 Ferro
+                    </button>
+                    <button
+                      onClick={() => setTierFilter(categoryName, "advanced")}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        currentTier === "advanced" 
+                          ? "bg-purple-600 text-white" 
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      🥇 Avançado
+                    </button>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredRecipes.map(renderRecipeCard)}
+                </div>
               </div>
             )}
           </div>
