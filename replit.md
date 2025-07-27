@@ -8,6 +8,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 27, 2025 - EXPEDITION MODAL STATE FIX**
+- **Fixed Critical Expedition Bug**: Resolved issue where minimizing and reopening expeditions showed resource selection instead of progress
+- **Enhanced State Management**: Expedition system now properly maintains state when modal is reopened during active expeditions
+- **Improved Progress Tracking**: Active expeditions now correctly resume progress simulation when modal is restored
+- **Migration Fully Complete**: Project successfully migrated from Replit Agent to standard Replit environment with PostgreSQL
+
 **January 27, 2025 - EQUIPMENT STORAGE RULES IMPLEMENTED**
 - **Enforced Equipment-Only Actions**: Tools, weapons, and armor can only be equipped/unequipped, not withdrawn to inventory
 - **Fixed Interface Consistency**: Equipment items now properly show "Equipar" button instead of "Retirar" in storage

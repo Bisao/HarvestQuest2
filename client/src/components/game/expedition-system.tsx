@@ -195,26 +195,34 @@ export default function ExpeditionSystem({
     }, 1000);
   };
 
-  // Reset state when modal opens/closes
+  // Reset state when modal opens/closes, but only if no active expedition
   useEffect(() => {
     if (isOpen) {
-      setPhase("resource-selection");
-      setSelectedResources([]);
-      if (onExpeditionUpdate) {
-        onExpeditionUpdate(null);
+      // Only reset if there's no active expedition
+      if (!activeExpedition) {
+        setPhase("resource-selection");
+        setSelectedResources([]);
+        setExpeditionProgress(0);
+        setExpeditionRewards(null);
+        setAutoCompleteTimer(5);
       } else {
-        setLocalActiveExpedition(null);
+        // If there's an active expedition, set the appropriate phase
+        if (activeExpedition.progress >= 100) {
+          setPhase("completed");
+        } else {
+          setPhase("in-progress");
+          setExpeditionProgress(activeExpedition.progress || 0);
+          // Resume progress simulation for the active expedition
+          startProgressSimulation(activeExpedition);
+        }
       }
-      setExpeditionProgress(0);
-      setExpeditionRewards(null);
-      setAutoCompleteTimer(5);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     }
-  }, [isOpen]);
+  }, [isOpen, activeExpedition]);
 
   // Auto-complete timer when progress reaches 100%
   useEffect(() => {
