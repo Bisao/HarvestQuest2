@@ -91,7 +91,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Pá Improvisada",
       emoji: "🔺",
-      requiredLevel: 2,
+      requiredLevel: 1,
       ingredients: { [resourceMap.madeira]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "shovel": 1 }
     },
@@ -114,7 +114,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Vara de Pesca Improvisada",
       emoji: "🎣",
-      requiredLevel: 3,
+      requiredLevel: 1,
       ingredients: { [resourceMap.bambu]: 2, [resourceMap.barbante]: 3, [resourceMap.gravetos]: 1 },
       output: { "fishing_rod": 1 }
     },
@@ -137,7 +137,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Foice Improvisada",
       emoji: "🔪",
-      requiredLevel: 2,
+      requiredLevel: 1,
       ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
       output: { "sickle": 1 }
     },
@@ -183,7 +183,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Balde Improvisado",
       emoji: "🪣",
-      requiredLevel: 2,
+      requiredLevel: 1,
       ingredients: { [resourceMap.madeira]: 3, [resourceMap.barbante]: 4 },
       output: { "bucket": 1 }
     },
@@ -229,7 +229,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Arco Improvisado",
       emoji: "🏹",
-      requiredLevel: 5,
+      requiredLevel: 1,
       ingredients: { [resourceMap.gravetos]: 2, [resourceMap.barbante]: 2, [resourceMap.pedras_soltas]: 1 },
       output: { "bow": 1 }
     },
@@ -252,7 +252,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Lança Improvisada",
       emoji: "🔱",
-      requiredLevel: 4,
+      requiredLevel: 1,
       ingredients: { [resourceMap.gravetos]: 2, [resourceMap.barbante]: 3, [resourceMap.pedras_soltas]: 1 },
       output: { "spear": 1 }
     },
@@ -275,8 +275,8 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Besta Improvisada",
       emoji: "🏹",
-      requiredLevel: 8,
-      ingredients: { [resourceMap.madeira]: 3, [resourceMap.ferro_fundido]: 1, [resourceMap.barbante]: 5 },
+      requiredLevel: 1,
+      ingredients: { [resourceMap.madeira]: 3, [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 5 },
       output: { "crossbow": 1 }
     },
     {
@@ -321,7 +321,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Peitoral Improvisado",
       emoji: "🦺",
-      requiredLevel: 3,
+      requiredLevel: 1,
       ingredients: { [resourceMap.couro]: 3, [resourceMap.barbante]: 4 },
       output: { "chestplate": 1 }
     },
@@ -344,7 +344,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Calças Improvisadas",
       emoji: "👖",
-      requiredLevel: 2,
+      requiredLevel: 1,
       ingredients: { [resourceMap.couro]: 2, [resourceMap.barbante]: 3 },
       output: { "leggings": 1 }
     },
@@ -390,7 +390,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Mochila Improvisada",
       emoji: "🎒",
-      requiredLevel: 4,
+      requiredLevel: 1,
       ingredients: { [resourceMap.couro]: 2, [resourceMap.barbante]: 4 },
       output: { "backpack": 1 }
     },
@@ -413,7 +413,7 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
     {
       name: "Bolsa de Comida Improvisada",
       emoji: "🥘",
-      requiredLevel: 6,
+      requiredLevel: 1,
       ingredients: { [resourceMap.couro]: 1, [resourceMap.barbante]: 3, [resourceMap.pelo]: 2 },
       output: { "foodbag": 1 }
     },
@@ -434,21 +434,21 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
 
     // ALIMENTOS EVOLUTIVOS - CARNES (3 TIERS)
     {
-      name: "Carne Assada",
+      name: "Carne Improvisada",
       emoji: "🥩",
       requiredLevel: 1,
       ingredients: { [resourceMap.carne]: 1, [resourceMap.gravetos]: 1 },
       output: { "cooked_meat": 1 }
     },
     {
-      name: "Carne Grelhada",
+      name: "Carne de Ferro",
       emoji: "🥩",
       requiredLevel: 5,
       ingredients: { [resourceMap.carne]: 2, [resourceMap.gravetos]: 2, [resourceMap.madeira]: 1 },
       output: { "cooked_meat": 2 }
     },
     {
-      name: "Carne Defumada",
+      name: "Carne Avançada",
       emoji: "🥩",
       requiredLevel: 12,
       ingredients: { [resourceMap.carne]: 3, [resourceMap.madeira]: 2, "mel_selvagem": 1 },
@@ -457,21 +457,21 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
 
     // ALIMENTOS EVOLUTIVOS - ENSOPADOS (3 TIERS)
     {
-      name: "Ensopado Simples",
+      name: "Ensopado Improvisado",
       emoji: "🍲",
-      requiredLevel: 3,
+      requiredLevel: 1,
       ingredients: { [resourceMap.carne]: 1, [resourceMap.agua_fresca]: 2, [resourceMap.cogumelos]: 1 },
       output: { "stew": 1 }
     },
     {
-      name: "Ensopado Nutritivo",
+      name: "Ensopado de Ferro",
       emoji: "🍲",
       requiredLevel: 8,
       ingredients: { [resourceMap.carne]: 2, [resourceMap.agua_fresca]: 3, [resourceMap.cogumelos]: 2, [resourceMap.frutas_silvestres]: 1 },
       output: { "stew": 2 }
     },
     {
-      name: "Ensopado Especial",
+      name: "Ensopado Avançado",
       emoji: "🍲",
       requiredLevel: 15,
       ingredients: { [resourceMap.carne]: 3, [resourceMap.agua_fresca]: 4, "ervas_medicinais": 2, "mel_selvagem": 1 },
@@ -480,21 +480,21 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
 
     // ALIMENTOS EVOLUTIVOS - COGUMELOS (3 TIERS)
     {
-      name: "Cogumelos Assados",
+      name: "Cogumelos Improvisados",
       emoji: "🍄",
-      requiredLevel: 2,
+      requiredLevel: 1,
       ingredients: { [resourceMap.cogumelos]: 3, [resourceMap.gravetos]: 1 },
       output: { "cooked_mushrooms": 1 }
     },
     {
-      name: "Cogumelos Grelhados",
+      name: "Cogumelos de Ferro",
       emoji: "🍄",
       requiredLevel: 6,
       ingredients: { [resourceMap.cogumelos]: 4, [resourceMap.madeira]: 1, [resourceMap.barbante]: 1 },
       output: { "cooked_mushrooms": 2 }
     },
     {
-      name: "Cogumelos Refogados",
+      name: "Cogumelos Avançados",
       emoji: "🍄",
       requiredLevel: 10,
       ingredients: { [resourceMap.cogumelos]: 5, [resourceMap.couro]: 1, "ervas_medicinais": 1 },
@@ -503,21 +503,21 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
 
     // ALIMENTOS EVOLUTIVOS - PEIXES (3 TIERS)
     {
-      name: "Peixe Grelhado",
+      name: "Peixe Improvisado",
       emoji: "🐟",
-      requiredLevel: 4,
+      requiredLevel: 1,
       ingredients: { [resourceMap.peixe_pequeno]: 2, [resourceMap.gravetos]: 1 },
       output: { "cooked_fish": 1 }
     },
     {
-      name: "Peixe Assado",
+      name: "Peixe de Ferro",
       emoji: "🐟",
       requiredLevel: 7,
       ingredients: { [resourceMap.peixe_grande]: 1, [resourceMap.madeira]: 1, [resourceMap.barbante]: 1 },
       output: { "cooked_fish": 2 }
     },
     {
-      name: "Peixe Defumado",
+      name: "Peixe Avançado",
       emoji: "🐟",
       requiredLevel: 14,
       ingredients: { [resourceMap.peixe_grande]: 2, [resourceMap.madeira]: 2, "mel_selvagem": 1 },
@@ -547,49 +547,118 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       output: { "fruit_juice": 3 }
     },
 
-    // UTENSÍLIOS DE COZINHA
+    // UTENSÍLIOS EVOLUTIVOS - PANELAS (3 TIERS)
     {
-      name: "Panela de Barro",
+      name: "Panela Improvisada",
       emoji: "🏺",
-      requiredLevel: 5,
-      ingredients: { [resourceMap.argila]: 10 },
+      requiredLevel: 1,
+      ingredients: { [resourceMap.argila]: 8, [resourceMap.gravetos]: 2 },
       output: { "clay_pot": 1 }
     },
     {
       name: "Panela de Ferro",
       emoji: "🍲",
       requiredLevel: 12,
-      ingredients: { [resourceMap.ferro_fundido]: 2 },
+      ingredients: { [resourceMap.ferro_fundido]: 2, [resourceMap.barbante]: 1 },
       output: { "iron_pot": 1 }
     },
     {
-      name: "Garrafa de Bambu",
-      emoji: "🎍",
-      requiredLevel: 4,
-      ingredients: { [resourceMap.bambu]: 2 },
-      output: { "bamboo_bottle": 1 }
+      name: "Panela Avançada",
+      emoji: "✨",
+      requiredLevel: 20,
+      ingredients: { [resourceMap.ferro_fundido]: 2, "natural_glue": 1, [resourceMap.couro]: 1 },
+      output: { "advanced_pot": 1 }
     },
 
-    // EQUIPAMENTOS UTILITÁRIOS
+    // UTENSÍLIOS EVOLUTIVOS - GARRAFAS (3 TIERS)
     {
-      name: "Corda",
+      name: "Garrafa Improvisada",
+      emoji: "🎍",
+      requiredLevel: 1,
+      ingredients: { [resourceMap.bambu]: 2, [resourceMap.barbante]: 1 },
+      output: { "bamboo_bottle": 1 }
+    },
+    {
+      name: "Garrafa de Ferro",
+      emoji: "🍶",
+      requiredLevel: 9,
+      ingredients: { [resourceMap.ferro_fundido]: 1, [resourceMap.couro]: 1 },
+      output: { "iron_bottle": 1 }
+    },
+    {
+      name: "Garrafa Avançada",
+      emoji: "🏺",
+      requiredLevel: 16,
+      ingredients: { [resourceMap.ferro_fundido]: 1, "natural_glue": 1, "mel_selvagem": 1 },
+      output: { "advanced_bottle": 1 }
+    },
+
+    // EQUIPAMENTOS UTILITÁRIOS EVOLUTIVOS - CORDAS (3 TIERS)
+    {
+      name: "Corda Improvisada",
       emoji: "🪢",
-      requiredLevel: 6,
-      ingredients: { [resourceMap.couro]: 2 },
+      requiredLevel: 1,
+      ingredients: { [resourceMap.barbante]: 4, [resourceMap.gravetos]: 1 },
       output: { "rope": 1 }
     },
     {
-      name: "Isca para Pesca",
+      name: "Corda de Ferro",
+      emoji: "🪢",
+      requiredLevel: 8,
+      ingredients: { [resourceMap.couro]: 2, [resourceMap.ferro_fundido]: 1 },
+      output: { "rope": 1 }
+    },
+    {
+      name: "Corda Avançada",
+      emoji: "🪢",
+      requiredLevel: 15,
+      ingredients: { [resourceMap.couro]: 3, "natural_glue": 1 },
+      output: { "rope": 1 }
+    },
+
+    // EQUIPAMENTOS UTILITÁRIOS EVOLUTIVOS - ISCAS (3 TIERS)
+    {
+      name: "Isca Improvisada",
       emoji: "🪱",
-      requiredLevel: 2,
+      requiredLevel: 1,
       ingredients: { [resourceMap.fibra]: 1, [resourceMap.frutas_silvestres]: 1 },
       output: { "fishing_bait": 1 }
     },
     {
-      name: "Armadilha Simples",
+      name: "Isca de Ferro",
+      emoji: "🪱",
+      requiredLevel: 6,
+      ingredients: { [resourceMap.carne]: 1, [resourceMap.ferro_fundido]: 1 },
+      output: { "fishing_bait": 2 }
+    },
+    {
+      name: "Isca Avançada",
+      emoji: "🪱",
+      requiredLevel: 12,
+      ingredients: { [resourceMap.carne]: 2, "mel_selvagem": 1 },
+      output: { "fishing_bait": 3 }
+    },
+
+    // EQUIPAMENTOS UTILITÁRIOS EVOLUTIVOS - ARMADILHAS (3 TIERS)
+    {
+      name: "Armadilha Improvisada",
       emoji: "🕳️",
-      requiredLevel: 8,
-      ingredients: { [resourceMap.madeira]: 3, [resourceMap.barbante]: 5, [resourceMap.pedra]: 2 },
+      requiredLevel: 1,
+      ingredients: { [resourceMap.madeira]: 2, [resourceMap.barbante]: 3, [resourceMap.pedras_soltas]: 1 },
+      output: { "simple_trap": 1 }
+    },
+    {
+      name: "Armadilha de Ferro",
+      emoji: "🕳️",
+      requiredLevel: 10,
+      ingredients: { [resourceMap.madeira]: 3, [resourceMap.ferro_fundido]: 2, [resourceMap.barbante]: 5 },
+      output: { "simple_trap": 1 }
+    },
+    {
+      name: "Armadilha Avançada",
+      emoji: "🕳️",
+      requiredLevel: 18,
+      ingredients: { [resourceMap.madeira]: 4, [resourceMap.ferro_fundido]: 2, "natural_glue": 2 },
       output: { "simple_trap": 1 }
     }
   ];

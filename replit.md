@@ -92,6 +92,19 @@ Preferred communication style: Simple, everyday language.
 - **Categorização expandida** - adicionada categoria "Alimentos Evolutivos" para comidas com variações
 - **Design totalmente simétrico** - usuário solicitou cards pequenos e uniformes em tamanho
 
+**January 27, 2025 - Sistema Evolutivo Completo e Níveis Corrigidos**
+- **TODAS receitas "Improvisadas" ajustadas para nível 1** - solicitação específica do usuário
+- **Sistema de receitas completamente reorganizado** - eliminadas duplicatas e inconsistências
+- **Nomenclatura padrão em 3 tiers**: Improvisado → de Ferro → Avançado para TODOS os itens
+- **Base de receitas limpa** - criado recipes-clean.ts com sistema impecável
+- **Agrupamento evolutivo perfeito** - todas as ferramentas, armas, armaduras, equipamentos utilitários e alimentos evolutivos
+- **Início de jogo otimizado** - jogador pode craftar qualquer item básico no nível 1 com recursos do armazém
+- **Receitas balanceadas** - Besta Improvisada usa pedras soltas ao invés de ferro fundido para nível 1
+- **Equipamentos Utilitários Evolutivos** - Cordas, Iscas, Armadilhas agora têm 3 tiers evolutivos
+- **Utensílios Evolutivos** - Panelas e Garrafas com variações Improvisada/de Ferro/Avançada
+- **Alimentos Evolutivos Agrupados** - Carnes, Ensopados, Cogumelos, Peixes com nomenclatura padronizada
+- **Sistema de categorização expandido** - agora inclui Equipamentos Evolutivos e Utensílios Evolutivos
+
 **January 27, 2025 - Enhanced Forest Biome Update**
 - **Vastly expanded Forest biome with realistic and diverse content** - added 15+ new animals, plants, and materials for balanced gameplay
 - **New Animals Added**:

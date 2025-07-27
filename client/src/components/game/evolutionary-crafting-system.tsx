@@ -182,6 +182,45 @@ const EQUIPMENT_FAMILIES = {
     emoji: "🥤",
     category: "Alimentos Evolutivos",
     tiers: ["Improvisadas", "de Ferro", "Avançadas"]
+  },
+
+  // Equipamentos utilitários evolutivos
+  rope: {
+    baseType: "rope",
+    name: "Corda",
+    emoji: "🪢",
+    category: "Equipamentos Evolutivos",
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
+  },
+  fishing_bait: {
+    baseType: "fishing_bait",
+    name: "Isca",
+    emoji: "🪱",
+    category: "Equipamentos Evolutivos",
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
+  },
+  simple_trap: {
+    baseType: "simple_trap",
+    name: "Armadilha",
+    emoji: "🕳️",
+    category: "Equipamentos Evolutivos",
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
+  },
+
+  // Utensílios evolutivos
+  clay_pot: {
+    baseType: "clay_pot",
+    name: "Panela",
+    emoji: "🏺",
+    category: "Utensílios Evolutivos",
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
+  },
+  bamboo_bottle: {
+    baseType: "bamboo_bottle", 
+    name: "Garrafa",
+    emoji: "🎍",
+    category: "Utensílios Evolutivos",
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   }
 };
 
@@ -322,8 +361,8 @@ export default function EvolutionaryCraftingSystem({
       "Armas Evolutivas": [],
       "Armaduras Evolutivas": [],
       "Alimentos Evolutivos": [],
-      "Equipamentos Utilitários": [],
-      "Utensílios de Cozinha": [],
+      "Equipamentos Evolutivos": [],
+      "Utensílios Evolutivos": [],
       "Consumíveis": []
     };
 
@@ -360,14 +399,14 @@ export default function EvolutionaryCraftingSystem({
                (name.includes("suco") || name.includes("vitamina") || name.includes("elixir"))) {
         categories["Alimentos Evolutivos"].push(recipe);
       }
-      // Equipamentos utilitários
+      // Equipamentos evolutivos (cordas, iscas, armadilhas)
       else if (name.includes("corda") || name.includes("isca") || 
                name.includes("armadilha")) {
-        categories["Equipamentos Utilitários"].push(recipe);
+        categories["Equipamentos Evolutivos"].push(recipe);
       }
-      // Utensílios de cozinha
+      // Utensílios evolutivos (panelas, garrafas)
       else if (name.includes("panela") || name.includes("garrafa")) {
-        categories["Utensílios de Cozinha"].push(recipe);
+        categories["Utensílios Evolutivos"].push(recipe);
       }
       // Consumíveis (comidas e bebidas)
       else {
