@@ -12,6 +12,7 @@ Preferred communication style: Simple, everyday language.
 - **Fixed Critical Expedition Bug**: Resolved issue where minimizing and reopening expeditions showed resource selection instead of progress
 - **Enhanced State Management**: Expedition system now properly maintains state when modal is reopened during active expeditions
 - **Improved Progress Tracking**: Active expeditions now correctly resume progress simulation when modal is restored
+- **Removed Auto-Expand**: Expeditions no longer auto-expand when completed, letting players choose when to interact
 - **Migration Fully Complete**: Project successfully migrated from Replit Agent to standard Replit environment with PostgreSQL
 
 **January 27, 2025 - EQUIPMENT STORAGE RULES IMPLEMENTED**

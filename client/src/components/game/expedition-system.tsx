@@ -146,13 +146,8 @@ export default function ExpeditionSystem({
 
       toast({
         title: "Expedição Concluída!",
-        description: `Recursos coletados com sucesso!`,
+        description: `Recursos coletados com sucesso! Clique para ver os resultados.`,
       });
-
-      // Force expand modal when expedition completes
-      if (isMinimized) {
-        onMinimize(); // This will expand the modal
-      }
 
       // Clear parent expedition state
       if (onExpeditionUpdate) {
