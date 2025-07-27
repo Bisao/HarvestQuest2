@@ -51,11 +51,16 @@ export class DistanceExpeditionService {
       throw new Error("No valid resources selected for expedition");
     }
 
-    // Check if player has required tools for selected resources
+    // Check if player has required tools for selected resources (except basic resources)
     for (const resourceId of validResources) {
+      const resource = allResources.find(r => r.id === resourceId);
+      // Skip tool check for basic resources - they are always collectable
+      if (resource && resource.type === "basic") {
+        continue;
+      }
+      
       const hasRequiredTool = await this.gameService.hasRequiredTool(playerId, resourceId);
       if (!hasRequiredTool) {
-        const resource = allResources.find(r => r.id === resourceId);
         throw new Error(`Missing required tool for ${resource?.name || 'resource'}`);
       }
     }

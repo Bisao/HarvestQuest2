@@ -65,16 +65,23 @@ export default function DistanceExpeditionSystem({
   // Check if resource is collectable based on equipment
   const isResourceCollectable = (resource: Resource) => {
     // BASIC RESOURCES ARE ALWAYS COLLECTIBLE - they are known to all players
-    if (resource.type === "basic") return true;
+    if (resource.type === "basic") {
+      console.log(`${resource.name} is basic resource - ALWAYS COLLECTIBLE`);
+      return true;
+    }
 
     // If resource doesn't require a tool, it's always collectable
-    if (!resource.requiredTool) return true;
+    if (!resource.requiredTool) {
+      console.log(`${resource.name} requires no tool - COLLECTIBLE`);
+      return true;
+    }
 
     // Special case for hunting large animals: requires weapon AND knife
     if (resource.requiredTool === "weapon_and_knife") {
       const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
       const hasKnife = (equippedTool && equippedTool.toolType === "knife") || 
                        (equippedWeapon && equippedWeapon.toolType === "knife");
+      console.log(`${resource.name} requires weapon+knife: hasWeapon=${!!hasNonKnifeWeapon}, hasKnife=${!!hasKnife}`);
       return !!(hasNonKnifeWeapon && hasKnife);
     }
 
@@ -82,13 +89,25 @@ export default function DistanceExpeditionSystem({
     const hasRequiredTool = (equippedTool && equippedTool.toolType === resource.requiredTool) ||
                            (equippedWeapon && equippedWeapon.toolType === resource.requiredTool);
 
+    console.log(`${resource.name} requires ${resource.requiredTool}: hasRequiredTool=${hasRequiredTool}`);
     return hasRequiredTool;
   };
 
+  // Debug logging to understand what's happening
+  console.log('Available resources from biome:', availableResources.length);
+  console.log('Sample available resources:', availableResources.slice(0, 3).map(r => ({name: r.name, type: r.type, distanceFromCamp: r.distanceFromCamp})));
+
   // Filter resources by distance and collectability
-  const resourcesInRange = availableResources.filter(r => 
-    r.distanceFromCamp <= expeditionState.maxDistance && isResourceCollectable(r)
-  );
+  const resourcesInRange = availableResources.filter(r => {
+    const withinDistance = r.distanceFromCamp <= expeditionState.maxDistance;
+    const isCollectable = isResourceCollectable(r);
+    if (r.type === 'basic') {
+      console.log(`Basic resource ${r.name}: withinDistance=${withinDistance} (${r.distanceFromCamp}m <= ${expeditionState.maxDistance}m), isCollectable=${isCollectable}`);
+    }
+    return withinDistance && isCollectable;
+  });
+
+  console.log(`Resources in range: ${resourcesInRange.length} out of ${availableResources.length} available`);
 
   // Start distance-based expedition
   const startExpeditionMutation = useMutation({
