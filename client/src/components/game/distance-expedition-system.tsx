@@ -20,7 +20,7 @@ interface DistanceExpeditionSystemProps {
 }
 
 interface ExpeditionState {
-  phase: 'distance-selection' | 'resource-selection' | 'in-progress' | 'completed';
+  phase: 'distance-selection' | 'in-progress' | 'completed';
   maxDistance: number;
   selectedResources: string[];
   currentDistance: number;
@@ -64,9 +64,20 @@ export default function DistanceExpeditionSystem({
 
   // Check if resource is collectable based on equipment
   const isResourceCollectable = (resource: Resource) => {
-    // BASIC RESOURCES ARE ALWAYS COLLECTIBLE - they are known to all players
-    if (resource.type === "basic") {
-      return true;
+    // Check if resource requires specific tools even for basic resources
+    if (resource.requiredTool) {
+      // Special case for hunting large animals: requires weapon AND knife
+      if (resource.requiredTool === "weapon_and_knife") {
+        const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
+        const hasKnife = (equippedTool && equippedTool.toolType === "knife") || 
+                         (equippedWeapon && equippedWeapon.toolType === "knife");
+        return !!(hasNonKnifeWeapon && hasKnife);
+      }
+
+      // Regular tool checks - check both tool and weapon slots for the required tool
+      const hasRequiredTool = (equippedTool && equippedTool.toolType === resource.requiredTool) ||
+                             (equippedWeapon && equippedWeapon.toolType === resource.requiredTool);
+      return hasRequiredTool;
     }
 
     // If resource doesn't require a tool, it's always collectable
@@ -327,85 +338,22 @@ export default function DistanceExpeditionSystem({
             </div>
 
             <Button 
-              onClick={() => setExpeditionState(prev => ({ ...prev, phase: 'confirmation' }))}
+              onClick={() => {
+                startExpeditionMutation.mutate({
+                  playerId,
+                  biomeId: biome.id,
+                  maxDistanceFromCamp: expeditionState.maxDistance,
+                  selectedResources: expeditionState.selectedResources,
+                });
+              }}
               className="w-full"
-              disabled={expeditionState.selectedResources.length === 0}
+              disabled={expeditionState.selectedResources.length === 0 || startExpeditionMutation.isPending}
             >
-              Iniciar Expedição ({expeditionState.selectedResources.length} recursos)
+              {startExpeditionMutation.isPending 
+                ? 'Iniciando...' 
+                : `Iniciar Expedição (${expeditionState.selectedResources.length} recursos)`
+              }
             </Button>
-          </div>
-        )}
-
-        {/* Confirmation Phase */}
-        {expeditionState.phase === 'confirmation' && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">Confirmar Expedição</h3>
-              <p className="text-gray-600">
-                Distância máxima: {expeditionState.maxDistance}m
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto">
-              {resourcesInRange.map(resource => (
-                <div
-                  key={resource.id}
-                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                    expeditionState.selectedResources.includes(resource.id)
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => {
-                    setExpeditionState(prev => ({
-                      ...prev,
-                      selectedResources: prev.selectedResources.includes(resource.id)
-                        ? prev.selectedResources.filter(id => id !== resource.id)
-                        : [...prev.selectedResources, resource.id]
-                    }));
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{resource.emoji}</span>
-                      <div>
-                        <span className="font-medium">{resource.name}</span>
-                        <div className="text-sm text-gray-500">
-                          {resource.distanceFromCamp}m • {resource.collectionTimeMinutes}min • {resource.weight}kg • {resource.collectionChance}% chance
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{resource.experienceValue} XP</div>
-                      <div className="text-sm text-gray-500">{resource.value} moedas</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setExpeditionState(prev => ({ ...prev, phase: 'distance-selection' }))}
-                className="flex-1"
-              >
-                Voltar
-              </Button>
-              <Button 
-                onClick={() => {
-                  startExpeditionMutation.mutate({
-                    playerId,
-                    biomeId: biome.id,
-                    maxDistanceFromCamp: expeditionState.maxDistance,
-                    selectedResources: expeditionState.selectedResources,
-                  });
-                }}
-                className="flex-1"
-                disabled={expeditionState.selectedResources.length === 0 || startExpeditionMutation.isPending}
-              >
-                {startExpeditionMutation.isPending ? 'Iniciando...' : 'Iniciar Expedição'}
-              </Button>
-            </div>
           </div>
         )}
 
