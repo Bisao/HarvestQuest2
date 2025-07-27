@@ -50,9 +50,11 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         title: "Item Craftado!",
         description: `${data.recipe.name} foi criado com sucesso!`,
       });
-      // Invalidate storage and inventory queries
+      // Real-time updates for all related data after crafting
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
     },
     onError: (error: any) => {
       toast({

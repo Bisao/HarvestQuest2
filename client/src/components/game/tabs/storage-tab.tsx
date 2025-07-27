@@ -60,7 +60,9 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate all related caches for real-time updates
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       toast({
         title: "Item equipado!",
@@ -82,8 +84,11 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
       return response.json();
     },
     onSuccess: (data: any) => {
+      // Real-time updates for all player data after consuming
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
       toast({
         title: "Item consumido!",
         description: `Fome: +${data.hungerRestored} | Sede: +${data.thirstRestored}`,
@@ -104,7 +109,11 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
       return response.json();
     },
     onSuccess: (data: any) => {
+      // Real-time updates for all player data after consuming water
+      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
       toast({
         title: "Água consumida!",
         description: `Sede: +${data.thirstRestored}`,

@@ -137,8 +137,12 @@ export default function ExpeditionSystem({
         intervalRef.current = null;
       }
 
+      // Complete real-time cache invalidation after expedition completion
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "quests"] });
 
       toast({
         title: "Expedição Concluída!",

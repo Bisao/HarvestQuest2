@@ -199,9 +199,11 @@ export default function EnhancedInventory({
       return response.json();
     },
     onSuccess: (data) => {
+      // Real-time updates for all player data after consuming
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
       setSelectedItem(null);
       toast({
         title: "Item consumido!",
