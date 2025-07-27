@@ -412,4 +412,21 @@ export class ExpeditionService {
   getExpedition(expeditionId: string): SimpleExpedition | null {
     return activeExpeditions.get(expeditionId) || null;
   }
+
+  // Cancel expedition
+  async cancelExpedition(expeditionId: string): Promise<void> {
+    const expedition = activeExpeditions.get(expeditionId);
+    if (expedition) {
+      activeExpeditions.delete(expeditionId);
+    }
+  }
+
+  // Update expedition progress (for compatibility)
+  async updateExpeditionProgress(expeditionId: string, progress: number): Promise<void> {
+    const expedition = activeExpeditions.get(expeditionId);
+    if (expedition) {
+      // Simple progress tracking - not really needed in this implementation
+      // but kept for API compatibility
+    }
+  }
 }

@@ -440,7 +440,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/expeditions/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const expedition = await expeditionService.updateExpeditionProgress(id);
+      await expeditionService.updateExpeditionProgress(id, 100);
+      const expedition = expeditionService.getExpedition(id);
       res.json(expedition);
     } catch (error) {
       res.status(500).json({ message: "Failed to update expedition" });
@@ -451,7 +452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/expeditions/:id/complete", async (req, res) => {
     try {
       const { id } = req.params;
-      const expedition = await expeditionService.completeExpedition(id);
+      const expedition = await expeditionService.completeExpedition(id, "manual");
       res.json(expedition);
     } catch (error) {
       console.error("Complete expedition error:", error);
@@ -834,7 +835,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required expedition parameters" });
       }
 
-      const { ExpeditionService } = await import("./services/simple-expedition-service");
+      const { ExpeditionService } = await import("./services/expedition-service");
       const expeditionService = new ExpeditionService(storage);
       
       const expedition = await expeditionService.startExpedition(
@@ -856,7 +857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { currentDistance } = req.body;
       
-      const { ExpeditionService } = await import("./services/simple-expedition-service");
+      const { ExpeditionService } = await import("./services/expedition-service");
       const expeditionService = new ExpeditionService(storage);
       
       const result = await expeditionService.simulateCollection(id, currentDistance);
@@ -872,7 +873,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { autoReturnTrigger } = req.body;
       
-      const { ExpeditionService } = await import("./services/simple-expedition-service");
+      const { ExpeditionService } = await import("./services/expedition-service");
       const expeditionService = new ExpeditionService(storage);
       
       const expedition = await expeditionService.completeExpedition(id, autoReturnTrigger);
@@ -887,7 +888,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId } = req.params;
       
-      const { ExpeditionService } = await import("./services/simple-expedition-service");
+      const { ExpeditionService } = await import("./services/expedition-service");
       const expeditionService = new ExpeditionService(storage);
       
       const activeExpedition = expeditionService.getActiveExpedition(playerId);
