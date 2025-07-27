@@ -42,16 +42,29 @@ Preferred communication style: Simple, everyday language.
 - Added unequip functionality - clicking equipped items removes them from slots
 - Verified all game systems are fully functional: expeditions, inventory, storage, crafting
 
-**January 26, 2025 - Enhanced Game Mechanics Update**
-- **Added "Pedras Soltas" resource** - collectible without tools in all biomes
-- **Enhanced hunting system** - coelhos can be hunted with knife only, larger animals require weapon + knife
-- **Implemented pickaxe bonus** - mining stone now also generates loose stones automatically
-- **Added XP display** - all resources now show experience points gained per item collected
-- **Added Faca (knife) equipment** - required for skinning hunted animals
-- **Updated resource experience values** - balanced XP rewards across all resource types
-- **Enhanced resource collection logic** - proper tool/weapon requirement checking with combined requirements
-- **Updated UI displays** - expedition system and biome views now show XP information
-- **Simplified rabbit hunting** - coelhos now require only knife (tool or weapon slot), not weapon + knife
+**January 27, 2025 - Enhanced Forest Biome Update**
+- **Vastly expanded Forest biome with realistic and diverse content** - added 15+ new animals, plants, and materials for balanced gameplay
+- **New Animals Added**:
+  - Small animals: Esquilo (squirrel), Rato do Campo (field mouse) - huntable with knife only
+  - Medium animals: Raposa (fox), Lobo (wolf) - require weapon + knife for hunting
+  - Large animals: Urso (bear) - rare and dangerous prey requiring weapon + knife
+  - Birds: Pato Selvagem (wild duck), Faisão (pheasant) - require weapon + knife
+  - New fish: Truta (trout), Enguia (eel) - expand fishing variety
+- **Enhanced Plant Collection System**:
+  - Ervas Medicinais (medicinal herbs) - rare healing ingredient
+  - Nozes (nuts), Flores Silvestres (wild flowers) - common gatherable resources
+  - Raízes (roots) - require shovel to collect, good food source
+  - Mel Selvagem (wild honey) - rare valuable ingredient for advanced recipes
+  - Resina de Árvore (tree resin) - crafting material requiring axe to collect
+- **Expanded Crafting System with 10+ New Recipes**:
+  - New foods: Chá de Ervas, Nozes Torradas, Raízes Cozidas, Carne Defumada, Sopa de Cogumelos, Torta de Frutas
+  - New beverages: Hidromél (mead) - advanced alcoholic drink from honey
+  - New materials: Cola Natural (natural glue) from resin and bones
+  - New tools: Pá de Madeira (wooden shovel), Armadilha Simples (simple trap)
+- **Enhanced Animal Processing** - new animals yield Penas (feathers) and Banha (fat) in addition to standard materials
+- **Improved Resource Categories** - updated filtering system to properly organize all new forest resources
+- **Balanced Progression** - new items have appropriate level requirements and realistic material costs
+- **Maintained Realism Focus** - no magical items, all additions based on realistic forest survival elements
 
 **January 26, 2025 - Modular Architecture Update**
 - **Completely restructured backend into modular architecture** for better maintainability and content addition

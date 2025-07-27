@@ -179,7 +179,78 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       requiredLevel: 3,
       ingredients: { "clay_pot": 1, [resourceMap.carne]: 2, [resourceMap.agua_fresca]: 3 },
       output: { "meat_stew": 1 },
-
+    },
+    
+    // NOVAS RECEITAS DA FLORESTA
+    {
+      name: "Chá de Ervas",
+      emoji: "🍵",
+      requiredLevel: 2,
+      ingredients: { [resourceMap.agua_fresca]: 1, "ervas_medicinais": 1 },
+      output: { "herbal_tea": 1 }
+    },
+    {
+      name: "Nozes Torradas",
+      emoji: "🥜",
+      requiredLevel: 1,
+      ingredients: { "nozes": 3, [resourceMap.gravetos]: 1 },
+      output: { "roasted_nuts": 1 }
+    },
+    {
+      name: "Raízes Cozidas",
+      emoji: "🥔",
+      requiredLevel: 1,
+      ingredients: { "raizes": 2, [resourceMap.agua_fresca]: 1, [resourceMap.gravetos]: 1 },
+      output: { "cooked_roots": 1 }
+    },
+    {
+      name: "Carne Defumada",
+      emoji: "🥓",
+      requiredLevel: 4,
+      ingredients: { [resourceMap.carne]: 2, [resourceMap.madeira]: 1, "resina_de_arvore": 1 },
+      output: { "smoked_meat": 1 }
+    },
+    {
+      name: "Sopa de Cogumelos",
+      emoji: "🥣",
+      requiredLevel: 2,
+      ingredients: { [resourceMap.cogumelos]: 4, [resourceMap.agua_fresca]: 2, "clay_pot": 1 },
+      output: { "mushroom_soup": 1 }
+    },
+    {
+      name: "Torta de Frutas",
+      emoji: "🥧",
+      requiredLevel: 5,
+      ingredients: { [resourceMap.frutas_silvestres]: 5, "nozes": 2, "mel_selvagem": 1, [resourceMap.madeira]: 1 },
+      output: { "fruit_pie": 1 }
+    },
+    {
+      name: "Hidromél",
+      emoji: "🍺",
+      requiredLevel: 6,
+      ingredients: { "mel_selvagem": 2, [resourceMap.agua_fresca]: 3, "ervas_medicinais": 1 },
+      output: { "mead": 1 }
+    },
+    {
+      name: "Cola Natural",
+      emoji: "🧴",
+      requiredLevel: 3,
+      ingredients: { "resina_de_arvore": 2, [resourceMap.ossos]: 3, [resourceMap.agua_fresca]: 1 },
+      output: { "natural_glue": 1 }
+    },
+    {
+      name: "Pá de Madeira",
+      emoji: "🔺",
+      requiredLevel: 2,
+      ingredients: { [resourceMap.madeira]: 1, [resourceMap.barbante]: 2 },
+      output: { "shovel": 1 }
+    },
+    {
+      name: "Armadilha Simples",
+      emoji: "🪤",
+      requiredLevel: 3,
+      ingredients: { [resourceMap.gravetos]: 4, [resourceMap.barbante]: 3, "natural_glue": 1 },
+      output: { "simple_trap": 1 }
     }
   ];
 }
