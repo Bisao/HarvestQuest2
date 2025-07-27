@@ -11,15 +11,17 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
-        target: "madeira",
-        amount: 5,
+        resourceId: "2403e29c-64a8-49c7-8515-6d314682167f", // Madeira
+        quantity: 5,
         description: "Colete 5 madeiras"
       }
     ],
     rewards: {
       coins: 50,
       experience: 25,
-      items: {}
+      items: {
+        "2c7495cc-9f28-4ce3-baf8-3f477b8424c0": 3 // Gravetos
+      }
     },
     isActive: true
   },
@@ -32,8 +34,8 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        target: "faca",
-        amount: 1,
+        itemId: "2e61f8ab-4055-49bf-9aa5-66b0e9fd041d", // Faca (tool)
+        quantity: 1,
         description: "Crie 1 faca"
       }
     ],
@@ -41,7 +43,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 100,
       experience: 50,
       items: {
-        "graveto": 3
+        "2c7495cc-9f28-4ce3-baf8-3f477b8424c0": 3 // Gravetos
       }
     },
     isActive: true
@@ -54,9 +56,9 @@ export const ALL_QUESTS: InsertQuest[] = [
     requiredLevel: 1,
     objectives: [
       {
-        type: "expedition_complete",
-        target: "floresta",
-        amount: 1,
+        type: "expedition",
+        biomeId: "78566f17-d3dc-45f6-a936-8b2332d89133", // Floresta
+        quantity: 1,
         description: "Complete 1 expedição na Floresta"
       }
     ],
@@ -64,7 +66,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 75,
       experience: 40,
       items: {
-        "agua_fresca": 2
+        "94e8664f-8c91-45e1-b869-6ddff1b51b35": 2 // Água Fresca
       }
     },
     isActive: true
@@ -80,20 +82,20 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
-        target: "pedra",
-        amount: 10,
+        resourceId: "92ad7096-9896-43ed-8ca5-57a49cce8367", // Pedra
+        quantity: 10,
         description: "Colete 10 pedras"
       },
       {
         type: "collect",
-        target: "fibra",
-        amount: 15,
+        resourceId: "ccf77b6d-ad96-4101-9eed-d80f2f2a77e4", // Fibra
+        quantity: 15,
         description: "Colete 15 fibras"
       },
       {
         type: "collect",
-        target: "graveto",
-        amount: 8,
+        resourceId: "2c7495cc-9f28-4ce3-baf8-3f477b8424c0", // Gravetos
+        quantity: 8,
         description: "Colete 8 gravetos"
       }
     ],
@@ -101,7 +103,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 200,
       experience: 100,
       items: {
-        "pedras_soltas": 5
+        "b1816cc3-14e2-4232-bec9-2370f40efdf1": 5 // Pedras Soltas
       }
     },
     isActive: true
@@ -115,14 +117,14 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
-        target: "coelho",
-        amount: 3,
+        resourceId: "d7e35c48-ba8b-4595-8533-3c7cf83cc729", // Coelho
+        quantity: 3,
         description: "Caçe 3 coelhos"
       },
       {
         type: "collect",
-        target: "veado",
-        amount: 1,
+        resourceId: "e5e768ff-5877-4e69-9a24-e1fe4b430f68", // Veado
+        quantity: 1,
         description: "Caçe 1 veado"
       }
     ],

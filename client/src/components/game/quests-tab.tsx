@@ -26,6 +26,7 @@ interface Quest {
   status: string;
   progress: Record<string, any>;
   playerQuest: any;
+  canComplete?: boolean;
 }
 
 interface QuestsTabProps {
@@ -125,11 +126,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
   };
 
   const canCompleteQuest = (quest: Quest) => {
-    if (quest.status !== 'active') return false;
-    
-    // Basic completion logic - this would need to be enhanced
-    // based on actual quest progress tracking
-    return true;
+    return quest.canComplete === true;
   };
 
   const formatRewards = (rewards: Quest['rewards']) => {
@@ -197,11 +194,31 @@ export default function QuestsTab({ player }: QuestsTabProps) {
                   
                   <div className="space-y-2">
                     <h4 className="font-semibold text-sm">Objetivos:</h4>
-                    {quest.objectives.map((objective, idx) => (
-                      <div key={idx} className="text-sm text-muted-foreground">
-                        • {objective.description}
-                      </div>
-                    ))}
+                    {quest.objectives.map((objective, idx) => {
+                      const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId);
+                      const objectiveProgress = quest.progress[progressKey];
+                      
+                      return (
+                        <div key={idx} className="text-sm">
+                          <div className="flex justify-between items-center">
+                            <span className={objectiveProgress?.completed ? "text-green-600" : "text-muted-foreground"}>
+                              • {objective.description}
+                            </span>
+                            {objectiveProgress && (
+                              <span className="text-xs font-medium">
+                                {objectiveProgress.current}/{objectiveProgress.required}
+                              </span>
+                            )}
+                          </div>
+                          {objectiveProgress && (
+                            <Progress 
+                              value={(objectiveProgress.current / objectiveProgress.required) * 100} 
+                              className="h-1 mt-1"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <div className="space-y-2">

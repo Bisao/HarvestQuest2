@@ -6,6 +6,7 @@ import { z } from "zod";
 import type { Player } from "@shared/schema";
 import { GameService } from "./services/game-service";
 import { ExpeditionService } from "./services/expedition-service";
+import { QuestService } from "./services/quest-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -14,6 +15,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize services
   const gameService = new GameService(storage);
   const expeditionService = new ExpeditionService(storage);
+  const questService = new QuestService(storage);
 
   // Get player data
   app.get("/api/player/:username", async (req, res) => {
@@ -812,18 +814,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Player not found" });
       }
 
-      // Combine quest data with player progress
-      const questsWithProgress = allQuests
-        .filter(quest => quest.isActive && quest.requiredLevel <= player.level)
-        .map(quest => {
-          const playerQuest = playerQuests.find(pq => pq.questId === quest.id);
-          return {
-            ...quest,
-            playerQuest: playerQuest || null,
-            status: playerQuest?.status || 'available',
-            progress: playerQuest?.progress || {}
-          };
-        });
+      // Combine quest data with player progress and check objectives
+      const questsWithProgress = await Promise.all(
+        allQuests
+          .filter(quest => quest.isActive && quest.requiredLevel <= player.level)
+          .map(async (quest) => {
+            const playerQuest = playerQuests.find(pq => pq.questId === quest.id);
+            let questProgress = { completed: false, progress: {} };
+            
+            // Check quest objectives if quest is active
+            if (playerQuest && playerQuest.status === 'active') {
+              questProgress = await questService.checkQuestObjectives(playerId, quest.id);
+            }
+            
+            return {
+              ...quest,
+              playerQuest: playerQuest || null,
+              status: playerQuest?.status || 'available',
+              progress: questProgress.progress,
+              canComplete: questProgress.completed && playerQuest?.status === 'active'
+            };
+          })
+      );
 
       res.json(questsWithProgress);
     } catch (error) {
