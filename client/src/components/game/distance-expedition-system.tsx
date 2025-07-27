@@ -53,6 +53,17 @@ export default function DistanceExpeditionSystem({
 
   const queryClient = useQueryClient();
 
+  // Get player weight status for inventory capacity indicator
+  const { data: weightStatus } = useQuery<{
+    currentWeight: number;
+    maxWeight: number;
+    percentage: number;
+    level: number;
+    levelRange: string;
+  }>({
+    queryKey: ["/api/player", playerId, "weight"],
+  });
+
   // Get available resources for selected biome
   const availableResources = biome 
     ? resources.filter(r => Array.isArray(biome.availableResources) && biome.availableResources.includes(r.id))
@@ -420,6 +431,37 @@ export default function DistanceExpeditionSystem({
             </div>
 
             <div className="space-y-4">
+              {/* Inventory Capacity Indicator */}
+              {weightStatus && (
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🎒</span>
+                      <span className="font-medium">Capacidade do Inventário</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-bold text-blue-600">{weightStatus.currentWeight.toFixed(1)}</span>
+                      <span className="text-gray-500">/</span>
+                      <span className="font-bold text-gray-700">{weightStatus.maxWeight.toFixed(1)} kg</span>
+                    </div>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        weightStatus.percentage >= 90 ? 'bg-gradient-to-r from-red-400 to-red-600' :
+                        weightStatus.percentage >= 70 ? 'bg-gradient-to-r from-orange-400 to-red-500' :
+                        'bg-gradient-to-r from-green-400 to-blue-500'
+                      }`}
+                      style={{ width: `${Math.min(weightStatus.percentage, 100)}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-gray-600 mt-1 text-center">
+                    {weightStatus.percentage.toFixed(1)}% utilizado
+                    {weightStatus.percentage >= 90 && " - Quase cheio!"}
+                  </div>
+                </div>
+              )}
+
               {/* Player Position Visual */}
               <div>
                 <div className="flex justify-between mb-2">

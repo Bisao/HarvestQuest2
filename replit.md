@@ -145,6 +145,17 @@ Preferred communication style: Simple, everyday language.
 - **Sistema de requisitos mantido** - alguns recursos precisam de ferramentas específicas para coleta
 - **Interface de seleção por distância** - slider mostra quantos recursos ficam disponíveis em cada distância
 
+**January 27, 2025 - Sistema de Capacidade do Inventário em Tempo Real na Expedição**
+- **Implementado indicador de capacidade na tela de expedição** - adicionado display em tempo real do peso do inventário durante expedições
+- **Interface visual melhorada** - barra de progresso colorida (verde→laranja→vermelho) baseada na porcentagem de uso
+- **Informações detalhadas** - mostra peso atual, peso máximo e porcentagem utilizada com atualização automática
+- **Alerta visual integrado** - aviso "Quase cheio!" quando capacidade ultrapassa 90%
+- **Posicionamento estratégico** - indicador localizado no topo da tela de expedição para monitoramento contínuo
+- **Integração com API existente** - utiliza endpoint `/api/player/:playerId/weight` já implementado no backend
+- **Design responsivo** - indicador compacto que não interfere na experiência de expedição
+- **Atualização em tempo real** - conectado ao sistema de React Query para dados sempre atualizados
+- **Projeto de migração finalizado** - todos os sistemas verificados e funcionando perfeitamente
+
 **January 27, 2025 - Enhanced Forest Biome Update**
 - **Vastly expanded Forest biome with realistic and diverse content** - added 15+ new animals, plants, and materials for balanced gameplay
 - **New Animals Added**:
