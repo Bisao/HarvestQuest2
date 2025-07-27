@@ -16,6 +16,7 @@ interface Quest {
   description: string;
   emoji: string;
   type: string;
+  category?: string;
   requiredLevel: number;
   objectives: any[];
   rewards: {
@@ -39,6 +40,22 @@ export default function QuestsTab({ player }: QuestsTabProps) {
   const { data: quests = [], isLoading } = useQuery<Quest[]>({
     queryKey: [`/api/player/${player.id}/quests`],
   });
+
+  // Group quests by category and status
+  const questsByCategory = quests.reduce((acc, quest) => {
+    const category = quest.category || 'outros';
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(quest);
+    return acc;
+  }, {} as Record<string, Quest[]>);
+
+  const categoryNames: Record<string, string> = {
+    'exploracao': '🗺️ Exploração',
+    'coleta': '📦 Coleta',
+    'caca': '🏹 Caça & Pesca',
+    'crafting': '🔨 Artesanato',
+    'outros': '📋 Outras'
+  };
 
   const startQuestMutation = useMutation({
     mutationFn: async (questId: string) => {

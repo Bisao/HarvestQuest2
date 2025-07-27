@@ -375,6 +375,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Update quest progress for crafted items
+      const outputKeys = Object.keys(recipe.output);
+      for (const itemId of outputKeys) {
+        const quantity = recipe.output[itemId];
+        await questService.updateQuestProgress(playerId, 'craft', { itemId, quantity });
+      }
+      
       res.json({ message: "Item crafted successfully!", recipe });
     } catch (error) {
       console.error("Craft error:", error);
@@ -417,6 +424,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const expedition = await expeditionService.completeExpedition(id);
+      
+      // Update quest progress for expedition completion and resources collected
+      if (expedition && expedition.playerId) {
+        await questService.updateQuestProgress(expedition.playerId, 'expedition', { biomeId: expedition.biomeId });
+        
+        // Update quest progress for resources collected during expedition
+        if (expedition.resourcesCollected) {
+          for (const [resourceId, quantity] of Object.entries(expedition.resourcesCollected)) {
+            await questService.updateQuestProgress(expedition.playerId, 'collect', { 
+              resourceId, 
+              quantity: Number(quantity) 
+            });
+          }
+        }
+      }
+      
       res.json(expedition);
     } catch (error) {
       console.error("Complete expedition error:", error);

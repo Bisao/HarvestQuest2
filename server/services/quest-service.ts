@@ -134,12 +134,44 @@ export class QuestService {
         const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId);
         
         switch (action) {
+          case 'collect':
+            if (objective.type === 'collect' && objective.resourceId === data.resourceId) {
+              if (!currentProgress[progressKey]) {
+                currentProgress[progressKey] = { current: 0, required: objective.quantity };
+              }
+              currentProgress[progressKey].current = Math.min(
+                currentProgress[progressKey].current + (data.quantity || 1), 
+                objective.quantity
+              );
+              currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
+              progressUpdated = true;
+            }
+            break;
+            
           case 'craft':
             if (objective.type === 'craft' && objective.itemId === data.itemId) {
               if (!currentProgress[progressKey]) {
-                currentProgress[progressKey] = { current: 0 };
+                currentProgress[progressKey] = { current: 0, required: objective.quantity };
               }
-              currentProgress[progressKey].current += data.quantity || 1;
+              currentProgress[progressKey].current = Math.min(
+                currentProgress[progressKey].current + (data.quantity || 1),
+                objective.quantity
+              );
+              currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
+              progressUpdated = true;
+            }
+            break;
+            
+          case 'expedition':
+            if (objective.type === 'expedition' && objective.biomeId === data.biomeId) {
+              if (!currentProgress[progressKey]) {
+                currentProgress[progressKey] = { current: 0, required: objective.quantity };
+              }
+              currentProgress[progressKey].current = Math.min(
+                currentProgress[progressKey].current + 1,
+                objective.quantity
+              );
+              currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
               progressUpdated = true;
             }
             break;
