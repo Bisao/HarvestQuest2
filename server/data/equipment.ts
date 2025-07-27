@@ -79,6 +79,166 @@ export const TOOL_EVOLUTIONS: EquipmentEvolution[] = [
         tier: 'avancado'
       }
     ]
+  },
+  {
+    baseType: "fishing_rod", 
+    levels: [
+      {
+        name: "Vara de Pesca Simples",
+        emoji: "🎣",
+        level: 3,
+        effect: "Pesca básica",
+        bonus: { type: "fishing", value: 1 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Vara de Pesca Reforçada",
+        emoji: "🎣",
+        level: 12,
+        effect: "Pesca avançada +25%",
+        bonus: { type: "fishing", value: 2 },
+        weight: 3,
+        tier: 'ferro'
+      },
+      {
+        name: "Vara de Pesca Mágica",
+        emoji: "🎣",
+        level: 24,
+        effect: "Pesca mágica +50%",
+        bonus: { type: "fishing", value: 3 },
+        weight: 2,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "shovel",
+    levels: [
+      {
+        name: "Pá de Madeira",
+        emoji: "🏗️",
+        level: 2,
+        effect: "Escavação básica",
+        bonus: { type: "digging", value: 1 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Pá de Ferro",
+        emoji: "🏗️",
+        level: 9, 
+        effect: "Escavação eficiente",
+        bonus: { type: "digging", value: 2 },
+        weight: 3,
+        tier: 'ferro'
+      },
+      {
+        name: "Pá Élfica",
+        emoji: "🏗️",
+        level: 20,
+        effect: "Escavação mágica",
+        bonus: { type: "digging", value: 3 },
+        weight: 2,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "sickle",
+    levels: [
+      {
+        name: "Foice Improvisada",
+        emoji: "🔪",
+        level: 4,
+        effect: "Colheita básica",
+        bonus: { type: "harvesting", value: 1 },
+        weight: 1,
+        tier: 'improvisado'
+      },
+      {
+        name: "Foice de Ferro", 
+        emoji: "🔪",
+        level: 11,
+        effect: "Colheita eficiente",
+        bonus: { type: "harvesting", value: 2 },
+        weight: 2,
+        tier: 'ferro'
+      },
+      {
+        name: "Foice Élfica",
+        emoji: "🔪",
+        level: 22,
+        effect: "Colheita mágica",
+        bonus: { type: "harvesting", value: 3 },
+        weight: 1,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "knife",
+    levels: [
+      {
+        name: "Faca Improvisada",
+        emoji: "🔪",
+        level: 1,
+        effect: "Corte básico",
+        bonus: { type: "cutting", value: 1 },
+        weight: 1,
+        tier: 'improvisado'
+      },
+      {
+        name: "Faca de Ferro",
+        emoji: "🔪", 
+        level: 6,
+        effect: "Corte preciso",
+        bonus: { type: "cutting", value: 2 },
+        weight: 1,
+        tier: 'ferro'
+      },
+      {
+        name: "Faca Élfica",
+        emoji: "🔪",
+        level: 16,
+        effect: "Corte mágico",
+        bonus: { type: "cutting", value: 3 },
+        weight: 1,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "bucket",
+    levels: [
+      {
+        name: "Balde de Madeira",
+        emoji: "🪣",
+        level: 5,
+        effect: "Transporte de líquidos",
+        bonus: { type: "liquid_storage", value: 10 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Balde de Ferro",
+        emoji: "🪣",
+        level: 13,
+        effect: "Transporte eficiente",
+        bonus: { type: "liquid_storage", value: 20 },
+        weight: 3,
+        tier: 'ferro'
+      },
+      {
+        name: "Balde Mágico",
+        emoji: "🪣",
+        level: 26,
+        effect: "Transporte infinito",
+        bonus: { type: "liquid_storage", value: 50 },
+        weight: 2,
+        tier: 'avancado'
+      }
+    ]
   }
 ];
 
@@ -144,6 +304,70 @@ export const WEAPON_EVOLUTIONS: EquipmentEvolution[] = [
         effect: "Caça de elite",
         bonus: { type: "hunting", value: 4 },
         weight: 2,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "spear",
+    levels: [
+      {
+        name: "Lança Improvisada",
+        emoji: "🗡️",
+        level: 7,
+        effect: "Arma de alcance",
+        bonus: { type: "hunting", value: 2 },
+        weight: 3,
+        tier: 'improvisado'
+      },
+      {
+        name: "Lança de Ferro",
+        emoji: "🗡️",
+        level: 17,
+        effect: "Perfuração aprimorada",
+        bonus: { type: "hunting", value: 3 },
+        weight: 4,
+        tier: 'ferro'
+      },
+      {
+        name: "Lança Élfica",
+        emoji: "🗡️",
+        level: 28,
+        effect: "Perfuração mágica",
+        bonus: { type: "hunting", value: 4 },
+        weight: 3,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "crossbow",
+    levels: [
+      {
+        name: "Besta Simples",
+        emoji: "🏹",
+        level: 14,
+        effect: "Precisão mecânica",
+        bonus: { type: "hunting", value: 3 },
+        weight: 4,
+        tier: 'improvisado'
+      },
+      {
+        name: "Besta de Ferro",
+        emoji: "🏹",
+        level: 23,
+        effect: "Alto impacto",
+        bonus: { type: "hunting", value: 4 },
+        weight: 5,
+        tier: 'ferro'
+      },
+      {
+        name: "Besta Élfica",
+        emoji: "🏹",
+        level: 32,
+        effect: "Precisão divina",
+        bonus: { type: "hunting", value: 5 },
+        weight: 4,
         tier: 'avancado'
       }
     ]

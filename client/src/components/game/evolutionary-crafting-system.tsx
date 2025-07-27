@@ -37,6 +37,41 @@ const EQUIPMENT_FAMILIES = {
     category: "Ferramentas Evolutivas",
     tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
+  fishing_rod: {
+    baseType: "fishing_rod",
+    name: "Vara de Pesca",
+    emoji: "🎣",
+    category: "Ferramentas Evolutivas",
+    tiers: ["Simples", "Reforçada", "Mágica"]
+  },
+  shovel: {
+    baseType: "shovel",
+    name: "Pá",
+    emoji: "🏗️",
+    category: "Ferramentas Evolutivas",
+    tiers: ["de Madeira", "de Ferro", "Élfica"]
+  },
+  sickle: {
+    baseType: "sickle",
+    name: "Foice",
+    emoji: "🔪",
+    category: "Ferramentas Evolutivas",
+    tiers: ["Improvisada", "de Ferro", "Élfica"]
+  },
+  knife: {
+    baseType: "knife",
+    name: "Faca",
+    emoji: "🔪",
+    category: "Ferramentas Evolutivas",
+    tiers: ["Improvisada", "de Ferro", "Élfica"]
+  },
+  bucket: {
+    baseType: "bucket",
+    name: "Balde",
+    emoji: "🪣",
+    category: "Ferramentas Evolutivas",
+    tiers: ["de Madeira", "de Ferro", "Mágico"]
+  },
   
   // Armas
   sword: {
@@ -52,6 +87,20 @@ const EQUIPMENT_FAMILIES = {
     emoji: "🏹", 
     category: "Armas Evolutivas",
     tiers: ["Simples", "Composto", "Élfico"]
+  },
+  spear: {
+    baseType: "spear",
+    name: "Lança",
+    emoji: "🗡️",
+    category: "Armas Evolutivas",
+    tiers: ["Improvisada", "de Ferro", "Élfica"]
+  },
+  crossbow: {
+    baseType: "crossbow",
+    name: "Besta",
+    emoji: "🏹",
+    category: "Armas Evolutivas",
+    tiers: ["Simples", "de Ferro", "Élfica"]
   },
   
   // Armaduras
