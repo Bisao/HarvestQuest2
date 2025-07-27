@@ -143,6 +143,13 @@ export default function ExpeditionSystem({
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "quests"] });
+      
+      // Force refetch to ensure UI updates immediately
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
+        queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
+        queryClient.refetchQueries({ queryKey: ["/api/player/Player1"] });
+      }, 100);
 
       toast({
         title: "Expedição Concluída!",
