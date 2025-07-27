@@ -105,15 +105,6 @@ Preferred communication style: Simple, everyday language.
 - **Alimentos Evolutivos Agrupados** - Carnes, Ensopados, Cogumelos, Peixes com nomenclatura padronizada
 - **Sistema de categorização expandido** - agora inclui Equipamentos Evolutivos e Utensílios Evolutivos
 
-**January 27, 2025 - Interface de Inventário Otimizada**
-- **Status do jogador integrado com equipamentos** - informações condensadas no painel de equipamentos para economizar espaço
-- **Barras de status minimalistas** - apenas ícone + barra para fome (🍖), sede (💧) e peso (🎒)
-- **Layout original mantido** - grid 9x4 estilo Minecraft preservado conforme solicitação do usuário
-- **Filtros simplificados** - busca por texto e filtros rápidos (Recursos, Equipamentos, Raros)
-- **Painel de detalhes** - aparece na parte inferior quando item é selecionado
-- **Informações técnicas removidas** - sem detalhes desnecessários sobre faixas de nível e próximos aumentos de peso
-- **Interface otimizada** - layout 4 colunas (equipamentos + inventário principal) para melhor organização
-
 **January 27, 2025 - Enhanced Forest Biome Update**
 - **Vastly expanded Forest biome with realistic and diverse content** - added 15+ new animals, plants, and materials for balanced gameplay
 - **New Animals Added**:
