@@ -156,6 +156,16 @@ Preferred communication style: Simple, everyday language.
 - **Atualização em tempo real** - conectado ao sistema de React Query para dados sempre atualizados
 - **Projeto de migração finalizado** - todos os sistemas verificados e funcionando perfeitamente
 
+**January 27, 2025 - Sistema de Comunicação Inventário-Expedição Corrigido**
+- **Integração completa entre sistema de expedições e inventário existente** - garantida comunicação perfeita entre ambos sistemas
+- **Métodos de storage corrigidos** - substituído uso incorreto de `getInventory()` por `getPlayerInventory()` e métodos adequados
+- **Sistema de atualização em tempo real** - inventário atualiza automaticamente durante coletas com React Query invalidation
+- **Condições de parada aprimoradas** - expedições param quando fome/sede atingem 10% ou inventário 90% cheio
+- **Taxa de coleta otimizada** - aumentada para 85% para melhor experiência de jogo
+- **Redução de recursos mais realista** - fome/sede reduzem 0.5 por coleta ao invés de 1.0
+- **Invalidação de cache completa** - todas as queries relacionadas são atualizadas após coletas
+- **Sistema testado e funcional** - verificado que recursos são adicionados corretamente ao inventário
+
 **January 27, 2025 - Enhanced Forest Biome Update**
 - **Vastly expanded Forest biome with realistic and diverse content** - added 15+ new animals, plants, and materials for balanced gameplay
 - **New Animals Added**:

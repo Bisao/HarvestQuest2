@@ -182,9 +182,10 @@ export default function SimpleExpeditionSystem({
           return newState;
         });
 
-        // Refresh weight status and inventory after collection
+        // Refresh weight status and inventory after collection for real-time updates
         queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
         queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+        queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
 
       } catch (error) {
         console.error('Simulation error:', error);
