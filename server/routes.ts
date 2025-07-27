@@ -7,6 +7,9 @@ import type { Player } from "@shared/schema";
 import { GameService } from "./services/game-service";
 import { ExpeditionService } from "./services/expedition-service";
 import { QuestService } from "./services/quest-service";
+import { registerHealthRoutes } from "./routes/health";
+import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
+import { registerAdminRoutes } from "./routes/admin";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -16,6 +19,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gameService = new GameService(storage);
   const expeditionService = new ExpeditionService(storage);
   const questService = new QuestService(storage);
+
+  // Register health and monitoring routes
+  registerHealthRoutes(app);
+
+  // Register enhanced game routes with full validation and caching
+  registerEnhancedGameRoutes(app, storage, gameService, expeditionService);
+
+  // Register admin routes for development
+  registerAdminRoutes(app);
 
   // Get player data
   app.get("/api/player/:username", async (req, res) => {
@@ -376,9 +388,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Update quest progress for crafted items
-      const outputKeys = Object.keys(recipe.output);
+      const outputKeys = Object.keys(recipe.output as Record<string, any>);
       for (const itemId of outputKeys) {
-        const quantity = recipe.output[itemId];
+        const quantity = (recipe.output as Record<string, any>)[itemId];
         await questService.updateQuestProgress(playerId, 'craft', { itemId, quantity });
       }
       
@@ -430,8 +442,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await questService.updateQuestProgress(expedition.playerId, 'expedition', { biomeId: expedition.biomeId });
         
         // Update quest progress for resources collected during expedition
-        if (expedition.resourcesCollected) {
-          for (const [resourceId, quantity] of Object.entries(expedition.resourcesCollected)) {
+        if (expedition.collectedResources) {
+          const collected = expedition.collectedResources as Record<string, any>;
+          for (const [resourceId, quantity] of Object.entries(collected)) {
             await questService.updateQuestProgress(expedition.playerId, 'collect', { 
               resourceId, 
               quantity: Number(quantity) 
