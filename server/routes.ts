@@ -361,12 +361,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           console.log(`Added ${quantity}x ${resourceItem.name} to storage for player ${playerId}`);
         } else {
-          // Find the actual equipment by toolType or name matching
+          // Check if itemType is actually an equipment ID
           const allEquipment = await storage.getAllEquipment();
-          const equipmentItem = allEquipment.find(eq => 
-            eq.toolType === itemType || 
-            eq.name.toLowerCase().includes(itemType.toLowerCase())
-          );
+          const equipmentItem = allEquipment.find(eq => eq.id === itemType);
 
           if (equipmentItem) {
               if (destination === 'inventory') {
@@ -410,15 +407,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 console.log(`Added ${quantity}x ${equipmentItem.name} to storage for player ${playerId}`);
               }
           } else {
-            console.error(`Item not found for type: ${itemType}`);
+            console.error(`Equipment not found for ID: ${itemType}`);
           }
         }
       }
 
-      // Update quest progress for crafted items
-      const outputKeys = Object.keys(recipe.output as Record<string, any>);
-      for (const itemId of outputKeys) {
-        const quantity = (recipe.output as Record<string, any>)[itemId];
+      // Update quest progress for crafted items - using the item IDs from recipe outputs
+      const outputs = recipe.output as Record<string, any>;
+      for (const [itemId, quantity] of Object.entries(outputs)) {
+        console.log(`[CRAFT DEBUG] Updating quest progress for crafted item: ${itemId}, quantity: ${quantity}`);
         await questService.updateQuestProgress(playerId, 'craft', { itemId, quantity });
       }
       

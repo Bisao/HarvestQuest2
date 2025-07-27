@@ -21,23 +21,18 @@ export class QuestService {
     for (const objective of objectives) {
       switch (objective.type) {
         case 'collect': {
-          const storageItems = await this.storage.getPlayerStorage(playerId);
-          const inventoryItems = await this.storage.getPlayerInventory(playerId);
-          
-          // Count items in both storage and inventory
-          const storageItem = storageItems.find(item => item.resourceId === objective.resourceId);
-          const inventoryItem = inventoryItems.find(item => item.resourceId === objective.resourceId);
-          
-          const totalQuantity = (storageItem?.quantity || 0) + (inventoryItem?.quantity || 0);
+          // Only use stored progress, not current inventory/storage counts
+          // to prevent retroactive quest completion
+          const collectProgress = (playerQuest.progress as any)?.[objective.type + '_' + objective.resourceId] || { current: 0 };
           const required = objective.quantity || 1;
           
           progress[objective.type + '_' + objective.resourceId] = {
-            current: Math.min(totalQuantity, required),
+            current: collectProgress.current,
             required: required,
-            completed: totalQuantity >= required
+            completed: collectProgress.current >= required
           };
           
-          if (totalQuantity < required) {
+          if (collectProgress.current < required) {
             allCompleted = false;
           }
           break;
