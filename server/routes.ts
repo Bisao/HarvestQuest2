@@ -934,16 +934,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Player level too low" });
       }
 
-      // Create player quest with current timestamp in seconds
+      // Create player quest
       const playerQuest = await storage.createPlayerQuest({
         playerId,
         questId,
         status: "active",
-        progress: {},
+        progress: {}
+      });
+
+      // Update with timestamp
+      const updatedPlayerQuest = await storage.updatePlayerQuest(playerQuest.id, {
         startedAt: Math.floor(Date.now() / 1000)
       });
 
-      res.json({ message: "Quest started successfully", playerQuest });
+      res.json({ message: "Quest started successfully", playerQuest: updatedPlayerQuest });
     } catch (error) {
       console.error("Start quest error:", error);
       res.status(500).json({ message: "Failed to start quest" });
@@ -1014,10 +1018,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Mark quest as completed
+      // Mark quest as completed with timestamp in seconds
       const completedPlayerQuest = await storage.updatePlayerQuest(playerQuest.id, {
         status: 'completed',
-        completedAt: Date.now()
+        completedAt: Math.floor(Date.now() / 1000)
       });
 
       res.json({
@@ -1026,7 +1030,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newLevel: newLevel !== player.level ? newLevel : undefined
       });
     } catch (error) {
-      res.status(500).json({ message: "Failed to complete quest" });
+      console.error("Complete quest error:", error);
+      res.status(500).json({ message: "Failed to complete quest", error: error.message });
     }
   });
 
