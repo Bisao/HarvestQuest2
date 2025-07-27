@@ -435,6 +435,8 @@ export default function Game() {
                 recipes={recipes}
                 resources={resources}
                 playerLevel={player.level}
+                playerId={player.id}
+                isBlocked={!!activeExpedition}
               />
             )}
           </div>
