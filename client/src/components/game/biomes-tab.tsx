@@ -82,13 +82,32 @@ function BiomeResourceTabs({ biomeResources, unlocked }: { biomeResources: Resou
             <ScrollArea className="h-32 w-full rounded-md border p-2">
               <div className={`grid grid-cols-1 gap-1 text-xs ${unlocked ? "" : "text-gray-500"}`}>
                 {tab.resources.length > 0 ? (
-                  tab.resources.map((resource) => (
-                    <div key={resource.id} className="flex items-center space-x-2 p-1 rounded hover:bg-gray-50">
-                      <span className="text-sm">{resource.emoji}</span>
-                      <span className="flex-1">{resource.name}</span>
-                      <span className="text-gray-400 text-xs">XP: {resource.experienceValue}</span>
-                    </div>
-                  ))
+                  tab.resources.map((resource) => {
+                    // Função para mostrar requisitos de ferramentas
+                    const getRequirementDisplay = (requiredTool: string | null) => {
+                      if (!requiredTool) return "✋ Mãos";
+                      
+                      const toolDisplayMap: Record<string, string> = {
+                        "knife": "🔪 Faca",
+                        "axe": "🪓 Machado", 
+                        "pickaxe": "⛏️ Picareta",
+                        "shovel": "🔺 Pá",
+                        "fishing_rod": "🎣 Vara de Pesca",
+                        "weapon_and_knife": "⚔️ Arma + Faca",
+                        "bucket": "🪣 Balde"
+                      };
+                      
+                      return toolDisplayMap[requiredTool] || `🔧 ${requiredTool}`;
+                    };
+
+                    return (
+                      <div key={resource.id} className="flex items-center space-x-2 p-1 rounded hover:bg-gray-50">
+                        <span className="text-sm">{resource.emoji}</span>
+                        <span className="flex-1">{resource.name}</span>
+                        <span className="text-gray-400 text-xs">{getRequirementDisplay(resource.requiredTool)}</span>
+                      </div>
+                    );
+                  })
                 ) : (
                   <div className="text-center text-gray-400 py-4">
                     Nenhum recurso desta categoria
