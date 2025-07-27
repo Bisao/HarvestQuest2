@@ -284,6 +284,9 @@ export default function ExpeditionSystem({
       equipment.find(eq => eq.id === player.equippedWeapon) : null;
 
     return biomeResources.filter(resource => {
+      // BASIC RESOURCES ARE ALWAYS SELECTABLE - they are known to all players
+      if (resource.type === "basic") return true;
+
       // If resource doesn't require a tool, it's always collectable
       if (!resource.requiredTool) return true;
 

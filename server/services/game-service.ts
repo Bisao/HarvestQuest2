@@ -78,7 +78,13 @@ export class GameService {
   // Check if player has required tool for resource
   async hasRequiredTool(playerId: string, resourceId: string): Promise<boolean> {
     const resource = await this.storage.getResource(resourceId);
-    if (!resource || !resource.requiredTool) return true;
+    if (!resource) return false;
+    
+    // BASIC RESOURCES ARE ALWAYS COLLECTIBLE - they are known to all players
+    if (resource.type === "basic") return true;
+    
+    // If resource doesn't require a tool, it's always collectable
+    if (!resource.requiredTool) return true;
     
     const player = await this.storage.getPlayer(playerId);
     if (!player) return false;
