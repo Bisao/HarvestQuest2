@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, SortAsc, Package, Star } from "lucide-react";
+import { Search, Filter, SortAsc, Package, Star, ChevronDown, ChevronUp } from "lucide-react";
 import EquipmentSelectorModal from "./equipment-selector-modal";
 import type { Resource, Equipment, Player } from "@shared/schema";
 
@@ -50,6 +50,10 @@ export default function EnhancedInventory({
   const [filterRarity, setFilterRarity] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  
+  // Expand/collapse states
+  const [equipmentExpanded, setEquipmentExpanded] = useState(true);
+  const [inventoryExpanded, setInventoryExpanded] = useState(true);
   
   const { toast } = useToast();
 
@@ -504,19 +508,30 @@ export default function EnhancedInventory({
                 <p className="text-sm text-gray-600">Nível {player.level} • {player.experience} XP</p>
               </div>
             </div>
-            <div className="text-right">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-yellow-600">💰</span>
-                <span className="font-bold">{player.coins}</span>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-yellow-600">💰</span>
+                  <span className="font-bold">{player.coins}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-red-600">🍖</span>
+                  <span className="font-bold">{player.hunger}/{player.maxHunger}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-600">💧</span>
+                  <span className="font-bold">{player.thirst}/{player.maxThirst}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-red-600">🍖</span>
-                <span className="font-bold">{player.hunger}/{player.maxHunger}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600">💧</span>
-                <span className="font-bold">{player.thirst}/{player.maxThirst}</span>
-              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setEquipmentExpanded(!equipmentExpanded)}
+                className="ml-3"
+              >
+                {equipmentExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                <span className="ml-1">⚔️ Equipamentos</span>
+              </Button>
             </div>
           </CardTitle>
         </CardHeader>
@@ -645,6 +660,14 @@ export default function EnhancedInventory({
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setInventoryExpanded(!inventoryExpanded)}
+                  className="p-1"
+                >
+                  {inventoryExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
                 <span>🎒</span>
                 Inventário Principal
                 <Badge variant="outline" className="ml-2">
@@ -661,6 +684,7 @@ export default function EnhancedInventory({
               </Button>
             </CardTitle>
           </CardHeader>
+          {inventoryExpanded && (
           <CardContent>
             {/* Enhanced Filters and Search */}
             <div className="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg">
@@ -937,6 +961,7 @@ export default function EnhancedInventory({
               </Card>
             )}
           </CardContent>
+          )}
         </Card>
       </div>
 
