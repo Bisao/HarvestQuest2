@@ -17,6 +17,7 @@ Preferred communication style: Simple, everyday language.
 - **Expandable Results Window**: Completed expeditions show compact results, expandable to detailed view without opening central modal
 - **Auto-Minimize on Completion**: Expeditions automatically switch to minimized mode when completed, avoiding modal popup
 - **Fixed Completion Buttons**: Removed "Expedição Finalizada" message and fixed API calls to properly complete expeditions
+- **Reduced Expedition Requirements**: Expeditions now require minimum 5 hunger/thirst instead of 30 for easier gameplay
 
 **January 27, 2025 - EXPEDITION MODAL STATE FIX**
 - **Fixed Critical Expedition Bug**: Resolved issue where minimizing and reopening expeditions showed resource selection instead of progress

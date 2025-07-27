@@ -24,10 +24,10 @@ export class ExpeditionService {
     if (!biome) throw new Error("Biome not found");
 
     // Check if player has enough hunger and thirst for expedition
-    if (player.hunger < 30) {
+    if (player.hunger < 5) {
       throw new Error("Jogador com muita fome para expedição");
     }
-    if (player.thirst < 30) {
+    if (player.thirst < 5) {
       throw new Error("Jogador com muita sede para expedição");
     }
 
