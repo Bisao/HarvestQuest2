@@ -46,6 +46,17 @@ export default function EnhancedInventory({
     queryKey: ["/api/inventory", playerId],
   });
 
+  // Get weight status from new API
+  const { data: weightStatus } = useQuery<{
+    currentWeight: number;
+    maxWeight: number;
+    percentage: number;
+    level: number;
+    levelRange: string;
+  }>({
+    queryKey: ["/api/player", playerId, "weight"],
+  });
+
   // Helper functions to get items by ID
   const getResourceById = (resourceId: string) => {
     return resources.find(r => r.id === resourceId);
@@ -397,12 +408,42 @@ export default function EnhancedInventory({
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span>Capacidade do Inventário:</span>
-                <span>{player.inventoryWeight}kg / {player.maxInventoryWeight}kg</span>
+                <div className="text-right">
+                  <Badge variant="outline" className="mr-2">
+                    {weightStatus?.currentWeight || 0}kg / {weightStatus?.maxWeight || 20}kg
+                  </Badge>
+                  {weightStatus && (
+                    <Badge variant="secondary">
+                      Nível {weightStatus.level} (Faixa {weightStatus.levelRange})
+                    </Badge>
+                  )}
+                </div>
               </div>
               <Progress 
-                value={(player.inventoryWeight / player.maxInventoryWeight) * 100} 
+                value={weightStatus?.percentage || 0} 
                 className="w-full h-2"
               />
+              
+              {/* Progressive weight system info */}
+              {weightStatus && (
+                <div className="text-xs text-muted-foreground mt-2">
+                  <div className="flex justify-between">
+                    <span>Capacidade por nível:</span>
+                    <span>Nível {weightStatus.levelRange} → {weightStatus.maxWeight}kg</span>
+                  </div>
+                  <div className="mt-1 text-center">
+                    {weightStatus.level < 6 && "Próximo aumento: Nível 6 → 30kg"}
+                    {weightStatus.level >= 6 && weightStatus.level < 11 && "Próximo aumento: Nível 11 → 40kg"}
+                    {weightStatus.level >= 11 && weightStatus.level < 16 && "Próximo aumento: Nível 16 → 50kg"}
+                    {weightStatus.level >= 16 && weightStatus.level < 21 && "Próximo aumento: Nível 21 → 60kg"}
+                    {weightStatus.level >= 21 && weightStatus.level < 26 && "Próximo aumento: Nível 26 → 70kg"}
+                    {weightStatus.level >= 26 && weightStatus.level < 31 && "Próximo aumento: Nível 31 → 80kg"}
+                    {weightStatus.level >= 31 && weightStatus.level < 36 && "Próximo aumento: Nível 36 → 90kg"}
+                    {weightStatus.level >= 36 && weightStatus.level < 41 && "Próximo aumento: Nível 41 → 100kg"}
+                    {weightStatus.level >= 41 && "Capacidade máxima atingida!"}
+                  </div>
+                </div>
+              )}
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">

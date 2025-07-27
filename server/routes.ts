@@ -86,6 +86,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get player weight status
+  app.get("/api/player/:playerId/weight", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+      
+      const currentWeight = await gameService.calculateInventoryWeight(playerId);
+      const maxWeight = gameService.calculateMaxInventoryWeight(player);
+      
+      res.json({
+        currentWeight,
+        maxWeight,
+        percentage: Math.round((currentWeight / maxWeight) * 100),
+        level: player.level,
+        levelRange: gameService.getLevelRange(player.level)
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get weight status" });
+    }
+  });
+
   // Get player storage
   app.get("/api/storage/:playerId", async (req, res) => {
     try {

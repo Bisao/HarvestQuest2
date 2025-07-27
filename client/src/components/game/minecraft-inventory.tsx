@@ -23,22 +23,30 @@ interface MinecraftInventoryProps {
   playerId: string;
   resources: Resource[];
   equipment: Equipment[];
+}
+
+interface WeightStatus {
   currentWeight: number;
   maxWeight: number;
+  percentage: number;
+  level: number;
+  levelRange: string;
 }
 
 export default function MinecraftInventory({
   playerId,
   resources,
-  equipment,
-  currentWeight,
-  maxWeight
+  equipment
 }: MinecraftInventoryProps) {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const { toast } = useToast();
 
   const { data: inventory = [] } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory", playerId],
+  });
+
+  const { data: weightStatus } = useQuery<WeightStatus>({
+    queryKey: ["/api/player", playerId, "weight"],
   });
 
   // Equipment slots organized in a symmetrical layout
@@ -120,20 +128,45 @@ export default function MinecraftInventory({
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>📊 Status do Jogador</span>
-            <div className="text-sm">
+            <div className="text-sm space-y-1">
               <Badge variant="outline">
-                Peso: {currentWeight}kg / {maxWeight}kg
+                Peso: {weightStatus?.currentWeight || 0}kg / {weightStatus?.maxWeight || 20}kg
               </Badge>
+              {weightStatus && (
+                <Badge variant="secondary" className="ml-2">
+                  Nível {weightStatus.level} (Faixa {weightStatus.levelRange})
+                </Badge>
+              )}
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex justify-between text-sm">
               <span>Capacidade do Inventário:</span>
-              <span>{Math.round((currentWeight / maxWeight) * 100)}%</span>
+              <span>{weightStatus?.percentage || 0}%</span>
             </div>
-            <Progress value={(currentWeight / maxWeight) * 100} className="w-full" />
+            <Progress value={weightStatus?.percentage || 0} className="w-full" />
+            
+            {weightStatus && (
+              <div className="text-xs text-muted-foreground">
+                <div className="flex justify-between">
+                  <span>Capacidade por nível:</span>
+                  <span>Nível {weightStatus.levelRange} → {weightStatus.maxWeight}kg</span>
+                </div>
+                <div className="mt-1 text-center">
+                  {weightStatus.level < 6 && "Próximo aumento: Nível 6 → 30kg"}
+                  {weightStatus.level >= 6 && weightStatus.level < 11 && "Próximo aumento: Nível 11 → 40kg"}
+                  {weightStatus.level >= 11 && weightStatus.level < 16 && "Próximo aumento: Nível 16 → 50kg"}
+                  {weightStatus.level >= 16 && weightStatus.level < 21 && "Próximo aumento: Nível 21 → 60kg"}
+                  {weightStatus.level >= 21 && weightStatus.level < 26 && "Próximo aumento: Nível 26 → 70kg"}
+                  {weightStatus.level >= 26 && weightStatus.level < 31 && "Próximo aumento: Nível 31 → 80kg"}
+                  {weightStatus.level >= 31 && weightStatus.level < 36 && "Próximo aumento: Nível 36 → 90kg"}
+                  {weightStatus.level >= 36 && weightStatus.level < 41 && "Próximo aumento: Nível 41 → 100kg"}
+                  {weightStatus.level >= 41 && "Capacidade máxima atingida!"}
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
