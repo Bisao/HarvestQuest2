@@ -283,9 +283,7 @@ export default function EvolutionaryCraftingSystem({
     const categories: Record<string, Recipe[]> = {
       "Materiais Básicos": [],
       "Ferramentas Evolutivas": [],
-      "Ferramentas Especializadas": [],
       "Armas Evolutivas": [],
-      "Armas Adicionais": [],
       "Armaduras Evolutivas": [],
       "Equipamentos Utilitários": [],
       "Utensílios de Cozinha": [],
@@ -299,26 +297,19 @@ export default function EvolutionaryCraftingSystem({
       if (name.includes("barbante") || name.includes("cola natural")) {
         categories["Materiais Básicos"].push(recipe);
       }
-      // Ferramentas evolutivas (machado, picareta)
-      else if (name.includes("machado") || name.includes("picareta")) {
-        categories["Ferramentas Evolutivas"].push(recipe);
-      }
-      // Ferramentas especializadas
-      else if (name.includes("pá") || name.includes("vara") || 
+      // Ferramentas evolutivas - TODAS as ferramentas com variações evolutivas
+      else if (name.includes("machado") || name.includes("picareta") || 
+               name.includes("vara de pesca") || name.includes("pá") ||
                name.includes("foice") || name.includes("faca") || 
                name.includes("balde")) {
-        categories["Ferramentas Especializadas"].push(recipe);
+        categories["Ferramentas Evolutivas"].push(recipe);
       }
-      // Armas evolutivas (espadas e arcos)
-      else if (name.includes("espada") || name.includes("arco")) {
+      // Armas evolutivas - TODAS as armas com variações evolutivas
+      else if (name.includes("espada") || name.includes("arco") ||
+               name.includes("lança") || name.includes("besta")) {
         categories["Armas Evolutivas"].push(recipe);
       }
-      // Armas adicionais
-      else if (name.includes("lança") || name.includes("besta") || 
-               name.includes("clava") || name.includes("martelo")) {
-        categories["Armas Adicionais"].push(recipe);
-      }
-      // Armaduras e equipamentos de proteção
+      // Armaduras evolutivas - TODAS as armaduras com variações evolutivas
       else if (name.includes("capacete") || name.includes("peitoral") || 
                name.includes("calças") || name.includes("botas") ||
                name.includes("mochila") || name.includes("bolsa")) {
@@ -330,8 +321,7 @@ export default function EvolutionaryCraftingSystem({
         categories["Equipamentos Utilitários"].push(recipe);
       }
       // Utensílios de cozinha
-      else if (name.includes("panela") || name.includes("garrafa") || 
-               name.includes("balde")) {
+      else if (name.includes("panela") || name.includes("garrafa")) {
         categories["Utensílios de Cozinha"].push(recipe);
       }
       // Consumíveis (comidas e bebidas)
@@ -404,7 +394,7 @@ export default function EvolutionaryCraftingSystem({
     return "BÁSICO";
   };
 
-  // Render do carrossel evolutivo
+  // Render do carrossel evolutivo com tamanho fixo e simétrico
   const renderEvolutionaryCarousel = (familyType: string, familyRecipes: Recipe[]) => {
     const family = EQUIPMENT_FAMILIES[familyType as keyof typeof EQUIPMENT_FAMILIES];
     if (!family) return null;
@@ -429,39 +419,39 @@ export default function EvolutionaryCraftingSystem({
     };
 
     return (
-      <div className={`border-2 rounded-lg p-4 ${getTierColor(currentRecipe.name)}`}>
-        {/* Header com navegação */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl">{family.emoji}</span>
+      <div className={`border-2 rounded-lg p-3 h-40 flex flex-col ${getTierColor(currentRecipe.name)}`}>
+        {/* Header compacto com navegação */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-1">
+            <span className="text-lg">{family.emoji}</span>
             <div>
-              <h4 className="font-bold text-sm">{currentRecipe.name}</h4>
-              <div className="flex items-center space-x-2 text-xs">
-                <span className="font-semibold">{getTierLabel(currentRecipe.name)}</span>
+              <h4 className="font-semibold text-xs">{currentRecipe.name}</h4>
+              <div className="flex items-center space-x-1 text-xs">
+                <span className="font-medium text-xs">{getTierLabel(currentRecipe.name)}</span>
                 <span>•</span>
                 <span>Nível {currentRecipe.requiredLevel}</span>
               </div>
             </div>
           </div>
           
-          {/* Controles do carrossel */}
+          {/* Controles compactos do carrossel */}
           <div className="flex items-center space-x-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigateCarousel('prev')}
               disabled={currentIndex === 0}
-              className="h-8 w-8 p-0"
+              className="h-6 w-6 p-0"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3 h-3" />
             </Button>
             
-            {/* Indicadores de pontos */}
-            <div className="flex space-x-1 mx-2">
+            {/* Indicadores de pontos menores */}
+            <div className="flex space-x-0.5 mx-1">
               {sortedRecipes.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-2 h-2 rounded-full ${
+                  className={`w-1.5 h-1.5 rounded-full ${
                     index === currentIndex ? 'bg-current' : 'bg-current opacity-30'
                   }`}
                 />
@@ -473,16 +463,16 @@ export default function EvolutionaryCraftingSystem({
               size="sm"
               onClick={() => navigateCarousel('next')}
               disabled={currentIndex === sortedRecipes.length - 1}
-              className="h-8 w-8 p-0"
+              className="h-6 w-6 p-0"
             >
-              <ChevronRightIcon className="w-4 h-4" />
+              <ChevronRightIcon className="w-3 h-3" />
             </Button>
           </div>
         </div>
 
-        {/* Ingredientes */}
-        <div className="space-y-2 mb-4">
-          <h5 className="text-xs font-semibold">Ingredientes:</h5>
+        {/* Ingredientes compactos */}
+        <div className="flex-1 space-y-1 mb-2 overflow-y-auto">
+          <h5 className="text-xs font-semibold text-gray-700">Ingredientes:</h5>
           {ingredients.map(({ resource, quantity }, index) => {
             if (!resource) return null;
             const available = getStorageQuantity(resource.id);
@@ -507,11 +497,11 @@ export default function EvolutionaryCraftingSystem({
           })}
         </div>
 
-        {/* Botão de craft */}
+        {/* Botão compacto */}
         <Button
           onClick={() => craftMutation.mutate({ recipeId: currentRecipe.id })}
           disabled={!canCraft || craftMutation.isPending || isBlocked}
-          className={`w-full text-xs ${
+          className={`w-full text-xs h-8 ${
             canCraft 
               ? "bg-green-600 hover:bg-green-700 text-white" 
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -525,22 +515,22 @@ export default function EvolutionaryCraftingSystem({
     );
   };
 
-  // Render de receita simples (não evolutiva)
+  // Render de receita simples (não evolutiva) - mesmo tamanho compacto
   const renderSimpleRecipe = (recipe: Recipe) => {
     const canCraft = canCraftRecipe(recipe);
     const ingredients = getRecipeIngredients(recipe);
 
     return (
-      <div key={recipe.id} className="border rounded-lg p-3 bg-white shadow-sm">
-        <div className="flex items-center space-x-2 mb-2">
+      <div key={recipe.id} className="border rounded-lg p-3 bg-white shadow-sm h-40 flex flex-col">
+        <div className="flex items-center space-x-1 mb-2">
           <span className="text-lg">{recipe.emoji || "🔧"}</span>
           <div>
-            <h4 className="font-semibold text-sm">{recipe.name}</h4>
+            <h4 className="font-semibold text-xs">{recipe.name}</h4>
             <p className="text-xs text-gray-600">Nível {recipe.requiredLevel}</p>
           </div>
         </div>
 
-        <div className="space-y-1 mb-3">
+        <div className="flex-1 space-y-1 mb-2 overflow-y-auto">
           <h5 className="text-xs font-semibold text-gray-700">Ingredientes:</h5>
           {ingredients.map(({ resource, quantity }, index) => {
             if (!resource) return null;
@@ -569,7 +559,7 @@ export default function EvolutionaryCraftingSystem({
         <Button
           onClick={() => craftMutation.mutate({ recipeId: recipe.id })}
           disabled={!canCraft || craftMutation.isPending || isBlocked}
-          className={`w-full text-xs ${
+          className={`w-full text-xs h-8 ${
             canCraft 
               ? "bg-green-600 hover:bg-green-700 text-white" 
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -619,16 +609,20 @@ export default function EvolutionaryCraftingSystem({
 
               {isExpanded && (
                 <div className="p-4 space-y-4">
-                  {/* Grupos evolutivos com carrossel */}
-                  {Object.entries(evolutionaryGroups).map(([familyType, familyRecipes]) => (
-                    <div key={familyType}>
-                      {renderEvolutionaryCarousel(familyType, familyRecipes)}
+                  {/* Grupos evolutivos com carrossel em grid compacto */}
+                  {Object.keys(evolutionaryGroups).length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                      {Object.entries(evolutionaryGroups).map(([familyType, familyRecipes]) => (
+                        <div key={familyType}>
+                          {renderEvolutionaryCarousel(familyType, familyRecipes)}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                   
-                  {/* Receitas não evolutivas em grid */}
+                  {/* Receitas não evolutivas em grid compacto */}
                   {nonEvolutionary.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                       {nonEvolutionary.map(recipe => renderSimpleRecipe(recipe))}
                     </div>
                   )}

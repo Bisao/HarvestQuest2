@@ -77,6 +77,18 @@ Preferred communication style: Simple, everyday language.
 - **Sistema de carrossel por família** - cada tipo de equipamento (machado, espada, capacete) tem seu próprio carrossel
 - Sistema anterior substituído pelo novo EvolutionaryCraftingSystem para melhor organização e experiência do usuário
 
+**January 27, 2025 - Cards Compactos e Simétricos**
+- **Padronizados todos os cards de crafting** com altura fixa de 160px (h-40) para total simetria visual
+- **Layout compacto** - todos os equipamentos evolutivos e simples têm exatamente o mesmo tamanho
+- **Grid responsivo otimizado** - 4-5 colunas em telas grandes para melhor aproveitamento do espaço  
+- **Controles de carrossel reduzidos** - botões menores (6x6) e pontos indicadores compactos
+- **Textos otimizados** - tamanhos de fonte reduzidos mas mantendo legibilidade
+- **Todas as ferramentas, armas e equipamentos são agora evolutivos** com 3 tiers cada:
+  - Ferramentas: Machado, Picareta, Vara de Pesca, Pá, Foice, Faca, Balde
+  - Armas: Espada, Arco, Lança, Besta
+  - Armaduras: Capacete, Peitoral, Calças, Botas, Mochila, Bolsa de Comida
+- **Design totalmente simétrico** - usuário solicitou cards pequenos e uniformes em tamanho
+
 **January 27, 2025 - Enhanced Forest Biome Update**
 - **Vastly expanded Forest biome with realistic and diverse content** - added 15+ new animals, plants, and materials for balanced gameplay
 - **New Animals Added**:
