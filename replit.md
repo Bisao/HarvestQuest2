@@ -117,7 +117,10 @@ Preferred communication style: Simple, everyday language.
 - **Alimentos Evolutivos Agrupados** - Carnes, Ensopados, Cogumelos, Peixes com nomenclatura padronizada
 - **Sistema de categorização expandido** - agora inclui Equipamentos Evolutivos e Utensílios Evolutivos
 
-**January 27, 2025 - Sistema de Expedições Corrigido e Otimizado**
+**January 27, 2025 - Sistema de Expedições com Emojis Visuais Implementado**
+- **Indicadores visuais de posição do jogador** - emojis 🏕️ (acampamento), 🚶‍♂️‍➡️ (saindo), 🚶‍♂️ (voltando)
+- **Status contextual de coleta** - "Procurando recursos..." → "Coletando [emoji] [recurso]..." → "Caçando [emoji] [animal]..."
+- **Sistema visual completo** - barra de progresso mantida + indicadores emoji para melhor experiência
 - **Corrigido sistema de timing das expedições** - recursos agora respeitam tempo de coleta individual
 - **Sistema de coleta sequencial implementado** - apenas 1 recurso é coletado por vez conforme especificado
 - **Corrigidos erros TypeScript no serviço de distância** para evitar falhas de expedição

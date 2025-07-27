@@ -27,6 +27,7 @@ interface ExpeditionState {
   collectedResources: Record<string, number>;
   autoReturnTrigger: string | null;
   timeRemaining: number;
+  lastCollectedResource: string | null;
 }
 
 export default function DistanceExpeditionSystem({
@@ -47,6 +48,7 @@ export default function DistanceExpeditionSystem({
     collectedResources: {},
     autoReturnTrigger: null,
     timeRemaining: 0,
+    lastCollectedResource: null,
   });
 
   const queryClient = useQueryClient();
@@ -179,6 +181,7 @@ export default function DistanceExpeditionSystem({
               phase: 'completed',
               autoReturnTrigger: result.returnReason,
               collectedResources: completedExpedition.collectedResources || prev.collectedResources,
+              lastCollectedResource: null,
             }));
           }
           return;
@@ -199,20 +202,23 @@ export default function DistanceExpeditionSystem({
             collectingResource = true;
             timeRemaining = result.collectionTime * 60; // Convert minutes to seconds
             newState.timeRemaining = timeRemaining;
+            newState.lastCollectedResource = result.resourceCollected; // Track for status message
           } else if (result.collectionTime > 0) {
-            // Failed collection attempt but time was spent
+            // Failed collection attempt but time was spent (searching)
             collectingResource = true;
             timeRemaining = result.collectionTime * 60;
             newState.timeRemaining = timeRemaining;
+            newState.lastCollectedResource = null; // Clear for "Procurando" message
           } else {
             // Move to next distance
             currentDistance = Math.min(currentDistance + 5, expeditionState.maxDistance);
             newState.currentDistance = currentDistance;
-            newState.timeRemaining = 30; // 30 seconds to move to next position
+            newState.timeRemaining = 10; // 10 seconds to move to next position
             
             // Start movement timer (no collecting during movement)
             collectingResource = false;
             timeRemaining = 0;
+            newState.lastCollectedResource = null;
           }
 
           return newState;
@@ -235,6 +241,28 @@ export default function DistanceExpeditionSystem({
     return () => clearInterval(interval);
   }, [playerId, queryClient]);
 
+  // Get collection status message with emojis
+  const getCollectionStatusMessage = () => {
+    if (expeditionState.timeRemaining <= 0) return "Explorando...";
+    
+    // Use the tracked last collected resource for status message
+    if (expeditionState.lastCollectedResource) {
+      const resource = availableResources.find(r => r.id === expeditionState.lastCollectedResource);
+      if (resource) {
+        // Check if it's an animal (for hunting message)
+        const isAnimal = ['Coelho', 'Veado', 'Javali', 'Esquilo', 'Rato do Campo', 'Raposa', 'Lobo', 'Urso', 'Pato Selvagem', 'Faisão'].includes(resource.name);
+        
+        if (isAnimal) {
+          return `Caçando ${resource.emoji} ${resource.name}...`;
+        } else {
+          return `Coletando ${resource.emoji} ${resource.name}...`;
+        }
+      }
+    }
+    
+    return "Procurando recursos...";
+  };
+
   // Complete expedition
   const completeExpedition = () => {
     onExpeditionComplete(expeditionState.collectedResources);
@@ -246,6 +274,7 @@ export default function DistanceExpeditionSystem({
       collectedResources: {},
       autoReturnTrigger: null,
       timeRemaining: 0,
+      lastCollectedResource: null,
     });
     onClose();
   };
@@ -391,18 +420,32 @@ export default function DistanceExpeditionSystem({
             </div>
 
             <div className="space-y-4">
+              {/* Player Position Visual */}
               <div>
                 <div className="flex justify-between mb-2">
-                  <span>Distância Atual</span>
+                  <span>Posição do Jogador</span>
                   <span>{expeditionState.currentDistance}m / {expeditionState.maxDistance}m</span>
                 </div>
+                
+                {/* Emoji Position Indicator */}
+                <div className="flex items-center justify-center mb-2 text-2xl">
+                  {expeditionState.currentDistance === 0 ? (
+                    <span>🏕️</span>
+                  ) : expeditionState.currentDistance < expeditionState.maxDistance ? (
+                    <span>🏕️ 🚶‍♂️‍➡️</span>
+                  ) : (
+                    <span>🏕️ 🚶‍♂️‍➡️ 🚶‍♂️</span>
+                  )}
+                </div>
+                
                 <Progress value={(expeditionState.currentDistance / expeditionState.maxDistance) * 100} />
               </div>
 
+              {/* Collection Status */}
               {expeditionState.timeRemaining > 0 && (
                 <div>
                   <div className="flex justify-between mb-2">
-                    <span>Coletando...</span>
+                    <span>{getCollectionStatusMessage()}</span>
                     <span>{Math.ceil(expeditionState.timeRemaining / 60)}min restantes</span>
                   </div>
                   <Progress value={((300 - expeditionState.timeRemaining) / 300) * 100} />
