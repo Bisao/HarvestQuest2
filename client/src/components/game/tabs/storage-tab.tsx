@@ -128,9 +128,22 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
   };
 
   const getItemData = (itemId: string) => {
-    const resource = getResourceData(itemId);
+    // First check if it's equipment
     const equip = getEquipmentData(itemId);
+    if (equip) {
+      return {
+        type: 'equipment' as const,
+        name: equip.name,
+        emoji: equip.emoji,
+        value: 0, // Equipment doesn't have value for now
+        rarity: 'common' as const,
+        weight: equip.weight,
+        slot: equip.slot
+      };
+    }
     
+    // Then check if it's a resource
+    const resource = getResourceData(itemId);
     if (resource) {
       return {
         type: 'resource' as const,
@@ -139,17 +152,6 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
         value: resource.value,
         rarity: resource.rarity,
         weight: resource.weight
-      };
-    }
-    
-    if (equip) {
-      return {
-        type: 'equipment' as const,
-        name: equip.name,
-        emoji: equip.emoji,
-        value: 0, // Equipment doesn't have value for now
-        rarity: 'common' as const,
-        weight: equip.weight
       };
     }
     
@@ -288,7 +290,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
                   <div>
                     <h4 className="font-semibold text-gray-800">{itemData.name}</h4>
                     <p className="text-sm text-gray-500">
-                      {itemData.type === "equipment" ? "Equipamento" : 
+                      {itemData.type === "equipment" ? `Equipamento (${(itemData as any).slot || 'unknown'})` : 
                        itemData.type === "resource" && itemData.rarity === "common" ? "Recurso básico" : "Recurso único"}
                     </p>
                   </div>
