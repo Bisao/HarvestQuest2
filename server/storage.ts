@@ -20,7 +20,7 @@ import { randomUUID } from "crypto";
 import { ALL_RESOURCES } from "./data/resources";
 import { createEquipmentData } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
-import { createRecipeData } from "./data/recipes";
+import { createRecipeData } from "./data/recipes-clean";
 
 export interface IStorage {
   // Player methods

@@ -42,35 +42,35 @@ const EQUIPMENT_FAMILIES = {
     name: "Vara de Pesca",
     emoji: "🎣",
     category: "Ferramentas Evolutivas",
-    tiers: ["Simples", "Reforçada", "Mágica"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   shovel: {
     baseType: "shovel",
     name: "Pá",
     emoji: "🏗️",
     category: "Ferramentas Evolutivas",
-    tiers: ["de Madeira", "de Ferro", "Élfica"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   sickle: {
     baseType: "sickle",
     name: "Foice",
     emoji: "🔪",
     category: "Ferramentas Evolutivas",
-    tiers: ["Improvisada", "de Ferro", "Élfica"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   knife: {
     baseType: "knife",
     name: "Faca",
     emoji: "🔪",
     category: "Ferramentas Evolutivas",
-    tiers: ["Improvisada", "de Ferro", "Élfica"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   bucket: {
     baseType: "bucket",
     name: "Balde",
     emoji: "🪣",
     category: "Ferramentas Evolutivas",
-    tiers: ["de Madeira", "de Ferro", "Mágico"]
+    tiers: ["Improvisado", "de Ferro", "Avançado"]
   },
   
   // Armas
@@ -79,28 +79,28 @@ const EQUIPMENT_FAMILIES = {
     name: "Espada", 
     emoji: "⚔️",
     category: "Armas Evolutivas",
-    tiers: ["Improvisada", "de Ferro", "Élfica"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   bow: {
     baseType: "bow",
     name: "Arco",
     emoji: "🏹", 
     category: "Armas Evolutivas",
-    tiers: ["Simples", "Composto", "Élfico"]
+    tiers: ["Improvisado", "de Ferro", "Avançado"]
   },
   spear: {
     baseType: "spear",
     name: "Lança",
     emoji: "🗡️",
     category: "Armas Evolutivas",
-    tiers: ["Improvisada", "de Ferro", "Élfica"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   crossbow: {
     baseType: "crossbow",
     name: "Besta",
     emoji: "🏹",
     category: "Armas Evolutivas",
-    tiers: ["Simples", "de Ferro", "Élfica"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   
   // Armaduras
@@ -109,42 +109,42 @@ const EQUIPMENT_FAMILIES = {
     name: "Capacete",
     emoji: "🎩",
     category: "Armaduras Evolutivas", 
-    tiers: ["de Couro", "de Ferro", "Élfico"]
+    tiers: ["Improvisado", "de Ferro", "Avançado"]
   },
   chestplate: {
     baseType: "chestplate",
     name: "Peitoral",
     emoji: "🦺",
     category: "Armaduras Evolutivas",
-    tiers: ["de Couro", "de Ferro", "Élfico"]
+    tiers: ["Improvisado", "de Ferro", "Avançado"]
   },
   leggings: {
     baseType: "leggings",
     name: "Calças",
     emoji: "👖", 
     category: "Armaduras Evolutivas",
-    tiers: ["de Couro", "de Ferro", "Élficas"]
+    tiers: ["Improvisadas", "de Ferro", "Avançadas"]
   },
   boots: {
     baseType: "boots",
     name: "Botas",
     emoji: "🥾",
     category: "Armaduras Evolutivas", 
-    tiers: ["de Couro", "de Ferro", "Élficas"]
+    tiers: ["Improvisadas", "de Ferro", "Avançadas"]
   },
   backpack: {
     baseType: "backpack",
     name: "Mochila",
     emoji: "🎒",
     category: "Armaduras Evolutivas",
-    tiers: ["Simples", "Reforçada", "Dimensional"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   foodbag: {
     baseType: "foodbag", 
     name: "Bolsa de Comida",
     emoji: "🥘",
     category: "Armaduras Evolutivas",
-    tiers: ["Normal", "Refrigerada", "Mágica"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   
   // Alimentos evolutivos
@@ -153,35 +153,35 @@ const EQUIPMENT_FAMILIES = {
     name: "Carne",
     emoji: "🥩",
     category: "Alimentos Evolutivos",
-    tiers: ["Assada", "Grelhada", "Defumada"]
+    tiers: ["Improvisada", "de Ferro", "Avançada"]
   },
   stew: {
     baseType: "stew",
     name: "Ensopado",
     emoji: "🍲",
     category: "Alimentos Evolutivos", 
-    tiers: ["Simples", "Nutritivo", "Especial"]
+    tiers: ["Improvisado", "de Ferro", "Avançado"]
   },
   cooked_mushrooms: {
     baseType: "cooked_mushrooms",
     name: "Cogumelos",
     emoji: "🍄",
     category: "Alimentos Evolutivos",
-    tiers: ["Assados", "Grelhados", "Refogados"]
+    tiers: ["Improvisados", "de Ferro", "Avançados"]
   },
   cooked_fish: {
     baseType: "cooked_fish",
     name: "Peixe",
     emoji: "🐟",
     category: "Alimentos Evolutivos",
-    tiers: ["Grelhado", "Assado", "Defumado"]
+    tiers: ["Improvisado", "de Ferro", "Avançado"]
   },
   beverages: {
     baseType: "beverages",
     name: "Bebidas",
     emoji: "🥤",
     category: "Alimentos Evolutivos",
-    tiers: ["Suco", "Vitamina", "Elixir"]
+    tiers: ["Improvisadas", "de Ferro", "Avançadas"]
   }
 };
 
@@ -354,7 +354,7 @@ export default function EvolutionaryCraftingSystem({
       }
       // Alimentos evolutivos - TODOS os alimentos com variações
       else if ((name.includes("carne") && (name.includes("assada") || name.includes("grelhada") || name.includes("defumada"))) ||
-               (name.includes("ensopado") || name.includes("sopa")) ||
+               (name.includes("ensopado")) ||
                (name.includes("cogumelos") && (name.includes("assados") || name.includes("grelhados") || name.includes("refogados"))) ||
                (name.includes("peixe") && (name.includes("grelhado") || name.includes("assado") || name.includes("defumado"))) ||
                (name.includes("suco") || name.includes("vitamina") || name.includes("elixir"))) {
