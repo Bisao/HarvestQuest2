@@ -109,7 +109,7 @@ export function getResourcesByCategory(category: string, resources: any[]): any[
   switch (category) {
     case RESOURCE_CATEGORIES.BASIC:
       return resources.filter(r => 
-        ["Fibra", "Pedra", "Pedras Soltas", "Gravetos", "Água Fresca", "Bambu", "Madeira", "Argila", "Ferro Fundido", "Couro", "Carne", "Ossos", "Pelo", "Barbante"].includes(r.name)
+        ["Fibra", "Pedra", "Pedras Soltas", "Gravetos", "Água Fresca", "Bambu", "Madeira", "Argila", "Ferro Fundido", "Couro", "Carne", "Ossos", "Pelo", "Penas", "Banha", "Barbante", "Corda", "Cola Natural"].includes(r.name)
       );
     case RESOURCE_CATEGORIES.ANIMALS:
       return resources.filter(r => ["Coelho", "Esquilo", "Rato do Campo", "Veado", "Raposa", "Lobo", "Javali", "Urso", "Pato Selvagem", "Faisão"].includes(r.name));
