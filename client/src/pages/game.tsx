@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
 import QuestsTab from "@/components/game/quests-tab";
@@ -108,58 +108,77 @@ export default function Game() {
     }
   }, [activeExpedition, expeditionMinimized]);
 
-  // Handler for completing expeditions
+  // Handler for completing expeditions - this triggers the API call
   const handleCompleteExpedition = () => {
-    // Check if auto-repeat is enabled for current biome before clearing expedition
-    const currentBiomeId = activeExpedition?.biomeId;
-    const shouldRestartAutoRepeat = currentBiomeId && autoRepeatSettings[currentBiomeId]?.enabled;
+    if (!activeExpedition) return;
     
-    setActiveExpedition(null);
-    setExpeditionModalOpen(false);
-    setExpeditionMinimized(false);
-    setExpeditionMinimizedExpanded(false);
-    queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-    
-    // Restart auto-repeat countdown if it was enabled
-    if (shouldRestartAutoRepeat && currentBiomeId) {
-      console.log('Expedition completed - restarting auto-repeat countdown for biome:', currentBiomeId);
+    // Make API call to complete expedition
+    completeExpeditionMutation.mutate(activeExpedition.id);
+  };
+
+  // Mutation for completing expeditions
+  const completeExpeditionMutation = useMutation({
+    mutationFn: async (expeditionId: string) => {
+      const response = await fetch(`/api/expeditions/${expeditionId}/complete`, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to complete expedition');
+      }
+      return response.json();
+    },
+    onSuccess: (result: any) => {
+      // Check if auto-repeat is enabled for current biome before clearing expedition
+      const currentBiomeId = activeExpedition?.biomeId;
+      const shouldRestartAutoRepeat = currentBiomeId && autoRepeatSettings[currentBiomeId]?.enabled;
       
-      // Add small delay to allow expedition state to clear, then restart countdown
-      setTimeout(() => {
-        setAutoRepeatSettings(prev => ({
-          ...prev,
-          [currentBiomeId]: { 
-            ...prev[currentBiomeId], 
-            countdown: 10,
-            enabled: true 
-          }
-        }));
+      setActiveExpedition(null);
+      setExpeditionModalOpen(false);
+      setExpeditionMinimized(false);
+      setExpeditionMinimizedExpanded(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Restart auto-repeat countdown if it was enabled
+      if (shouldRestartAutoRepeat && currentBiomeId) {
+        console.log('Expedition completed - restarting auto-repeat countdown for biome:', currentBiomeId);
         
-        // Start new countdown timer
-        const countdownInterval = setInterval(() => {
-          setAutoRepeatSettings(prevSettings => {
-            const currentCountdown = prevSettings[currentBiomeId]?.countdown || 0;
-            if (currentCountdown <= 1) {
-              clearInterval(countdownInterval);
+        // Add small delay to allow expedition state to clear, then restart countdown
+        setTimeout(() => {
+          setAutoRepeatSettings(prev => ({
+            ...prev,
+            [currentBiomeId]: { 
+              ...prev[currentBiomeId], 
+              countdown: 10,
+              enabled: true 
+            }
+          }));
+          
+          // Start new countdown timer
+          const countdownInterval = setInterval(() => {
+            setAutoRepeatSettings(prevSettings => {
+              const currentCountdown = prevSettings[currentBiomeId]?.countdown || 0;
+              if (currentCountdown <= 1) {
+                clearInterval(countdownInterval);
+                return {
+                  ...prevSettings,
+                  [currentBiomeId]: { ...prevSettings[currentBiomeId], countdown: 0 }
+                };
+              }
               return {
                 ...prevSettings,
-                [currentBiomeId]: { ...prevSettings[currentBiomeId], countdown: 0 }
+                [currentBiomeId]: { ...prevSettings[currentBiomeId], countdown: currentCountdown - 1 }
               };
-            }
-            return {
-              ...prevSettings,
-              [currentBiomeId]: { ...prevSettings[currentBiomeId], countdown: currentCountdown - 1 }
-            };
-          });
+            });
+          }, 1000);
+          
+          setAutoRepeatTimers(prev => ({
+            ...prev,
+            [currentBiomeId]: countdownInterval
+          }));
         }, 1000);
-        
-        setAutoRepeatTimers(prev => ({
-          ...prev,
-          [currentBiomeId]: countdownInterval
-        }));
-      }, 1000);
+      }
     }
-  };
+  });
 
   // Load last expedition resources from localStorage
   useEffect(() => {
@@ -534,10 +553,7 @@ export default function Game() {
               </button>
             </div>
             <div className="space-y-2">
-              {/* Simple completion indicator */}
-              <div className="bg-green-50 p-2 rounded border text-center">
-                <div className="text-xs font-semibold text-green-700">✅ Expedição Finalizada</div>
-              </div>
+
               <button
                 onClick={handleCompleteExpedition}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
