@@ -493,109 +493,96 @@ export default function EnhancedInventory({
         </Card>
       )}
 
-      {/* Player Stats */}
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">👤</span>
-              <div>
-                <h3 className="text-lg">Status do Jogador</h3>
-                <p className="text-sm text-gray-600">Nível {player.level} • {player.experience} XP</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-yellow-600">💰</span>
-                <span className="font-bold">{player.coins}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-red-600">🍖</span>
-                <span className="font-bold">{player.hunger}/{player.maxHunger}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600">💧</span>
-                <span className="font-bold">{player.thirst}/{player.maxThirst}</span>
-              </div>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Capacidade do Inventário:</span>
-                <div className="text-right">
-                  <Badge variant="outline" className="mr-2">
-                    {weightStatus?.currentWeight || 0}kg / {weightStatus?.maxWeight || 20}kg
-                  </Badge>
-                  {weightStatus && (
-                    <Badge variant="secondary">
-                      Nível {weightStatus.level} (Faixa {weightStatus.levelRange})
-                    </Badge>
-                  )}
-                </div>
-              </div>
-              <Progress 
-                value={weightStatus?.percentage || 0} 
-                className="w-full h-2"
-              />
-              
-              {/* Progressive weight system info */}
-              {weightStatus && (
-                <div className="text-xs text-muted-foreground mt-2">
-                  <div className="flex justify-between">
-                    <span>Capacidade por nível:</span>
-                    <span>Nível {weightStatus.levelRange} → {weightStatus.maxWeight}kg</span>
-                  </div>
-                  <div className="mt-1 text-center">
-                    {weightStatus.level < 6 && "Próximo aumento: Nível 6 → 30kg"}
-                    {weightStatus.level >= 6 && weightStatus.level < 11 && "Próximo aumento: Nível 11 → 40kg"}
-                    {weightStatus.level >= 11 && weightStatus.level < 16 && "Próximo aumento: Nível 16 → 50kg"}
-                    {weightStatus.level >= 16 && weightStatus.level < 21 && "Próximo aumento: Nível 21 → 60kg"}
-                    {weightStatus.level >= 21 && weightStatus.level < 26 && "Próximo aumento: Nível 26 → 70kg"}
-                    {weightStatus.level >= 26 && weightStatus.level < 31 && "Próximo aumento: Nível 31 → 80kg"}
-                    {weightStatus.level >= 31 && weightStatus.level < 36 && "Próximo aumento: Nível 36 → 90kg"}
-                    {weightStatus.level >= 36 && weightStatus.level < 41 && "Próximo aumento: Nível 41 → 100kg"}
-                    {weightStatus.level >= 41 && "Capacidade máxima atingida!"}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Fome:</span>
-                <span>{Math.round((player.hunger / player.maxHunger) * 100)}%</span>
-              </div>
-              <Progress 
-                value={(player.hunger / player.maxHunger) * 100} 
-                className="w-full h-2"
+      {/* Simple Search and Quick Filters */}
+      <Card className="mb-4">
+        <CardContent className="pt-4">
+          <div className="flex flex-wrap gap-3 items-center">
+            <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+              <Search className="h-4 w-4 text-gray-500" />
+              <Input
+                placeholder="Buscar itens..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1"
               />
             </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Sede:</span>
-                <span>{Math.round((player.thirst / player.maxThirst) * 100)}%</span>
-              </div>
-              <Progress 
-                value={(player.thirst / player.maxThirst) * 100} 
-                className="w-full h-2"
-              />
-            </div>
+            <Button
+              variant={filterType === "resources" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilterType(filterType === "resources" ? "all" : "resources")}
+            >
+              📦 Recursos
+            </Button>
+            <Button
+              variant={filterType === "equipment" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilterType(filterType === "equipment" ? "all" : "equipment")}
+            >
+              ⚔️ Equipamentos
+            </Button>
+            <Button
+              variant={filterRarity === "rare" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilterRarity(filterRarity === "rare" ? "all" : "rare")}
+            >
+              ⭐ Raros
+            </Button>
+            {(searchTerm || filterType !== "all" || filterRarity !== "all") && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterType("all");
+                  setFilterRarity("all");
+                }}
+              >
+                Limpar
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
-        {/* Equipment Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        {/* Equipment & Player Status Panel */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span>⚔️</span>
-              Equipamentos
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span>⚔️</span>
+                Equipamentos
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className="text-xs">
+                  Nv.{player.level}
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  💰{player.coins}
+                </Badge>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Player Status Bars */}
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm">🍖</span>
+                <Progress value={(player.hunger / player.maxHunger) * 100} className="flex-1 h-2" />
+                <span className="text-xs text-gray-500">{player.hunger}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">💧</span>
+                <Progress value={(player.thirst / player.maxThirst) * 100} className="flex-1 h-2" />
+                <span className="text-xs text-gray-500">{player.thirst}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">🎒</span>
+                <Progress value={weightStatus?.percentage || 0} className="flex-1 h-2" />
+                <span className="text-xs text-gray-500">{weightStatus?.currentWeight || 0}/{weightStatus?.maxWeight || 20}kg</span>
+              </div>
+            </div>
+
             {/* Equipment Layout (Minecraft style) */}
             <div className="grid grid-cols-3 gap-2 md:gap-3 max-w-[140px] md:max-w-[180px] mx-auto">
               {/* Row 0: Empty, Helmet, Backpack */}
@@ -618,37 +605,105 @@ export default function EnhancedInventory({
               {renderEquipmentSlot(equipmentSlots[5])} {/* Boots */}
               <div></div>
             </div>
-            
-            <Separator className="my-4" />
-            
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">💡 Equipamentos ativos:</p>
-              <div className="space-y-1">
-                {equipmentSlots.filter(slot => slot.equipped).map(slot => {
-                  const equippedItem = getEquipmentById(slot.equipped!);
-                  return equippedItem ? (
-                    <Badge key={slot.id} variant="outline" className="block">
-                      {equippedItem.emoji} {equippedItem.name}
-                    </Badge>
-                  ) : null;
-                })}
-                {equipmentSlots.filter(slot => slot.equipped).length === 0 && (
-                  <p className="text-xs text-gray-500">Nenhum equipamento ativo</p>
-                )}
+          </CardContent>
+        </Card>
+
+        {/* Resources Category */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span>📦</span>
+                Recursos
+                <Badge variant="outline" className="ml-2">
+                  {getFilteredAndSortedInventory().filter(item => {
+                    const itemData = getItemById(item.resourceId);
+                    return itemData && 'type' in itemData;
+                  }).length} itens
+                </Badge>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setFilterType("resources");
+                  setSortBy("name");
+                }}
+                className="text-xs px-2"
+              >
+                Filtrar
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Resources Grid */}
+            <div className="grid grid-cols-6 md:grid-cols-8 gap-1 md:gap-2 mb-4">
+              {getFilteredAndSortedInventory()
+                .filter(item => {
+                  const itemData = getItemById(item.resourceId);
+                  return itemData && 'type' in itemData;
+                })
+                .slice(0, 24)
+                .map((item, index) => {
+                  const itemData = getItemById(item.resourceId);
+                  return (
+                    <TooltipProvider key={item.id}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            onClick={() => setSelectedItem(item)}
+                            className={`
+                              aspect-square border-2 rounded-lg flex flex-col items-center justify-center
+                              cursor-pointer transition-all hover:scale-105 relative
+                              ${selectedItem?.id === item.id ? "border-forest bg-green-50 shadow-lg" : "border-gray-300"}
+                              bg-white border-solid
+                            `}
+                          >
+                            {itemData && (
+                              <>
+                                <span className="text-lg">{itemData.emoji}</span>
+                                <span className="absolute bottom-0 right-0 text-xs font-bold bg-gray-800 text-white rounded px-1">
+                                  {item.quantity}
+                                </span>
+                                {'rarity' in itemData && itemData.rarity === "rare" && (
+                                  <div className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full"></div>
+                                )}
+                                {'rarity' in itemData && itemData.rarity === "uncommon" && (
+                                  <div className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></div>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {itemData && (
+                            <div>
+                              <p className="font-semibold">{itemData.name}</p>
+                              <p className="text-sm">Quantidade: {item.quantity}</p>
+                              <p className="text-sm">Peso: {itemData.weight * item.quantity}kg</p>
+                            </div>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  );
+                })}
             </div>
           </CardContent>
         </Card>
 
-        {/* Main Inventory */}
-        <Card className="lg:col-span-3">
+        {/* Equipment Category */}
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span>🎒</span>
-                Inventário Principal
+                <span>⚡</span>
+                Equipamentos & Itens
                 <Badge variant="outline" className="ml-2">
-                  {getFilteredAndSortedInventory().length} itens
+                  {getFilteredAndSortedInventory().filter(item => {
+                    const itemData = getItemById(item.resourceId);
+                    return itemData && !('type' in itemData);
+                  }).length} itens
                 </Badge>
               </div>
               <Button
@@ -656,197 +711,69 @@ export default function EnhancedInventory({
                 size="sm"
                 onClick={() => storeAllMutation.mutate()}
                 disabled={inventory.length === 0 || isBlocked || storeAllMutation.isPending}
+                className="text-xs px-2"
               >
-                📦 Guardar Tudo
+                📦 Guardar
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Enhanced Filters and Search */}
-            <div className="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg">
-              <div className="flex flex-wrap gap-3 items-center">
-                {/* Search */}
-                <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-                  <Search className="h-4 w-4 text-gray-500" />
-                  <Input
-                    placeholder="Buscar itens..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="flex-1"
-                  />
-                </div>
-
-                {/* Type Filter */}
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-gray-500" />
-                  <Select value={filterType} onValueChange={setFilterType}>
-                    <SelectTrigger className="w-[130px]">
-                      <SelectValue placeholder="Tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="resources">Recursos</SelectItem>
-                      <SelectItem value="equipment">Equipamentos</SelectItem>
-                      <SelectItem value="food">Comida</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Rarity Filter */}
-                <div className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-gray-500" />
-                  <Select value={filterRarity} onValueChange={setFilterRarity}>
-                    <SelectTrigger className="w-[120px]">
-                      <SelectValue placeholder="Raridade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas</SelectItem>
-                      <SelectItem value="common">Comum</SelectItem>
-                      <SelectItem value="uncommon">Incomum</SelectItem>
-                      <SelectItem value="rare">Raro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Sort By */}
-                <div className="flex items-center gap-2">
-                  <SortAsc className="h-4 w-4 text-gray-500" />
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-[120px]">
-                      <SelectValue placeholder="Ordenar" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="name">Nome</SelectItem>
-                      <SelectItem value="quantity">Quantidade</SelectItem>
-                      <SelectItem value="weight">Peso</SelectItem>
-                      <SelectItem value="rarity">Raridade</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* View Mode Toggle */}
-                <div className="flex items-center gap-1 border rounded-md">
-                  <Button
-                    variant={viewMode === "grid" ? "default" : "ghost"}
-                    size="sm"
-                    className="px-2"
-                    onClick={() => setViewMode("grid")}
-                  >
-                    Grid
-                  </Button>
-                  <Button
-                    variant={viewMode === "list" ? "default" : "ghost"}
-                    size="sm"
-                    className="px-2"
-                    onClick={() => setViewMode("list")}
-                  >
-                    Lista
-                  </Button>
-                </div>
-
-                {/* Clear Filters */}
-                {(searchTerm || filterType !== "all" || filterRarity !== "all" || sortBy !== "name") && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSearchTerm("");
-                      setFilterType("all");
-                      setFilterRarity("all");
-                      setSortBy("name");
-                    }}
-                  >
-                    Limpar
-                  </Button>
-                )}
-              </div>
-
-              {/* Filter Results Summary and Quick Actions */}
-              <div className="text-sm text-gray-600 flex justify-between items-center">
-                <span>
-                  Mostrando {getFilteredAndSortedInventory().length} de {inventory.length} itens
-                </span>
-                <div className="flex gap-2 items-center">
-                  <Badge variant="outline" className="text-xs">
-                    Peso: {getFilteredAndSortedInventory().reduce((total, item) => {
-                      const itemData = getItemById(item.resourceId);
-                      return total + (itemData ? itemData.weight * item.quantity : 0);
-                    }, 0)}kg
-                  </Badge>
-                  
-                  {/* Quick Actions */}
-                  <div className="flex gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs px-2 py-1"
-                      onClick={() => {
-                        setFilterType("equipment");
-                        setSortBy("name");
-                      }}
-                      title="Ver apenas equipamentos"
-                    >
-                      ⚔️
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs px-2 py-1"
-                      onClick={() => {
-                        setFilterType("food");
-                        setSortBy("quantity");
-                      }}
-                      title="Ver apenas comida"
-                    >
-                      🍖
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs px-2 py-1"
-                      onClick={() => {
-                        setFilterRarity("rare");
-                        setSortBy("rarity");
-                      }}
-                      title="Ver apenas itens raros"
-                    >
-                      ⭐
-                    </Button>
-                  </div>
-                </div>
-              </div>
+            {/* Equipment & Items Grid */}
+            <div className="grid grid-cols-6 md:grid-cols-8 gap-1 md:gap-2 mb-4">
+              {getFilteredAndSortedInventory()
+                .filter(item => {
+                  const itemData = getItemById(item.resourceId);
+                  return itemData && !('type' in itemData);
+                })
+                .slice(0, 24)
+                .map((item, index) => {
+                  const itemData = getItemById(item.resourceId);
+                  return (
+                    <TooltipProvider key={item.id}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            onClick={() => setSelectedItem(item)}
+                            className={`
+                              aspect-square border-2 rounded-lg flex flex-col items-center justify-center
+                              cursor-pointer transition-all hover:scale-105 relative
+                              ${selectedItem?.id === item.id ? "border-forest bg-green-50 shadow-lg" : "border-gray-300"}
+                              bg-white border-solid
+                            `}
+                          >
+                            {itemData && (
+                              <>
+                                <span className="text-lg">{itemData.emoji}</span>
+                                <span className="absolute bottom-0 right-0 text-xs font-bold bg-gray-800 text-white rounded px-1">
+                                  {item.quantity}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {itemData && (
+                            <div>
+                              <p className="font-semibold">{itemData.name}</p>
+                              <p className="text-sm">Quantidade: {item.quantity}</p>
+                              <p className="text-sm">Peso: {itemData.weight * item.quantity}kg</p>
+                            </div>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  );
+                })}
             </div>
 
-            {/* Inventory Grid */}
-            <div className="grid grid-cols-6 md:grid-cols-9 gap-1 md:gap-2 mb-4">
-              {Array.from({ length: Math.max(totalSlots, getFilteredAndSortedInventory().length) }, (_, i) => renderInventorySlot(i))}
-            </div>
-
-            {/* Empty State */}
-            {getFilteredAndSortedInventory().length === 0 && inventory.length > 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Nenhum item encontrado com os filtros aplicados</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setFilterType("all");
-                    setFilterRarity("all");
-                  }}
-                >
-                  Limpar filtros
-                </Button>
-              </div>
-            )}
-
-            {getFilteredAndSortedInventory().length === 0 && inventory.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Inventário vazio</p>
-                <p className="text-sm">Explore biomas para encontrar recursos!</p>
+            {/* Empty State for Equipment */}
+            {getFilteredAndSortedInventory().filter(item => {
+              const itemData = getItemById(item.resourceId);
+              return itemData && !('type' in itemData);
+            }).length === 0 && (
+              <div className="text-center py-4 text-gray-500">
+                <span className="text-3xl">⚔️</span>
+                <p className="text-sm mt-2">Nenhum equipamento no inventário</p>
               </div>
             )}
 
@@ -939,6 +866,88 @@ export default function EnhancedInventory({
           </CardContent>
         </Card>
       </div>
+
+      {/* Item Details Panel */}
+      {selectedItem && (
+        <Card className="mt-4">
+          <CardContent className="pt-4">
+            {(() => {
+              const itemData = getItemById(selectedItem.resourceId);
+              if (itemData) {
+                const isResource = 'rarity' in itemData;
+                const isEquipment = 'slot' in itemData;
+                return (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{itemData.emoji}</span>
+                      <div>
+                        <h4 className="font-semibold text-lg">{itemData.name}</h4>
+                        <p className="text-sm text-gray-600">
+                          Quantidade: {selectedItem.quantity} • Peso total: {itemData.weight * selectedItem.quantity}kg
+                        </p>
+                        {isResource && 'value' in itemData && (
+                          <p className="text-sm text-gray-600">
+                            Valor unitário: {itemData.value} moedas
+                          </p>
+                        )}
+                        <div className="flex gap-2 mt-2">
+                          {isResource && 'rarity' in itemData && (
+                            <Badge variant={
+                              itemData.rarity === "rare" ? "destructive" : 
+                              itemData.rarity === "uncommon" ? "secondary" : "outline"
+                            }>
+                              {itemData.rarity === "common" ? "Comum" : 
+                               itemData.rarity === "uncommon" ? "Incomum" : "Raro"}
+                            </Badge>
+                          )}
+                          {isResource && 'type' in itemData && (
+                            <Badge variant="outline">
+                              {itemData.type === "basic" ? "Básico" : "Único"}
+                            </Badge>
+                          )}
+                          {isEquipment && (
+                            <Badge variant="secondary">
+                              Equipamento
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {/* Show consume button for food items */}
+                      {itemData && (itemData.name === "Frutas Silvestres" || 
+                        itemData.name === "Cogumelos" || 
+                        itemData.name === "Suco de Frutas" ||
+                        itemData.name === "Cogumelos Assados" ||
+                        itemData.name === "Peixe Grelhado" ||
+                        itemData.name === "Carne Assada" ||
+                        itemData.name === "Ensopado de Carne" ||
+                        itemData.name === "Água Fresca") && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          🍽️ Consumir
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => moveToStorageMutation.mutate(selectedItem.id)}
+                        disabled={isBlocked || moveToStorageMutation.isPending}
+                      >
+                        📦 Armazenar
+                      </Button>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Actions */}
       <Card>
