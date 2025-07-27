@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Filter, SortAsc, Package, Star } from "lucide-react";
 import EquipmentSelectorModal from "./equipment-selector-modal";
 import type { Resource, Equipment, Player } from "@shared/schema";
 
@@ -40,6 +43,14 @@ export default function EnhancedInventory({
     name: string;
     equipped: string | null;
   } | null>(null);
+  
+  // New filter and search states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterRarity, setFilterRarity] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("name");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  
   const { toast } = useToast();
 
   const { data: inventoryData = [] } = useQuery<InventoryItem[]>({
@@ -71,6 +82,58 @@ export default function EnhancedInventory({
     const resource = getResourceById(item.resourceId);
     return resource && resource.name !== "Água Fresca";
   });
+
+  // Enhanced filtering and searching functions
+  const getFilteredAndSortedInventory = () => {
+    let filtered = inventory.filter(item => {
+      const itemData = getItemById(item.resourceId);
+      if (!itemData) return false;
+
+      // Search filter
+      if (searchTerm && !itemData.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return false;
+      }
+
+      // Type filter
+      if (filterType !== "all") {
+        if (filterType === "resources" && !('type' in itemData)) return false;
+        if (filterType === "equipment" && 'type' in itemData) return false;
+        if (filterType === "food" && (!('type' in itemData) || !itemData.name.toLowerCase().includes('carne') && !itemData.name.toLowerCase().includes('cogumelo') && !itemData.name.toLowerCase().includes('peixe'))) return false;
+      }
+
+      // Rarity filter
+      if (filterRarity !== "all" && 'rarity' in itemData) {
+        if (itemData.rarity !== filterRarity) return false;
+      }
+
+      return true;
+    });
+
+    // Sort items
+    filtered.sort((a, b) => {
+      const itemA = getItemById(a.resourceId);
+      const itemB = getItemById(b.resourceId);
+      if (!itemA || !itemB) return 0;
+
+      switch (sortBy) {
+        case "name":
+          return itemA.name.localeCompare(itemB.name);
+        case "quantity":
+          return b.quantity - a.quantity;
+        case "weight":
+          return (itemB.weight * b.quantity) - (itemA.weight * a.quantity);
+        case "rarity":
+          const rarityOrder = { common: 0, uncommon: 1, rare: 2 };
+          const rarityA = 'rarity' in itemA ? rarityOrder[itemA.rarity as keyof typeof rarityOrder] || 0 : 0;
+          const rarityB = 'rarity' in itemB ? rarityOrder[itemB.rarity as keyof typeof rarityOrder] || 0 : 0;
+          return rarityB - rarityA;
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  };
 
   // Equipment slots configuration
   const equipmentSlots = [
@@ -315,7 +378,8 @@ export default function EnhancedInventory({
   };
 
   const renderInventorySlot = (slotIndex: number) => {
-    const item = inventory[slotIndex];
+    const filteredInventory = getFilteredAndSortedInventory();
+    const item = filteredInventory[slotIndex];
     const itemData = item ? getItemById(item.resourceId) : null;
     
     return (
@@ -374,8 +438,61 @@ export default function EnhancedInventory({
     );
   };
 
+  // Weight capacity warnings
+  const getWeightWarningLevel = () => {
+    if (!weightStatus) return null;
+    if (weightStatus.percentage >= 90) return "critical";
+    if (weightStatus.percentage >= 75) return "warning";
+    if (weightStatus.percentage >= 60) return "info";
+    return null;
+  };
+
+  const weightWarning = getWeightWarningLevel();
+
   return (
     <div className="space-y-6">
+      {/* Weight Capacity Warning */}
+      {weightWarning && (
+        <Card className={`border-2 ${
+          weightWarning === "critical" ? "bg-red-50 border-red-300" :
+          weightWarning === "warning" ? "bg-yellow-50 border-yellow-300" :
+          "bg-blue-50 border-blue-300"
+        }`}>
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">
+                  {weightWarning === "critical" ? "⚠️" : 
+                   weightWarning === "warning" ? "⚡" : "💡"}
+                </span>
+                <div>
+                  <h4 className="font-semibold">
+                    {weightWarning === "critical" ? "Capacidade Crítica!" :
+                     weightWarning === "warning" ? "Capacidade Quase Cheia" :
+                     "Dica de Organização"}
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    {weightWarning === "critical" ? "Inventário quase cheio! Armazene itens urgentemente." :
+                     weightWarning === "warning" ? "Considere armazenar alguns itens no armazém." :
+                     "Use 'Guardar Tudo' para liberar espaço automaticamente."}
+                  </p>
+                </div>
+              </div>
+              {weightWarning !== "info" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => storeAllMutation.mutate()}
+                  disabled={inventory.length === 0 || isBlocked || storeAllMutation.isPending}
+                >
+                  📦 Armazenar Agora
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Player Stats */}
       <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
         <CardHeader>
@@ -530,6 +647,9 @@ export default function EnhancedInventory({
               <div className="flex items-center gap-2">
                 <span>🎒</span>
                 Inventário Principal
+                <Badge variant="outline" className="ml-2">
+                  {getFilteredAndSortedInventory().length} itens
+                </Badge>
               </div>
               <Button
                 variant="outline"
@@ -542,10 +662,193 @@ export default function EnhancedInventory({
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Enhanced Filters and Search */}
+            <div className="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="flex flex-wrap gap-3 items-center">
+                {/* Search */}
+                <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                  <Search className="h-4 w-4 text-gray-500" />
+                  <Input
+                    placeholder="Buscar itens..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="flex-1"
+                  />
+                </div>
+
+                {/* Type Filter */}
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-gray-500" />
+                  <Select value={filterType} onValueChange={setFilterType}>
+                    <SelectTrigger className="w-[130px]">
+                      <SelectValue placeholder="Tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="resources">Recursos</SelectItem>
+                      <SelectItem value="equipment">Equipamentos</SelectItem>
+                      <SelectItem value="food">Comida</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Rarity Filter */}
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-gray-500" />
+                  <Select value={filterRarity} onValueChange={setFilterRarity}>
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue placeholder="Raridade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas</SelectItem>
+                      <SelectItem value="common">Comum</SelectItem>
+                      <SelectItem value="uncommon">Incomum</SelectItem>
+                      <SelectItem value="rare">Raro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Sort By */}
+                <div className="flex items-center gap-2">
+                  <SortAsc className="h-4 w-4 text-gray-500" />
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue placeholder="Ordenar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="name">Nome</SelectItem>
+                      <SelectItem value="quantity">Quantidade</SelectItem>
+                      <SelectItem value="weight">Peso</SelectItem>
+                      <SelectItem value="rarity">Raridade</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-1 border rounded-md">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    className="px-2"
+                    onClick={() => setViewMode("grid")}
+                  >
+                    Grid
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    className="px-2"
+                    onClick={() => setViewMode("list")}
+                  >
+                    Lista
+                  </Button>
+                </div>
+
+                {/* Clear Filters */}
+                {(searchTerm || filterType !== "all" || filterRarity !== "all" || sortBy !== "name") && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setFilterType("all");
+                      setFilterRarity("all");
+                      setSortBy("name");
+                    }}
+                  >
+                    Limpar
+                  </Button>
+                )}
+              </div>
+
+              {/* Filter Results Summary and Quick Actions */}
+              <div className="text-sm text-gray-600 flex justify-between items-center">
+                <span>
+                  Mostrando {getFilteredAndSortedInventory().length} de {inventory.length} itens
+                </span>
+                <div className="flex gap-2 items-center">
+                  <Badge variant="outline" className="text-xs">
+                    Peso: {getFilteredAndSortedInventory().reduce((total, item) => {
+                      const itemData = getItemById(item.resourceId);
+                      return total + (itemData ? itemData.weight * item.quantity : 0);
+                    }, 0)}kg
+                  </Badge>
+                  
+                  {/* Quick Actions */}
+                  <div className="flex gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs px-2 py-1"
+                      onClick={() => {
+                        setFilterType("equipment");
+                        setSortBy("name");
+                      }}
+                      title="Ver apenas equipamentos"
+                    >
+                      ⚔️
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs px-2 py-1"
+                      onClick={() => {
+                        setFilterType("food");
+                        setSortBy("quantity");
+                      }}
+                      title="Ver apenas comida"
+                    >
+                      🍖
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs px-2 py-1"
+                      onClick={() => {
+                        setFilterRarity("rare");
+                        setSortBy("rarity");
+                      }}
+                      title="Ver apenas itens raros"
+                    >
+                      ⭐
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Inventory Grid */}
             <div className="grid grid-cols-6 md:grid-cols-9 gap-1 md:gap-2 mb-4">
-              {Array.from({ length: totalSlots }, (_, i) => renderInventorySlot(i))}
+              {Array.from({ length: Math.max(totalSlots, getFilteredAndSortedInventory().length) }, (_, i) => renderInventorySlot(i))}
             </div>
+
+            {/* Empty State */}
+            {getFilteredAndSortedInventory().length === 0 && inventory.length > 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Nenhum item encontrado com os filtros aplicados</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setFilterType("all");
+                    setFilterRarity("all");
+                  }}
+                >
+                  Limpar filtros
+                </Button>
+              </div>
+            )}
+
+            {getFilteredAndSortedInventory().length === 0 && inventory.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Inventário vazio</p>
+                <p className="text-sm">Explore biomas para encontrar recursos!</p>
+              </div>
+            )}
 
             {/* Item Details Panel */}
             {selectedItem && (
