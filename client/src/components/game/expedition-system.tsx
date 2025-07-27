@@ -411,21 +411,23 @@ export default function ExpeditionSystem({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Progress Indicator */}
-          <div className="flex items-center justify-between">
-            {["resource-selection", "confirmation"].map((step, index) => (
-              <div key={step} className={`flex items-center ${index < 1 ? "flex-1" : ""}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                  phase === step ? "bg-forest text-white" :
-                  ["resource-selection", "confirmation"].indexOf(phase) > index ? "bg-green-500 text-white" :
-                  "bg-gray-200 text-gray-600"
-                }`}>
-                  {index + 1}
+          {/* Progress Indicator - Only show for resource-selection and confirmation phases */}
+          {phase !== "completed" && phase !== "in-progress" && (
+            <div className="flex items-center justify-between">
+              {["resource-selection", "confirmation"].map((step, index) => (
+                <div key={step} className={`flex items-center ${index < 1 ? "flex-1" : ""}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                    phase === step ? "bg-forest text-white" :
+                    ["resource-selection", "confirmation"].indexOf(phase) > index ? "bg-green-500 text-white" :
+                    "bg-gray-200 text-gray-600"
+                  }`}>
+                    {index + 1}
+                  </div>
+                  {index < 1 && <div className="flex-1 h-0.5 bg-gray-200 mx-2" />}
                 </div>
-                {index < 1 && <div className="flex-1 h-0.5 bg-gray-200 mx-2" />}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Setup Phase */}
           {phase === "setup" && (
