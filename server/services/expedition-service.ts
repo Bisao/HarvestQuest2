@@ -72,9 +72,9 @@ export class ExpeditionService {
       return expedition;
     }
 
-    const currentTime = Date.now();
+    const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
     const elapsedTime = currentTime - (expedition.startTime || currentTime);
-    const totalDuration = 30000; // 30 seconds for demo purposes
+    const totalDuration = 30; // 30 seconds for demo purposes
     
     const progress = Math.min(100, Math.floor((elapsedTime / totalDuration) * 100));
 
@@ -117,10 +117,10 @@ export class ExpeditionService {
       coins: player.coins + this.calculateCoinReward(rewards, resources)
     });
 
-    // Mark expedition as completed
+    // Mark expedition as completed with timestamp in seconds
     return await this.storage.updateExpedition(expeditionId, {
       status: "completed",
-      endTime: Date.now(),
+      endTime: Math.floor(Date.now() / 1000),
       progress: 100,
       collectedResources: rewards
     });
@@ -356,7 +356,7 @@ export class ExpeditionService {
   async cancelExpedition(expeditionId: string): Promise<void> {
     await this.storage.updateExpedition(expeditionId, {
       status: "cancelled",
-      endTime: Date.now()
+      endTime: Math.floor(Date.now() / 1000)
     });
   }
 
