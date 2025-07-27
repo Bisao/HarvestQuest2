@@ -28,10 +28,10 @@ export const BASIC_RESOURCES: InsertResource[] = [
 ];
 
 export const UNIQUE_RESOURCES: InsertResource[] = [
-  { name: "Madeira", emoji: "🌳", weight: 5, value: 8, type: "unique", rarity: "common", requiredTool: "axe", experienceValue: 3 },
-  { name: "Areia", emoji: "⏳", weight: 2, value: 5, type: "unique", rarity: "common", requiredTool: "shovel", experienceValue: 2 },
-  { name: "Cristais", emoji: "💎", weight: 1, value: 20, type: "unique", rarity: "rare", requiredTool: "pickaxe", experienceValue: 10 },
-  { name: "Conchas", emoji: "🐚", weight: 1, value: 12, type: "unique", rarity: "uncommon", requiredTool: null, experienceValue: 4 },
+  { name: "Madeira", emoji: "🌳", weight: 5, value: 8, type: "unique", rarity: "common", requiredTool: "axe", experienceValue: 3, distanceFromCamp: 25, collectionTimeMinutes: 6, collectionChance: 70 },
+  { name: "Areia", emoji: "⏳", weight: 2, value: 5, type: "unique", rarity: "common", requiredTool: "shovel", experienceValue: 2, distanceFromCamp: 35, collectionTimeMinutes: 5, collectionChance: 80 },
+  { name: "Cristais", emoji: "💎", weight: 1, value: 20, type: "unique", rarity: "rare", requiredTool: "pickaxe", experienceValue: 10, distanceFromCamp: 80, collectionTimeMinutes: 15, collectionChance: 30 },
+  { name: "Conchas", emoji: "🐚", weight: 1, value: 12, type: "unique", rarity: "uncommon", requiredTool: null, experienceValue: 4, distanceFromCamp: 15, collectionTimeMinutes: 3, collectionChance: 60 },
 ];
 
 // Recursos de comida aprimorados para a floresta

@@ -89,10 +89,11 @@ export default function DistanceExpeditionSystem({
     return hasRequiredTool;
   };
 
-  // SHOW ALL AVAILABLE RESOURCES as requested by user
+  // Filter resources by distance and collectability
   const resourcesInRange = availableResources.filter(r => {
+    const withinDistance = r.distanceFromCamp <= expeditionState.maxDistance;
     const isCollectable = isResourceCollectable(r);
-    return isCollectable;
+    return withinDistance && isCollectable;
   });
 
   // Start distance-based expedition

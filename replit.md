@@ -117,6 +117,21 @@ Preferred communication style: Simple, everyday language.
 - **Alimentos Evolutivos Agrupados** - Carnes, Ensopados, Cogumelos, Peixes com nomenclatura padronizada
 - **Sistema de categorização expandido** - agora inclui Equipamentos Evolutivos e Utensílios Evolutivos
 
+**January 27, 2025 - Sistema de Expedições por Distância Implementado**
+- **Sistema completo de expedições baseado em distância** - recursos aparecem conforme aumenta a distância máxima
+- **Interface visual melhorada** - mostra recursos próximos e distantes com suas distâncias específicas
+- **Filtragem inteligente** - recursos básicos sempre disponíveis, outros requerem equipamentos específicos
+- **Distâncias definidas para todos os recursos**:
+  - Recursos básicos: 10-30m (Fibra 10m, Pedra 15m, Ferro Fundido 30m)
+  - Animais pequenos: 25m (Coelho, Esquilo, Rato do Campo com faca)
+  - Animais médios: 35-45m (Raposa, Veado, Lobo com arma+faca)  
+  - Animais grandes: 50-60m (Javali, Urso com arma+faca)
+  - Peixes: 20-30m (com vara de pesca)
+  - Plantas: 10-20m (sem ferramentas necessárias)
+  - Recursos únicos: 15-80m (Conchas 15m, Cristais 80m)
+- **Sistema de requisitos mantido** - alguns recursos precisam de ferramentas específicas para coleta
+- **Interface de seleção por distância** - slider mostra quantos recursos ficam disponíveis em cada distância
+
 **January 27, 2025 - Enhanced Forest Biome Update**
 - **Vastly expanded Forest biome with realistic and diverse content** - added 15+ new animals, plants, and materials for balanced gameplay
 - **New Animals Added**:
