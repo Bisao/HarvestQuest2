@@ -8,7 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 27, 2025 - QUEST SYSTEM DEBUGGED & FIXED**
+**January 27, 2025 - EQUIPMENT STORAGE RULES IMPLEMENTED**
+- **Enforced Equipment-Only Actions**: Tools, weapons, and armor can only be equipped/unequipped, not withdrawn to inventory
+- **Fixed Interface Consistency**: Equipment items now properly show "Equipar" button instead of "Retirar" in storage
+- **Backend Validation Added**: Server prevents equipment withdrawal attempts with clear error message
+- **Enhanced Type Detection**: Storage interface now prioritizes equipment identification over resources
+- **User-Friendly Error Messaging**: Clear Portuguese messages when trying to withdraw equipment
+
+**January 27, 2025 - QUEST SYSTEM DEBUGGED & FIXED**  
 - **Fixed Quest Progress Tracking System**: Resolved issue where quests for collecting fibra and crafting barbante weren't registering progress
 - **Database Schema Corrections**: Fixed quest objectives to use proper resource IDs instead of names
 - **Enhanced Quest Debugging**: Added comprehensive logging to track quest progress updates in real-time

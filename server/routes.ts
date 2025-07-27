@@ -703,6 +703,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId, storageItemId, quantity } = req.body;
 
+      // Get storage item to check resource ID
+      const storageItems = await storage.getPlayerStorage(playerId);
+      const storageItem = storageItems.find(item => item.id === storageItemId);
+      
+      if (!storageItem) {
+        return res.status(404).json({ message: "Item not found in storage" });
+      }
+
+      // Check if the item is equipment (tools, weapons, armor)
+      const equipment = await storage.getAllEquipment();
+      const isEquipment = equipment.some(eq => eq.id === storageItem.resourceId);
+      
+      if (isEquipment) {
+        return res.status(400).json({ 
+          message: "Equipamentos, ferramentas e armas só podem ser equipados, não retirados para o inventário." 
+        });
+      }
+
       await gameService.moveToInventory(playerId, storageItemId, quantity);
       res.json({ message: "Items withdrawn successfully" });
     } catch (error) {

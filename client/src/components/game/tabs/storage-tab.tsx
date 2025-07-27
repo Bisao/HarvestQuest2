@@ -326,6 +326,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
                   </button>
                 )}
                 {itemData.type === "equipment" ? (
+                  // Equipment can only be equipped, not withdrawn
                   <button
                     onClick={() => handleEquip(storageItem.resourceId)}
                     disabled={equipMutation.isPending || isBlocked}
@@ -338,6 +339,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
                     {isEquipped(storageItem.resourceId) ? "✓ Equipado" : "⚔️ Equipar"}
                   </button>
                 ) : (
+                  // Only resources can be withdrawn to inventory
                   <button
                     onClick={() => handleWithdraw(storageItem)}
                     className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 font-medium py-2 px-3 rounded text-sm transition-colors"
