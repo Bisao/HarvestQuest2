@@ -134,11 +134,29 @@ export default function DistanceExpeditionSystem({
 
   // Collection simulation for distance-based expedition with chance system
   const startCollectionSimulation = useCallback((expeditionId: string) => {
+    let currentDistance = 0;
+    let collectingResource = false;
+    let timeRemaining = 0;
+
     const interval = setInterval(async () => {
       try {
-        // Call the backend simulation API
+        // If currently collecting, just count down time
+        if (collectingResource && timeRemaining > 0) {
+          timeRemaining -= 5;
+          setExpeditionState(prev => ({
+            ...prev,
+            timeRemaining: Math.max(0, timeRemaining),
+          }));
+          
+          if (timeRemaining <= 0) {
+            collectingResource = false;
+          }
+          return;
+        }
+
+        // Call the backend simulation API with current distance
         const response = await apiRequest('POST', `/api/expeditions/distance/${expeditionId}/simulate`, {
-          currentDistance: expeditionState.currentDistance,
+          currentDistance,
         });
 
         if (!response.ok) {
@@ -176,20 +194,25 @@ export default function DistanceExpeditionSystem({
               ...prev.collectedResources,
               [result.resourceCollected]: (prev.collectedResources[result.resourceCollected] || 0) + 1,
             };
-            newState.timeRemaining = result.collectionTime * 60; // Convert minutes to seconds
+            
+            // Start collection timer
+            collectingResource = true;
+            timeRemaining = result.collectionTime * 60; // Convert minutes to seconds
+            newState.timeRemaining = timeRemaining;
           } else if (result.collectionTime > 0) {
             // Failed collection attempt but time was spent
-            newState.timeRemaining = result.collectionTime * 60;
+            collectingResource = true;
+            timeRemaining = result.collectionTime * 60;
+            newState.timeRemaining = timeRemaining;
           } else {
             // Move to next distance
-            const newDistance = Math.min(prev.currentDistance + 5, prev.maxDistance);
-            newState.currentDistance = newDistance;
+            currentDistance = Math.min(currentDistance + 5, expeditionState.maxDistance);
+            newState.currentDistance = currentDistance;
             newState.timeRemaining = 30; // 30 seconds to move to next position
-          }
-
-          // Reduce remaining time
-          if (newState.timeRemaining > 0) {
-            newState.timeRemaining = Math.max(0, newState.timeRemaining - 5); // 5 second intervals
+            
+            // Start movement timer (no collecting during movement)
+            collectingResource = false;
+            timeRemaining = 0;
           }
 
           return newState;
@@ -210,7 +233,7 @@ export default function DistanceExpeditionSystem({
     }, 5000); // Check every 5 seconds
 
     return () => clearInterval(interval);
-  }, [expeditionState.currentDistance, playerId, queryClient]);
+  }, [playerId, queryClient]);
 
   // Complete expedition
   const completeExpedition = () => {

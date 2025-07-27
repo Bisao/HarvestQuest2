@@ -66,24 +66,18 @@ export class DistanceExpeditionService {
     }
 
     // Create expedition
-    const expedition: Expedition = {
-      id: crypto.randomUUID(),
+    const expedition = {
       playerId,
       biomeId,
-      status: "in_progress",
-      selectedResources: validResources,
-      selectedEquipment: [], // Not used in distance-based system
-      collectedResources: {},
+      selectedResources: validResources as any,
+      selectedEquipment: [] as any,
       maxDistanceFromCamp,
       currentDistance: 0,
       autoReturnTrigger: null,
-      startTime: Date.now(),
-      endTime: null,
-      progress: 0,
     };
 
-    await this.storage.createExpedition(expedition);
-    return expedition;
+    const createdExpedition = await this.storage.createExpedition(expedition);
+    return createdExpedition;
   }
 
   // Simulate collection at current distance with chance-based system
@@ -100,7 +94,8 @@ export class DistanceExpeditionService {
     const allResources = await this.storage.getAllResources();
     
     // Get resources available at current distance
-    const availableAtDistance = expedition.selectedResources.filter(resourceId => {
+    const selectedResources = expedition.selectedResources as string[];
+    const availableAtDistance = selectedResources.filter((resourceId: string) => {
       const resource = allResources.find(r => r.id === resourceId);
       return resource && resource.distanceFromCamp <= currentDistance;
     });
@@ -346,12 +341,12 @@ export class DistanceExpeditionService {
     if (autoStorage) {
       // Add to storage
       for (const [resourceId, quantity] of Object.entries(rewards)) {
-        await this.storage.addToStorage(playerId, resourceId, quantity);
+        await this.gameService.addToStorage(playerId, resourceId, quantity);
       }
     } else {
       // Add to inventory
       for (const [resourceId, quantity] of Object.entries(rewards)) {
-        await this.storage.addToInventory(playerId, resourceId, quantity);
+        await this.gameService.addToInventory(playerId, resourceId, quantity);
       }
     }
   }

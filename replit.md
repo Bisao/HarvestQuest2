@@ -117,6 +117,16 @@ Preferred communication style: Simple, everyday language.
 - **Alimentos Evolutivos Agrupados** - Carnes, Ensopados, Cogumelos, Peixes com nomenclatura padronizada
 - **Sistema de categorização expandido** - agora inclui Equipamentos Evolutivos e Utensílios Evolutivos
 
+**January 27, 2025 - Sistema de Expedições Corrigido e Otimizado**
+- **Corrigido sistema de timing das expedições** - recursos agora respeitam tempo de coleta individual
+- **Sistema de coleta sequencial implementado** - apenas 1 recurso é coletado por vez conforme especificado
+- **Corrigidos erros TypeScript no serviço de distância** para evitar falhas de expedição
+- **Melhorado sistema de simulação** - expedições não terminam instantaneamente
+- **Removida tela de confirmação desnecessária** - expedição inicia diretamente após seleção
+- **Corrigida filtragem de recursos** - Pedra, Madeira e Água requerem ferramentas específicas
+- **Sistema de tempo realista** - cada recurso tem seu tempo próprio de coleta baseado na dificuldade
+- **Interface única otimizada** - seleção de distância e recursos na mesma tela
+
 **January 27, 2025 - Sistema de Expedições por Distância Implementado**
 - **Sistema completo de expedições baseado em distância** - recursos aparecem conforme aumenta a distância máxima
 - **Interface visual melhorada** - mostra recursos próximos e distantes com suas distâncias específicas
