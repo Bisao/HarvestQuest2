@@ -33,9 +33,9 @@ import {
   type InsertPlayerQuest
 } from "@shared/schema";
 import type { IStorage } from "./storage";
-import { BASIC_RESOURCES, UNIQUE_RESOURCES, ANIMAL_RESOURCES, FOOD_RESOURCES } from "./data/resources";
+import { createResourcesWithIds, RESOURCE_IDS } from "./data/resources";
 import { createBiomeData } from "./data/biomes";
-import { ALL_EQUIPMENT } from "./data/equipment";
+import { createEquipmentWithIds } from "./data/equipment";
 import { createRecipeData } from "./data/recipes";
 import { ALL_QUESTS } from "./data/quests";
 
@@ -312,7 +312,7 @@ export class DatabaseStorage implements IStorage {
     // Check and initialize resources
     const existingResources = await db.select().from(resources).limit(1);
     if (existingResources.length === 0) {
-      const allResources = [...BASIC_RESOURCES, ...UNIQUE_RESOURCES, ...ANIMAL_RESOURCES, ...FOOD_RESOURCES];
+      const allResources = createResourcesWithIds();
       await db.insert(resources).values(allResources);
       console.log("✅ Resources initialized");
     }
@@ -330,16 +330,15 @@ export class DatabaseStorage implements IStorage {
     // Check and initialize equipment
     const existingEquipment = await db.select().from(equipment).limit(1);
     if (existingEquipment.length === 0) {
-      await db.insert(equipment).values(ALL_EQUIPMENT);
+      const allEquipment = createEquipmentWithIds();
+      await db.insert(equipment).values(allEquipment);
       console.log("✅ Equipment initialized");
     }
 
     // Check and initialize recipes
     const existingRecipes = await db.select().from(recipes).limit(1);
     if (existingRecipes.length === 0) {
-      const allResources = await db.select().from(resources);
-      const resourceIds = allResources.map(r => r.id);
-      const recipeData = createRecipeData(resourceIds);
+      const recipeData = createRecipeData();
       await db.insert(recipes).values(recipeData);
       console.log("✅ Recipes initialized");
     }
@@ -387,7 +386,7 @@ export class DatabaseStorage implements IStorage {
             objectives: [
               {
                 type: "collect" as const,
-                resourceId: "fibra",
+                resourceId: RESOURCE_IDS.FIBRA,
                 quantity: 10,
                 description: "Colete 10 Fibras"
               }
@@ -409,7 +408,7 @@ export class DatabaseStorage implements IStorage {
             objectives: [
               {
                 type: "craft" as const,
-                recipeId: "barbante",
+                recipeId: RESOURCE_IDS.BARBANTE,
                 quantity: 1,
                 description: "Crafie 1 Barbante"
               }

@@ -8,6 +8,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 27, 2025 - UUID CONSISTENCY SYSTEM IMPLEMENTED**
+- **Fixed UUID System**: Implemented consistent UUID system across all resources, equipment, and recipes for reliable cross-system referencing
+- **Pre-defined Resource IDs**: All 25 resources now have fixed UUIDs for consistent identification across expeditions, quests, inventory, storage, and crafting
+- **Pre-defined Equipment IDs**: All 19 equipment items have fixed UUIDs ensuring proper crafting recipe references and inventory management
+- **Updated Recipe System**: All 18 recipes now use correct resource and equipment UUIDs for consistent crafting and item creation
+- **Database Schema Improved**: Modified insert schemas to support optional IDs for data consistency during initialization
+- **Quest System Fixed**: Quest objectives now reference correct resource IDs for proper progress tracking
+- **Migration Completed Successfully**: Project fully migrated from Replit Agent with PostgreSQL database and all systems verified functional
+- **Production Ready**: All game systems (expeditions, crafting, inventory, storage, quests) now use consistent ID management for reliable gameplay
+
 **January 27, 2025 - EXPEDITION COMPLETION UI ENHANCED**
 - **Enhanced Minimized Window**: Completed expeditions now show resource collection summary and rewards (XP/coins) instead of progress bar
 - **Removed Step Indicators**: Progress steps "1" and "2" no longer appear in completed expedition modals for cleaner interface

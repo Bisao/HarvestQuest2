@@ -122,9 +122,7 @@ export const insertPlayerSchema = createInsertSchema(players).omit({
   id: true,
 });
 
-export const insertResourceSchema = createInsertSchema(resources).omit({
-  id: true,
-});
+export const insertResourceSchema = createInsertSchema(resources);
 
 export const insertBiomeSchema = createInsertSchema(biomes).omit({
   id: true,
@@ -147,9 +145,7 @@ export const insertExpeditionSchema = createInsertSchema(expeditions).omit({
   collectedResources: true,
 });
 
-export const insertEquipmentSchema = createInsertSchema(equipment).omit({
-  id: true,
-});
+export const insertEquipmentSchema = createInsertSchema(equipment);
 
 export const insertRecipeSchema = createInsertSchema(recipes).omit({
   id: true,
