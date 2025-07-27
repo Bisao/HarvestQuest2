@@ -1,29 +1,44 @@
-// Distance-based expedition service
+// Simplified expedition service that actually works
 import type { IStorage } from "../storage";
-import type { Player, Expedition, Resource, Equipment, Biome } from "@shared/schema";
+import type { Player, Resource, Equipment, Biome } from "@shared/schema";
 import { GameService } from "./game-service";
 
-export class DistanceExpeditionService {
+interface SimpleExpedition {
+  id: string;
+  playerId: string;
+  biomeId: string;
+  selectedResources: string[];
+  maxDistance: number;
+  currentDistance: number;
+  collectedResources: Record<string, number>;
+  status: 'active' | 'completed';
+  startTime: number;
+}
+
+// In-memory store for active expeditions
+const activeExpeditions = new Map<string, SimpleExpedition>();
+
+export class SimpleExpeditionService {
   private gameService: GameService;
 
   constructor(private storage: IStorage) {
     this.gameService = new GameService(storage);
   }
 
-  // Start a new distance-based expedition
-  async startDistanceExpedition(
-    playerId: string, 
-    biomeId: string, 
-    maxDistanceFromCamp: number,
+  // Start a new expedition
+  async startExpedition(
+    playerId: string,
+    biomeId: string,
+    maxDistance: number,
     selectedResources: string[]
-  ): Promise<Expedition> {
+  ): Promise<SimpleExpedition> {
     const player = await this.storage.getPlayer(playerId);
     if (!player) throw new Error("Player not found");
 
     const biome = await this.storage.getBiome(biomeId);
     if (!biome) throw new Error("Biome not found");
 
-    // Check if player has enough hunger and thirst for expedition
+    // Check hunger and thirst
     if (player.hunger < 30) {
       throw new Error("Jogador com muita fome para expedição");
     }
@@ -31,78 +46,47 @@ export class DistanceExpeditionService {
       throw new Error("Jogador com muita sede para expedição");
     }
 
-    // Check if player has required level
-    if (player.level < biome.requiredLevel) {
-      throw new Error("Player level too low for this biome");
-    }
-
-    // Validate selected resources are available in biome and within distance
-    const availableResources = Array.isArray(biome.availableResources) ? biome.availableResources : [];
-    const allResources = await this.storage.getAllResources();
-    
-    const validResources = selectedResources.filter(resourceId => {
-      const resource = allResources.find(r => r.id === resourceId);
-      return availableResources.includes(resourceId) && 
-             resource && 
-             resource.distanceFromCamp <= maxDistanceFromCamp;
-    });
-
-    if (validResources.length === 0) {
-      throw new Error("No valid resources selected for expedition");
-    }
-
-    // Check if player has required tools for selected resources (except basic resources)
-    for (const resourceId of validResources) {
-      const resource = allResources.find(r => r.id === resourceId);
-      // Skip tool check for basic resources - they are always collectable
-      if (resource && resource.type === "basic") {
-        continue;
-      }
-      
-      const hasRequiredTool = await this.gameService.hasRequiredTool(playerId, resourceId);
-      if (!hasRequiredTool) {
-        throw new Error(`Missing required tool for ${resource?.name || 'resource'}`);
-      }
-    }
-
     // Create expedition
-    const expedition = {
+    const expeditionId = `exp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const expedition: SimpleExpedition = {
+      id: expeditionId,
       playerId,
       biomeId,
-      selectedResources: validResources as any,
-      selectedEquipment: [] as any,
-      maxDistanceFromCamp,
+      selectedResources,
+      maxDistance,
       currentDistance: 0,
-      autoReturnTrigger: null,
+      collectedResources: {},
+      status: 'active',
+      startTime: Date.now()
     };
 
-    const createdExpedition = await this.storage.createExpedition(expedition);
-    return createdExpedition;
+    activeExpeditions.set(expeditionId, expedition);
+    console.log(`Storing expedition with ID: ${expeditionId}`);
+    
+    return expedition;
   }
 
-  // Simulate collection at current distance with chance-based system
-  async simulateCollectionAtDistance(
-    expeditionId: string, 
-    currentDistance: number
-  ): Promise<{ resourceCollected: string | null; shouldReturn: boolean; returnReason: string | null; collectionTime: number }> {
-    const expedition = await this.storage.getExpedition(expeditionId);
-    if (!expedition) throw new Error("Expedition not found");
+  // Simulate collection at current distance
+  async simulateCollection(expeditionId: string, currentDistance: number): Promise<{
+    resourceCollected: string | null;
+    shouldReturn: boolean;
+    returnReason: string | null;
+    collectionTime: number;
+  }> {
+    const expedition = activeExpeditions.get(expeditionId);
+    if (!expedition) {
+      throw new Error("Expedition not found");
+    }
 
     const player = await this.storage.getPlayer(expedition.playerId);
     if (!player) throw new Error("Player not found");
 
     const allResources = await this.storage.getAllResources();
-    
-    // Get resources available at current distance
-    const selectedResources = expedition.selectedResources as string[];
-    const availableAtDistance = selectedResources.filter((resourceId: string) => {
-      const resource = allResources.find(r => r.id === resourceId);
-      return resource && resource.distanceFromCamp <= currentDistance;
-    });
 
     // Check auto-return conditions
     const currentWeight = await this.gameService.calculateInventoryWeight(expedition.playerId);
-    const inventoryFull = currentWeight >= player.maxInventoryWeight * 0.9; // Return at 90% capacity
+    const maxWeight = this.gameService.calculateMaxInventoryWeight(player);
+    const inventoryFull = currentWeight >= maxWeight * 0.9;
     const hungerLow = player.hunger <= 10;
     const thirstLow = player.thirst <= 10;
 
@@ -111,98 +95,92 @@ export class DistanceExpeditionService {
       return { resourceCollected: null, shouldReturn: true, returnReason, collectionTime: 0 };
     }
 
-    // Try to collect a resource with chance-based system
-    if (availableAtDistance.length > 0) {
-      const resourceToTry = availableAtDistance[Math.floor(Math.random() * availableAtDistance.length)];
-      const resource = allResources.find(r => r.id === resourceToTry);
-      
-      if (resource) {
-        // Check collection chance
-        const randomChance = Math.random() * 100;
-        const collectSuccess = randomChance <= resource.collectionChance;
-        
-        if (collectSuccess) {
-          // Check if player can carry the resource
-          const canCarry = await this.gameService.canCarryMore(expedition.playerId, resource.weight);
-          if (!canCarry) {
-            return { resourceCollected: null, shouldReturn: true, returnReason: 'inventory_full', collectionTime: 0 };
-          }
+    // Get resources available at current distance
+    const availableResources = expedition.selectedResources
+      .map(id => allResources.find(r => r.id === id))
+      .filter((r): r is Resource => r !== undefined && r.distanceFromCamp <= currentDistance);
 
-          // Add resource to expedition collected resources
-          const currentCollected = expedition.collectedResources as Record<string, number>;
-          const newCollected = {
-            ...currentCollected,
-            [resourceToTry]: (currentCollected[resourceToTry] || 0) + 1,
-          };
-
-          await this.storage.updateExpedition(expeditionId, {
-            collectedResources: newCollected,
-            currentDistance,
-          });
-
-          // Reduce player hunger and thirst
-          await this.storage.updatePlayer(expedition.playerId, {
-            hunger: Math.max(0, player.hunger - 2),
-            thirst: Math.max(0, player.thirst - 2),
-          });
-
-          return { 
-            resourceCollected: resourceToTry, 
-            shouldReturn: false, 
-            returnReason: null, 
-            collectionTime: resource.collectionTimeMinutes 
-          };
-        } else {
-          // Failed to collect - return collection time to simulate search effort
-          return { 
-            resourceCollected: null, 
-            shouldReturn: false, 
-            returnReason: null, 
-            collectionTime: Math.ceil(resource.collectionTimeMinutes / 2) // Half time for failed attempt
-          };
-        }
-      }
+    if (availableResources.length === 0) {
+      return { resourceCollected: null, shouldReturn: false, returnReason: null, collectionTime: 0.5 };
     }
 
-    return { resourceCollected: null, shouldReturn: false, returnReason: null, collectionTime: 1 };
+    // Try to collect a random resource
+    const resourceToTry = availableResources[Math.floor(Math.random() * availableResources.length)];
+    
+    // Simplified collection chance - 70% success rate
+    const success = Math.random() < 0.7;
+    
+    if (success) {
+      // Check if player can carry more
+      const canCarry = await this.gameService.canCarryMore(expedition.playerId, resourceToTry.weight);
+      if (!canCarry) {
+        return { resourceCollected: null, shouldReturn: true, returnReason: 'inventory_full', collectionTime: 0 };
+      }
+
+      // Add to expedition collected resources
+      expedition.collectedResources[resourceToTry.id] = (expedition.collectedResources[resourceToTry.id] || 0) + 1;
+      expedition.currentDistance = currentDistance;
+
+      // Reduce hunger and thirst
+      await this.storage.updatePlayer(expedition.playerId, {
+        hunger: Math.max(0, player.hunger - 1),
+        thirst: Math.max(0, player.thirst - 1),
+      });
+
+      return {
+        resourceCollected: resourceToTry.id,
+        shouldReturn: false,
+        returnReason: null,
+        collectionTime: resourceToTry.collectionTimeMinutes || 2
+      };
+    } else {
+      // Failed to collect
+      return {
+        resourceCollected: null,
+        shouldReturn: false,
+        returnReason: null,
+        collectionTime: 1 // Search time
+      };
+    }
   }
 
-  // Complete distance-based expedition
-  async completeDistanceExpedition(expeditionId: string, autoReturnTrigger: string): Promise<Expedition> {
-    const expedition = await this.storage.getExpedition(expeditionId);
+  // Complete expedition
+  async completeExpedition(expeditionId: string, autoReturnTrigger: string): Promise<SimpleExpedition> {
+    const expedition = activeExpeditions.get(expeditionId);
     if (!expedition) throw new Error("Expedition not found");
 
     const player = await this.storage.getPlayer(expedition.playerId);
     if (!player) throw new Error("Player not found");
 
     // Process collected resources (including animal processing)
-    const processedResources = await this.processCollectedResources(
-      expedition.collectedResources as Record<string, number>
-    );
+    const processedResources = await this.processCollectedResources(expedition.collectedResources);
 
-    // Add rewards to storage or inventory based on auto-storage setting
-    await this.distributeRewards(expedition.playerId, processedResources, player.autoStorage);
+    // Add rewards to storage or inventory
+    await this.distributeRewards(expedition.playerId, processedResources, player.autoStorage || false);
 
-    // Calculate experience gain
-    const resources = await this.storage.getAllResources();
-    const expGain = this.gameService.calculateExperienceGain(processedResources, resources);
+    // Calculate experience and coins
+    const allResources = await this.storage.getAllResources();
+    const expGain = this.gameService.calculateExperienceGain(processedResources, allResources);
+    const coinReward = this.calculateCoinReward(processedResources, allResources);
     
     // Update player stats
     const levelData = this.gameService.calculateLevelUp(player.experience, expGain);
     await this.storage.updatePlayer(expedition.playerId, {
       experience: levelData.newExp,
       level: levelData.newLevel,
-      coins: player.coins + this.calculateCoinReward(processedResources, resources)
+      coins: player.coins + coinReward
     });
 
-    // Mark expedition as completed
-    return await this.storage.updateExpedition(expeditionId, {
-      status: "completed",
-      endTime: Date.now(),
-      progress: 100,
-      collectedResources: processedResources,
-      autoReturnTrigger,
-    });
+    // Update expedition status
+    expedition.status = 'completed';
+    expedition.collectedResources = processedResources;
+
+    // Clean up after 1 minute
+    setTimeout(() => {
+      activeExpeditions.delete(expeditionId);
+    }, 60000);
+
+    return expedition;
   }
 
   // Process collected resources (animal processing)
@@ -365,9 +343,18 @@ export class DistanceExpeditionService {
     return Math.floor(totalValue * 0.1); // 10% of resource value as coins
   }
 
-  // Get active distance expedition for player
-  async getActiveDistanceExpedition(playerId: string): Promise<Expedition | null> {
-    const expeditions = await this.storage.getPlayerExpeditions(playerId);
-    return expeditions.find(exp => exp.status === "in_progress") || null;
+  // Get active expedition for player
+  getActiveExpedition(playerId: string): SimpleExpedition | null {
+    for (const expedition of activeExpeditions.values()) {
+      if (expedition.playerId === playerId && expedition.status === 'active') {
+        return expedition;
+      }
+    }
+    return null;
+  }
+
+  // Get expedition by ID
+  getExpedition(expeditionId: string): SimpleExpedition | null {
+    return activeExpeditions.get(expeditionId) || null;
   }
 }

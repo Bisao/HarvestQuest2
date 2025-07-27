@@ -5,7 +5,7 @@ import BiomesTab from "@/components/game/biomes-tab";
 import EnhancedInventory from "@/components/game/enhanced-inventory";
 import StorageTab from "@/components/game/storage-tab";
 import EvolutionaryCraftingSystem from "@/components/game/evolutionary-crafting-system";
-import DistanceExpeditionSystem from "@/components/game/distance-expedition-system";
+import SimpleExpeditionSystem from "@/components/game/simple-expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
 import { queryClient } from "@/lib/queryClient";
 import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema";
@@ -442,7 +442,7 @@ export default function Game() {
         </div>
       </main>
 
-      <DistanceExpeditionSystem
+      <SimpleExpeditionSystem
         isOpen={expeditionModalOpen}
         onClose={() => {
           setExpeditionModalOpen(false);
@@ -451,8 +451,25 @@ export default function Game() {
         }}
         biome={selectedBiome}
         resources={resources}
+        equipment={equipment}
         playerId={player.id}
         player={player}
+        onExpeditionComplete={(rewards) => {
+          console.log('Expedition completed with rewards:', rewards);
+          // Update localStorage with last expedition resources
+          if (selectedBiome) {
+            const lastExpeditions = JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}');
+            lastExpeditions[selectedBiome.id] = Object.keys(rewards);
+            localStorage.setItem('lastExpeditionResources', JSON.stringify(lastExpeditions));
+          }
+          
+          // Refresh queries
+          queryClient.invalidateQueries({ queryKey: ["/api/player"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/storage"] });
+          
+          setActiveExpedition(null);
+        }}
       />
 
       {/* Minimized Expedition Window */}

@@ -834,10 +834,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required expedition parameters" });
       }
 
-      const { DistanceExpeditionService } = await import("./services/distance-expedition-service");
-      const distanceExpeditionService = new DistanceExpeditionService(storage);
+      const { SimpleExpeditionService } = await import("./services/simple-expedition-service");
+      const expeditionService = new SimpleExpeditionService(storage);
       
-      const expedition = await distanceExpeditionService.startDistanceExpedition(
+      const expedition = await expeditionService.startExpedition(
         playerId, 
         biomeId, 
         maxDistanceFromCamp, 
@@ -856,10 +856,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { currentDistance } = req.body;
       
-      const { DistanceExpeditionService } = await import("./services/distance-expedition-service");
-      const distanceExpeditionService = new DistanceExpeditionService(storage);
+      const { SimpleExpeditionService } = await import("./services/simple-expedition-service");
+      const expeditionService = new SimpleExpeditionService(storage);
       
-      const result = await distanceExpeditionService.simulateCollectionAtDistance(id, currentDistance);
+      const result = await expeditionService.simulateCollection(id, currentDistance);
       res.json(result);
     } catch (error) {
       console.error("Failed to simulate collection:", error);
@@ -872,10 +872,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { autoReturnTrigger } = req.body;
       
-      const { DistanceExpeditionService } = await import("./services/distance-expedition-service");
-      const distanceExpeditionService = new DistanceExpeditionService(storage);
+      const { SimpleExpeditionService } = await import("./services/simple-expedition-service");
+      const expeditionService = new SimpleExpeditionService(storage);
       
-      const expedition = await distanceExpeditionService.completeDistanceExpedition(id, autoReturnTrigger);
+      const expedition = await expeditionService.completeExpedition(id, autoReturnTrigger);
       res.json(expedition);
     } catch (error) {
       console.error("Failed to complete distance expedition:", error);
@@ -887,10 +887,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId } = req.params;
       
-      const { DistanceExpeditionService } = await import("./services/distance-expedition-service");
-      const distanceExpeditionService = new DistanceExpeditionService(storage);
+      const { SimpleExpeditionService } = await import("./services/simple-expedition-service");
+      const expeditionService = new SimpleExpeditionService(storage);
       
-      const activeExpedition = await distanceExpeditionService.getActiveDistanceExpedition(playerId);
+      const activeExpedition = expeditionService.getActiveExpedition(playerId);
       res.json(activeExpedition);
     } catch (error) {
       console.error("Failed to get active distance expedition:", error);
