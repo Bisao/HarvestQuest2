@@ -90,10 +90,8 @@ export default function Game() {
 
         setActiveExpedition((prev: any) => prev ? { ...prev, progress: newProgress } : null);
 
-        // Auto-expand when expedition completes
+        // Don't auto-expand when expedition completes - let user choose
         if (newProgress >= 100) {
-          setExpeditionMinimized(false);
-          setExpeditionModalOpen(true);
           clearInterval(interval);
         }
       }, 1000);
@@ -478,7 +476,9 @@ export default function Game() {
                 <span className="text-2xl">{selectedBiome.emoji}</span>
                 <div>
                   <h4 className="font-semibold text-sm">Expedição na {selectedBiome.name}</h4>
-                  <p className="text-xs text-gray-500">Em andamento...</p>
+                  <p className="text-xs text-gray-500">
+                    {activeExpedition.progress >= 100 ? "Concluída!" : "Em andamento..."}
+                  </p>
                 </div>
               </div>
               <button
@@ -493,13 +493,23 @@ export default function Game() {
             <div className="space-y-2">
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className="bg-forest h-2 rounded-full transition-all duration-300"
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    activeExpedition.progress >= 100 ? "bg-green-500" : "bg-forest"
+                  }`}
                   style={{ width: `${activeExpedition.progress || 0}%` }}
                 ></div>
               </div>
               <p className="text-xs text-gray-600 text-center">
                 Progresso: {Math.floor(activeExpedition.progress || 0)}%
               </p>
+              {activeExpedition.progress >= 100 && (
+                <button
+                  onClick={handleCompleteExpedition}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
+                >
+                  ✅ Finalizar Expedição
+                </button>
+              )}
             </div>
           </div>
         </div>
