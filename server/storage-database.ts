@@ -222,13 +222,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createExpedition(expedition: InsertExpedition): Promise<Expedition> {
+    // Convert JavaScript timestamps to PostgreSQL compatible integers
+    const now = Math.floor(Date.now() / 1000); // Convert to seconds for PostgreSQL integer storage
+    const endTime = now + 60; // 1 minute expedition in seconds
+    
     const [newExpedition] = await db
       .insert(expeditions)
       .values({
         ...expedition,
         status: "in_progress",
-        startTime: Date.now(),
-        endTime: Date.now() + 60000, // 1 minute expedition
+        startTime: now,
+        endTime: endTime,
         progress: 0,
         collectedResources: {}
       })

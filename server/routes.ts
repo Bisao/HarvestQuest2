@@ -924,31 +924,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Quest not found" });
       }
 
-      // Get player to check level requirement
+      // Check player level requirement
       const player = await storage.getPlayer(playerId);
       if (!player) {
         return res.status(404).json({ message: "Player not found" });
       }
-
+      
       if (player.level < quest.requiredLevel) {
-        return res.status(400).json({ message: "Player level too low for this quest" });
+        return res.status(400).json({ message: "Player level too low" });
       }
 
-      // Create player quest
+      // Create player quest with current timestamp in seconds
       const playerQuest = await storage.createPlayerQuest({
         playerId,
         questId,
-        status: 'active',
-        progress: {}
+        status: "active",
+        progress: {},
+        startedAt: Math.floor(Date.now() / 1000)
       });
 
-      // Update with start time
-      const updatedPlayerQuest = await storage.updatePlayerQuest(playerQuest.id, {
-        startedAt: Date.now()
-      });
-
-      res.json(updatedPlayerQuest);
+      res.json({ message: "Quest started successfully", playerQuest });
     } catch (error) {
+      console.error("Start quest error:", error);
       res.status(500).json({ message: "Failed to start quest" });
     }
   });
