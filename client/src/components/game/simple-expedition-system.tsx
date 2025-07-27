@@ -129,7 +129,7 @@ export default function SimpleExpeditionSystem({
 
         searchTime++;
 
-        // Call simulation API
+        // Call simulation API with current expedition state
         const response = await apiRequest('POST', `/api/expeditions/distance/${expeditionId}/simulate`, {
           currentDistance,
         });
@@ -412,9 +412,9 @@ export default function SimpleExpeditionSystem({
               {expeditionState.autoReturnTrigger && (
                 <p className="text-gray-600">
                   Motivo do retorno: {
-                    expeditionState.autoReturnTrigger === 'inventory_full' ? 'Inventário cheio' :
-                    expeditionState.autoReturnTrigger === 'hunger_low' ? 'Fome baixa' :
-                    expeditionState.autoReturnTrigger === 'thirst_low' ? 'Sede baixa' :
+                    expeditionState.autoReturnTrigger === 'inventory_full' ? 'Inventário 90% cheio' :
+                    expeditionState.autoReturnTrigger === 'hunger_low' ? 'Fome baixa (10% restante)' :
+                    expeditionState.autoReturnTrigger === 'thirst_low' ? 'Sede baixa (10% restante)' :
                     'Expedição completada'
                   }
                 </p>

@@ -83,12 +83,12 @@ export class SimpleExpeditionService {
 
     const allResources = await this.storage.getAllResources();
 
-    // Check auto-return conditions
+    // Check auto-return conditions - continue until hunger/thirst below 10% or inventory 90% full
     const currentWeight = await this.gameService.calculateInventoryWeight(expedition.playerId);
     const maxWeight = this.gameService.calculateMaxInventoryWeight(player);
     const inventoryFull = currentWeight >= maxWeight * 0.9;
-    const hungerLow = player.hunger <= 10;
-    const thirstLow = player.thirst <= 10;
+    const hungerLow = player.hunger <= (player.maxHunger * 0.1); // 10% of max hunger
+    const thirstLow = player.thirst <= (player.maxThirst * 0.1); // 10% of max thirst
 
     if (inventoryFull || hungerLow || thirstLow) {
       const returnReason = inventoryFull ? 'inventory_full' : hungerLow ? 'hunger_low' : 'thirst_low';
@@ -107,8 +107,8 @@ export class SimpleExpeditionService {
     // Try to collect a random resource
     const resourceToTry = availableResources[Math.floor(Math.random() * availableResources.length)];
     
-    // Simplified collection chance - 70% success rate
-    const success = Math.random() < 0.7;
+    // Higher collection chance for better gameplay - 85% success rate
+    const success = Math.random() < 0.85;
     
     if (success) {
       // Check if player can carry more
@@ -121,15 +121,26 @@ export class SimpleExpeditionService {
       expedition.collectedResources[resourceToTry.id] = (expedition.collectedResources[resourceToTry.id] || 0) + 1;
       expedition.currentDistance = currentDistance;
 
-      // Add resource directly to player's inventory using existing method
-      const inventory = await this.storage.getInventory(expedition.playerId);
-      inventory[resourceToTry.id] = (inventory[resourceToTry.id] || 0) + 1;
-      await this.storage.updateInventory(expedition.playerId, inventory);
+      // Add resource directly to player's inventory using existing methods
+      const inventoryItems = await this.storage.getPlayerInventory(expedition.playerId);
+      const existingItem = inventoryItems.find(item => item.resourceId === resourceToTry.id);
+      
+      if (existingItem) {
+        await this.storage.updateInventoryItem(existingItem.id, {
+          quantity: existingItem.quantity + 1
+        });
+      } else {
+        await this.storage.addInventoryItem({
+          playerId: expedition.playerId,
+          resourceId: resourceToTry.id,
+          quantity: 1
+        });
+      }
 
-      // Reduce hunger and thirst
+      // Reduce hunger and thirst slightly for each collection
       await this.storage.updatePlayer(expedition.playerId, {
-        hunger: Math.max(0, player.hunger - 1),
-        thirst: Math.max(0, player.thirst - 1),
+        hunger: Math.max(0, player.hunger - 0.5), // Slower hunger reduction
+        thirst: Math.max(0, player.thirst - 0.5), // Slower thirst reduction
       });
 
       return {
@@ -336,20 +347,40 @@ export class SimpleExpeditionService {
 
   // Distribute rewards to inventory or storage
   private async distributeRewards(playerId: string, rewards: Record<string, number>, autoStorage: boolean): Promise<void> {
-    if (autoStorage) {
-      // Add to storage
-      const storage = await this.storage.getStorage(playerId);
-      for (const [resourceId, quantity] of Object.entries(rewards)) {
-        storage[resourceId] = (storage[resourceId] || 0) + quantity;
+    for (const [resourceId, quantity] of Object.entries(rewards)) {
+      if (autoStorage) {
+        // Add to storage
+        const storageItems = await this.storage.getPlayerStorage(playerId);
+        const existingStorageItem = storageItems.find(item => item.resourceId === resourceId);
+        
+        if (existingStorageItem) {
+          await this.storage.updateStorageItem(existingStorageItem.id, {
+            quantity: existingStorageItem.quantity + quantity
+          });
+        } else {
+          await this.storage.addStorageItem({
+            playerId: playerId,
+            resourceId: resourceId,
+            quantity: quantity
+          });
+        }
+      } else {
+        // Add to inventory
+        const inventoryItems = await this.storage.getPlayerInventory(playerId);
+        const existingInventoryItem = inventoryItems.find(item => item.resourceId === resourceId);
+        
+        if (existingInventoryItem) {
+          await this.storage.updateInventoryItem(existingInventoryItem.id, {
+            quantity: existingInventoryItem.quantity + quantity
+          });
+        } else {
+          await this.storage.addInventoryItem({
+            playerId: playerId,
+            resourceId: resourceId,
+            quantity: quantity
+          });
+        }
       }
-      await this.storage.updateStorage(playerId, storage);
-    } else {
-      // Add to inventory
-      const inventory = await this.storage.getInventory(playerId);
-      for (const [resourceId, quantity] of Object.entries(rewards)) {
-        inventory[resourceId] = (inventory[resourceId] || 0) + quantity;
-      }
-      await this.storage.updateInventory(playerId, inventory);
     }
   }
 
