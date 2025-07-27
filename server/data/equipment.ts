@@ -346,258 +346,470 @@ export const ARMOR_EVOLUTIONS: EquipmentEvolution[] = [
   }
 ];
 
-// Função para gerar equipamentos evolutivos
-export const EVOLUTIONARY_TOOLS: InsertEquipment[] = TOOL_EVOLUTIONS.flatMap(evolution => 
-  evolution.levels.map(level => ({
+// Helper function to convert evolution data to equipment
+function evolutionToEquipment(evolution: EquipmentEvolution, slot: string): InsertEquipment[] {
+  return evolution.levels.map(level => ({
     name: level.name,
     emoji: level.emoji,
     effect: level.effect,
     bonus: level.bonus,
-    slot: "tool" as const,
+    slot: slot as any,
     toolType: evolution.baseType,
     weight: level.weight,
-  }))
-);
+  }));
+}
 
-export const EVOLUTIONARY_WEAPONS: InsertEquipment[] = WEAPON_EVOLUTIONS.flatMap(evolution => 
-  evolution.levels.map(level => ({
-    name: level.name,
-    emoji: level.emoji,
-    effect: level.effect,
-    bonus: level.bonus,
-    slot: "weapon" as const,
-    toolType: evolution.baseType,
-    weight: level.weight,
-  }))
-);
-
-export const EVOLUTIONARY_ARMOR: InsertEquipment[] = ARMOR_EVOLUTIONS.flatMap(evolution => 
-  evolution.levels.map(level => ({
-    name: level.name,
-    emoji: level.emoji,
-    effect: level.effect,
-    bonus: level.bonus,
-    slot: evolution.baseType as any,
-    toolType: null,
-    weight: level.weight,
-  }))
-);
-
-// Ferramentas básicas (não evolutivas) 
-export const BASIC_TOOLS: InsertEquipment[] = [
+// FERRAMENTAS ESPECIALIZADAS - 3 VARIAÇÕES CADA
+export const SPECIALIZED_TOOLS: EquipmentEvolution[] = [
   {
-    name: "Pá de Madeira",
-    emoji: "🔺",
-    effect: "+15% escavação",
-    bonus: { type: "resource_boost", resource: "areia", multiplier: 1.15 },
-    slot: "tool",
-    toolType: "shovel",
-    weight: 2,
+    baseType: "shovel",
+    levels: [
+      {
+        name: "Pá de Madeira",
+        emoji: "🔺",
+        level: 2,
+        effect: "+15% escavação",
+        bonus: { type: "resource_boost", resource: "argila", multiplier: 1.15 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Pá de Ferro",
+        emoji: "🏗️",
+        level: 9,
+        effect: "+30% escavação",
+        bonus: { type: "resource_boost", resource: "argila", multiplier: 1.3 },
+        weight: 4,
+        tier: 'ferro'
+      },
+      {
+        name: "Pá Elite",
+        emoji: "⚡",
+        level: 20,
+        effect: "+50% escavação",
+        bonus: { type: "resource_boost", resource: "argila", multiplier: 1.5 },
+        weight: 3,
+        tier: 'avancado'
+      }
+    ]
   },
   {
-    name: "Vara de Pesca",
-    emoji: "🎣",
-    effect: "Permite pescar",
-    bonus: { type: "fishing", value: 1 },
-    slot: "tool",
-    toolType: "fishing_rod",
-    weight: 2,
+    baseType: "fishing_rod",
+    levels: [
+      {
+        name: "Vara de Pesca Simples",
+        emoji: "🎣",
+        level: 3,
+        effect: "Pesca básica",
+        bonus: { type: "fishing", value: 1 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Vara de Pesca Reforçada",
+        emoji: "🎣",
+        level: 12,
+        effect: "+25% chance de peixe grande",
+        bonus: { type: "fishing", value: 2 },
+        weight: 3,
+        tier: 'ferro'
+      },
+      {
+        name: "Vara de Pesca Mágica",
+        emoji: "🎣",
+        level: 24,
+        effect: "+50% peixes raros",
+        bonus: { type: "fishing", value: 3 },
+        weight: 2,
+        tier: 'avancado'
+      }
+    ]
   },
   {
-    name: "Foice",
-    emoji: "🔪",
-    effect: "+15% plantas",
-    bonus: { type: "resource_boost", resource: "fibra", multiplier: 1.15 },
-    slot: "tool",
-    toolType: "sickle",
-    weight: 2,
+    baseType: "sickle",
+    levels: [
+      {
+        name: "Foice de Pedra",
+        emoji: "🔪",
+        level: 2,
+        effect: "+15% plantas",
+        bonus: { type: "resource_boost", resource: "fibra", multiplier: 1.15 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Foice de Ferro",
+        emoji: "🔪",
+        level: 10,
+        effect: "+30% plantas",
+        bonus: { type: "resource_boost", resource: "fibra", multiplier: 1.3 },
+        weight: 3,
+        tier: 'ferro'
+      },
+      {
+        name: "Foice Druídica",
+        emoji: "🔪",
+        level: 22,
+        effect: "+50% plantas raras",
+        bonus: { type: "resource_boost", resource: "fibra", multiplier: 1.5 },
+        weight: 2,
+        tier: 'avancado'
+      }
+    ]
   },
   {
-    name: "Faca",
-    emoji: "🗡️",
-    effect: "Permite esfolar animais",
-    bonus: { type: "skinning", value: 1 },
-    slot: "tool",
-    toolType: "knife",
-    weight: 1,
+    baseType: "knife",
+    levels: [
+      {
+        name: "Faca de Pedra",
+        emoji: "🗡️",
+        level: 1,
+        effect: "Esfola animais pequenos",
+        bonus: { type: "skinning", value: 1 },
+        weight: 1,
+        tier: 'improvisado'
+      },
+      {
+        name: "Faca de Ferro",
+        emoji: "🗡️",
+        level: 8,
+        effect: "Esfola todos os animais",
+        bonus: { type: "skinning", value: 2 },
+        weight: 2,
+        tier: 'ferro'
+      },
+      {
+        name: "Faca de Caçador",
+        emoji: "🗡️",
+        level: 19,
+        effect: "+25% materiais animais",
+        bonus: { type: "skinning", value: 3 },
+        weight: 1,
+        tier: 'avancado'
+      }
+    ]
   },
   {
-    name: "Balde de Madeira",
-    emoji: "🪣",
-    effect: "Permite coletar água",
-    bonus: { type: "water_collection", value: 1 },
-    slot: "tool",
-    toolType: "bucket",
-    weight: 2,
-  },
+    baseType: "bucket",
+    levels: [
+      {
+        name: "Balde de Madeira",
+        emoji: "🪣",
+        level: 2,
+        effect: "Coleta água básica",
+        bonus: { type: "water_collection", value: 1 },
+        weight: 2,
+        tier: 'improvisado'
+      },
+      {
+        name: "Balde de Ferro",
+        emoji: "🪣",
+        level: 11,
+        effect: "Coleta mais água",
+        bonus: { type: "water_collection", value: 2 },
+        weight: 4,
+        tier: 'ferro'
+      },
+      {
+        name: "Balde Mágico",
+        emoji: "🪣",
+        level: 23,
+        effect: "Água infinita",
+        bonus: { type: "water_collection", value: 3 },
+        weight: 2,
+        tier: 'avancado'
+      }
+    ]
+  }
 ];
 
-export const UTILITY_TOOLS: InsertEquipment[] = [
+// UTENSÍLIOS DE COZINHA - 3 VARIAÇÕES CADA
+export const COOKING_UTENSILS: EquipmentEvolution[] = [
   {
-    name: "Garrafa de Bambu",
-    emoji: "🎍",
-    effect: "Usado para fazer bebidas",
-    bonus: { type: "crafting", value: 1 },
-    slot: "tool",
-    toolType: "bamboo_bottle",
-    weight: 1,
+    baseType: "pot",
+    levels: [
+      {
+        name: "Panela de Barro",
+        emoji: "🏺",
+        level: 4,
+        effect: "Cozinha receitas básicas",
+        bonus: { type: "cooking", value: 1 },
+        weight: 4,
+        tier: 'improvisado'
+      },
+      {
+        name: "Panela de Ferro",
+        emoji: "🫕",
+        level: 12,
+        effect: "Cozinha receitas avançadas",
+        bonus: { type: "cooking", value: 2 },
+        weight: 5,
+        tier: 'ferro'
+      },
+      {
+        name: "Caldeirão Mágico",
+        emoji: "🔮",
+        level: 28,
+        effect: "Cozinha receitas especiais",
+        bonus: { type: "cooking", value: 3 },
+        weight: 4,
+        tier: 'avancado'
+      }
+    ]
   },
   {
-    name: "Panela",
-    emoji: "🫕",
-    effect: "Usada para cozinhar ensopados",
-    bonus: { type: "cooking", value: 1 },
+    baseType: "bottle",
+    levels: [
+      {
+        name: "Garrafa de Bambu",
+        emoji: "🎍",
+        level: 2,
+        effect: "Armazena bebidas básicas",
+        bonus: { type: "storage", value: 1 },
+        weight: 1,
+        tier: 'improvisado'
+      },
+      {
+        name: "Garrafa de Vidro",
+        emoji: "🍶",
+        level: 14,
+        effect: "Armazena bebidas especiais",
+        bonus: { type: "storage", value: 2 },
+        weight: 2,
+        tier: 'ferro'
+      },
+      {
+        name: "Garrafa Cristalina",
+        emoji: "💎",
+        level: 26,
+        effect: "Preserva bebidas perfeitamente",
+        bonus: { type: "storage", value: 3 },
+        weight: 1,
+        tier: 'avancado'
+      }
+    ]
+  }
+];
+
+// MATERIAIS DE CRAFTING - 3 VARIAÇÕES CADA
+export const CRAFTING_MATERIALS: EquipmentEvolution[] = [
+  {
+    baseType: "rope",
+    levels: [
+      {
+        name: "Corda de Fibra",
+        emoji: "🪢",
+        level: 3,
+        effect: "Material básico de crafting",
+        bonus: { type: "crafting", value: 1 },
+        weight: 1,
+        tier: 'improvisado'
+      },
+      {
+        name: "Corda de Couro",
+        emoji: "🪢",
+        level: 11,
+        effect: "Material resistente",
+        bonus: { type: "crafting", value: 2 },
+        weight: 2,
+        tier: 'ferro'
+      },
+      {
+        name: "Corda Élfica",
+        emoji: "🪢",
+        level: 25,
+        effect: "Material superior",
+        bonus: { type: "crafting", value: 3 },
+        weight: 1,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "bait",
+    levels: [
+      {
+        name: "Isca Simples",
+        emoji: "🪱",
+        level: 2,
+        effect: "Melhora pesca básica",
+        bonus: { type: "fishing_boost", value: 1 },
+        weight: 0.1,
+        tier: 'improvisado'
+      },
+      {
+        name: "Isca Especial",
+        emoji: "🐛",
+        level: 13,
+        effect: "Atrai peixes grandes",
+        bonus: { type: "fishing_boost", value: 2 },
+        weight: 0.2,
+        tier: 'ferro'
+      },
+      {
+        name: "Isca Mágica",
+        emoji: "✨",
+        level: 27,
+        effect: "Atrai peixes lendários",
+        bonus: { type: "fishing_boost", value: 3 },
+        weight: 0.1,
+        tier: 'avancado'
+      }
+    ]
+  }
+];
+
+// Equipamentos utilitários diversos
+export const UTILITY_EQUIPMENT: InsertEquipment[] = [
+  {
+    name: "Armadilha Simples",
+    emoji: "🕳️",
+    effect: "Captura animais pequenos",
+    bonus: { type: "trap", value: 1 },
     slot: "tool",
-    toolType: "pot",
+    toolType: "trap",
     weight: 3,
   },
-  {
-    name: "Isca para Pesca",
-    emoji: "🪱",
-    effect: "Melhora chance de pescar",
-    bonus: { type: "fishing", value: 2 },
-    slot: "tool",
-    toolType: "bait",
-    weight: 0.1,
-  },
-  {
-    name: "Corda",
-    emoji: "🪢",
-    effect: "Material robusto para crafting",
-    bonus: { type: "crafting", value: 2 },
-    slot: "tool",
-    toolType: "rope",
-    weight: 1,
-  },
-  {
-    name: "Panela de Barro",
-    emoji: "🏺",
-    effect: "Usada para cozinhar ensopados",
-    bonus: { type: "cooking", value: 1 },
-    slot: "tool",
-    toolType: "clay_pot",
-    weight: 4,
-  },
 ];
 
-export const EQUIPMENT_ARMOR: InsertEquipment[] = [
+// ARMAS ADICIONAIS - 3 VARIAÇÕES CADA
+export const ADDITIONAL_WEAPONS: EquipmentEvolution[] = [
   {
-    name: "Mochila",
-    emoji: "🎒",
-    effect: "Aumenta capacidade de inventário",
-    bonus: { type: "inventory", value: 50 },
-    slot: "chestplate",
-    toolType: "backpack",
-    weight: 2,
+    baseType: "spear",
+    levels: [
+      {
+        name: "Lança de Madeira",
+        emoji: "🔱",
+        level: 4,
+        effect: "Caça animais médios",
+        bonus: { type: "hunting", value: 2 },
+        weight: 3,
+        tier: 'improvisado'
+      },
+      {
+        name: "Lança de Ferro",
+        emoji: "🔱",
+        level: 16,
+        effect: "Caça animais grandes",
+        bonus: { type: "hunting", value: 3 },
+        weight: 5,
+        tier: 'ferro'
+      },
+      {
+        name: "Lança Ancestral",
+        emoji: "🔱",
+        level: 32,
+        effect: "Caça criaturas lendárias",
+        bonus: { type: "hunting", value: 4 },
+        weight: 4,
+        tier: 'avancado'
+      }
+    ]
   },
+  {
+    baseType: "crossbow",
+    levels: [
+      {
+        name: "Besta Simples",
+        emoji: "🏹",
+        level: 8,
+        effect: "Precisão aprimorada",
+        bonus: { type: "hunting", value: 2 },
+        weight: 4,
+        tier: 'improvisado'
+      },
+      {
+        name: "Besta de Ferro",
+        emoji: "🏹",
+        level: 18,
+        effect: "Alta precisão",
+        bonus: { type: "hunting", value: 3 },
+        weight: 6,
+        tier: 'ferro'
+      },
+      {
+        name: "Besta Élfica",
+        emoji: "🏹",
+        level: 35,
+        effect: "Precisão perfeita",
+        bonus: { type: "hunting", value: 4 },
+        weight: 4,
+        tier: 'avancado'
+      }
+    ]
+  },
+  {
+    baseType: "mace",
+    levels: [
+      {
+        name: "Clava de Madeira",
+        emoji: "🔨",
+        level: 3,
+        effect: "Força bruta básica",
+        bonus: { type: "hunting", value: 1 },
+        weight: 4,
+        tier: 'improvisado'
+      },
+      {
+        name: "Martelo de Guerra",
+        emoji: "🔨",
+        level: 14,
+        effect: "Força devastadora",
+        bonus: { type: "hunting", value: 3 },
+        weight: 7,
+        tier: 'ferro'
+      },
+      {
+        name: "Martelo dos Titãs",
+        emoji: "🔨",
+        level: 30,
+        effect: "Poder absoluto",
+        bonus: { type: "hunting", value: 4 },
+        weight: 6,
+        tier: 'avancado'
+      }
+    ]
+  }
 ];
 
-export const WEAPONS: InsertEquipment[] = [
-  {
-    name: "Espada de Pedra",
-    emoji: "⚔️",
-    effect: "Permite caçar animais pequenos",
-    bonus: { type: "hunting", value: 1 },
-    slot: "weapon",
-    toolType: "sword",
-    weight: 4,
-  },
-  {
-    name: "Arco e Flecha",
-    emoji: "🏹",
-    effect: "Permite caçar todos os animais",
-    bonus: { type: "hunting", value: 2 },
-    slot: "weapon",
-    toolType: "bow",
-    weight: 3,
-  },
-  {
-    name: "Lança",
-    emoji: "🔱",
-    effect: "Permite caçar animais grandes",
-    bonus: { type: "hunting", value: 3 },
-    slot: "weapon",
-    toolType: "spear",
-    weight: 5,
-  },
-  {
-    name: "Faca",
-    emoji: "🗡️",
-    effect: "Permite esfolar animais + caça pequena",
-    bonus: { type: "hunting", value: 1 },
-    slot: "weapon",
-    toolType: "knife",
-    weight: 1,
-  },
-];
+// Cleaned up - removing duplicated armor that's now in EVOLUTIONARY_ARMOR
 
-export const ARMOR: InsertEquipment[] = [
-  {
-    name: "Capacete de Ferro",
-    emoji: "🪖",
-    effect: "+10% proteção",
-    bonus: { type: "protection", value: 10 },
-    slot: "helmet",
-    toolType: null,
-    weight: 2,
-  },
-  {
-    name: "Mochila",
-    emoji: "🎒",
-    effect: "+15 kg capacidade",
-    bonus: { type: "weight_boost", value: 15 },
-    slot: "backpack",
-    toolType: null,
-    weight: 3,
-  },
-  {
-    name: "Peitoral de Ferro",
-    emoji: "🦺",
-    effect: "+15% proteção",
-    bonus: { type: "protection", value: 15 },
-    slot: "chestplate",
-    toolType: null,
-    weight: 4,
-  },
-  {
-    name: "Calças de Couro",
-    emoji: "👖",
-    effect: "+5% proteção",
-    bonus: { type: "protection", value: 5 },
-    slot: "leggings",
-    toolType: null,
-    weight: 2,
-  },
-  {
-    name: "Bolsa de Comida",
-    emoji: "🥘",
-    effect: "Preserva alimentos",
-    bonus: { type: "food_preservation", value: 1 },
-    slot: "foodbag",
-    toolType: null,
-    weight: 2,
-  },
-  {
-    name: "Botas de Couro",
-    emoji: "🥾",
-    effect: "+5% velocidade",
-    bonus: { type: "speed_boost", value: 5 },
-    slot: "boots",
-    toolType: null,
-    weight: 1,
-  },
-];
+export function createEquipmentData(): InsertEquipment[] {
+  const toolEvolutions = [
+    ...TOOL_EVOLUTIONS,
+    ...SPECIALIZED_TOOLS
+  ].flatMap(evolution => evolutionToEquipment(evolution, "tool"));
 
-export const ALL_EQUIPMENT = [
-  ...EVOLUTIONARY_TOOLS, 
-  ...BASIC_TOOLS, 
-  ...UTILITY_TOOLS, 
-  ...EVOLUTIONARY_WEAPONS, 
-  ...EVOLUTIONARY_ARMOR, 
-  ...WEAPONS, 
-  ...EQUIPMENT_ARMOR, 
-  ...ARMOR
-];
+  const weaponEvolutions = [
+    ...WEAPON_EVOLUTIONS,
+    ...ADDITIONAL_WEAPONS
+  ].flatMap(evolution => evolutionToEquipment(evolution, "weapon"));
+
+  const armorEvolutions = ARMOR_EVOLUTIONS.flatMap(evolution => 
+    evolution.levels.map(level => ({
+      name: level.name,
+      emoji: level.emoji,
+      effect: level.effect,
+      bonus: level.bonus,
+      slot: evolution.baseType as any,
+      toolType: null,
+      weight: level.weight,
+    }))
+  );
+
+  const utensilEvolutions = [
+    ...COOKING_UTENSILS,
+    ...CRAFTING_MATERIALS
+  ].flatMap(evolution => evolutionToEquipment(evolution, "tool"));
+
+  return [
+    ...toolEvolutions,
+    ...weaponEvolutions,
+    ...armorEvolutions,
+    ...utensilEvolutions,
+    ...UTILITY_EQUIPMENT,
+  ];
+}
 
 // Equipment categories for better organization
 export const EQUIPMENT_CATEGORIES = {
@@ -613,30 +825,30 @@ export const EQUIPMENT_CATEGORIES = {
 } as const;
 
 export function getEquipmentByCategory(category: string): InsertEquipment[] {
+  const allEquipment = createEquipmentData();
   switch (category) {
     case EQUIPMENT_CATEGORIES.TOOLS:
-      return [...EVOLUTIONARY_TOOLS, ...BASIC_TOOLS, ...UTILITY_TOOLS];
+      return allEquipment.filter(eq => eq.slot === "tool");
     case EQUIPMENT_CATEGORIES.WEAPONS:
-      return [...EVOLUTIONARY_WEAPONS, ...WEAPONS];
-    case EQUIPMENT_CATEGORIES.ARMOR:
-      return [...EVOLUTIONARY_ARMOR, ...ARMOR];
+      return allEquipment.filter(eq => eq.slot === "weapon");
     case EQUIPMENT_CATEGORIES.HELMET:
-      return ALL_EQUIPMENT.filter(eq => eq.slot === "helmet");
+      return allEquipment.filter(eq => eq.slot === "helmet");
     case EQUIPMENT_CATEGORIES.CHESTPLATE:
-      return ALL_EQUIPMENT.filter(eq => eq.slot === "chestplate");
+      return allEquipment.filter(eq => eq.slot === "chestplate");
     case EQUIPMENT_CATEGORIES.LEGGINGS:
-      return ALL_EQUIPMENT.filter(eq => eq.slot === "leggings");
+      return allEquipment.filter(eq => eq.slot === "leggings");
     case EQUIPMENT_CATEGORIES.BOOTS:
-      return ALL_EQUIPMENT.filter(eq => eq.slot === "boots");
+      return allEquipment.filter(eq => eq.slot === "boots");
     case EQUIPMENT_CATEGORIES.BACKPACK:
-      return ALL_EQUIPMENT.filter(eq => eq.slot === "backpack");
+      return allEquipment.filter(eq => eq.slot === "backpack");
     case EQUIPMENT_CATEGORIES.FOODBAG:
-      return ALL_EQUIPMENT.filter(eq => eq.slot === "foodbag");
+      return allEquipment.filter(eq => eq.slot === "foodbag");
     default:
-      return ALL_EQUIPMENT;
+      return allEquipment;
   }
 }
 
 export function getEquipmentBySlot(slot: string): InsertEquipment[] {
-  return ALL_EQUIPMENT.filter(eq => eq.slot === slot);
+  const allEquipment = createEquipmentData();
+  return allEquipment.filter(eq => eq.slot === slot);
 }

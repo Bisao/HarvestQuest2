@@ -18,7 +18,7 @@ import {
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { ALL_RESOURCES } from "./data/resources";
-import { ALL_EQUIPMENT } from "./data/equipment";
+import { createEquipmentData } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
 import { createRecipeData } from "./data/recipes";
 
@@ -109,7 +109,8 @@ export class MemStorage implements IStorage {
     }
 
     // Initialize equipment using modular data
-    for (const equip of ALL_EQUIPMENT) {
+    const equipmentData = createEquipmentData();
+    for (const equip of equipmentData) {
       await this.createEquipment(equip);
     }
 

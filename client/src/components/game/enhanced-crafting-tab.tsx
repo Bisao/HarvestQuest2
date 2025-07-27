@@ -18,11 +18,14 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
-    "Materiais": true,
-    "Ferramentas": true,
-    "Armas": false,
-    "Equipamentos": false,
-    "Utensílios": false,
+    "Materiais Básicos": true,
+    "Ferramentas Evolutivas": true,
+    "Ferramentas Especializadas": false,
+    "Armas Evolutivas": false,
+    "Armas Adicionais": false,
+    "Armaduras Evolutivas": false,
+    "Equipamentos Utilitários": false,
+    "Utensílios de Cozinha": false,
     "Consumíveis": false,
   });
 
@@ -151,44 +154,71 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
   const categorizeRecipes = (recipes: Recipe[]) => {
     const categories: Record<string, Recipe[]> = {
-      "Materiais": [],
-      "Ferramentas": [],
-      "Armas": [],
-      "Equipamentos": [],
-      "Utensílios": [],
+      "Materiais Básicos": [],
+      "Ferramentas Evolutivas": [],
+      "Ferramentas Especializadas": [],
+      "Armas Evolutivas": [],
+      "Armas Adicionais": [],
+      "Armaduras Evolutivas": [],
+      "Equipamentos Utilitários": [],
+      "Utensílios de Cozinha": [],
       "Consumíveis": []
     };
 
     recipes.forEach(recipe => {
       const name = recipe.name.toLowerCase();
       
-      // Materiais básicos
-      if (name.includes("barbante") || name.includes("corda") || name.includes("isca")) {
-        categories["Materiais"].push(recipe);
+      // Materiais básicos para crafting
+      if (name.includes("barbante") || name.includes("cola natural")) {
+        categories["Materiais Básicos"].push(recipe);
       }
-      // Ferramentas de trabalho
-      else if (name.includes("machado") || name.includes("picareta") || name.includes("foice") || name.includes("balde") || name.includes("vara")) {
-        categories["Ferramentas"].push(recipe);
+      // Ferramentas evolutivas principais (3 tiers cada)
+      else if (name.includes("machado") || name.includes("picareta")) {
+        categories["Ferramentas Evolutivas"].push(recipe);
       }
-      // Armas
-      else if (name.includes("arco") || name.includes("lança") || name.includes("faca")) {
-        categories["Armas"].push(recipe);
+      // Ferramentas especializadas (3 tiers cada)
+      else if (name.includes("pá") || name.includes("vara de pesca") || 
+               name.includes("foice") || name.includes("faca") || 
+               name.includes("balde")) {
+        categories["Ferramentas Especializadas"].push(recipe);
       }
-      // Equipamentos pessoais
-      else if (name.includes("mochila") || name.includes("capacete") || name.includes("peitoral") || name.includes("calças") || name.includes("botas")) {
-        categories["Equipamentos"].push(recipe);
+      // Armas evolutivas principais (espadas e arcos)
+      else if (name.includes("espada") || name.includes("arco")) {
+        categories["Armas Evolutivas"].push(recipe);
+      }
+      // Armas adicionais (lanças, bestas, martelos)
+      else if (name.includes("lança") || name.includes("besta") || 
+               name.includes("clava") || name.includes("martelo")) {
+        categories["Armas Adicionais"].push(recipe);
+      }
+      // Armaduras e equipamentos de proteção
+      else if (name.includes("capacete") || name.includes("peitoral") || 
+               name.includes("calças") || name.includes("botas") ||
+               name.includes("mochila") || name.includes("bolsa")) {
+        categories["Armaduras Evolutivas"].push(recipe);
+      }
+      // Equipamentos utilitários diversos
+      else if (name.includes("corda") || name.includes("isca") ||
+               name.includes("armadilha")) {
+        categories["Equipamentos Utilitários"].push(recipe);
       }
       // Utensílios de cozinha
       else if (name.includes("panela") || name.includes("garrafa")) {
-        categories["Utensílios"].push(recipe);
+        categories["Utensílios de Cozinha"].push(recipe);
       }
       // Comidas e bebidas
-      else if (name.includes("suco") || name.includes("assados") || name.includes("grelhado") || name.includes("assada") || name.includes("ensopado")) {
+      else if (name.includes("suco") || name.includes("assados") || 
+               name.includes("grelhado") || name.includes("assada") || 
+               name.includes("ensopado") || name.includes("chá") ||
+               name.includes("nozes") || name.includes("raízes") ||
+               name.includes("carne") || name.includes("cogumelos") ||
+               name.includes("torta") || name.includes("sopa") ||
+               name.includes("hidromél")) {
         categories["Consumíveis"].push(recipe);
       }
-      // Fallback
+      // Fallback para itens não categorizados
       else {
-        categories["Materiais"].push(recipe);
+        categories["Materiais Básicos"].push(recipe);
       }
     });
 
@@ -298,13 +328,20 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
             >
               <div className="flex items-center space-x-3">
                 <span className="text-lg">
-                  {categoryName === "Ferramentas" && "🔧"}
-                  {categoryName === "Equipamentos" && "⚔️"}
-                  {categoryName === "Consumíveis" && "🍽️"}
-                  {categoryName === "Itens Especiais" && "✨"}
+                  {categoryName === "Materiais Básicos" && "🧵"}
+                  {categoryName === "Ferramentas Evolutivas" && "🔧"}
+                  {categoryName === "Ferramentas Especializadas" && "⚒️"}
+                  {categoryName === "Armas Evolutivas" && "⚔️"}
+                  {categoryName === "Armas Adicionais" && "🛡️"}
+                  {categoryName === "Armaduras Evolutivas" && "🥾"}
+                  {categoryName === "Equipamentos Utilitários" && "🎒"}
+                  {categoryName === "Utensílios de Cozinha" && "🍽️"}
+                  {categoryName === "Consumíveis" && "🍖"}
                 </span>
                 <h4 className="text-lg font-semibold text-gray-800">{categoryName}</h4>
-                <span className="text-sm text-gray-500">({categoryRecipes.length})</span>
+                <span className="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                  {categoryRecipes.length} {categoryRecipes.length === 1 ? 'receita' : 'receitas'}
+                </span>
               </div>
               {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
             </button>

@@ -78,6 +78,128 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       name: "Picareta Avançada",
       emoji: "⛏️",
       requiredLevel: 18,
+      ingredients: { [resourceMap.ferro_fundido]: 3, "natural_glue": 2, [resourceMap.madeira]: 1 },
+      output: { "pickaxe": 1 }
+    },
+    
+    // FERRAMENTAS ESPECIALIZADAS - PÁS
+    {
+      name: "Pá de Madeira",
+      emoji: "🔺",
+      requiredLevel: 2,
+      ingredients: { [resourceMap.madeira]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
+      output: { "shovel": 1 }
+    },
+    {
+      name: "Pá de Ferro",
+      emoji: "🏗️",
+      requiredLevel: 9,
+      ingredients: { [resourceMap.ferro_fundido]: 2, [resourceMap.madeira]: 1, [resourceMap.barbante]: 3 },
+      output: { "shovel": 1 }
+    },
+    {
+      name: "Pá Elite",
+      emoji: "⚡",
+      requiredLevel: 20,
+      ingredients: { [resourceMap.ferro_fundido]: 2, "natural_glue": 1, [resourceMap.couro]: 1 },
+      output: { "shovel": 1 }
+    },
+    
+    // FERRAMENTAS ESPECIALIZADAS - VARAS DE PESCA
+    {
+      name: "Vara de Pesca Simples",
+      emoji: "🎣",
+      requiredLevel: 3,
+      ingredients: { [resourceMap.bambu]: 2, [resourceMap.barbante]: 3, [resourceMap.gravetos]: 1 },
+      output: { "fishing_rod": 1 }
+    },
+    {
+      name: "Vara de Pesca Reforçada",
+      emoji: "🎣",
+      requiredLevel: 12,
+      ingredients: { [resourceMap.ferro_fundido]: 1, [resourceMap.bambu]: 2, [resourceMap.barbante]: 4 },
+      output: { "fishing_rod": 1 }
+    },
+    {
+      name: "Vara de Pesca Mágica",
+      emoji: "🎣",
+      requiredLevel: 24,
+      ingredients: { [resourceMap.ferro_fundido]: 1, "natural_glue": 1, "mel_selvagem": 1 },
+      output: { "fishing_rod": 1 }
+    },
+    
+    // FERRAMENTAS ESPECIALIZADAS - FOICES
+    {
+      name: "Foice de Pedra",
+      emoji: "🔪",
+      requiredLevel: 2,
+      ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 2, [resourceMap.gravetos]: 1 },
+      output: { "sickle": 1 }
+    },
+    {
+      name: "Foice de Ferro",
+      emoji: "🔪",
+      requiredLevel: 10,
+      ingredients: { [resourceMap.ferro_fundido]: 1, [resourceMap.madeira]: 1, [resourceMap.barbante]: 3 },
+      output: { "sickle": 1 }
+    },
+    {
+      name: "Foice Druídica",
+      emoji: "🔪",
+      requiredLevel: 22,
+      ingredients: { [resourceMap.ferro_fundido]: 1, "natural_glue": 1, "ervas_medicinais": 2 },
+      output: { "sickle": 1 }
+    },
+    
+    // FERRAMENTAS ESPECIALIZADAS - FACAS
+    {
+      name: "Faca de Pedra",
+      emoji: "🗡️",
+      requiredLevel: 1,
+      ingredients: { [resourceMap.pedras_soltas]: 1, [resourceMap.barbante]: 1, [resourceMap.gravetos]: 1 },
+      output: { "knife": 1 }
+    },
+    {
+      name: "Faca de Ferro",
+      emoji: "🗡️",
+      requiredLevel: 8,
+      ingredients: { [resourceMap.ferro_fundido]: 1, [resourceMap.madeira]: 1, [resourceMap.barbante]: 2 },
+      output: { "knife": 1 }
+    },
+    {
+      name: "Faca de Caçador",
+      emoji: "🗡️",
+      requiredLevel: 19,
+      ingredients: { [resourceMap.ferro_fundido]: 1, "natural_glue": 1, [resourceMap.couro]: 1 },
+      output: { "knife": 1 }
+    },
+    
+    // FERRAMENTAS ESPECIALIZADAS - BALDES
+    {
+      name: "Balde de Madeira",
+      emoji: "🪣",
+      requiredLevel: 2,
+      ingredients: { [resourceMap.madeira]: 3, [resourceMap.barbante]: 4 },
+      output: { "bucket": 1 }
+    },
+    {
+      name: "Balde de Ferro",
+      emoji: "🪣",
+      requiredLevel: 11,
+      ingredients: { [resourceMap.ferro_fundido]: 2, [resourceMap.barbante]: 3 },
+      output: { "bucket": 1 }
+    },
+    {
+      name: "Balde Mágico",
+      emoji: "🪣",
+      requiredLevel: 23,
+      ingredients: { [resourceMap.ferro_fundido]: 2, "natural_glue": 1, "mel_selvagem": 1 },
+      output: { "bucket": 1 }
+    },
+    {
+      name: "Picareta Avançada",
+      emoji: "⛏️",
+      requiredLevel: 18,
       ingredients: { [resourceMap.ferro_fundido]: 3, "natural_glue": 1, [resourceMap.madeira]: 2 },
       output: { "pickaxe": 1 }
     },
@@ -158,13 +280,73 @@ export function createRecipeData(resourceIds: string[]): InsertRecipe[] {
       output: { "bow": 1 }
     },
     
-    // ARMAS ORIGINAIS
+    // ARMAS ADICIONAIS - LANÇAS (3 VARIAÇÕES)
     {
-      name: "Lança",
+      name: "Lança de Madeira",
       emoji: "🔱",
       requiredLevel: 4,
-      ingredients: { [resourceMap.gravetos]: 2, [resourceMap.barbante]: 4, [resourceMap.pedras_soltas]: 1 },
+      ingredients: { [resourceMap.gravetos]: 2, [resourceMap.barbante]: 3, [resourceMap.pedras_soltas]: 1 },
       output: { "spear": 1 }
+    },
+    {
+      name: "Lança de Ferro",
+      emoji: "🔱",
+      requiredLevel: 16,
+      ingredients: { [resourceMap.madeira]: 2, [resourceMap.ferro_fundido]: 2, [resourceMap.barbante]: 4 },
+      output: { "spear": 1 }
+    },
+    {
+      name: "Lança Ancestral",
+      emoji: "🔱",
+      requiredLevel: 32,
+      ingredients: { [resourceMap.madeira]: 3, [resourceMap.ferro_fundido]: 2, "natural_glue": 2, "ervas_medicinais": 1 },
+      output: { "spear": 1 }
+    },
+    
+    // ARMAS ADICIONAIS - BESTAS (3 VARIAÇÕES)
+    {
+      name: "Besta Simples",
+      emoji: "🏹",
+      requiredLevel: 8,
+      ingredients: { [resourceMap.madeira]: 3, [resourceMap.ferro_fundido]: 1, [resourceMap.barbante]: 5 },
+      output: { "crossbow": 1 }
+    },
+    {
+      name: "Besta de Ferro",
+      emoji: "🏹",
+      requiredLevel: 18,
+      ingredients: { [resourceMap.madeira]: 3, [resourceMap.ferro_fundido]: 3, [resourceMap.barbante]: 6, [resourceMap.couro]: 1 },
+      output: { "crossbow": 1 }
+    },
+    {
+      name: "Besta Élfica",
+      emoji: "🏹",
+      requiredLevel: 35,
+      ingredients: { [resourceMap.madeira]: 4, [resourceMap.ferro_fundido]: 3, "natural_glue": 3, "mel_selvagem": 2 },
+      output: { "crossbow": 1 }
+    },
+    
+    // ARMAS ADICIONAIS - MARTELOS (3 VARIAÇÕES)
+    {
+      name: "Clava de Madeira",
+      emoji: "🔨",
+      requiredLevel: 3,
+      ingredients: { [resourceMap.madeira]: 3, [resourceMap.barbante]: 2, [resourceMap.pedra]: 1 },
+      output: { "mace": 1 }
+    },
+    {
+      name: "Martelo de Guerra",
+      emoji: "🔨",
+      requiredLevel: 14,
+      ingredients: { [resourceMap.madeira]: 2, [resourceMap.ferro_fundido]: 4, [resourceMap.barbante]: 4 },
+      output: { "mace": 1 }
+    },
+    {
+      name: "Martelo dos Titãs",
+      emoji: "🔨",
+      requiredLevel: 30,
+      ingredients: { [resourceMap.madeira]: 3, [resourceMap.ferro_fundido]: 5, "natural_glue": 3, [resourceMap.couro]: 2 },
+      output: { "mace": 1 }
     },
     
     // ARMADURAS EVOLUTIVAS - CAPACETES
