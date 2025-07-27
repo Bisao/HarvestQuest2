@@ -506,4 +506,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Use PostgreSQL database storage
+import { DatabaseStorage } from "./storage-database";
+
+export const storage = new DatabaseStorage();
+console.log("🚀 Coletor Adventures using PostgreSQL Database Storage");

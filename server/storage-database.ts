@@ -9,6 +9,8 @@ import {
   expeditions, 
   equipment, 
   recipes,
+  quests,
+  playerQuests,
   type Player,
   type Resource,
   type Biome,
@@ -17,6 +19,8 @@ import {
   type Expedition,
   type Equipment,
   type Recipe,
+  type Quest,
+  type PlayerQuest,
   type InsertPlayer,
   type InsertResource,
   type InsertBiome,
@@ -24,7 +28,9 @@ import {
   type InsertStorageItem,
   type InsertExpedition,
   type InsertEquipment,
-  type InsertRecipe
+  type InsertRecipe,
+  type InsertQuest,
+  type InsertPlayerQuest
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 import { BASIC_RESOURCES, UNIQUE_RESOURCES, ANIMAL_RESOURCES, FOOD_RESOURCES } from "./data/resources";
@@ -113,7 +119,7 @@ export class DatabaseStorage implements IStorage {
     if (existingItem) {
       const [updatedItem] = await db
         .update(inventoryItems)
-        .set({ quantity: existingItem.quantity + item.quantity })
+        .set({ quantity: (existingItem.quantity || 0) + (item.quantity || 0) })
         .where(eq(inventoryItems.id, existingItem.id))
         .returning();
       return updatedItem;
@@ -155,7 +161,7 @@ export class DatabaseStorage implements IStorage {
     if (existingItem) {
       const [updatedItem] = await db
         .update(storageItems)
-        .set({ quantity: existingItem.quantity + item.quantity })
+        .set({ quantity: (existingItem.quantity || 0) + (item.quantity || 0) })
         .where(eq(storageItems.id, existingItem.id))
         .returning();
       return updatedItem;
@@ -253,6 +259,47 @@ export class DatabaseStorage implements IStorage {
     return recipe || undefined;
   }
 
+  // Quest methods 
+  async getAllQuests(): Promise<Quest[]> {
+    return await db.select().from(quests);
+  }
+
+  async getQuest(id: string): Promise<Quest | undefined> {
+    const [quest] = await db.select().from(quests).where(eq(quests.id, id));
+    return quest || undefined;
+  }
+
+  async getPlayerQuests(playerId: string): Promise<PlayerQuest[]> {
+    return await db.select().from(playerQuests).where(eq(playerQuests.playerId, playerId));
+  }
+
+  async getPlayerQuest(playerId: string, questId: string): Promise<PlayerQuest | undefined> {
+    const [playerQuest] = await db
+      .select()
+      .from(playerQuests)
+      .where(
+        sql`${playerQuests.playerId} = ${playerId} AND ${playerQuests.questId} = ${questId}`
+      );
+    return playerQuest || undefined;
+  }
+
+  async createPlayerQuest(insertPlayerQuest: InsertPlayerQuest): Promise<PlayerQuest> {
+    const [newPlayerQuest] = await db
+      .insert(playerQuests)
+      .values(insertPlayerQuest)
+      .returning();
+    return newPlayerQuest;
+  }
+
+  async updatePlayerQuest(id: string, updates: Partial<PlayerQuest>): Promise<PlayerQuest> {
+    const [playerQuest] = await db
+      .update(playerQuests)
+      .set(updates)
+      .where(eq(playerQuests.id, id))
+      .returning();
+    return playerQuest;
+  }
+
   // Game initialization
   async initializeGameData(): Promise<void> {
     // Check if data already exists
@@ -277,8 +324,6 @@ export class DatabaseStorage implements IStorage {
     const recipeData = createRecipeData(resourceIds);
     await db.insert(recipes).values(recipeData);
 
-    console.log("Game data initialized successfully!");
+    console.log("✅ PostgreSQL database initialized with game data successfully!");
   }
 }
-
-export const storage = new DatabaseStorage();

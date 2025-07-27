@@ -100,7 +100,7 @@ export const TOOLS: InsertEquipment[] = [
     bonus: { type: "fishing", value: 2 },
     slot: "tool",
     toolType: "bait",
-    weight: 0.1,
+    weight: 1,
   },
   {
     name: "Corda",
