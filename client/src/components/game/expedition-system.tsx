@@ -35,7 +35,7 @@ interface ActiveExpedition {
   estimatedDuration: number;
 }
 
-type ExpeditionPhase = "setup" | "resource-selection" | "confirmation" | "in-progress" | "completed";
+type ExpeditionPhase = "setup" | "resource-selection" | "in-progress" | "completed";
 
 export default function ExpeditionSystem({
   isOpen,
@@ -358,6 +358,11 @@ export default function ExpeditionSystem({
       biomeId: biome.id,
       selectedResources
     });
+
+    // Auto-minimize modal when expedition starts
+    setTimeout(() => {
+      onMinimize();
+    }, 1000);
   };
 
   const handleCompleteExpedition = () => {
@@ -404,7 +409,6 @@ export default function ExpeditionSystem({
                 <h2 className="text-lg md:text-2xl font-bold">Expedição na {biome.name}</h2>
                 <p className="text-xs md:text-sm text-muted-foreground">
                   {phase === "resource-selection" && "Escolha os recursos para coletar"}
-                  {phase === "confirmation" && "Confirme os detalhes da expedição"}
                   {phase === "in-progress" && "Expedição em andamento..."}
                   {phase === "completed" && "Expedição concluída!"}
                 </p>
@@ -434,23 +438,6 @@ export default function ExpeditionSystem({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Progress Indicator - Only show for resource-selection and confirmation phases */}
-          {phase !== "completed" && phase !== "in-progress" && (
-            <div className="flex items-center justify-between">
-              {["resource-selection", "confirmation"].map((step, index) => (
-                <div key={step} className={`flex items-center ${index < 1 ? "flex-1" : ""}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    phase === step ? "bg-forest text-white" :
-                    ["resource-selection", "confirmation"].indexOf(phase) > index ? "bg-green-500 text-white" :
-                    "bg-gray-200 text-gray-600"
-                  }`}>
-                    {index + 1}
-                  </div>
-                  {index < 1 && <div className="flex-1 h-0.5 bg-gray-200 mx-2" />}
-                </div>
-              ))}
-            </div>
-          )}
 
           {/* Setup Phase */}
           {phase === "setup" && (
@@ -558,48 +545,50 @@ export default function ExpeditionSystem({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {collectableResources.map(resource => {
-                  const isSelected = selectedResources.includes(resource.id);
-                  const requiresTool = !!resource.requiredTool;
+              <div className="max-h-96 overflow-y-auto pr-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {collectableResources.map(resource => {
+                    const isSelected = selectedResources.includes(resource.id);
+                    const requiresTool = !!resource.requiredTool;
 
-                  return (
-                    <label
-                      key={resource.id}
-                      className={`cursor-pointer p-4 border-2 rounded-lg transition-all ${
-                        isSelected
-                          ? "border-forest bg-green-50"
-                          : "border-gray-200 hover:border-forest/50"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleResourceToggle(resource.id)}
-                        className="sr-only"
-                      />
-                      <div className="flex items-center gap-3">
-                        <span className="text-3xl">{resource.emoji}</span>
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{resource.name}</h4>
-                          <p className="text-sm text-gray-600">
-                            Peso: {resource.weight}kg • Valor: {resource.value} moedas • XP: {resource.experienceValue || Math.floor(resource.value / 2)}
-                          </p>
-                          <div className="flex gap-2 mt-2">
-                            <Badge variant={resource.rarity === "rare" ? "destructive" : resource.rarity === "uncommon" ? "secondary" : "outline"}>
-                              {resource.rarity === "common" ? "Comum" : resource.rarity === "uncommon" ? "Incomum" : "Raro"}
-                            </Badge>
-                            {requiresTool && (
-                              <Badge variant="outline" className="text-xs">
-                                Requer: {resource.requiredTool === "fishing_rod" ? "🎣 Vara de Pesca + Isca" : resource.requiredTool}
+                    return (
+                      <label
+                        key={resource.id}
+                        className={`cursor-pointer p-4 border-2 rounded-lg transition-all ${
+                          isSelected
+                            ? "border-forest bg-green-50"
+                            : "border-gray-200 hover:border-forest/50"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleResourceToggle(resource.id)}
+                          className="sr-only"
+                        />
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">{resource.emoji}</span>
+                          <div className="flex-1">
+                            <h4 className="font-semibold">{resource.name}</h4>
+                            <p className="text-sm text-gray-600">
+                              Peso: {resource.weight}kg • Valor: {resource.value} moedas • XP: {resource.experienceValue || Math.floor(resource.value / 2)}
+                            </p>
+                            <div className="flex gap-2 mt-2">
+                              <Badge variant={resource.rarity === "rare" ? "destructive" : resource.rarity === "uncommon" ? "secondary" : "outline"}>
+                                {resource.rarity === "common" ? "Comum" : resource.rarity === "uncommon" ? "Incomum" : "Raro"}
                               </Badge>
-                            )}
+                              {requiresTool && (
+                                <Badge variant="outline" className="text-xs">
+                                  Requer: {resource.requiredTool === "fishing_rod" ? "🎣 Vara de Pesca + Isca" : resource.requiredTool}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </label>
-                  );
-                })}
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
 
               {collectableResources.length === 0 && (
@@ -617,59 +606,8 @@ export default function ExpeditionSystem({
                   Cancelar
                 </Button>
                 <Button 
-                  onClick={() => setPhase("confirmation")}
-                  disabled={selectedResources.length === 0}
-                  className="bg-forest hover:bg-forest/90"
-                >
-                  Próximo: Confirmação
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Confirmation Phase */}
-          {phase === "confirmation" && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold">Confirme os detalhes da sua expedição:</h3>
-
-              <div className="bg-gray-50 p-6 rounded-lg space-y-4">
-                <div>
-                  <h4 className="font-semibold mb-2">Destino:</h4>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{biome.emoji}</span>
-                    <span className="font-medium">{biome.name}</span>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2">Recursos Selecionados ({selectedResources.length}):</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {selectedResources.map(resourceId => {
-                      const resource = getResourceById(resourceId);
-                      if (!resource) return null;
-                      return (
-                        <div key={resourceId} className="flex items-center gap-2 bg-white p-2 rounded">
-                          <span>{resource.emoji}</span>
-                          <span className="text-sm">{resource.name}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2">Tempo Estimado:</h4>
-                  <p className="text-lg font-bold text-forest">{estimatedTime} segundos</p>
-                </div>
-              </div>
-
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={() => setPhase("resource-selection")}>
-                  Voltar
-                </Button>
-                <Button 
                   onClick={handleStartExpedition}
-                  disabled={startExpeditionMutation.isPending}
+                  disabled={selectedResources.length === 0 || startExpeditionMutation.isPending}
                   className="bg-forest hover:bg-forest/90"
                 >
                   {startExpeditionMutation.isPending ? "Iniciando..." : "🚀 Iniciar Expedição"}
@@ -677,6 +615,8 @@ export default function ExpeditionSystem({
               </div>
             </div>
           )}
+
+
 
           {/* In Progress Phase */}
           {phase === "in-progress" && activeExpedition && (
