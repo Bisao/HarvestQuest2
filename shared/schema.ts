@@ -15,8 +15,7 @@ export const players = sqliteTable("players", {
   coins: integer("coins").notNull().default(0),
   inventoryWeight: integer("inventory_weight").notNull().default(0),
   maxInventoryWeight: integer("max_inventory_weight").notNull().default(100),
-  autoStorage: integer("auto_storage", { mode: 'boolean' }).notNull().default(false),
-  craftedItemsDestination: text("crafted_items_destination").notNull().default('storage'), // 'inventory' or 'storage'
+  autoStorage: integer("auto_storage", { mode: 'boolean' }).notNull().default(true), // Changed default to true
   waterStorage: integer("water_storage").notNull().default(0),
   maxWaterStorage: integer("max_water_storage").notNull().default(500),
   equippedHelmet: text("equipped_helmet"),
@@ -148,9 +147,7 @@ export const insertExpeditionSchema = createInsertSchema(expeditions).omit({
 
 export const insertEquipmentSchema = createInsertSchema(equipment);
 
-export const insertRecipeSchema = createInsertSchema(recipes).omit({
-  id: true,
-});
+export const insertRecipeSchema = createInsertSchema(recipes);
 
 export const insertQuestSchema = createInsertSchema(quests).omit({
   id: true,

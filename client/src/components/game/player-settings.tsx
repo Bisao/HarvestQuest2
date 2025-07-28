@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import type { Player } from "@shared/schema";
-import { Settings, Package, Archive } from "lucide-react";
+import { Settings, Archive } from "lucide-react";
 
 interface PlayerSettingsProps {
   player: Player;
@@ -17,10 +17,9 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [autoStorage, setAutoStorage] = useState(player.autoStorage);
-  const [craftedItemsDestination, setCraftedItemsDestination] = useState(player.craftedItemsDestination || 'storage');
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async (settings: { autoStorage?: boolean; craftedItemsDestination?: string }) => {
+    mutationFn: async (settings: { autoStorage?: boolean }) => {
       const response = await fetch(`/api/player/${player.id}/settings`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -52,7 +51,6 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
   const handleSaveSettings = () => {
     updateSettingsMutation.mutate({
       autoStorage,
-      craftedItemsDestination,
     });
   };
 
@@ -85,38 +83,7 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
             />
           </div>
 
-          {/* Crafted Items Destination Setting */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-3 mb-3">
-              <Package className="w-5 h-5 text-purple-600" />
-              <div>
-                <p className="font-medium text-gray-800">Destino dos Itens Craftados</p>
-                <p className="text-sm text-gray-600">Onde os itens criados devem ir</p>
-              </div>
-            </div>
-            <Select
-              value={craftedItemsDestination}
-              onValueChange={setCraftedItemsDestination}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="storage">
-                  <div className="flex items-center space-x-2">
-                    <Archive className="w-4 h-4" />
-                    <span>Armazém</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="inventory">
-                  <div className="flex items-center space-x-2">
-                    <Package className="w-4 h-4" />
-                    <span>Inventário</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
         </div>
 
         <div className="flex justify-end space-x-3 mt-6">

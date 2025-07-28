@@ -20,12 +20,12 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
-    "Materiais": true,
+    "Materiais Básicos": true,
     "Ferramentas": true,
     "Armas": false,
     "Equipamentos": false,
-    "Utensílios": false,
-    "Consumíveis": false,
+    "Utensílios de Cozinha": false,
+    "Comidas e Bebidas": false,
   });
 
   // State for craft quantities

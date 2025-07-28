@@ -182,9 +182,17 @@ export function registerEnhancedGameRoutes(
         for (const [itemId, baseAmount] of Object.entries(output)) {
           const totalAmount = baseAmount * quantity;
           
-          // Always add to storage regardless of player preference for crafted items
-          const existingItem = playerStorage.find(item => item.resourceId === itemId);
-          if (existingItem) {
+          // Always add to storage (items craftados sempre vão para o armazém)
+          const existingItem = playerStorage.find(item => 
+            item.resourceId === itemId && item.itemType === 'resource'
+          );
+          
+          // Check if this is equipment or resource
+          const allEquipment = await storage.getAllEquipment();
+          const isEquipment = allEquipment.some(eq => eq.id === itemId);
+          const itemType = isEquipment ? 'equipment' : 'resource';
+          
+          if (existingItem && !isEquipment) {
             await storage.updateStorageItem(existingItem.id, {
               quantity: existingItem.quantity + totalAmount
             });
@@ -192,7 +200,8 @@ export function registerEnhancedGameRoutes(
             await storage.addStorageItem({
               playerId,
               resourceId: itemId,
-              quantity: totalAmount
+              quantity: totalAmount,
+              itemType
             });
           }
           
