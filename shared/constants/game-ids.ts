@@ -73,19 +73,18 @@ export const EQUIPMENT_IDS = {
   MOCHILA: "eq-util-78901234-5678-9012-1234-567890123456",
 } as const;
 
+// Update BIOME_IDS with correct actual database IDs
 export const BIOME_IDS = {
-  FLORESTA: "biome-150d2ded-b2d1-46c1-ad0d-8cc12732f9f9",
-  DESERTO: "biome-2a5e3b7c-9d1f-4e8a-b2c6-f93845672abc",
-  MONTANHA: "biome-3b6f4c8d-ae20-5f9b-c3d7-0a4956783bcd",
-  OCEANO: "biome-4c7e5d9e-bf31-60ac-d4e8-1b5067894cde"
+  FLORESTA: "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+  DESERTO: "1680de81-559a-4115-9bd5-b3ac92e7f678", 
+  MONTANHA: "f89038af-b3af-4246-b563-eb992f7b2f50",
+  OCEANO: "829bd63f-69f7-49f8-a10e-925c122e32c6"
 } as const;
 
 export const QUEST_IDS = {
-  PRIMEIRO_EXPLORADOR: "quest-61a0f187-0b75-4e53-a96e-ae5a0e26dde2",
-  COLETOR_INICIANTE: "quest-72b1f298-1c86-5f64-ba7f-bf6b1f37ee3",
-  ARTESAO_NOVATO: "quest-83c2f3a9-2d97-6075-cb80-c07c2048ff4",
-  INTRODUCAO_CACA: "quest-94d3f4ba-3ea8-7186-dc91-d18d3159005",
-  INTRODUCAO_PESCA: "quest-a5e4f5cb-4fb9-8297-eda2-e29e4260116"
+  PRIMEIRO_EXPLORADOR: "8d5b36f3-12cf-47e6-8283-cd73b9e8c85c",
+  PRIMEIRO_PASSO: "e5184b00-3c28-4b30-8b64-f16a7f10c49b",
+  PRIMEIRO_ARTESAO: "6028baa4-bbdc-4fc4-801c-741ed9c5b3ee"
 } as const;
 
 export const RECIPE_IDS = {

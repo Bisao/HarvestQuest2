@@ -8,7 +8,6 @@ import { BIOME_IDS } from "@shared/constants/game-ids";
 export const ALL_QUESTS: InsertQuest[] = [
   // ===== CATEGORIA: EXPLORAÇÃO =====
   {
-    id: QUEST_IDS.PRIMEIRO_EXPLORADOR,
     name: "Primeiro Explorador",
     description: "Complete sua primeira expedição na Floresta",
     emoji: "🏕️",
