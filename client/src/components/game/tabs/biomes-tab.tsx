@@ -92,7 +92,7 @@ function BiomeResourceTabs({ biomeResources, unlocked }: { biomeResources: Resou
                         "axe": "🪓 Machado", 
                         "pickaxe": "⛏️ Picareta",
                         "shovel": "🔺 Pá",
-                        "fishing_rod": "🎣 Vara de Pesca",
+                        "fishing_rod": "🎣 Vara de Pesca + Isca",
                         "weapon_and_knife": "⚔️ Arma + Faca",
                         "bucket": "🪣 Balde"
                       };

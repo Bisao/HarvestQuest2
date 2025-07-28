@@ -305,6 +305,13 @@ export default function ExpeditionSystem({
       // If resource doesn't require a tool, it's always collectable
       if (!resource.requiredTool) return true;
 
+      // Special case for fishing: requires fishing rod AND bait in inventory
+      if (resource.requiredTool === "fishing_rod") {
+        const hasFishingRod = equippedTool && equippedTool.toolType === "fishing_rod";
+        // TODO: Check for bait in inventory (will be validated on server)
+        return !!hasFishingRod;
+      }
+
       // Special case for hunting large animals: requires weapon AND knife
       if (resource.requiredTool === "weapon_and_knife") {
         const hasNonKnifeWeapon = equippedWeapon && equippedWeapon.toolType !== "knife";
@@ -579,7 +586,7 @@ export default function ExpeditionSystem({
                             </Badge>
                             {requiresTool && (
                               <Badge variant="outline" className="text-xs">
-                                Requer: {resource.requiredTool}
+                                Requer: {resource.requiredTool === "fishing_rod" ? "🎣 Vara de Pesca + Isca" : resource.requiredTool}
                               </Badge>
                             )}
                           </div>

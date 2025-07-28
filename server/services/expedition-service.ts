@@ -149,6 +149,15 @@ export class ExpeditionService {
       const resource = allResources.find(r => r.id === resourceId);
       if (!resource) continue;
       
+      // Special handling for fishing - consume bait
+      if (this.isFish(resource.name)) {
+        const baitConsumed = await this.consumeBaitForFishing(expedition.playerId);
+        if (!baitConsumed) {
+          console.log(`No bait available for fishing ${resource.name}`);
+          continue; // Skip this fish if no bait
+        }
+      }
+      
       // Check if this is an animal that needs processing
       if (this.isAnimal(resource.name)) {
         // Process animal into component parts
@@ -172,6 +181,37 @@ export class ExpeditionService {
   // Check if a resource is an animal or fish
   private isAnimal(resourceName: string): boolean {
     return ["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
+  }
+  
+  // Check if a resource is a fish
+  private isFish(resourceName: string): boolean {
+    return ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
+  }
+  
+  // Consume bait from player inventory when fishing
+  private async consumeBaitForFishing(playerId: string): Promise<boolean> {
+    const inventoryItems = await this.storage.getPlayerInventory(playerId);
+    const equipment = await this.storage.getAllEquipment();
+    
+    // Find bait equipment ID
+    const baitEquipment = equipment.find(eq => eq.toolType === "bait");
+    if (!baitEquipment) return false;
+    
+    // Find bait in inventory
+    const baitItem = inventoryItems.find(item => item.resourceId === baitEquipment.id);
+    if (!baitItem || baitItem.quantity <= 0) return false;
+    
+    // Consume 1 bait
+    if (baitItem.quantity === 1) {
+      await this.storage.removeInventoryItem(baitItem.id);
+    } else {
+      await this.storage.updateInventoryItem(baitItem.id, {
+        quantity: baitItem.quantity - 1
+      });
+    }
+    
+    console.log(`Consumed 1 bait for fishing. Remaining: ${baitItem.quantity - 1}`);
+    return true;
   }
   
   // Process animal into component resources

@@ -97,7 +97,7 @@ export function createRecipeData(): InsertRecipe[] {
       emoji: "🪱",
       requiredLevel: 2,
       ingredients: { [RESOURCE_IDS.FIBRA]: 1, [RESOURCE_IDS.FRUTAS_SILVESTRES]: 1 },
-      output: { [EQUIPMENT_IDS.ISCA_PESCA]: 1 }
+      output: { [EQUIPMENT_IDS.ISCA_PESCA]: 3 } // Produz 3 iscas por craft
     },
     
     // UTENSÍLIOS DE COZINHA

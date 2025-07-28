@@ -12,7 +12,7 @@ export const EQUIPMENT_IDS = {
   FACA: "tool-6f789012-3456-7890-f123-456789012345",
   BALDE_MADEIRA: "tool-7890123a-4567-8901-1234-567890123456",
   GARRAFA_BAMBU: "tool-890123ab-5678-9012-2345-678901234567",
-  ISCA_PESCA: "tool-90123abc-6789-0123-3456-789012345678",
+  ISCA_PESCA: "tool-bait-fishing-001",
   CORDA: "tool-0123abcd-789a-1234-4567-89012345678a",
   
   // Weapons
@@ -132,10 +132,11 @@ export function createEquipmentWithIds(): InsertEquipment[] {
     weight: 2,
   },
   {
+    id: EQUIPMENT_IDS.ISCA_PESCA,
     name: "Isca para Pesca",
     emoji: "🪱",
-    effect: "Melhora chance de pescar",
-    bonus: { type: "fishing", value: 2 },
+    effect: "Necessária para pescar peixes",
+    bonus: { type: "fishing", value: 1 },
     slot: "tool",
     toolType: "bait",
     weight: 1,

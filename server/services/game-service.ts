@@ -53,6 +53,19 @@ export class GameService {
     
     const equipment = await this.storage.getAllEquipment();
     
+    // Special case for fishing: requires fishing rod AND bait in inventory
+    if (resource.requiredTool === "fishing_rod") {
+      // Check if player has fishing rod equipped
+      const equippedTool = equipment.find(eq => 
+        eq.id === player.equippedTool && eq.toolType === "fishing_rod"
+      );
+      
+      if (!equippedTool) return false;
+      
+      // Check if player has bait in inventory
+      return await this.hasBaitInInventory(playerId);
+    }
+    
     // Special case for hunting large animals: requires weapon AND knife
     if (resource.requiredTool === "weapon_and_knife") {
       // Check if player has a weapon equipped (not a knife)
@@ -80,6 +93,20 @@ export class GameService {
     );
     
     return !!(equippedTool || equippedWeapon);
+  }
+
+  // Check if player has bait in inventory
+  private async hasBaitInInventory(playerId: string): Promise<boolean> {
+    const inventoryItems = await this.storage.getPlayerInventory(playerId);
+    const equipment = await this.storage.getAllEquipment();
+    
+    // Find bait equipment ID
+    const baitEquipment = equipment.find(eq => eq.toolType === "bait");
+    if (!baitEquipment) return false;
+    
+    // Check if player has bait in inventory
+    const baitItem = inventoryItems.find(item => item.resourceId === baitEquipment.id);
+    return !!(baitItem && baitItem.quantity > 0);
   }
 
   // Move item from inventory to storage
