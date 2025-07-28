@@ -8,11 +8,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 28, 2025 - CRAFTING UI ENHANCED & QUEST SYSTEM FIXED**
+**January 28, 2025 - CRAFTING SYSTEM COMPLETELY FIXED & ENHANCED**
+- **Critical Database Architecture Fix**: Resolved foreign key constraint issues preventing equipment storage by removing constraints and adding item_type column
 - **Slider Interface for Crafting**: Replaced +/- buttons with intuitive slider bar for quantity selection
-- **Quest System Bug Fix**: Fixed issue where crafting multiple items only registered 1 item in quest progress tracking
+- **Quest System Bug Fix**: Fixed issue where crafting multiple items only registered 1 item in quest progress tracking  
 - **Storage Configuration**: All crafted items now automatically go to storage/warehouse (armazém) as per user preference
+- **Equipment Storage Working**: Database now properly stores both resources and equipment with item_type discriminator
+- **Recipe ID Consistency**: All recipe outputs now use correct equipment IDs instead of placeholder IDs
 - **Real-time Validation**: Ingredient requirements update dynamically based on selected quantity
+- **Enhanced Storage API**: Storage endpoint now returns proper equipment and resource information with names and emojis
+- **Full System Integration**: Crafting → storage → quest progress tracking all working seamlessly
 
 **January 28, 2025 - QUEST SYSTEM COMPLETELY FIXED & MIGRATION COMPLETED**
 - **Quest System Critical Fixes**: Completely overhauled quest objectives to use correct resource and equipment IDs, eliminating quest tracking failures

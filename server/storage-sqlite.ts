@@ -410,7 +410,34 @@ export class SQLiteStorage implements IStorage {
 
   // Storage methods
   async getPlayerStorage(playerId: string): Promise<StorageItem[]> {
-    return await db.select().from(storageItems).where(eq(storageItems.playerId, playerId));
+    // Get all storage items and join with resources and equipment to get names
+    const rawStorage = await db.select().from(storageItems).where(eq(storageItems.playerId, playerId));
+    
+    // Transform storage items to include proper resource/equipment information
+    const result = await Promise.all(rawStorage.map(async (item) => {
+      if (item.resourceId && item.resourceId !== '') {
+        // Resource item
+        const resource = await this.getResource(item.resourceId);
+        return {
+          ...item,
+          name: resource?.name || 'Unknown Resource',
+          emoji: resource?.emoji || '❓',
+          type: 'resource' as const
+        };
+      } else if (item.equipmentId) {
+        // Equipment item
+        const equipment = await this.getEquipment(item.equipmentId);
+        return {
+          ...item,
+          name: equipment?.name || 'Unknown Equipment',
+          emoji: equipment?.emoji || '❓',
+          type: 'equipment' as const
+        };
+      }
+      return item;
+    }));
+    
+    return result;
   }
 
   async addStorageItem(item: InsertStorageItem): Promise<StorageItem> {

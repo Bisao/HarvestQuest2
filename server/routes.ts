@@ -7,6 +7,7 @@ import type { Player } from "@shared/schema";
 import { GameService } from "./services/game-service";
 import { ExpeditionService } from "./services/expedition-service";
 import { QuestService } from "./services/quest-service";
+import { randomUUID } from "crypto";
 import { registerHealthRoutes } from "./routes/health";
 import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
 import { registerAdminRoutes } from "./routes/admin";
@@ -399,24 +400,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const equipmentItem = allEquipment.find(eq => eq.id === itemType);
 
           if (equipmentItem) {
-            // Add to storage (always storage)
-            const existingStorageItem = storageItems.find(item => item.resourceId === equipmentItem.id);
+            // Add equipment to storage using SQLite database
+            const { sqlite } = await import("./db-sqlite");
+            
+            // Check if equipment already exists in storage
+            const existingEquipment = sqlite.prepare(`
+              SELECT * FROM storage_items 
+              WHERE player_id = ? AND equipment_id = ? AND item_type = 'equipment'
+            `).get(playerId, equipmentItem.id);
 
-            if (existingStorageItem) {
-              await storage.updateStorageItem(existingStorageItem.id, {
-                quantity: existingStorageItem.quantity + totalOutput
-              });
+            if (existingEquipment) {
+              // Update existing equipment quantity
+              sqlite.prepare(`
+                UPDATE storage_items 
+                SET quantity = quantity + ? 
+                WHERE player_id = ? AND equipment_id = ? AND item_type = 'equipment'
+              `).run(totalOutput, playerId, equipmentItem.id);
             } else {
-              await storage.addStorageItem({
-                playerId,
-                resourceId: equipmentItem.id,
-                quantity: totalOutput
-              });
+              // Insert new equipment storage item
+              sqlite.prepare(`
+                INSERT INTO storage_items (id, player_id, equipment_id, quantity, item_type, resource_id) 
+                VALUES (?, ?, ?, ?, 'equipment', '')
+              `).run(randomUUID(), playerId, equipmentItem.id, totalOutput);
             }
 
             console.log(`Added ${totalOutput}x ${equipmentItem.name} to storage for player ${playerId}`);
           } else {
-            // Equipment not found for the given ID
+            console.log(`Equipment with ID ${itemType} not found`);
           }
         }
       }
@@ -438,7 +448,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Item crafted successfully!", recipe, quantity });
     } catch (error) {
       console.error("Craft error:", error);
-      res.status(500).json({ message: "Failed to craft item" });
+      console.error("Error details:", error.message, error.stack);
+      res.status(500).json({ message: "Failed to craft item", error: error.message });
     }
   });
 
