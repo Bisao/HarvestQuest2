@@ -10,6 +10,8 @@ import {
   expeditions, 
   equipment, 
   recipes,
+  quests,
+  playerQuests,
   type Player,
   type Resource,
   type Biome,
@@ -18,6 +20,8 @@ import {
   type Expedition,
   type Equipment,
   type Recipe,
+  type Quest,
+  type PlayerQuest,
   type InsertPlayer,
   type InsertResource,
   type InsertBiome,
@@ -25,13 +29,16 @@ import {
   type InsertStorageItem,
   type InsertExpedition,
   type InsertEquipment,
-  type InsertRecipe
+  type InsertRecipe,
+  type InsertQuest,
+  type InsertPlayerQuest
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 import { ALL_RESOURCES } from "./data/resources";
 import { createBiomeData } from "./data/biomes";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createRecipeData } from "./data/recipes";
+import { ALL_QUESTS } from "./data/quests";
 
 export class SQLiteStorage implements IStorage {
   
@@ -70,6 +77,11 @@ export class SQLiteStorage implements IStorage {
     const recipesData = createRecipeData(resourceIds);
     for (const recipe of recipesData) {
       await this.createRecipe(recipe);
+    }
+
+    // Initialize quests using modular data
+    for (const quest of ALL_QUESTS) {
+      await this.createQuest({ ...quest, category: quest.category || null });
     }
 
     console.log("SQLite game data initialized successfully!");
@@ -174,6 +186,31 @@ export class SQLiteStorage implements IStorage {
         ingredients TEXT NOT NULL,
         output TEXT NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS quests (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        emoji TEXT NOT NULL,
+        type TEXT NOT NULL,
+        category TEXT,
+        required_level INTEGER DEFAULT 1,
+        objectives TEXT NOT NULL,
+        rewards TEXT NOT NULL,
+        is_active INTEGER DEFAULT 1
+      );
+
+      CREATE TABLE IF NOT EXISTS player_quests (
+        id TEXT PRIMARY KEY,
+        player_id TEXT NOT NULL,
+        quest_id TEXT NOT NULL,
+        status TEXT DEFAULT 'available',
+        progress TEXT DEFAULT '{}',
+        started_at INTEGER,
+        completed_at INTEGER,
+        FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE,
+        FOREIGN KEY (quest_id) REFERENCES quests(id)
+      );
     `);
   }
 
@@ -194,22 +231,16 @@ export class SQLiteStorage implements IStorage {
       .insert(players)
       .values({ 
         ...insertPlayer, 
-        id,
-        autoStorage: insertPlayer.autoStorage ? 1 : 0 // Convert boolean to integer for SQLite
+        id
       })
       .returning();
     return player;
   }
 
   async updatePlayer(id: string, updates: Partial<Player>): Promise<Player> {
-    const sqliteUpdates = { ...updates };
-    if ('autoStorage' in updates) {
-      sqliteUpdates.autoStorage = updates.autoStorage ? 1 : 0;
-    }
-    
     const [player] = await db
       .update(players)
-      .set(sqliteUpdates)
+      .set(updates)
       .where(eq(players.id, id))
       .returning();
     return player;
@@ -381,16 +412,11 @@ export class SQLiteStorage implements IStorage {
     return expedition || undefined;
   }
 
-  async createExpedition(expedition: InsertExpedition): Promise<Expedition> {
+  async createExpedition(insertExpedition: InsertExpedition): Promise<Expedition> {
     const id = randomUUID();
     const [newExpedition] = await db.insert(expeditions).values({
-      ...expedition,
-      id,
-      startTime: expedition.startTime || Date.now(),
-      endTime: expedition.endTime || null,
-      progress: expedition.progress || 0,
-      status: expedition.status || 'in_progress',
-      collectedResources: expedition.collectedResources || {}
+      ...insertExpedition,
+      id
     }).returning();
     return newExpedition;
   }
@@ -409,9 +435,9 @@ export class SQLiteStorage implements IStorage {
     return await db.select().from(equipment);
   }
 
-  async createEquipment(equip: InsertEquipment): Promise<Equipment> {
+  async createEquipment(insertEquipment: InsertEquipment): Promise<Equipment> {
     const id = randomUUID();
-    const [newEquipment] = await db.insert(equipment).values({ ...equip, id }).returning();
+    const [newEquipment] = await db.insert(equipment).values({ ...insertEquipment, id }).returning();
     return newEquipment;
   }
 
@@ -429,5 +455,47 @@ export class SQLiteStorage implements IStorage {
     const id = randomUUID();
     const [newRecipe] = await db.insert(recipes).values({ ...recipe, id }).returning();
     return newRecipe;
+  }
+
+  // Quest methods
+  async getAllQuests(): Promise<Quest[]> {
+    return await db.select().from(quests);
+  }
+
+  async getQuest(id: string): Promise<Quest | undefined> {
+    const [quest] = await db.select().from(quests).where(eq(quests.id, id));
+    return quest || undefined;
+  }
+
+  async createQuest(quest: InsertQuest): Promise<Quest> {
+    const id = randomUUID();
+    const [newQuest] = await db.insert(quests).values({ ...quest, id }).returning();
+    return newQuest;
+  }
+
+  // Player Quest methods
+  async getPlayerQuests(playerId: string): Promise<PlayerQuest[]> {
+    return await db.select().from(playerQuests).where(eq(playerQuests.playerId, playerId));
+  }
+
+  async getPlayerQuest(playerId: string, questId: string): Promise<PlayerQuest | undefined> {
+    const [playerQuest] = await db.select().from(playerQuests)
+      .where(eq(playerQuests.playerId, playerId));
+    return playerQuest || undefined;
+  }
+
+  async createPlayerQuest(playerQuest: InsertPlayerQuest): Promise<PlayerQuest> {
+    const id = randomUUID();
+    const [newPlayerQuest] = await db.insert(playerQuests).values({ ...playerQuest, id }).returning();
+    return newPlayerQuest;
+  }
+
+  async updatePlayerQuest(id: string, updates: Partial<PlayerQuest>): Promise<PlayerQuest> {
+    const [playerQuest] = await db
+      .update(playerQuests)
+      .set(updates)
+      .where(eq(playerQuests.id, id))
+      .returning();
+    return playerQuest;
   }
 }

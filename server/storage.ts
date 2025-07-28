@@ -138,7 +138,7 @@ export class MemStorage implements IStorage {
 
     // Initialize quests using modular data
     for (const quest of ALL_QUESTS) {
-      await this.createQuest(quest);
+      await this.createQuest({ ...quest, category: quest.category || null });
     }
 
     // Create default player
@@ -460,6 +460,7 @@ export class MemStorage implements IStorage {
       description: insertQuest.description,
       emoji: insertQuest.emoji,
       type: insertQuest.type,
+      category: insertQuest.category || null,
       requiredLevel: insertQuest.requiredLevel ?? 1,
       objectives: insertQuest.objectives,
       rewards: insertQuest.rewards,
@@ -506,8 +507,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use PostgreSQL database storage
-import { DatabaseStorage } from "./storage-database";
+// Use SQLite database storage for better Replit compatibility
+import { SQLiteStorage } from "./storage-sqlite";
 
-export const storage = new DatabaseStorage();
-console.log("🚀 Coletor Adventures using PostgreSQL Database Storage");
+export const storage = new SQLiteStorage();
+console.log("🚀 Coletor Adventures using SQLite Database Storage");
