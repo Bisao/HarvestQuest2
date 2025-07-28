@@ -35,7 +35,7 @@ interface ActiveExpedition {
   estimatedDuration: number;
 }
 
-type ExpeditionPhase = "setup" | "resource-selection" | "in-progress" | "completed";
+type ExpeditionPhase = "setup" | "resource-selection" | "in-progress";
 
 export default function ExpeditionSystem({
   isOpen,
@@ -56,8 +56,6 @@ export default function ExpeditionSystem({
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
   const [localActiveExpedition, setLocalActiveExpedition] = useState<ActiveExpedition | null>(null);
   const [expeditionProgress, setExpeditionProgress] = useState(0);
-  const [expeditionRewards, setExpeditionRewards] = useState<any>(null);
-  const [autoCompleteTimer, setAutoCompleteTimer] = useState<number>(5);
 
   // Use parent's activeExpedition if provided, otherwise use local state
   const activeExpedition = parentActiveExpedition || localActiveExpedition;
@@ -116,10 +114,7 @@ export default function ExpeditionSystem({
         (window as any).setActiveExpedition(newActiveExpedition);
       }
 
-      toast({
-        title: "Expedição Iniciada!",
-        description: `Coletando recursos na ${biome?.name}. Duração estimada: ${Math.round(duration)}s`,
-      });
+
     },
     onError: (error) => {
       console.error('Expedition error:', error);
@@ -137,8 +132,6 @@ export default function ExpeditionSystem({
       return response.json();
     },
     onSuccess: (result) => {
-      setPhase("completed");
-      setExpeditionRewards(result);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -162,11 +155,6 @@ export default function ExpeditionSystem({
       queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.refetchQueries({ queryKey: ["/api/player/Player1"] });
 
-      toast({
-        title: "Expedição Concluída!",
-        description: `Recursos coletados com sucesso! Clique para ver os resultados.`,
-      });
-
       // Clear parent expedition state
       if (onExpeditionUpdate) {
         onExpeditionUpdate(null);
@@ -174,10 +162,8 @@ export default function ExpeditionSystem({
         setLocalActiveExpedition(null);
       }
 
-      // Auto-close modal after 3 seconds to allow auto-repeat to work
-      setTimeout(() => {
-        onExpeditionComplete();
-      }, 3000);
+      // Auto-close modal immediately without showing completion phase
+      onExpeditionComplete();
     },
     onError: () => {
       toast({
@@ -216,18 +202,12 @@ export default function ExpeditionSystem({
         setPhase("resource-selection");
         setSelectedResources([]);
         setExpeditionProgress(0);
-        setExpeditionRewards(null);
-        setAutoCompleteTimer(5);
       } else {
-        // If there's an active expedition, set the appropriate phase
-        if (activeExpedition.progress >= 100) {
-          setPhase("completed");
-        } else {
-          setPhase("in-progress");
-          setExpeditionProgress(activeExpedition.progress || 0);
-          // Resume progress simulation for the active expedition
-          startProgressSimulation(activeExpedition);
-        }
+        // If there's an active expedition, set the in-progress phase
+        setPhase("in-progress");
+        setExpeditionProgress(activeExpedition.progress || 0);
+        // Resume progress simulation for the active expedition
+        startProgressSimulation(activeExpedition);
       }
     } else {
       if (intervalRef.current) {
@@ -237,21 +217,10 @@ export default function ExpeditionSystem({
     }
   }, [isOpen, activeExpedition]);
 
-  // Auto-complete timer when progress reaches 100%
+  // Auto-complete when progress reaches 100%
   useEffect(() => {
     if (expeditionProgress >= 100 && phase === "in-progress") {
-      const timerInterval = setInterval(() => {
-        setAutoCompleteTimer(prev => {
-          if (prev <= 1) {
-            clearInterval(timerInterval);
-            handleCompleteExpedition();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timerInterval);
+      handleCompleteExpedition();
     }
   }, [expeditionProgress, phase]);
 
@@ -410,7 +379,6 @@ export default function ExpeditionSystem({
                 <p className="text-xs md:text-sm text-muted-foreground">
                   {phase === "resource-selection" && "Escolha os recursos para coletar"}
                   {phase === "in-progress" && "Expedição em andamento..."}
-                  {phase === "completed" && "Expedição concluída!"}
                 </p>
               </div>
             </div>
@@ -508,42 +476,7 @@ export default function ExpeditionSystem({
                 </div>
               </div>
 
-              {/* Equipment Status */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-800 mb-2">⛏️ Status dos Equipamentos</h4>
-                <div className="text-sm text-blue-600 space-y-1">
-                  {player.equippedTool ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      Ferramenta: {equipment.find(eq => eq.id === player.equippedTool)?.name}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-orange-500">⚠️</span>
-                      Nenhuma ferramenta equipada
-                    </div>
-                  )}
-                  {player.equippedWeapon ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      Arma: {equipment.find(eq => eq.id === player.equippedWeapon)?.name}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-orange-500">⚠️</span>
-                      Nenhuma arma equipada
-                    </div>
-                  )}
-                  {/* Special note about knife versatility */}
-                  {((player.equippedTool && equipment.find(eq => eq.id === player.equippedTool)?.toolType === "knife") ||
-                    (player.equippedWeapon && equipment.find(eq => eq.id === player.equippedWeapon)?.toolType === "knife")) && (
-                    <div className="flex items-center gap-2 text-green-700">
-                      <span>🗡️</span>
-                      Faca detectada - permite esfolar animais caçados
-                    </div>
-                  )}
-                </div>
-              </div>
+
 
               <div className="max-h-96 overflow-y-auto pr-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -690,9 +623,7 @@ export default function ExpeditionSystem({
                       >
                         {completeExpeditionMutation.isPending ? "Finalizando..." : "✅ Finalizar Expedição"}
                       </Button>
-                      <p className="text-sm text-gray-600 mt-2">
-                        Auto-finalização em {autoCompleteTimer} segundos...
-                      </p>
+
                     </div>
                   </>
                 )}
@@ -700,86 +631,7 @@ export default function ExpeditionSystem({
             </div>
           )}
 
-          {/* Completed Phase */}
-          {phase === "completed" && expeditionRewards && (
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-xl">
-                <h3 className="text-xl font-semibold mb-4 text-center">🎉 Expedição Concluída!</h3>
 
-                {/* Recursos Coletados */}
-                <div className="mb-6">
-                  <h4 className="font-semibold mb-3 text-center">📦 Recursos Coletados:</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {expeditionRewards.collectedResources && Object.entries(expeditionRewards.collectedResources).map(([resourceId, quantity]: [string, any]) => {
-                      const resource = resources.find(r => r.id === resourceId);
-                      if (!resource || quantity <= 0) return null;
-                      return (
-                        <div key={resourceId} className="bg-white p-3 rounded-lg border flex items-center gap-2">
-                          <span className="text-2xl">{resource.emoji}</span>
-                          <div className="flex-1">
-                            <div className="font-medium text-sm">{resource.name}</div>
-                            <div className="text-xs text-gray-600">x{quantity}</div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* XP e Moedas Ganhas */}
-                <div className="bg-white p-4 rounded-lg border mb-6">
-                  <h4 className="font-semibold mb-2 text-center">⭐ Recompensas:</h4>
-                  <div className="grid grid-cols-2 gap-4 text-center">
-                    <div>
-                      <div className="text-2xl mb-1">🎯</div>
-                      <div className="font-semibold text-blue-600">+{expeditionRewards.experienceGained || 0} XP</div>
-                      <div className="text-xs text-gray-600">Experiência</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl mb-1">🪙</div>
-                      <div className="font-semibold text-yellow-600">+{expeditionRewards.coinsGained || 0}</div>
-                      <div className="text-xs text-gray-600">Moedas</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Log da Expedição */}
-                <div className="bg-gray-50 p-4 rounded-lg border mb-6">
-                  <h4 className="font-semibold mb-2 text-center">📋 Log da Expedição:</h4>
-                  <div className="text-sm space-y-1 text-left">
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      <span>Expedição iniciada na {biome.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      <span>Recursos selecionados para coleta: {selectedResources.length}</span>
-                    </div>
-                    {expeditionRewards.collectedResources && Object.keys(expeditionRewards.collectedResources).length > 0 && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-green-600">✓</span>
-                        <span>Coletados {Object.keys(expeditionRewards.collectedResources).length} tipos de recursos diferentes</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      <span>Experiência e moedas adicionadas à conta</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      <span>Recursos {player.autoStorage ? 'armazenados automaticamente' : 'adicionados ao inventário'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-center">
-                  <Button onClick={handleClose} className="bg-forest hover:bg-forest/90">
-                    Fechar
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </DialogContent>
     </Dialog>
