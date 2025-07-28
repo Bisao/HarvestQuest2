@@ -1,12 +1,12 @@
 import { useState } from "react";
 import type { Recipe, Resource, StorageItem } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight, Plus, Minus } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface CraftingTabProps {
   recipes: Recipe[];
@@ -292,51 +292,25 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
           ))}
         </div>
 
-        {/* Quantity Selector */}
+        {/* Quantity Slider */}
         {unlocked && maxQuantity > 1 && (
           <div className="mb-4">
             <Label className="text-sm font-semibold text-gray-700 mb-2 block">
-              Quantidade: (Máx: {maxQuantity})
+              Quantidade: {currentQuantity} (Máx: {maxQuantity})
             </Label>
-            <div className="flex items-center space-x-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => updateCraftQuantity(recipe.id, currentQuantity - 1)}
-                disabled={currentQuantity <= 1}
-                className="w-8 h-8 p-0"
-              >
-                <Minus className="w-3 h-3" />
-              </Button>
-              <Input
-                type="number"
-                min="1"
+            <div className="px-2">
+              <Slider
+                value={[currentQuantity]}
+                onValueChange={(value) => updateCraftQuantity(recipe.id, value[0])}
                 max={maxQuantity}
-                value={currentQuantity}
-                onChange={(e) => {
-                  const value = Math.min(maxQuantity, Math.max(1, parseInt(e.target.value) || 1));
-                  updateCraftQuantity(recipe.id, value);
-                }}
-                className="text-center w-16 h-8 text-sm"
+                min={1}
+                step={1}
+                className="w-full"
               />
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => updateCraftQuantity(recipe.id, currentQuantity + 1)}
-                disabled={currentQuantity >= maxQuantity}
-                className="w-8 h-8 p-0"
-              >
-                <Plus className="w-3 h-3" />
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => updateCraftQuantity(recipe.id, maxQuantity)}
-                disabled={currentQuantity >= maxQuantity}
-                className="text-xs px-2 h-8"
-              >
-                Max
-              </Button>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>1</span>
+                <span>{maxQuantity}</span>
+              </div>
             </div>
           </div>
         )}

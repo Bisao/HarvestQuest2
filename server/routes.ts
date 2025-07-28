@@ -447,9 +447,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Update quest progress for crafted items - using the item IDs from recipe outputs
       const outputs = recipe.output as Record<string, any>;
-      for (const [itemId, quantity] of Object.entries(outputs)) {
+      for (const [itemId, baseQuantity] of Object.entries(outputs)) {
+        const totalCrafted = baseQuantity * quantity; // Multiply by craft quantity
         // Updating quest progress for crafted item
-        await questService.updateQuestProgress(playerId, 'craft', { itemId, quantity });
+        await questService.updateQuestProgress(playerId, 'craft', { itemId, quantity: totalCrafted });
       }
 
       // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
