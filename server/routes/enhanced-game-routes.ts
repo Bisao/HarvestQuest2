@@ -215,7 +215,7 @@ export function registerEnhancedGameRoutes(
           const itemName = isResource 
             ? allResources.find(r => r.id === itemId)?.name 
             : allEquipment.find(e => e.id === itemId)?.name;
-          console.log(`Crafted ${totalAmount}x ${itemName} (${itemType}) added to storage for player ${playerId}`);
+          console.log(`DEBUG: Crafted ${totalAmount}x ${itemName} (${itemType}) with ID ${itemId} added to storage for player ${playerId}`);
           
           items.push({ itemId, quantity: totalAmount });
         }
