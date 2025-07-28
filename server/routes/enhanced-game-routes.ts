@@ -257,7 +257,10 @@ export function registerEnhancedGameRoutes(
         invalidateInventoryCache(playerId);
 
         successResponse(res, {
-          recipe: recipe.name,
+          recipe: {
+            id: recipe.id,
+            name: recipe.name
+          },
           quantity,
           items,
           destination: 'storage'

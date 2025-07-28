@@ -45,25 +45,40 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message);
+        throw new Error(error.message || "Erro no crafting");
       }
       return response.json();
     },
-    onSuccess: (data) => {
-      const quantity = data.quantity || 1;
+    onSuccess: (response) => {
+      // Handle both wrapped and direct response formats
+      const data = response.data || response;
+      const quantity = data?.quantity || 1;
+      const recipeName = data?.recipe?.name || data?.recipe || "Item";
+      
       toast({
         title: "Item Craftado!",
-        description: `${quantity}x ${data.recipe.name} foi criado com sucesso!`,
+        description: `${quantity}x ${recipeName} foi criado com sucesso!`,
       });
+      
       // Reset craft quantity for this recipe
-      setCraftQuantities(prev => ({ ...prev, [data.recipe.id]: 1 }));
-      // Real-time updates for all related data after crafting
+      if (data?.recipe?.id) {
+        setCraftQuantities(prev => ({ ...prev, [data.recipe.id]: 1 }));
+      }
+      
+      // CRITICAL: Force complete cache invalidation for real-time sync
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId, "quests"] });
+      
+      // Force immediate refetch
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "quests"] });
     },
     onError: (error: any) => {
+      console.error("Craft error:", error);
       toast({
         title: "Erro no Crafting",
         description: error.message || "Não foi possível craftar o item",
