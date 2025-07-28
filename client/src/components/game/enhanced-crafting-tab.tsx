@@ -27,7 +27,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     "Utensílios": false,
     "Consumíveis": false,
   });
-  
+
   // State for craft quantities
   const [craftQuantities, setCraftQuantities] = useState<Record<string, number>>({});
 
@@ -39,10 +39,10 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
   const craftMutation = useMutation({
     mutationFn: async ({ recipeId, quantity = 1 }: { recipeId: string; quantity?: number }) => {
-      const response = await fetch("/api/craft", {
+      const response = await fetch("/api/v2/craft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId, recipeId, quantity }),
+        body: JSON.stringify({ playerId, recipeId, quantity: quantity || 1 }),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -77,7 +77,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     // First try to find in resources
     const resource = resources.find(r => r.id === resourceId);
     if (resource) return resource;
-    
+
     // If not found, it might be an equipment name (like "string", "bamboo_bottle", etc.)
     // Return a placeholder with the resourceId as name for display
     return {
@@ -105,7 +105,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     // Check storage items for resources
     const storageItem = storageItems.find(item => item.resourceId === resourceId);
     if (storageItem) return storageItem.quantity;
-    
+
     // For equipment items (like "string", "bamboo_bottle"), check by name match
     const equipmentMappings: Record<string, string> = {
       "string": "Barbante",
@@ -113,7 +113,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       "clay_pot": "Panela de Barro",
       "rope": "Corda"
     };
-    
+
     if (equipmentMappings[resourceId]) {
       const equipmentName = equipmentMappings[resourceId];
       const equipmentInStorage = storageItems.find(item => {
@@ -122,7 +122,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       });
       return equipmentInStorage?.quantity || 0;
     }
-    
+
     return 0;
   };
 
@@ -138,14 +138,14 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
   const canCraftRecipe = (recipe: Recipe, quantity = 1) => {
     if (playerLevel < recipe.requiredLevel) return false;
-    
+
     const ingredients = getRecipeIngredients(recipe);
     return ingredients.every(ingredient => ingredient.available >= (ingredient.quantity * quantity));
   };
 
   const getMaxCraftableQuantity = (recipe: Recipe) => {
     if (playerLevel < recipe.requiredLevel) return 0;
-    
+
     const ingredients = getRecipeIngredients(recipe);
     const maxQuantities = ingredients.map(ingredient => 
       Math.floor(ingredient.available / ingredient.quantity)
@@ -190,7 +190,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
     recipes.forEach(recipe => {
       const name = recipe.name.toLowerCase();
-      
+
       // Materiais básicos
       if (name.includes("barbante") || name.includes("corda") || name.includes("isca")) {
         categories["Materiais"].push(recipe);
@@ -316,7 +316,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         )}
 
         <Button
-          onClick={() => handleCraft(recipe)}
+          onClick={() => craftMutation.mutate({ recipeId, quantity: craftQuantities[recipe.id] || 1 })}
           disabled={!canCraft || craftMutation.isPending || isBlocked || maxQuantity === 0}
           className={`w-full ${
             canCraft 
@@ -343,9 +343,9 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
       {Object.entries(categorizedRecipes).map(([categoryName, categoryRecipes]) => {
         if (categoryRecipes.length === 0) return null;
-        
+
         const isExpanded = expandedCategories[categoryName];
-        
+
         return (
           <div key={categoryName} className="mb-6">
             <button
@@ -364,7 +364,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
               </div>
               {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
             </button>
-            
+
             {isExpanded && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {categoryRecipes.map(renderRecipeCard)}

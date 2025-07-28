@@ -103,7 +103,7 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
 
   const consumeMutation = useMutation({
     mutationFn: async (itemId: string) => {
-      const response = await apiRequest("POST", `/api/player/${playerId}/consume`, { itemId, quantity: 1 });
+      const response = await apiRequest("POST", `/api/v2/player/${playerId}/consume`, { itemId, quantity: 1 });
       return response.json();
     },
     onSuccess: (data: any) => {

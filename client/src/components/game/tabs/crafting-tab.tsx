@@ -255,11 +255,11 @@ export default function EvolutionaryCraftingSystem({
   });
 
   const craftMutation = useMutation({
-    mutationFn: async ({ recipeId }: { recipeId: string }) => {
-      const response = await fetch("/api/craft", {
+    mutationFn: async ({ recipeId, quantity }: { recipeId: string; quantity?: number }) => {
+      const response = await fetch("/api/v2/craft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId, recipeId }),
+        body: JSON.stringify({ playerId, recipeId, quantity: quantity || 1 }),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -594,7 +594,7 @@ export default function EvolutionaryCraftingSystem({
 
         {/* Botão compacto */}
         <Button
-          onClick={() => craftMutation.mutate({ recipeId: currentRecipe.id })}
+          onClick={() => craftMutation.mutate({ recipeId: currentRecipe.id, quantity: 1 })}
           disabled={!canCraft || craftMutation.isPending || isBlocked}
           className={`w-full text-xs h-7 ${
             canCraft 
@@ -652,7 +652,7 @@ export default function EvolutionaryCraftingSystem({
         </div>
 
         <Button
-          onClick={() => craftMutation.mutate({ recipeId: recipe.id })}
+          onClick={() => craftMutation.mutate({ recipeId: recipe.id, quantity: 1 })}
           disabled={!canCraft || craftMutation.isPending || isBlocked}
           className={`w-full text-xs h-7 ${
             canCraft 

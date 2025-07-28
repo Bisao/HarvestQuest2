@@ -175,40 +175,25 @@ export function registerEnhancedGameRoutes(
           }
         }
 
-        // Add crafted items based on player preference
+        // Add crafted items to storage (always storage as per requirement)
         const output = recipe.output as Record<string, number>;
         const items = [];
         
         for (const [itemId, baseAmount] of Object.entries(output)) {
           const totalAmount = baseAmount * quantity;
           
-          if (player.craftedItemsDestination === 'inventory') {
-            // Check inventory capacity
-            const canCarry = await gameService.canCarryMore(playerId, totalAmount);
-            if (!canCarry) {
-              throw new InvalidOperationError("Inventory full. Items will be sent to storage.");
-            }
-            
-            // Add to inventory
-            await storage.addInventoryItem({
+          // Always add to storage regardless of player preference for crafted items
+          const existingItem = playerStorage.find(item => item.resourceId === itemId);
+          if (existingItem) {
+            await storage.updateStorageItem(existingItem.id, {
+              quantity: existingItem.quantity + totalAmount
+            });
+          } else {
+            await storage.addStorageItem({
               playerId,
               resourceId: itemId,
               quantity: totalAmount
             });
-          } else {
-            // Add to storage
-            const existingItem = playerStorage.find(item => item.resourceId === itemId);
-            if (existingItem) {
-              await storage.updateStorageItem(existingItem.id, {
-                quantity: existingItem.quantity + totalAmount
-              });
-            } else {
-              await storage.addStorageItem({
-                playerId,
-                resourceId: itemId,
-                quantity: totalAmount
-              });
-            }
           }
           
           items.push({ itemId, quantity: totalAmount });
@@ -221,7 +206,7 @@ export function registerEnhancedGameRoutes(
           recipe: recipe.name,
           quantity,
           items,
-          destination: player.craftedItemsDestination
+          destination: 'storage'
         }, `Successfully crafted ${quantity}x ${recipe.name}`);
 
       } catch (error) {
