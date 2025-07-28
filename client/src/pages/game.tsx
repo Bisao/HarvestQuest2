@@ -20,6 +20,7 @@ export default function Game() {
   const [activeExpedition, setActiveExpedition] = useState<any>(null);
   const [autoRepeatSettings, setAutoRepeatSettings] = useState<{[biomeId: string]: {enabled: boolean, resources: string[], countdown: number}}>({});
   const [autoRepeatTimers, setAutoRepeatTimers] = useState<Record<string, NodeJS.Timeout>>({});
+  const [autoCompleteTimer, setAutoCompleteTimer] = useState<number | null>(null);
 
   const { gameState, updateGameState } = useGameState();
 
@@ -106,6 +107,24 @@ export default function Game() {
           setExpeditionMinimized(true);
           setExpeditionModalOpen(false);
           clearInterval(interval);
+
+          // Start auto-complete timer
+          setAutoCompleteTimer(10);
+          const timerInterval = setInterval(() => {
+            setAutoCompleteTimer(prev => {
+              if (prev === null) {
+                clearInterval(timerInterval);
+                return null;
+              }
+              if (prev <= 1) {
+                clearInterval(timerInterval);
+                // Auto-complete expedition
+                handleCompleteExpedition();
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
         }
       }, 1000);
 
@@ -116,8 +135,9 @@ export default function Game() {
   // Handler for completing expeditions - this triggers the API call
   const handleCompleteExpedition = () => {
     if (!activeExpedition) return;
-    
-    // Make API call to complete expedition
+
+    // Clear auto-complete timer when manually completing
+    setAutoCompleteTimer(null);
     completeExpeditionMutation.mutate(activeExpedition.id);
   };
 
@@ -136,17 +156,17 @@ export default function Game() {
       // Check if auto-repeat is enabled for current biome before clearing expedition
       const currentBiomeId = activeExpedition?.biomeId;
       const shouldRestartAutoRepeat = currentBiomeId && autoRepeatSettings[currentBiomeId]?.enabled;
-      
+
       setActiveExpedition(null);
       setExpeditionModalOpen(false);
       setExpeditionMinimized(false);
       setExpeditionMinimizedExpanded(false);
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      
+
       // Restart auto-repeat countdown if it was enabled
       if (shouldRestartAutoRepeat && currentBiomeId) {
         console.log('Expedition completed - restarting auto-repeat countdown for biome:', currentBiomeId);
-        
+
         // Add small delay to allow expedition state to clear, then restart countdown
         setTimeout(() => {
           setAutoRepeatSettings(prev => ({
@@ -157,7 +177,7 @@ export default function Game() {
               enabled: true 
             }
           }));
-          
+
           // Use the new startCountdownTimer function
           startCountdownTimer(currentBiomeId);
         }, 1000);
@@ -186,7 +206,7 @@ export default function Game() {
     };
 
     window.addEventListener('expeditionStarted', handleExpeditionStarted as EventListener);
-    
+
     return () => {
       window.removeEventListener('expeditionStarted', handleExpeditionStarted as EventListener);
     };
@@ -207,7 +227,7 @@ export default function Game() {
   const startCountdownTimer = (biomeId: string) => {
     // Clear any existing timer first
     clearBiomeTimer(biomeId);
-    
+
     const countdownInterval = setInterval(() => {
       setAutoRepeatSettings(prevSettings => {
         const currentCountdown = prevSettings[biomeId]?.countdown || 0;
@@ -229,7 +249,7 @@ export default function Game() {
         };
       });
     }, 1000);
-    
+
     setAutoRepeatTimers(prev => ({
       ...prev,
       [biomeId]: countdownInterval
@@ -238,21 +258,21 @@ export default function Game() {
 
   const handleToggleAutoRepeat = (biomeId: string) => {
     console.log('Toggle auto-repeat for biome:', biomeId);
-    
+
     // Get last expedition resources
     const lastExpeditions = typeof window !== 'undefined' 
       ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
       : {};
-    
+
     console.log('Last expeditions:', lastExpeditions);
-    
+
     setAutoRepeatSettings(prev => {
       const newSettings = { ...prev };
-      
+
       if (newSettings[biomeId]) {
         // Toggle the enabled state
         newSettings[biomeId].enabled = !newSettings[biomeId].enabled;
-        
+
         if (newSettings[biomeId].enabled) {
           // Starting auto-repeat
           newSettings[biomeId].countdown = 10;
@@ -278,7 +298,7 @@ export default function Game() {
           console.log('No last expedition resources found for biome:', biomeId);
         }
       }
-      
+
       console.log('New settings:', newSettings);
       return newSettings;
     });
@@ -287,45 +307,45 @@ export default function Game() {
   // Auto-repeat expedition logic - watch for countdown reaching 0 and start expedition
   useEffect(() => {
     console.log('Auto-repeat useEffect triggered. autoRepeatSettings:', autoRepeatSettings, 'activeExpedition:', !!activeExpedition);
-    
+
     const enabledBiome = Object.entries(autoRepeatSettings).find(([_, settings]) => 
       settings.enabled && settings.countdown === 0 && !activeExpedition
     );
-    
+
     console.log('Found enabled biome for auto-start:', enabledBiome);
-    
+
     if (enabledBiome) {
       const [biomeId, settings] = enabledBiome;
       const biome = biomes?.find(b => b.id === biomeId);
-      
+
       console.log('Biome found:', biome?.name, 'Player stats:', { 
         hunger: player?.hunger, 
         thirst: player?.thirst,
         canStart: biome && player && player.hunger >= 30 && player.thirst >= 30 
       });
-      
+
       if (biome && player && player.hunger >= 30 && player.thirst >= 30) {
         console.log('All conditions met - Auto-starting expedition for biome:', biomeId);
-        
+
         // Get last expedition resources
         const lastExpeditions = typeof window !== 'undefined' 
           ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
           : {};
-          
+
         if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
           console.log('Auto-starting expedition for biome:', biomeId, 'with resources:', lastExpeditions[biomeId]);
-          
+
           // Set selected biome first
           setSelectedBiome(biome);
-          
+
           // Then open modal and minimize it to show the expedition in progress
           setTimeout(() => {
             console.log('Opening expedition modal - setting states');
             setExpeditionModalOpen(true);
             setExpeditionMinimized(false);
-            
+
             console.log('Modal states set - expeditionModalOpen: true, expeditionMinimized: false');
-            
+
             // Auto-start expedition with last resources after modal opens
             setTimeout(() => {
               console.log('Dispatching autoStartExpedition event');
@@ -335,7 +355,7 @@ export default function Game() {
               window.dispatchEvent(event);
             }, 500);
           }, 100);
-          
+
           // Reset the auto-repeat countdown for next cycle
           setAutoRepeatSettings(prev => ({
             ...prev,
@@ -407,7 +427,7 @@ export default function Game() {
                   const lastExpeditions = typeof window !== 'undefined' 
                     ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
                     : {};
-                  
+
                   return {
                     ...biome,
                     autoRepeatEnabled: autoRepeatSettings[biome.id]?.enabled || false,
@@ -570,8 +590,8 @@ export default function Game() {
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{selectedBiome.emoji}</span>
                 <div>
-                  <h4 className="font-semibold text-sm">Expedição na {selectedBiome.name}</h4>
-                  <p className="text-xs text-gray-500">Concluída!</p>
+                  <h4 className="font-semibold">Expedição na {selectedBiome.name}</h4>
+                  <p className="text-xs text-green-600 font-medium">✅ Concluída!</p>
                 </div>
               </div>
               <button
@@ -583,7 +603,27 @@ export default function Game() {
                 </svg>
               </button>
             </div>
-            
+
+            {/* Auto-complete timer */}
+            {autoCompleteTimer !== null && autoCompleteTimer > 0 && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+                <div className="text-center">
+                  <div className="text-sm text-orange-700 font-medium mb-2">
+                    ⏰ Finalização automática em {autoCompleteTimer}s
+                  </div>
+                  <div className="w-full bg-orange-200 rounded-full h-2">
+                    <div 
+                      className="bg-orange-600 h-2 rounded-full transition-all duration-1000"
+                      style={{ width: `${((10 - autoCompleteTimer) / 10) * 100}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-orange-600 mt-1">
+                    Clique em "Finalizar Expedição" para parar o timer
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-3">
               {/* Collected Resources */}
               <div>
