@@ -1144,6 +1144,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset all completed quests for a player
+  app.post("/api/player/:playerId/quests/reset-completed", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      
+      // Get all player quests
+      const allPlayerQuests = await storage.getPlayerQuests(playerId);
+      const completedQuests = allPlayerQuests.filter(pq => pq.status === 'completed');
+      
+      if (completedQuests.length === 0) {
+        return res.status(400).json({ message: "No completed quests to reset" });
+      }
+
+      // Reset all completed quests to active status with empty progress
+      for (const playerQuest of completedQuests) {
+        await storage.updatePlayerQuest(playerQuest.id, {
+          status: 'active',
+          progress: {},
+          startedAt: Math.floor(Date.now() / 1000),
+          completedAt: null
+        });
+      }
+
+      // Invalidate cache
+      const { invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidatePlayerCache(playerId);
+
+      res.json({ 
+        message: `${completedQuests.length} quests reset successfully`,
+        resetQuestCount: completedQuests.length
+      });
+    } catch (error) {
+      console.error("Reset all completed quests error:", error);
+      res.status(500).json({ message: "Failed to reset completed quests" });
+    }
+  });
+
   // Reset/repeat a completed quest
   app.post("/api/player/:playerId/quests/:questId/repeat", async (req, res) => {
     try {

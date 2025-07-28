@@ -105,12 +105,12 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}/quests`] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      
+
       let message = "Quest completada!";
       if (data.newLevel) {
         message += ` Parabéns, você subiu para o nível ${data.newLevel}!`;
       }
-      
+
       toast({
         title: "Sucesso!",
         description: message,
@@ -151,6 +151,32 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     },
   });
 
+    const resetAllCompletedMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/player/${player.id}/quests/reset`, {
+        method: 'POST'
+      });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}/quests`] });
+      toast({
+        title: "Quests Resetadas!",
+        description: "Todas as quests completadas foram resetadas.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível resetar as quests.",
+      });
+    },
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'available':
@@ -187,34 +213,34 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     if (resource) {
       return `${resource.emoji} ${resource.name}`;
     }
-    
+
     // Then check equipment
     const equip = (equipment as any[]).find((e: any) => e.id === itemId);
     if (equip) {
       return `${equip.emoji} ${equip.name}`;
     }
-    
+
     return "Item Desconhecido";
   };
 
   const formatRewards = (rewards: Quest['rewards']) => {
     const parts = [];
-    
+
     if (rewards.coins) {
       parts.push(`💰 ${rewards.coins} moedas`);
     }
-    
+
     if (rewards.experience) {
       parts.push(`⭐ ${rewards.experience} XP`);
     }
-    
+
     if (rewards.items) {
       for (const [itemId, quantity] of Object.entries(rewards.items)) {
         const itemName = getItemName(itemId);
         parts.push(`${quantity}x ${itemName}`);
       }
     }
-    
+
     return parts.join(", ");
   };
 
@@ -260,13 +286,13 @@ export default function QuestsTab({ player }: QuestsTabProps) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <CardDescription>{quest.description}</CardDescription>
-                  
+
                   <div className="space-y-2">
                     <h4 className="font-semibold text-sm">Objetivos:</h4>
                     {quest.objectives.map((objective, idx) => {
                       const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId);
                       const objectiveProgress = quest.progress[progressKey];
-                      
+
                       return (
                         <div key={idx} className="text-sm">
                           <div className="flex justify-between items-center">
@@ -342,7 +368,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <CardDescription>{quest.description}</CardDescription>
-                  
+
                   <div className="space-y-2">
                     <h4 className="font-semibold text-sm">Objetivos:</h4>
                     {quest.objectives.map((objective, idx) => (
