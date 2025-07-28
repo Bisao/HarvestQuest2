@@ -316,7 +316,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         )}
 
         <Button
-          onClick={() => craftMutation.mutate({ recipeId, quantity: craftQuantities[recipe.id] || 1 })}
+          onClick={() => handleCraft(recipe)}
           disabled={!canCraft || craftMutation.isPending || isBlocked || maxQuantity === 0}
           className={`w-full ${
             canCraft 
