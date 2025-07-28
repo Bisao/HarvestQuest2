@@ -208,6 +208,35 @@ export function registerEnhancedGameRoutes(
           items.push({ itemId, quantity: totalAmount });
         }
 
+        // Update quest progress for crafting (only for active quests)
+        const activeQuests = await storage.getPlayerQuests(playerId);
+        const activePlayerQuests = activeQuests.filter(pq => pq.status === 'active');
+        
+        for (const [craftedItemId, craftedAmount] of Object.entries(output)) {
+          const totalCraftedAmount = craftedAmount * quantity;
+          
+          for (const playerQuest of activePlayerQuests) {
+            const quest = await storage.getQuest(playerQuest.questId);
+            if (quest && quest.type === 'craft') {
+              const objectives = quest.objectives as any[];
+              
+              for (const objective of objectives) {
+                if (objective.type === 'craft' && objective.itemId === craftedItemId) {
+                  const currentProgress = (playerQuest.progress as any)?.[objective.itemId] || 0;
+                  const newProgress = Math.min(currentProgress + totalCraftedAmount, objective.quantity);
+                  
+                  await storage.updatePlayerQuest(playerQuest.id, {
+                    progress: {
+                      ...playerQuest.progress as any,
+                      [objective.itemId]: newProgress
+                    }
+                  });
+                }
+              }
+            }
+          }
+        }
+
         // Invalidate player cache
         invalidatePlayerCache(playerId);
 

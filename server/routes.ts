@@ -87,9 +87,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (typeof autoStorage === 'boolean') {
         updates.autoStorage = autoStorage;
       }
-      if (craftedItemsDestination === 'inventory' || craftedItemsDestination === 'storage') {
-        updates.craftedItemsDestination = craftedItemsDestination;
-      }
 
       const updatedPlayer = await storage.updatePlayer(playerId, updates);
       res.json(updatedPlayer);
@@ -1017,6 +1014,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingPlayerQuest = await storage.getPlayerQuest(playerId, questId);
       if (existingPlayerQuest) {
         return res.status(400).json({ message: "Quest already started or completed" });
+      }
+
+      // Check active quest limit (maximum 3 active quests)
+      const allPlayerQuests = await storage.getPlayerQuests(playerId);
+      const activeQuests = allPlayerQuests.filter(pq => pq.status === 'active');
+      if (activeQuests.length >= 3) {
+        return res.status(400).json({ message: "Maximum 3 active quests allowed. Complete or cancel an existing quest first." });
       }
 
       // Get quest to validate
