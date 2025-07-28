@@ -55,15 +55,15 @@ export class SQLiteStorage implements IStorage {
 
     console.log("Initializing game data in SQLite database...");
     
-    // Initialize all resources using modular data
+    // Initialize all resources using modular data with fixed IDs
     const resourceIds: string[] = [];
     for (const resource of ALL_RESOURCES) {
       const created = await this.createResource(resource);
       resourceIds.push(created.id);
     }
 
-    // Initialize biomes using modular data
-    const biomesData = createBiomeData(resourceIds);
+    // Initialize biomes using modular data (no need to pass resourceIds since biomes use fixed IDs)
+    const biomesData = createBiomeData();
     for (const biome of biomesData) {
       await this.createBiome(biome);
     }
@@ -73,8 +73,8 @@ export class SQLiteStorage implements IStorage {
       await this.createEquipment(equip);
     }
 
-    // Initialize recipes using modular data
-    const recipesData = createRecipeData(resourceIds);
+    // Initialize recipes using modular data (no need to pass resourceIds since recipes use fixed IDs)
+    const recipesData = createRecipeData();
     for (const recipe of recipesData) {
       await this.createRecipe(recipe);
     }
@@ -265,7 +265,7 @@ export class SQLiteStorage implements IStorage {
   }
 
   async createResource(resource: InsertResource): Promise<Resource> {
-    const id = randomUUID();
+    const id = resource.id || randomUUID(); // Use provided ID if available
     const [newResource] = await db.insert(resources).values({ ...resource, id }).returning();
     return newResource;
   }

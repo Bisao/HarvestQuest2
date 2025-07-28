@@ -1,5 +1,6 @@
 // Biome data management module
 import type { InsertBiome } from "@shared/schema";
+import { RESOURCE_IDS } from "./resources";
 
 export interface BiomeConfig {
   name: string;
@@ -40,7 +41,7 @@ export const BIOME_CONFIGS: BiomeConfig[] = [
   },
 ];
 
-export function createBiomeData(resourceIds: string[]): InsertBiome[] {
+export function createBiomeData(): InsertBiome[] {
   return [
     {
       name: "Floresta",
@@ -48,40 +49,58 @@ export function createBiomeData(resourceIds: string[]): InsertBiome[] {
       requiredLevel: 1,
       // Inclui recursos básicos + madeira + todos os novos recursos de caça/pesca
       availableResources: [
-        resourceIds[0], // Fibra
-        resourceIds[1], // Pedra
-        resourceIds[2], // Pedras Soltas
-        resourceIds[3], // Gravetos
-        resourceIds[4], // Água Fresca  
-        resourceIds[5], // Bambu
-        resourceIds[6], // Madeira
-        resourceIds[18], // Coelho (index correto)
-        resourceIds[19], // Veado (index correto)
-        resourceIds[20], // Javali (index correto)
-        resourceIds[21], // Peixe Pequeno (index correto)
-        resourceIds[22], // Peixe Grande (index correto)
-        resourceIds[23], // Salmão (index correto)
-        resourceIds[24], // Cogumelos (index correto)
-        resourceIds[25], // Frutas Silvestres (index correto)
+        RESOURCE_IDS.FIBRA,
+        RESOURCE_IDS.PEDRA,
+        RESOURCE_IDS.PEDRAS_SOLTAS,
+        RESOURCE_IDS.GRAVETOS,
+        RESOURCE_IDS.AGUA_FRESCA,
+        RESOURCE_IDS.BAMBU,
+        RESOURCE_IDS.MADEIRA,
+        RESOURCE_IDS.COELHO,
+        RESOURCE_IDS.VEADO,
+        RESOURCE_IDS.JAVALI,
+        RESOURCE_IDS.PEIXE_PEQUENO,
+        RESOURCE_IDS.PEIXE_GRANDE,
+        RESOURCE_IDS.SALMAO,
+        RESOURCE_IDS.COGUMELOS,
+        RESOURCE_IDS.FRUTAS_SILVESTRES,
       ],
     },
     {
       name: "Deserto",
       emoji: "🏜️",
       requiredLevel: 20,
-      availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[3], resourceIds[5]], // Fibra, Pedra, Pedras Soltas, Gravetos, Areia
+      availableResources: [
+        RESOURCE_IDS.FIBRA,
+        RESOURCE_IDS.PEDRA,
+        RESOURCE_IDS.PEDRAS_SOLTAS,
+        RESOURCE_IDS.GRAVETOS,
+        RESOURCE_IDS.AREIA
+      ],
     },
     {
       name: "Montanha",
       emoji: "🏔️",
       requiredLevel: 50,
-      availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[3], resourceIds[6]], // Fibra, Pedra, Pedras Soltas, Gravetos, Cristais
+      availableResources: [
+        RESOURCE_IDS.FIBRA,
+        RESOURCE_IDS.PEDRA,
+        RESOURCE_IDS.PEDRAS_SOLTAS,
+        RESOURCE_IDS.GRAVETOS,
+        RESOURCE_IDS.CRISTAIS
+      ],
     },
     {
       name: "Oceano",
       emoji: "🌊",
       requiredLevel: 75,
-      availableResources: [resourceIds[0], resourceIds[1], resourceIds[2], resourceIds[3], resourceIds[7]], // Fibra, Pedra, Pedras Soltas, Gravetos, Conchas
+      availableResources: [
+        RESOURCE_IDS.FIBRA,
+        RESOURCE_IDS.PEDRA,
+        RESOURCE_IDS.PEDRAS_SOLTAS,
+        RESOURCE_IDS.GRAVETOS,
+        RESOURCE_IDS.CONCHAS
+      ],
     },
   ];
 }

@@ -8,6 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 28, 2025 - MIGRATION TO REPLIT COMPLETED SUCCESSFULLY**
+- **Database Migration Fixed**: Successfully migrated from PostgreSQL to SQLite with consistent resource IDs
+- **Crafting System Restored**: Fixed resource ID mismatches that were causing "Recursos insuficientes" errors
+- **Fixed ID System**: All resources, recipes, and biomes now use consistent fixed UUIDs for reliable cross-system referencing
+- **SQLite Optimization**: Database now uses better-sqlite3 for improved performance and Replit compatibility
+- **Migration Verified**: All game systems (expeditions, crafting, inventory, storage, quests) fully functional after migration
+- **Production Ready**: Project successfully migrated from Replit Agent to standard Replit environment
+
 **January 27, 2025 - PERFORMANCE REVOLUTION COMPLETED**
 - **98% Performance Improvement**: Game now loads 50x faster with response times reduced from ~1000ms to ~2ms
 - **Advanced Caching System**: Memory cache implemented across all major routes with intelligent TTL management
