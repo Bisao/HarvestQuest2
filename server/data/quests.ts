@@ -1,5 +1,12 @@
 // Quest data management module
 import type { InsertQuest } from "@shared/schema";
+import { RESOURCE_IDS } from "./resources";
+import { EQUIPMENT_IDS } from "./equipment";
+
+// Fixed biome IDs for quest objectives
+const BIOME_IDS = {
+  FLORESTA: "d1ba8bc7-c04e-4d86-a933-c9d1b251d01c"
+};
 
 export const ALL_QUESTS: InsertQuest[] = [
   // ===== CATEGORIA: EXPLORAÇÃO =====
@@ -13,7 +20,7 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "expedition",
-        biomeId: "78566f17-d3dc-45f6-a936-8b2332d89133", // Floresta
+        biomeId: BIOME_IDS.FLORESTA,
         quantity: 1,
         description: "Complete 1 expedição na Floresta"
       }
@@ -22,7 +29,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 50,
       experience: 25,
       items: {
-        "94e8664f-8c91-45e1-b869-6ddff1b51b35": 2 // Água Fresca
+        [RESOURCE_IDS.AGUA_FRESCA]: 2
       }
     },
     isActive: true
@@ -37,7 +44,7 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "expedition",
-        biomeId: "78566f17-d3dc-45f6-a936-8b2332d89133", // Floresta
+        biomeId: BIOME_IDS.FLORESTA,
         quantity: 5,
         description: "Complete 5 expedições na Floresta"
       }
@@ -46,7 +53,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 200,
       experience: 100,
       items: {
-        "2c7495cc-9f28-4ce3-baf8-3f477b8424c0": 10 // Gravetos
+        [RESOURCE_IDS.GRAVETOS]: 10
       }
     },
     isActive: true
@@ -61,7 +68,7 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "expedition",
-        biomeId: "78566f17-d3dc-45f6-a936-8b2332d89133", // Floresta
+        biomeId: BIOME_IDS.FLORESTA,
         quantity: 15,
         description: "Complete 15 expedições na Floresta"
       }
@@ -70,7 +77,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 500,
       experience: 250,
       items: {
-        "ccf77b6d-ad96-4101-9eed-d80f2f2a77e4": 20 // Fibra
+        [RESOURCE_IDS.FIBRA]: 20
       }
     },
     isActive: true
@@ -87,13 +94,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
-        resourceId: "ccf77b6d-ad96-4101-9eed-d80f2f2a77e4", // Fibra
+        resourceId: RESOURCE_IDS.FIBRA,
         quantity: 5,
         description: "Colete 5 fibras"
       },
       {
         type: "collect",
-        resourceId: "2c7495cc-9f28-4ce3-baf8-3f477b8424c0", // Gravetos
+        resourceId: RESOURCE_IDS.GRAVETOS,
         quantity: 3,
         description: "Colete 3 gravetos"
       }
@@ -102,7 +109,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 30,
       experience: 15,
       items: {
-        "b1816cc3-14e2-4232-bec9-2370f40efdf1": 2 // Pedras Soltas
+        [RESOURCE_IDS.PEDRAS_SOLTAS]: 2
       }
     },
     isActive: true
@@ -117,13 +124,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
-        resourceId: "2403e29c-64a8-49c7-8515-6d314682167f", // Madeira
+        resourceId: RESOURCE_IDS.MADEIRA,
         quantity: 10,
         description: "Colete 10 madeiras"
       },
       {
         type: "collect",
-        resourceId: "b1816cc3-14e2-4232-bec9-2370f40efdf1", // Pedras Soltas
+        resourceId: RESOURCE_IDS.PEDRAS_SOLTAS,
         quantity: 15,
         description: "Colete 15 pedras soltas"
       }
@@ -132,7 +139,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 100,
       experience: 50,
       items: {
-        "ccf77b6d-ad96-4101-9eed-d80f2f2a77e4": 10 // Fibra
+        [RESOURCE_IDS.FIBRA]: 10
       }
     },
     isActive: true
@@ -147,7 +154,7 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
-        resourceId: "92ad7096-9896-43ed-8ca5-57a49cce8367", // Pedra
+        resourceId: RESOURCE_IDS.PEDRA,
         quantity: 20,
         description: "Colete 20 pedras (requer picareta)"
       }
@@ -156,7 +163,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 150,
       experience: 75,
       items: {
-        "c7efa60d-2184-4289-86ef-47d230afe951": 5 // Argila
+        [RESOURCE_IDS.ARGILA]: 5
       }
     },
     isActive: true
@@ -171,13 +178,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
-        resourceId: "5e1bc0d0-7631-4aee-8001-210771dc2def", // Ferro Fundido
+        resourceId: RESOURCE_IDS.FERRO_FUNDIDO,
         quantity: 5,
         description: "Colete 5 ferro fundido"
       },
       {
         type: "collect",
-        resourceId: "c7efa60d-2184-4289-86ef-47d230afe951", // Argila
+        resourceId: RESOURCE_IDS.ARGILA,
         quantity: 25,
         description: "Colete 25 argilas"
       }
@@ -186,16 +193,46 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 300,
       experience: 150,
       items: {
-        "31ad8a38-aceb-4cfa-a751-c12832a7b986": 1 // Cristais
+        [RESOURCE_IDS.CRISTAIS]: 1
       }
     },
     isActive: true
   },
 
-  // ===== CATEGORIA: CAÇA =====
+  // ===== CATEGORIA: CAÇA E PESCA =====
+  {
+    name: "Introdução à Caça",
+    description: "Aprenda os fundamentos da caça na floresta",
+    emoji: "🏹",
+    type: "hunt",
+    category: "caca",
+    requiredLevel: 2,
+    objectives: [
+      {
+        type: "collect",
+        resourceId: RESOURCE_IDS.COGUMELOS,
+        quantity: 5,
+        description: "Colete 5 cogumelos (prática para observação)"
+      },
+      {
+        type: "collect",
+        resourceId: RESOURCE_IDS.FRUTAS_SILVESTRES,
+        quantity: 8,
+        description: "Colete 8 frutas silvestres (desenvolva paciência)"
+      }
+    ],
+    rewards: {
+      coins: 80,
+      experience: 40,
+      items: {
+        [RESOURCE_IDS.BARBANTE]: 3
+      }
+    },
+    isActive: true
+  },
   {
     name: "Primeiro Caçador",
-    description: "Aprenda a caçar animais pequenos",
+    description: "Caçe seu primeiro animal pequeno",
     emoji: "🐰",
     type: "hunt",
     category: "caca",
@@ -203,100 +240,122 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
-        resourceId: "d7e35c48-ba8b-4595-8533-3c7cf83cc729", // Coelho
-        quantity: 3,
-        description: "Caçe 3 coelhos (requer faca)"
+        resourceId: RESOURCE_IDS.COELHO,
+        quantity: 2,
+        description: "Caçe 2 coelhos (requer faca equipada)"
       }
     ],
     rewards: {
       coins: 120,
       experience: 60,
       items: {
-        "f9d5e263-c12f-41b2-ab35-fd973504bcd8": 3 // Carne
+        [RESOURCE_IDS.CARNE]: 4,
+        [RESOURCE_IDS.COURO]: 2
       }
     },
     isActive: true
   },
   {
-    name: "Caçador de Plantas",
-    description: "Colete plantas e cogumelos da floresta",
-    emoji: "🍄",
+    name: "Introdução à Pesca",
+    description: "Aprenda os conceitos básicos da pesca",
+    emoji: "🎣",
     type: "hunt",
     category: "caca",
-    requiredLevel: 2,
+    requiredLevel: 3,
     objectives: [
       {
-        type: "collect",
-        resourceId: "af1c8c31-cc47-4dd9-9bb3-ae6e2be6c513", // Cogumelos
-        quantity: 10,
-        description: "Colete 10 cogumelos"
-      },
-      {
-        type: "collect",
-        resourceId: "9ea8effe-3ad4-4ff1-9c0a-f22b66c79acd", // Frutas Silvestres
-        quantity: 15,
-        description: "Colete 15 frutas silvestres"
+        type: "craft",
+        itemId: EQUIPMENT_IDS.VARA_PESCA,
+        quantity: 1,
+        description: "Crie 1 vara de pesca"
       }
     ],
     rewards: {
-      coins: 80,
-      experience: 40,
+      coins: 100,
+      experience: 50,
       items: {
-        "16b463d8-b17d-437e-8fd6-ecdca805475f": 3 // Barbante
+        [RESOURCE_IDS.AGUA_FRESCA]: 5
       }
     },
     isActive: true
   },
   {
     name: "Pescador Iniciante",
-    description: "Aprenda a pescar nos rios da floresta",
-    emoji: "🎣",
+    description: "Pesque seus primeiros peixes",
+    emoji: "🐟",
     type: "hunt",
     category: "caca",
-    requiredLevel: 5,
+    requiredLevel: 4,
     objectives: [
       {
         type: "collect",
-        resourceId: "7a423b00-cf97-4637-9f7a-f39ee6c91736", // Peixe Pequeno
-        quantity: 8,
-        description: "Pesque 8 peixes pequenos (requer vara de pesca)"
+        resourceId: RESOURCE_IDS.PEIXE_PEQUENO,
+        quantity: 5,
+        description: "Pesque 5 peixes pequenos (requer vara de pesca equipada)"
       }
     ],
     rewards: {
-      coins: 180,
-      experience: 90,
+      coins: 150,
+      experience: 75,
       items: {
-        "4d5eb4a6-0d99-41f3-a41c-d5b6d4fec95b": 5 // Ossos
+        [RESOURCE_IDS.OSSOS]: 5,
+        [RESOURCE_IDS.CARNE]: 3
       }
     },
     isActive: true
   },
   {
-    name: "Caçador Experiente",
-    description: "Caçe animais maiores e mais desafiadores",
+    name: "Caçador Avançado",
+    description: "Caçe animais maiores na floresta",
     emoji: "🦌",
     type: "hunt",
     category: "caca",
-    requiredLevel: 8,
+    requiredLevel: 6,
     objectives: [
       {
         type: "collect",
-        resourceId: "e5e768ff-5877-4e69-9a24-e1fe4b430f68", // Veado
-        quantity: 2,
-        description: "Caçe 2 veados (requer arma + faca)"
-      },
-      {
-        type: "collect",
-        resourceId: "4f9ae68f-a445-4d8c-a1c7-b6831263b1c6", // Peixe Grande
-        quantity: 5,
-        description: "Pesque 5 peixes grandes"
+        resourceId: RESOURCE_IDS.VEADO,
+        quantity: 1,
+        description: "Caçe 1 veado (requer arma + faca equipadas)"
       }
     ],
     rewards: {
-      coins: 400,
-      experience: 200,
+      coins: 250,
+      experience: 125,
       items: {
-        "425e9a16-2ca5-45f4-b04e-e9cddecd1b73": 8 // Couro
+        [RESOURCE_IDS.COURO]: 4,
+        [RESOURCE_IDS.CARNE]: 6
+      }
+    },
+    isActive: true
+  },
+  {
+    name: "Pescador Experiente",
+    description: "Domine a pesca de peixes maiores",
+    emoji: "🐠",
+    type: "hunt",
+    category: "caca",
+    requiredLevel: 7,
+    objectives: [
+      {
+        type: "collect",
+        resourceId: RESOURCE_IDS.PEIXE_GRANDE,
+        quantity: 3,
+        description: "Pesque 3 peixes grandes"
+      },
+      {
+        type: "collect",
+        resourceId: RESOURCE_IDS.SALMAO,
+        quantity: 1,
+        description: "Pesque 1 salmão (mais raro)"
+      }
+    ],
+    rewards: {
+      coins: 350,
+      experience: 175,
+      items: {
+        [RESOURCE_IDS.OSSOS]: 8,
+        [RESOURCE_IDS.CARNE]: 10
       }
     },
     isActive: true
@@ -313,7 +372,7 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: "16b463d8-b17d-437e-8fd6-ecdca805475f", // Barbante
+        itemId: RESOURCE_IDS.BARBANTE,
         quantity: 3,
         description: "Crie 3 barbantes"
       }
@@ -322,7 +381,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 60,
       experience: 30,
       items: {
-        "2c7495cc-9f28-4ce3-baf8-3f477b8424c0": 5 // Gravetos
+        [RESOURCE_IDS.GRAVETOS]: 5
       }
     },
     isActive: true
@@ -337,13 +396,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: "2e61f8ab-4055-49bf-9aa5-66b0e9fd041d", // Faca
+        itemId: EQUIPMENT_IDS.FACA,
         quantity: 1,
         description: "Crie 1 faca"
       },
       {
         type: "craft",
-        itemId: "331078c4-80d7-4e58-9b61-57f4c07746ba", // Machado
+        itemId: EQUIPMENT_IDS.MACHADO,
         quantity: 1,
         description: "Crie 1 machado"
       }
@@ -352,7 +411,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 200,
       experience: 100,
       items: {
-        "b1816cc3-14e2-4232-bec9-2370f40efdf1": 10 // Pedras Soltas
+        [RESOURCE_IDS.PEDRAS_SOLTAS]: 10
       }
     },
     isActive: true
@@ -367,13 +426,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: "61442df8-fdde-43fc-aec4-7cb3113c7516", // Picareta
+        itemId: EQUIPMENT_IDS.PICARETA,
         quantity: 1,
         description: "Crie 1 picareta"
       },
       {
         type: "craft",
-        itemId: "c43802c7-0dd6-42e0-ba94-5dbd82cf28a3", // Vara de Pesca
+        itemId: EQUIPMENT_IDS.VARA_PESCA,
         quantity: 1,
         description: "Crie 1 vara de pesca"
       }
@@ -382,7 +441,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 300,
       experience: 150,
       items: {
-        "16b463d8-b17d-437e-8fd6-ecdca805475f": 15 // Barbante
+        [RESOURCE_IDS.BARBANTE]: 15
       }
     },
     isActive: true
@@ -397,13 +456,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: "0177efd5-e051-438a-87db-7051ecdd3560", // Cogumelos Assados
+        itemId: RESOURCE_IDS.COGUMELOS_ASSADOS,
         quantity: 5,
         description: "Cozinhe 5 cogumelos assados"
       },
       {
         type: "craft",
-        itemId: "e7d8654b-c7da-4f21-9153-66088bd748e8", // Carne Assada
+        itemId: RESOURCE_IDS.CARNE_ASSADA,
         quantity: 3,
         description: "Cozinhe 3 carnes assadas"
       }
@@ -412,7 +471,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 250,
       experience: 125,
       items: {
-        "94e8664f-8c91-45e1-b869-6ddff1b51b35": 10 // Água Fresca
+        [RESOURCE_IDS.AGUA_FRESCA]: 10
       }
     },
     isActive: true
@@ -427,13 +486,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: "12b5e8a1-4c72-4d8f-9a3e-7f6b8c9d0e1f", // Ensopado de Carne
+        itemId: RESOURCE_IDS.ENSOPADO_CARNE,
         quantity: 2,
         description: "Cozinhe 2 ensopados de carne"
       },
       {
         type: "craft",
-        itemId: "23c6f9b2-5d83-4e9f-ab4f-8g7c9d0e1f2g", // Suco de Frutas
+        itemId: RESOURCE_IDS.SUCO_FRUTAS,
         quantity: 5,
         description: "Prepare 5 sucos de frutas"
       }
@@ -442,7 +501,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 450,
       experience: 225,
       items: {
-        "5e1bc0d0-7631-4aee-8001-210771dc2def": 3 // Ferro Fundido
+        [RESOURCE_IDS.FERRO_FUNDIDO]: 3
       }
     },
     isActive: true
@@ -457,13 +516,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: "40e7b350-6e02-463d-b88d-76b9c67c19d4", // Mochila
+        itemId: EQUIPMENT_IDS.MOCHILA,
         quantity: 1,
         description: "Crie 1 mochila"
       },
       {
         type: "craft",
-        itemId: "8f2e5a76-3b94-4c82-9d61-a5e8f7b2c4d9", // Arco e Flecha
+        itemId: EQUIPMENT_IDS.ARCO_FLECHA,
         quantity: 1,
         description: "Crie 1 arco e flecha"
       }
@@ -472,7 +531,7 @@ export const ALL_QUESTS: InsertQuest[] = [
       coins: 600,
       experience: 300,
       items: {
-        "31ad8a38-aceb-4cfa-a751-c12832a7b986": 2 // Cristais
+        [RESOURCE_IDS.CRISTAIS]: 2
       }
     },
     isActive: true

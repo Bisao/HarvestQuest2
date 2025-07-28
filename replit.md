@@ -8,13 +8,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 28, 2025 - MIGRATION TO REPLIT COMPLETED SUCCESSFULLY**
-- **Database Migration Fixed**: Successfully migrated from PostgreSQL to SQLite with consistent resource IDs
-- **Crafting System Restored**: Fixed resource ID mismatches that were causing "Recursos insuficientes" errors
-- **Fixed ID System**: All resources, recipes, and biomes now use consistent fixed UUIDs for reliable cross-system referencing
-- **SQLite Optimization**: Database now uses better-sqlite3 for improved performance and Replit compatibility
-- **Migration Verified**: All game systems (expeditions, crafting, inventory, storage, quests) fully functional after migration
-- **Production Ready**: Project successfully migrated from Replit Agent to standard Replit environment
+**January 28, 2025 - QUEST SYSTEM COMPLETELY FIXED & MIGRATION COMPLETED**
+- **Quest System Critical Fixes**: Completely overhauled quest objectives to use correct resource and equipment IDs, eliminating quest tracking failures
+- **Enhanced Hunting & Fishing Introduction**: Added progressive quest series for hunting/fishing with proper skill development:
+  - "Introdução à Caça" - teaches observation skills through plant gathering
+  - "Introdução à Pesca" - requires crafting a fishing rod first
+  - Progressive difficulty from rabbits → deer, small fish → salmon
+- **Comprehensive Quest ID Corrections**: All 17+ quests now use proper RESOURCE_IDS and EQUIPMENT_IDS constants
+- **Database Reinitialization**: Fresh SQLite database with corrected quest data ensures reliable quest progress tracking
+- **Migration to Replit Completed**: Project successfully migrated from Replit Agent to standard Replit environment
+- **Production Ready**: All game systems (expeditions, crafting, inventory, storage, quests) fully operational with consistent ID management
 
 **January 27, 2025 - PERFORMANCE REVOLUTION COMPLETED**
 - **98% Performance Improvement**: Game now loads 50x faster with response times reduced from ~1000ms to ~2ms
