@@ -170,11 +170,13 @@ export class QuestService {
               if (!currentProgress[progressKey]) {
                 currentProgress[progressKey] = { current: 0, required: objective.quantity };
               }
+              const previousCurrent = currentProgress[progressKey].current;
               currentProgress[progressKey].current = Math.min(
                 currentProgress[progressKey].current + 1,
                 objective.quantity
               );
               currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
+              console.log(`[QUEST DEBUG] Expedition progress updated for quest ${quest.name}: ${previousCurrent} -> ${currentProgress[progressKey].current}/${objective.quantity} (biome: ${data.biomeId})`);
               progressUpdated = true;
             }
             break;

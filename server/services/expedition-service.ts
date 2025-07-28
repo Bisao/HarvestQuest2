@@ -2,12 +2,15 @@
 import type { IStorage } from "../storage";
 import type { Player, Expedition, Resource, Equipment, Biome } from "@shared/schema";
 import { GameService } from "./game-service";
+import { QuestService } from "./quest-service";
 
 export class ExpeditionService {
   private gameService: GameService;
+  private questService: QuestService;
 
   constructor(private storage: IStorage) {
     this.gameService = new GameService(storage);
+    this.questService = new QuestService(storage);
   }
 
   // Start a new expedition
@@ -115,6 +118,11 @@ export class ExpeditionService {
       experience: levelData.newExp,
       level: levelData.newLevel,
       coins: player.coins + this.calculateCoinReward(rewards, resources)
+    });
+
+    // Update quest progress for expedition completion
+    await this.questService.updateQuestProgress(expedition.playerId, 'expedition', {
+      biomeId: expedition.biomeId
     });
 
     // Mark expedition as completed with timestamp in seconds
