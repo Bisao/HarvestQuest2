@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Biome, Resource, Equipment, Player, InventoryItem } from "@shared/schema";
@@ -35,7 +34,7 @@ interface ActiveExpedition {
   estimatedDuration: number;
 }
 
-type ExpeditionPhase = "setup" | "resource-selection" | "in-progress";
+type ExpeditionPhase = "resource-selection";
 
 export default function ExpeditionSystem({
   isOpen,
@@ -52,7 +51,7 @@ export default function ExpeditionSystem({
   onExpeditionUpdate,
   inventoryItems
 }: ExpeditionSystemProps) {
-  const [phase, setPhase] = useState<ExpeditionPhase>("setup");
+  const [phase, setPhase] = useState<ExpeditionPhase>("resource-selection");
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
   const [localActiveExpedition, setLocalActiveExpedition] = useState<ActiveExpedition | null>(null);
   const [expeditionProgress, setExpeditionProgress] = useState(0);
@@ -106,7 +105,7 @@ export default function ExpeditionSystem({
         setLocalActiveExpedition(newActiveExpedition);
       }
 
-      setPhase("in-progress");
+      // Phase remains resource-selection since modal will close immediately
       startProgressSimulation(newActiveExpedition);
 
       // Store expedition state in parent component
@@ -219,11 +218,8 @@ export default function ExpeditionSystem({
         setSelectedResources([]);
         setExpeditionProgress(0);
       } else {
-        // If there's an active expedition, set the in-progress phase
-        setPhase("in-progress");
-        setExpeditionProgress(activeExpedition.progress || 0);
-        // Resume progress simulation for the active expedition
-        startProgressSimulation(activeExpedition);
+        // If there's an active expedition, just keep the modal closed
+        // Active expeditions should be handled by the minimized view only
       }
     } else {
       if (intervalRef.current) {
@@ -235,10 +231,10 @@ export default function ExpeditionSystem({
 
   // Auto-complete when progress reaches 100%
   useEffect(() => {
-    if (expeditionProgress >= 100 && phase === "in-progress") {
+    if (expeditionProgress >= 100 && activeExpedition) {
       handleCompleteExpedition();
     }
-  }, [expeditionProgress, phase]);
+  }, [expeditionProgress, activeExpedition]);
 
   // Auto-start expedition when modal opens with last resources
   useEffect(() => {
@@ -393,79 +389,24 @@ export default function ExpeditionSystem({
               <div>
                 <h2 className="text-lg md:text-2xl font-bold">Expedição na {biome.name}</h2>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  {phase === "resource-selection" && "Escolha os recursos para coletar"}
-                  {phase === "in-progress" && "Expedição em andamento..."}
+                  Escolha os recursos para coletar
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
-              {phase === "in-progress" && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onMinimize}
-                  className="p-2"
-                >
-                  −
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClose}
-                className="p-2"
-              >
-                ✕
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClose}
+              className="p-2"
+            >
+              ✕
+            </Button>
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
 
-          {/* Setup Phase */}
-          {phase === "setup" && (
-            <div className="text-center space-y-6">
-              <div className="bg-gradient-to-br from-green-50 to-blue-50 p-8 rounded-xl">
-                <h3 className="text-xl font-semibold mb-4">Bem-vindo à {biome.name}</h3>
-                <p className="text-gray-600 mb-6">
-                  Prepare-se para uma expedição de coleta de recursos. Você pode encontrar diversos materiais valiosos neste bioma.
-                </p>
 
-                {/* Show available vs collectable resources */}
-                <div className="mb-6">
-                  <h4 className="font-semibold mb-3">Recursos Disponíveis ({collectableResources.length}/{getBiomeResources().length} coletáveis)</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                    {getBiomeResources().map(resource => {
-                      const isCollectable = collectableResources.some(cr => cr.id === resource.id);
-                      return (
-                        <div key={resource.id} className={`p-3 rounded-lg text-center border-2 ${
-                          isCollectable ? "bg-white border-green-200" : "bg-gray-100 border-gray-200"
-                        }`}>
-                          <div className="text-2xl mb-1">{resource.emoji}</div>
-                          <div className="text-sm font-medium">{resource.name}</div>
-                          <div className="flex flex-col gap-1 mt-1">
-                            <Badge variant="outline" className="text-xs">
-                              {resource.type === "basic" ? "Básico" : "Único"}
-                            </Badge>
-                            {!isCollectable && resource.requiredTool && (
-                              <Badge variant="destructive" className="text-xs">
-                                Requer: {resource.requiredTool}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <Button onClick={() => setPhase("resource-selection")} className="bg-forest hover:bg-forest/90">
-                  Iniciar Planejamento
-                </Button>
-              </div>
-            </div>
-          )}
 
           {/* Resource Selection Phase */}
           {phase === "resource-selection" && (
@@ -564,89 +505,6 @@ export default function ExpeditionSystem({
               </div>
             </div>
           )}
-
-
-
-          {/* In Progress Phase */}
-          {phase === "in-progress" && activeExpedition && (
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-blue-50 to-green-50 p-6 rounded-xl">
-                {expeditionProgress < 100 ? (
-                  <>
-                    <h3 className="text-xl font-semibold mb-4 text-center">Expedição em Andamento</h3>
-                    <div className="text-6xl mb-4 text-center">{biome.emoji}</div>
-                    <p className="text-gray-600 mb-6 text-center">
-                      Coletando recursos na {biome.name}...
-                    </p>
-
-                    <div className="space-y-4">
-                      <Progress value={expeditionProgress} className="w-full" />
-                      <p className="text-sm font-medium text-center">
-                        Progresso: {Math.floor(expeditionProgress)}%
-                      </p>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <h3 className="text-xl font-semibold mb-4 text-center">🎉 Expedição Concluída!</h3>
-
-                    {/* Recursos Coletados Simulados */}
-                    <div className="mb-6">
-                      <h4 className="font-semibold mb-3 text-center">📦 Recursos Coletados:</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {selectedResources.map(resourceId => {
-                          const resource = resources.find(r => r.id === resourceId);
-                          if (!resource) return null;
-
-                          // Simular quantidade coletada (1-3 por recurso)
-                          const quantity = Math.floor(Math.random() * 3) + 1;
-
-                          return (
-                            <div key={resourceId} className="bg-white p-3 rounded-lg border flex items-center gap-2">
-                              <span className="text-2xl">{resource.emoji}</span>
-                              <div className="flex-1">
-                                <div className="font-medium text-sm">{resource.name}</div>
-                                <div className="text-xs text-gray-600">x{quantity}</div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* XP e Moedas Ganhas */}
-                    <div className="bg-white p-4 rounded-lg border mb-6">
-                      <h4 className="font-semibold mb-2 text-center">⭐ Recompensas:</h4>
-                      <div className="grid grid-cols-2 gap-4 text-center">
-                        <div>
-                          <div className="text-2xl mb-1">🎯</div>
-                          <div className="font-semibold text-blue-600">+{selectedResources.length * 15} XP</div>
-                          <div className="text-xs text-gray-600">Experiência</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl mb-1">🪙</div>
-                          <div className="font-semibold text-yellow-600">+{selectedResources.length * 8}</div>
-                          <div className="text-xs text-gray-600">Moedas</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-center">
-                      <Button 
-                        onClick={handleCompleteExpedition}
-                        disabled={completeExpeditionMutation.isPending}
-                        className="bg-forest hover:bg-forest/90"
-                      >
-                        {completeExpeditionMutation.isPending ? "Finalizando..." : "✅ Finalizar Expedição"}
-                      </Button>
-
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
 
         </div>
       </DialogContent>
