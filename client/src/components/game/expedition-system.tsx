@@ -114,6 +114,10 @@ export default function ExpeditionSystem({
         (window as any).setActiveExpedition(newActiveExpedition);
       }
 
+      // AUTO-MINIMIZE: Immediately minimize the modal when expedition starts
+      setTimeout(() => {
+        onMinimize();
+      }, 100); // Small delay to ensure state is updated
 
     },
     onError: (error) => {
