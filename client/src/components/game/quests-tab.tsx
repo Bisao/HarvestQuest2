@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ interface QuestsTabProps {
 
 export default function QuestsTab({ player }: QuestsTabProps) {
   const { toast } = useToast();
+  const [activeCategory, setActiveCategory] = useState<string>("active");
 
   const { data: quests = [], isLoading } = useQuery<Quest[]>({
     queryKey: [`/api/player/${player.id}/quests`],
@@ -49,22 +51,6 @@ export default function QuestsTab({ player }: QuestsTabProps) {
   const { data: equipment = [] } = useQuery({
     queryKey: ['/api/equipment']
   });
-
-  // Group quests by category and status
-  const questsByCategory = quests.reduce((acc, quest) => {
-    const category = quest.category || 'outros';
-    if (!acc[category]) acc[category] = [];
-    acc[category].push(quest);
-    return acc;
-  }, {} as Record<string, Quest[]>);
-
-  const categoryNames: Record<string, string> = {
-    'exploracao': '🗺️ Exploração',
-    'coleta': '📦 Coleta',
-    'caca': '🏹 Caça & Pesca',
-    'crafting': '🔨 Artesanato',
-    'outros': '📋 Outras'
-  };
 
   const startQuestMutation = useMutation({
     mutationFn: async (questId: string) => {
@@ -151,7 +137,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     },
   });
 
-    const resetAllCompletedMutation = useMutation({
+  const resetAllCompletedMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`/api/player/${player.id}/quests/reset`, {
         method: 'POST'
@@ -249,9 +235,140 @@ export default function QuestsTab({ player }: QuestsTabProps) {
   const activeQuests = quests.filter(q => q.status === 'active');
   const completedQuests = quests.filter(q => q.status === 'completed');
 
+  const questCategories = {
+    active: {
+      label: "Missões Ativas",
+      emoji: "🔥",
+      quests: activeQuests,
+      color: "border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800"
+    },
+    available: {
+      label: "Missões Disponíveis",
+      emoji: "✨",
+      quests: availableQuests,
+      color: ""
+    },
+    completed: {
+      label: "Missões Completadas",
+      emoji: "✅",
+      quests: completedQuests,
+      color: "bg-muted/50"
+    }
+  };
+
   if (isLoading) {
     return <div className="flex justify-center p-8">Carregando quests...</div>;
   }
+
+  const renderQuestCard = (quest: Quest, isActive = false) => (
+    <Card key={quest.id} className={isActive ? questCategories.active.color : questCategories[quest.status as keyof typeof questCategories]?.color}>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">{quest.emoji}</span>
+            <div>
+              <CardTitle className="text-lg">{quest.name}</CardTitle>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant={getStatusColor(quest.status)}>
+                  {getStatusText(quest.status)}
+                </Badge>
+                {quest.status === 'available' && (
+                  <Badge variant="outline">
+                    Nível {quest.requiredLevel}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <CardDescription>{quest.description}</CardDescription>
+
+        <div className="space-y-2">
+          <h4 className="font-semibold text-sm">Objetivos:</h4>
+          {quest.objectives.map((objective, idx) => {
+            if (quest.status === 'active') {
+              const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId);
+              const objectiveProgress = quest.progress[progressKey];
+
+              return (
+                <div key={idx} className="text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className={objectiveProgress?.completed ? "text-green-600" : "text-muted-foreground"}>
+                      • {objective.description}
+                    </span>
+                    {objectiveProgress && (
+                      <span className="text-xs font-medium">
+                        {objectiveProgress.current}/{objectiveProgress.required}
+                      </span>
+                    )}
+                  </div>
+                  {objectiveProgress && (
+                    <Progress 
+                      value={(objectiveProgress.current / objectiveProgress.required) * 100} 
+                      className="h-1 mt-1"
+                    />
+                  )}
+                </div>
+              );
+            } else {
+              return (
+                <div key={idx} className="text-sm text-muted-foreground">
+                  • {objective.description}
+                </div>
+              );
+            }
+          })}
+        </div>
+
+        <div className="space-y-2">
+          <h4 className="font-semibold text-sm">Recompensas:</h4>
+          <p className="text-sm text-muted-foreground">
+            {formatRewards(quest.rewards)}
+          </p>
+        </div>
+
+        {quest.status === 'available' && (
+          <Button 
+            onClick={() => startQuestMutation.mutate(quest.id)}
+            disabled={startQuestMutation.isPending || player.level < quest.requiredLevel}
+            className="w-full"
+          >
+            {startQuestMutation.isPending ? "Iniciando..." : 
+             player.level < quest.requiredLevel ? `Requer Nível ${quest.requiredLevel}` :
+             "Iniciar Quest"}
+          </Button>
+        )}
+
+        {quest.status === 'active' && canCompleteQuest(quest) && (
+          <Button 
+            onClick={() => completeQuestMutation.mutate(quest.id)}
+            disabled={completeQuestMutation.isPending}
+            className="w-full"
+          >
+            {completeQuestMutation.isPending ? "Completando..." : "Completar Quest"}
+          </Button>
+        )}
+
+        {quest.status === 'completed' && (
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="flex-1 justify-center">
+              ✅ Completa
+            </Badge>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => repeatQuestMutation.mutate(quest.id)}
+              disabled={repeatQuestMutation.isPending}
+            >
+              {repeatQuestMutation.isPending ? "Reiniciando..." : "🔄 Repetir"}
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -262,190 +379,73 @@ export default function QuestsTab({ player }: QuestsTabProps) {
         </p>
       </div>
 
-      {/* Active Quests */}
-      {activeQuests.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            🔥 Missões Ativas ({activeQuests.length})
-          </h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {activeQuests.map((quest) => (
-              <Card key={quest.id} className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{quest.emoji}</span>
-                      <div>
-                        <CardTitle className="text-lg">{quest.name}</CardTitle>
-                        <Badge variant={getStatusColor(quest.status)} className="mt-1">
-                          {getStatusText(quest.status)}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <CardDescription>{quest.description}</CardDescription>
-
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">Objetivos:</h4>
-                    {quest.objectives.map((objective, idx) => {
-                      const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId);
-                      const objectiveProgress = quest.progress[progressKey];
-
-                      return (
-                        <div key={idx} className="text-sm">
-                          <div className="flex justify-between items-center">
-                            <span className={objectiveProgress?.completed ? "text-green-600" : "text-muted-foreground"}>
-                              • {objective.description}
-                            </span>
-                            {objectiveProgress && (
-                              <span className="text-xs font-medium">
-                                {objectiveProgress.current}/{objectiveProgress.required}
-                              </span>
-                            )}
-                          </div>
-                          {objectiveProgress && (
-                            <Progress 
-                              value={(objectiveProgress.current / objectiveProgress.required) * 100} 
-                              className="h-1 mt-1"
-                            />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">Recompensas:</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {formatRewards(quest.rewards)}
-                    </p>
-                  </div>
-
-                  {canCompleteQuest(quest) && (
-                    <Button 
-                      onClick={() => completeQuestMutation.mutate(quest.id)}
-                      disabled={completeQuestMutation.isPending}
-                      className="w-full"
-                    >
-                      {completeQuestMutation.isPending ? "Completando..." : "Completar Quest"}
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      {/* Horizontal Category Tabs */}
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
+          {Object.entries(questCategories).map(([categoryKey, category]) => {
+            if (category.quests.length === 0) return null;
+            
+            const isActive = activeCategory === categoryKey;
+            
+            return (
+              <button
+                key={categoryKey}
+                onClick={() => setActiveCategory(categoryKey)}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
+                  isActive 
+                    ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
+                    : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
+                }`}
+              >
+                <span className="text-lg">{category.emoji}</span>
+                <span>{category.label}</span>
+                <span className="text-sm text-gray-500">({category.quests.length})</span>
+              </button>
+            );
+          })}
         </div>
-      )}
 
-      {/* Available Quests */}
-      {availableQuests.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            ✨ Missões Disponíveis ({availableQuests.length})
-          </h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {availableQuests.map((quest) => (
-              <Card key={quest.id}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{quest.emoji}</span>
-                      <div>
-                        <CardTitle className="text-lg">{quest.name}</CardTitle>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant={getStatusColor(quest.status)}>
-                            {getStatusText(quest.status)}
-                          </Badge>
-                          <Badge variant="outline">
-                            Nível {quest.requiredLevel}
-                          </Badge>
-                        </div>
-                      </div>
+        {/* Quest Content for Active Category */}
+        <div className="bg-white border border-gray-300 border-t-0 rounded-b-lg p-6">
+          {Object.entries(questCategories).map(([categoryKey, category]) => {
+            if (activeCategory !== categoryKey || category.quests.length === 0) return null;
+
+            return (
+              <div key={categoryKey}>
+                {categoryKey === 'completed' ? (
+                  <ScrollArea className="h-96">
+                    <div className="space-y-4">
+                      {category.quests.map((quest) => renderQuestCard(quest))}
                     </div>
+                  </ScrollArea>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {category.quests.map((quest) => renderQuestCard(quest, categoryKey === 'active'))}
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <CardDescription>{quest.description}</CardDescription>
+                )}
+              </div>
+            );
+          })}
 
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">Objetivos:</h4>
-                    {quest.objectives.map((objective, idx) => (
-                      <div key={idx} className="text-sm text-muted-foreground">
-                        • {objective.description}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">Recompensas:</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {formatRewards(quest.rewards)}
-                    </p>
-                  </div>
-
-                  <Button 
-                    onClick={() => startQuestMutation.mutate(quest.id)}
-                    disabled={startQuestMutation.isPending || player.level < quest.requiredLevel}
-                    className="w-full"
-                  >
-                    {startQuestMutation.isPending ? "Iniciando..." : 
-                     player.level < quest.requiredLevel ? `Requer Nível ${quest.requiredLevel}` :
-                     "Iniciar Quest"}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Completed Quests */}
-      {completedQuests.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            ✅ Missões Completadas ({completedQuests.length})
-          </h2>
-          <ScrollArea className="h-96">
-            <div className="space-y-2">
-              {completedQuests.map((quest) => (
-                <Card key={quest.id} className="bg-muted/50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg opacity-75">{quest.emoji}</span>
-                        <div>
-                          <h3 className="font-semibold">{quest.name}</h3>
-                          <p className="text-sm text-muted-foreground">{quest.description}</p>
-                          <div className="mt-2">
-                            <p className="text-xs text-muted-foreground">
-                              Recompensas: {formatRewards(quest.rewards)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">
-                          ✅ Completa
-                        </Badge>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => repeatQuestMutation.mutate(quest.id)}
-                          disabled={repeatQuestMutation.isPending}
-                        >
-                          {repeatQuestMutation.isPending ? "Reiniciando..." : "🔄 Repetir"}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+          {activeCategory && questCategories[activeCategory as keyof typeof questCategories]?.quests.length === 0 && (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-4">📋</div>
+              <h3 className="text-lg font-semibold mb-2">
+                Nenhuma quest {
+                  activeCategory === 'active' ? 'ativa' :
+                  activeCategory === 'available' ? 'disponível' :
+                  'completada'
+                }
+              </h3>
+              <p className="text-muted-foreground">
+                {activeCategory === 'available' && "Continue explorando e subindo de nível para desbloquear novas missões!"}
+                {activeCategory === 'active' && "Inicie uma quest disponível para começar sua jornada!"}
+                {activeCategory === 'completed' && "Complete algumas quests para vê-las aqui!"}
+              </p>
             </div>
-          </ScrollArea>
+          )}
         </div>
-      )}
+      </div>
 
       {quests.length === 0 && (
         <Card>
