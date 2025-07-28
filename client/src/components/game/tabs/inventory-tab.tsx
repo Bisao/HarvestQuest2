@@ -74,10 +74,22 @@ export default function MinecraftInventory({
   const storeAllMutation = useMutation({
     mutationFn: () => apiRequest("POST", `/api/storage/store-all/${playerId}`),
     onSuccess: () => {
+      // CRITICAL: Force immediate cache removal and refetch for real-time sync
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Force fresh data fetch
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Additional forced refetch to ensure UI updates immediately
+      queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
+      
       toast({
         title: "Sucesso!",
         description: "Todos os itens foram armazenados.",
@@ -98,10 +110,22 @@ export default function MinecraftInventory({
       return response.json();
     },
     onSuccess: () => {
+      // CRITICAL: Force immediate cache removal and refetch for real-time sync
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Force fresh data fetch
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Additional forced refetch to ensure UI updates immediately
+      queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
+      
       toast({
         title: "Item movido",
         description: "Item transferido para o armazém.",

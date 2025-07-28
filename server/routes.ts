@@ -474,6 +474,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedEquipment || []
       );
 
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately (hunger/thirst change)
+      const { invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidatePlayerCache(playerId);
+
       res.json(expedition);
     } catch (error) {
       console.error('Expedition creation error:', error);
@@ -513,6 +517,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       }
+      
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+      const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateStorageCache(expedition.playerId);
+      invalidateInventoryCache(expedition.playerId);
+      invalidatePlayerCache(expedition.playerId);
       
       res.json(expedition);
     } catch (error) {

@@ -137,19 +137,23 @@ export default function ExpeditionSystem({
         intervalRef.current = null;
       }
 
-      // Complete real-time cache invalidation after expedition completion
+      // CRITICAL: Force immediate cache removal and refetch for real-time sync
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Force fresh data fetch
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "quests"] });
       
-      // Force refetch to ensure UI updates immediately
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
-        queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
-        queryClient.refetchQueries({ queryKey: ["/api/player/Player1"] });
-      }, 100);
+      // Additional forced refetch to ensure UI updates immediately
+      queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.refetchQueries({ queryKey: ["/api/player/Player1"] });
 
       toast({
         title: "Expedição Concluída!",
