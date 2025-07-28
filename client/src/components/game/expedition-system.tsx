@@ -114,9 +114,21 @@ export default function ExpeditionSystem({
         (window as any).setActiveExpedition(newActiveExpedition);
       }
 
-      // AUTO-MINIMIZE: Immediately minimize the modal when expedition starts
+      // AUTO-MINIMIZE: Immediately close modal and set minimized state
       setTimeout(() => {
-        onMinimize();
+        onClose(); // Close the modal completely
+        
+        // Set parent states for minimized expedition view
+        if (typeof window !== 'undefined') {
+          // Dispatch event to parent to set minimized state
+          const event = new CustomEvent('expeditionStarted', { 
+            detail: { 
+              shouldMinimize: true,
+              expedition: newActiveExpedition 
+            } 
+          });
+          window.dispatchEvent(event);
+        }
       }, 100); // Small delay to ensure state is updated
 
     },

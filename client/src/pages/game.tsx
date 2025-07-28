@@ -174,6 +174,24 @@ export default function Game() {
     }
   }, []);
 
+  // Listen for expedition started event to set minimized state
+  useEffect(() => {
+    const handleExpeditionStarted = (event: CustomEvent) => {
+      console.log('Expedition started event received:', event.detail);
+      if (event.detail.shouldMinimize) {
+        setExpeditionModalOpen(false);
+        setExpeditionMinimized(true);
+        setActiveExpedition(event.detail.expedition);
+      }
+    };
+
+    window.addEventListener('expeditionStarted', handleExpeditionStarted as EventListener);
+    
+    return () => {
+      window.removeEventListener('expeditionStarted', handleExpeditionStarted as EventListener);
+    };
+  }, []);
+
   // Clear timer for a specific biome
   const clearBiomeTimer = (biomeId: string) => {
     if (autoRepeatTimers[biomeId]) {
