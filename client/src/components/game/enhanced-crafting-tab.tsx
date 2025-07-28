@@ -21,7 +21,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   const queryClient = useQueryClient();
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
     "Materiais": true,
-    "Ferramentas": true,
+    "Ferramentas": false,
     "Armas": false,
     "Utensílios": false,
     "Comidas": false,
@@ -171,10 +171,14 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   };
 
   const toggleCategory = (category: string) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [category]: !prev[category]
-    }));
+    // Only show one category at a time (tab behavior)
+    setExpandedCategories(prev => {
+      const newState: Record<string, boolean> = {};
+      Object.keys(prev).forEach(key => {
+        newState[key] = key === category;
+      });
+      return newState;
+    });
   };
 
   const categorizeRecipes = (recipes: Recipe[]) => {
@@ -335,18 +339,24 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         </p>
       </div>
 
-      {Object.entries(categorizedRecipes).map(([categoryName, categoryRecipes]) => {
-        if (categoryRecipes.length === 0) return null;
-
-        const isExpanded = expandedCategories[categoryName];
-
-        return (
-          <div key={categoryName} className="mb-6">
-            <button
-              onClick={() => toggleCategory(categoryName)}
-              className="w-full flex items-center justify-between bg-gray-100 hover:bg-gray-200 rounded-lg p-4 mb-4 transition-colors"
-            >
-              <div className="flex items-center space-x-3">
+      {/* Horizontal Category Tabs */}
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
+          {Object.entries(categorizedRecipes).map(([categoryName, categoryRecipes]) => {
+            if (categoryRecipes.length === 0) return null;
+            
+            const isActive = expandedCategories[categoryName];
+            
+            return (
+              <button
+                key={categoryName}
+                onClick={() => toggleCategory(categoryName)}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
+                  isActive 
+                    ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
+                    : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
+                }`}
+              >
                 <span className="text-lg">
                   {categoryName === "Materiais" && "🧵"}
                   {categoryName === "Ferramentas" && "🔧"}
@@ -354,20 +364,24 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
                   {categoryName === "Utensílios" && "🍳"}
                   {categoryName === "Comidas" && "🍽️"}
                 </span>
-                <h4 className="text-lg font-semibold text-gray-800">{categoryName}</h4>
+                <span>{categoryName}</span>
                 <span className="text-sm text-gray-500">({categoryRecipes.length})</span>
-              </div>
-              {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-            </button>
+              </button>
+            );
+          })}
+        </div>
 
-            {isExpanded && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categoryRecipes.map(renderRecipeCard)}
-              </div>
-            )}
-          </div>
-        );
-      })}
+        {/* Content for Active Category */}
+        {Object.entries(categorizedRecipes).map(([categoryName, categoryRecipes]) => {
+          if (categoryRecipes.length === 0 || !expandedCategories[categoryName]) return null;
+
+          return (
+            <div key={categoryName} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categoryRecipes.map(renderRecipeCard)}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
