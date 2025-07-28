@@ -202,6 +202,7 @@ export function registerEnhancedGameRoutes(
               quantity: existingItem.quantity + totalAmount
             });
           } else {
+            // Create new storage item to avoid foreign key issues
             await storage.addStorageItem({
               playerId,
               resourceId: itemId,

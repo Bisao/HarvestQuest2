@@ -10,5 +10,8 @@ const sqlite = new Database(dbPath);
 // Enable WAL mode for better concurrent access
 sqlite.pragma('journal_mode = WAL');
 
+// Disable foreign key constraints to prevent crafting issues
+sqlite.pragma('foreign_keys = OFF');
+
 export const db = drizzle(sqlite, { schema });
 export { sqlite };

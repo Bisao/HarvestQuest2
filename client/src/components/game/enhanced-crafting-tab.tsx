@@ -23,6 +23,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     "Materiais": true,
     "Ferramentas": false,
     "Armas": false,
+    "Equipamentos": false,
     "Utensílios": false,
     "Comidas": false,
   });
@@ -201,6 +202,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       "Materiais": [],
       "Ferramentas": [],
       "Armas": [],
+      "Equipamentos": [],
       "Utensílios": [],
       "Comidas": []
     };
@@ -212,9 +214,13 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       if (name.includes("barbante") || name.includes("corda") || name.includes("isca")) {
         categories["Materiais"].push(recipe);
       }
-      // Ferramentas de trabalho (inclui equipamentos de proteção)
-      else if (name.includes("machado") || name.includes("picareta") || name.includes("foice") || name.includes("balde") || name.includes("vara") || name.includes("mochila")) {
+      // Ferramentas de trabalho
+      else if (name.includes("machado") || name.includes("picareta") || name.includes("foice") || name.includes("balde") || name.includes("vara")) {
         categories["Ferramentas"].push(recipe);
+      }
+      // Equipamentos de proteção e acessórios
+      else if (name.includes("mochila") || name.includes("capacete") || name.includes("armadura") || name.includes("escudo")) {
+        categories["Equipamentos"].push(recipe);
       }
       // Armas
       else if (name.includes("arco") || name.includes("lança") || name.includes("faca")) {
