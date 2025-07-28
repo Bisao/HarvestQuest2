@@ -8,6 +8,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 28, 2025 - CRAFTING UI ENHANCED & QUEST SYSTEM FIXED**
+- **Slider Interface for Crafting**: Replaced +/- buttons with intuitive slider bar for quantity selection
+- **Quest System Bug Fix**: Fixed issue where crafting multiple items only registered 1 item in quest progress tracking
+- **Storage Configuration**: All crafted items now automatically go to storage/warehouse (armazém) as per user preference
+- **Real-time Validation**: Ingredient requirements update dynamically based on selected quantity
+
 **January 28, 2025 - QUEST SYSTEM COMPLETELY FIXED & MIGRATION COMPLETED**
 - **Quest System Critical Fixes**: Completely overhauled quest objectives to use correct resource and equipment IDs, eliminating quest tracking failures
 - **Enhanced Hunting & Fishing Introduction**: Added progressive quest series for hunting/fishing with proper skill development:

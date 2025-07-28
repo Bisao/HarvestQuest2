@@ -366,8 +366,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Add crafted items to player's preferred destination (inventory or storage)
-      const destination = player.craftedItemsDestination || 'storage';
+      // Add crafted items to storage (always storage as per user requirement)
+      const destination = 'storage';
       const outputEntries = Object.entries(recipe.output as Record<string, number>);
 
       for (const [itemType, baseQuantity] of outputEntries) {
@@ -399,46 +399,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const equipmentItem = allEquipment.find(eq => eq.id === itemType);
 
           if (equipmentItem) {
-              if (destination === 'inventory') {
-                // Add to inventory
-                const inventoryItems = await storage.getPlayerInventory(playerId);
-                const existingInventoryItem = inventoryItems.find(item => item.resourceId === equipmentItem.id);
+            // Add to storage (always storage)
+            const existingStorageItem = storageItems.find(item => item.resourceId === equipmentItem.id);
 
-                if (existingInventoryItem) {
-                  await storage.updateInventoryItem(existingInventoryItem.id, {
-                    quantity: existingInventoryItem.quantity + totalOutput
-                  });
-                } else {
-                  await storage.addInventoryItem({
-                    playerId,
-                    resourceId: equipmentItem.id,
-                    quantity: totalOutput
-                  });
-                }
+            if (existingStorageItem) {
+              await storage.updateStorageItem(existingStorageItem.id, {
+                quantity: existingStorageItem.quantity + totalOutput
+              });
+            } else {
+              await storage.addStorageItem({
+                playerId,
+                resourceId: equipmentItem.id,
+                quantity: totalOutput
+              });
+            }
 
-                // Update player inventory weight
-                const newWeight = player.inventoryWeight + (equipmentItem.weight * totalOutput);
-                await storage.updatePlayer(playerId, { inventoryWeight: newWeight });
-
-                console.log(`Added ${totalOutput}x ${equipmentItem.name} to inventory for player ${playerId}`);
-              } else {
-                // Add to storage (default behavior)
-                const existingStorageItem = storageItems.find(item => item.resourceId === equipmentItem.id);
-
-                if (existingStorageItem) {
-                  await storage.updateStorageItem(existingStorageItem.id, {
-                    quantity: existingStorageItem.quantity + totalOutput
-                  });
-                } else {
-                  await storage.addStorageItem({
-                    playerId,
-                    resourceId: equipmentItem.id,
-                    quantity: totalOutput
-                  });
-                }
-
-                // Added crafted equipment to storage
-              }
+            console.log(`Added ${totalOutput}x ${equipmentItem.name} to storage for player ${playerId}`);
           } else {
             // Equipment not found for the given ID
           }
