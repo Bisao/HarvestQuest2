@@ -448,6 +448,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Updating quest progress for crafted item
         await questService.updateQuestProgress(playerId, 'craft', { itemId, quantity });
       }
+
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+      const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateStorageCache(playerId);
+      invalidateInventoryCache(playerId);
+      invalidatePlayerCache(playerId);
       
       res.json({ message: "Item crafted successfully!", recipe });
     } catch (error) {

@@ -272,8 +272,19 @@ export default function EvolutionaryCraftingSystem({
         title: "Item Craftado!",
         description: `${data.recipe.name} foi criado com sucesso!`,
       });
+      
+      // CRITICAL: Force immediate cache removal and refetch for real-time sync
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
+      
+      // Force fresh data fetch with immediate refetch
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
+      
+      // Additional forced refetch to ensure UI updates immediately  
+      queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
     },
     onError: (error: any) => {
       toast({

@@ -174,3 +174,12 @@ export function invalidateStaticDataCache() {
   gameCache.delete(CACHE_KEYS.ALL_EQUIPMENT);
   gameCache.delete(CACHE_KEYS.ALL_RECIPES);
 }
+
+// Additional invalidation functions for specific operations
+export function invalidateStorageCache(playerId: string): void {
+  gameCache.delete(CACHE_KEYS.PLAYER_STORAGE(playerId));
+}
+
+export function invalidateInventoryCache(playerId: string): void {
+  gameCache.delete(CACHE_KEYS.PLAYER_INVENTORY(playerId));
+}
