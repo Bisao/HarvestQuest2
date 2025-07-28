@@ -3,7 +3,7 @@ import { validateBody, validateParams } from "../middleware/validation";
 import { validatePlayerAccess, validateUsername } from "../middleware/auth";
 import { NotFoundError, InsufficientResourcesError, InvalidOperationError } from "../middleware/error-handler";
 import { successResponse, errorResponse } from "../utils/response-helpers";
-import { gameCache, CACHE_KEYS, CACHE_TTL, cacheGetOrSet, invalidatePlayerCache } from "../cache/memory-cache";
+import { gameCache, CACHE_KEYS, CACHE_TTL, cacheGetOrSet, invalidatePlayerCache, invalidateStorageCache, invalidateInventoryCache } from "../cache/memory-cache";
 import {
   updatePlayerSettingsSchema,
   consumeItemSchema,
@@ -184,11 +184,16 @@ export function registerEnhancedGameRoutes(
           
           // Always add to storage (items craftados sempre vão para o armazém)
           // Check if this is equipment or resource
+          const allResources = await storage.getAllResources();
           const allEquipment = await storage.getAllEquipment();
+          
+          const isResource = allResources.some(r => r.id === itemId);
           const isEquipment = allEquipment.some(eq => eq.id === itemId);
           const itemType = isEquipment ? 'equipment' : 'resource';
           
-          const existingItem = playerStorage.find(item => 
+          // Refresh player storage to get current state
+          const currentStorage = await storage.getPlayerStorage(playerId);
+          const existingItem = currentStorage.find(item => 
             item.resourceId === itemId && item.itemType === itemType
           );
           
@@ -205,15 +210,22 @@ export function registerEnhancedGameRoutes(
             });
           }
           
+          // Log for debugging
+          const itemName = isResource 
+            ? allResources.find(r => r.id === itemId)?.name 
+            : allEquipment.find(e => e.id === itemId)?.name;
+          console.log(`Crafted ${totalAmount}x ${itemName} (${itemType}) added to storage for player ${playerId}`);
+          
           items.push({ itemId, quantity: totalAmount });
         }
 
         // Update quest progress for crafting (only for active quests)
+        // CRITICAL FIX: Multiply quest progress by quantity to count all crafted items
         const activeQuests = await storage.getPlayerQuests(playerId);
         const activePlayerQuests = activeQuests.filter(pq => pq.status === 'active');
         
         for (const [craftedItemId, craftedAmount] of Object.entries(output)) {
-          const totalCraftedAmount = craftedAmount * quantity;
+          const totalCraftedAmount = craftedAmount * quantity; // This is the total amount crafted
           
           for (const playerQuest of activePlayerQuests) {
             const quest = await storage.getQuest(playerQuest.questId);
@@ -224,6 +236,8 @@ export function registerEnhancedGameRoutes(
                 if (objective.type === 'craft' && objective.itemId === craftedItemId) {
                   const currentProgress = (playerQuest.progress as any)?.[objective.itemId] || 0;
                   const newProgress = Math.min(currentProgress + totalCraftedAmount, objective.quantity);
+                  
+                  console.log(`Quest progress update: ${objective.itemId} from ${currentProgress} to ${newProgress} (added ${totalCraftedAmount})`);
                   
                   await storage.updatePlayerQuest(playerQuest.id, {
                     progress: {
@@ -237,8 +251,10 @@ export function registerEnhancedGameRoutes(
           }
         }
 
-        // Invalidate player cache
+        // CRITICAL: Invalidate ALL caches to ensure frontend sees updated data immediately
         invalidatePlayerCache(playerId);
+        invalidateStorageCache(playerId);
+        invalidateInventoryCache(playerId);
 
         successResponse(res, {
           recipe: recipe.name,
