@@ -56,9 +56,17 @@ export default function Game() {
     enabled: !!player?.id,
   });
 
+  const { data: quests = [] } = useQuery({
+    queryKey: [`/api/player/${player?.id}/quests`],
+    enabled: !!player?.id,
+  });
+
+  // Check if there are any completable quests
+  const hasCompletableQuests = quests.some((quest: any) => quest.canComplete === true);
+
   const tabs = [
     { id: "biomes", label: "Biomas", emoji: "🌍" },
-    { id: "quests", label: "Quests", emoji: "📋" },
+    { id: "quests", label: "Quests", emoji: "📋", hasNotification: hasCompletableQuests },
     { id: "inventory", label: "Inventário", emoji: "🎒" },
     { id: "storage", label: "Armazém", emoji: "🏪" },
     { id: "crafting", label: "Crafting", emoji: "🔨" },
@@ -387,7 +395,7 @@ export default function Game() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
+                    className={`relative flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
                       isActive 
                         ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
                         : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
@@ -396,6 +404,11 @@ export default function Game() {
                     <span className="text-lg">{tab.emoji}</span>
                     <span className="hidden sm:inline">{tab.label}</span>
                     <span className="sm:hidden">{tab.id === "biomes" ? "Biomas" : tab.id === "quests" ? "Quests" : tab.id === "inventory" ? "Inv." : tab.id === "storage" ? "Arm." : "Craft"}</span>
+                    {tab.hasNotification && (
+                      <span className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-xs font-bold quest-notification shadow-lg">
+                        !
+                      </span>
+                    )}
                   </button>
                 );
               })}
