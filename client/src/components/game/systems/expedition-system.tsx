@@ -54,8 +54,6 @@ export default function SimpleExpeditionSystem({
     lastCollectedResource: null,
   });
 
-  const [autoCompleteTimer, setAutoCompleteTimer] = useState<number | null>(null);
-
   const queryClient = useQueryClient();
 
   // Get player weight status for inventory capacity indicator
@@ -158,8 +156,6 @@ export default function SimpleExpeditionSystem({
               collectedResources: completedExpedition.collectedResources || prev.collectedResources,
               status: 'Expedição concluída!',
             }));
-            // Start auto-complete timer
-            setAutoCompleteTimer(10);
           }
           return;
         }
@@ -218,23 +214,8 @@ export default function SimpleExpeditionSystem({
     });
   };
 
-  // Auto-complete timer effect
-  useEffect(() => {
-    if (autoCompleteTimer !== null && autoCompleteTimer > 0) {
-      const timer = setTimeout(() => {
-        setAutoCompleteTimer(autoCompleteTimer - 1);
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    } else if (autoCompleteTimer === 0) {
-      // Timer reached 0, auto-complete the expedition
-      completeExpedition();
-    }
-  }, [autoCompleteTimer]);
-
   // Complete expedition
   const completeExpedition = () => {
-    setAutoCompleteTimer(null); // Clear timer
     onExpeditionComplete(expeditionState.collectedResources);
     setExpeditionState({
       phase: 'setup',
@@ -440,26 +421,6 @@ export default function SimpleExpeditionSystem({
                 </p>
               )}
             </div>
-
-            {/* Auto-complete timer */}
-            {autoCompleteTimer !== null && autoCompleteTimer > 0 && (
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                <div className="text-center">
-                  <div className="text-sm text-orange-700 font-medium mb-2">
-                    ⏰ Finalização automática em {autoCompleteTimer}s
-                  </div>
-                  <div className="w-full bg-orange-200 rounded-full h-2">
-                    <div 
-                      className="bg-orange-600 h-2 rounded-full transition-all duration-1000"
-                      style={{ width: `${((10 - autoCompleteTimer) / 10) * 100}%` }}
-                    />
-                  </div>
-                  <div className="text-xs text-orange-600 mt-1">
-                    Clique em "Finalizar Expedição" para parar o timer
-                  </div>
-                </div>
-              </div>
-            )}</div>
 
             {/* Final Collected Resources */}
             <div>
