@@ -39,6 +39,7 @@ import { createBiomeData } from "./data/biomes";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createRecipeData } from "./data/recipes";
 import { ALL_QUESTS } from "./data/quests";
+import { MigrationHelper, type PlayerBackup } from "./migration-helper";
 
 export class SQLiteStorage implements IStorage {
   
@@ -54,6 +55,9 @@ export class SQLiteStorage implements IStorage {
     }
 
     console.log("Initializing game data in SQLite database...");
+    
+    // Check if this is a migration and load player backups
+    const playerBackups = MigrationHelper.isMigration() ? MigrationHelper.loadPlayerData() : [];
     
     // Initialize all resources using modular data with fixed IDs
     const resourceIds: string[] = [];
@@ -85,6 +89,81 @@ export class SQLiteStorage implements IStorage {
     }
 
     console.log("SQLite game data initialized successfully!");
+    
+    // Restore player data if we had backups
+    if (playerBackups.length > 0) {
+      console.log("Restoring player data from backup...");
+      for (const playerBackup of playerBackups) {
+        try {
+          // Check if player already exists in new system
+          const existingPlayer = await db.select().from(players).where(eq(players.username, playerBackup.username)).limit(1);
+          
+          if (existingPlayer.length === 0) {
+            // Create player in new system
+            const newPlayer = await this.createPlayer({
+              username: playerBackup.username,
+              level: playerBackup.level,
+              experience: playerBackup.experience,
+              hunger: playerBackup.hunger,
+              maxHunger: playerBackup.maxHunger,
+              thirst: playerBackup.thirst,
+              maxThirst: playerBackup.maxThirst,
+              coins: playerBackup.coins,
+              inventoryWeight: playerBackup.inventoryWeight,
+              maxInventoryWeight: playerBackup.maxInventoryWeight,
+              autoStorage: playerBackup.autoStorage,
+              craftedItemsDestination: playerBackup.craftedItemsDestination,
+              equippedHelmet: playerBackup.equippedHelmet,
+              equippedChestplate: playerBackup.equippedChestplate,
+              equippedLeggings: playerBackup.equippedLeggings,
+              equippedBoots: playerBackup.equippedBoots,
+              equippedWeapon: playerBackup.equippedWeapon,
+              equippedTool: playerBackup.equippedTool
+            });
+            
+            // Restore inventory items (only if they exist in new resource system)
+            for (const invItem of playerBackup.inventory) {
+              try {
+                const resourceExists = await this.getResource(invItem.resourceId);
+                if (resourceExists) {
+                  await this.addInventoryItem({
+                    playerId: newPlayer.id,
+                    resourceId: invItem.resourceId,
+                    quantity: invItem.quantity
+                  });
+                }
+              } catch (err) {
+                console.log(`Could not restore inventory item ${invItem.resourceId} for ${playerBackup.username}`);
+              }
+            }
+            
+            // Restore storage items (only if they exist in new resource system)
+            for (const storageItem of playerBackup.storage) {
+              try {
+                const resourceExists = await this.getResource(storageItem.resourceId);
+                if (resourceExists) {
+                  await this.addStorageItem({
+                    playerId: newPlayer.id,
+                    resourceId: storageItem.resourceId,
+                    quantity: storageItem.quantity
+                  });
+                }
+              } catch (err) {
+                console.log(`Could not restore storage item ${storageItem.resourceId} for ${playerBackup.username}`);
+              }
+            }
+            
+            console.log(`✓ Successfully restored player data for ${playerBackup.username}`);
+          }
+        } catch (err) {
+          console.log(`✗ Failed to restore player ${playerBackup.username}:`, err);
+        }
+      }
+      
+      // Clean up backup file after successful restoration
+      MigrationHelper.cleanupBackup();
+      console.log("✓ Player data migration completed successfully!");
+    }
   }
 
   private async createTables(): Promise<void> {
