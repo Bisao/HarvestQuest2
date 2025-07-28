@@ -109,6 +109,24 @@ export class GameService {
     return !!(baitItem && baitItem.quantity > 0);
   }
 
+  // Check if player has fishing requirements (rod equipped + bait in inventory)
+  async hasFishingRequirements(playerId: string): Promise<boolean> {
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) return false;
+    
+    const equipment = await this.storage.getAllEquipment();
+    
+    // Check if player has fishing rod equipped
+    const equippedTool = equipment.find(eq => 
+      eq.id === player.equippedTool && eq.toolType === "fishing_rod"
+    );
+    
+    if (!equippedTool) return false;
+    
+    // Check if player has bait in inventory
+    return await this.hasBaitInInventory(playerId);
+  }
+
   // Move item from inventory to storage
   async moveToStorage(playerId: string, inventoryItemId: string, quantity: number): Promise<void> {
     const inventoryItem = await this.storage.getPlayerInventory(playerId);

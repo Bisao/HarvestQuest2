@@ -9,7 +9,7 @@ import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 import ExpeditionSystem from "@/components/game/expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
 import { queryClient } from "@/lib/queryClient";
-import type { Player, Biome, Resource, Equipment, Recipe } from "@shared/schema";
+import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/schema";
 
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
@@ -49,6 +49,11 @@ export default function Game() {
 
   const { data: recipes = [] } = useQuery<Recipe[]>({
     queryKey: ["/api/recipes"],
+  });
+
+  const { data: inventoryItems = [] } = useQuery<InventoryItem[]>({
+    queryKey: ["/api/inventory", player?.id],
+    enabled: !!player?.id,
   });
 
   const tabs = [
@@ -493,6 +498,7 @@ export default function Game() {
         onExpeditionComplete={handleCompleteExpedition}
         activeExpedition={activeExpedition}
         onExpeditionUpdate={setActiveExpedition}
+        inventoryItems={inventoryItems}
       />
 
       {/* Minimized Expedition Window */}

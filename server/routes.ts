@@ -909,16 +909,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId, resourceId } = req.params;
 
-      const canCollect = await gameService.hasRequiredTool(playerId, resourceId);
+      // Get resource to check if it's a fish
       const resource = await storage.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: "Resource not found" });
+      }
+
+      let canCollect = false;
+      
+      // Special check for fishing resources
+      if (resource.requiredTool === "fishing_rod") {
+        canCollect = await gameService.hasFishingRequirements(playerId);
+      } else {
+        // Regular tool check for other resources
+        canCollect = await gameService.hasRequiredTool(playerId, resourceId);
+      }
 
       res.json({
         canCollect,
-        resource: resource ? {
+        resource: {
           name: resource.name,
           emoji: resource.emoji,
           requiredTool: resource.requiredTool
-        } : null
+        }
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to check collection ability" });

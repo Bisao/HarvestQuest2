@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import type { Biome, Resource, Equipment, Player } from "@shared/schema";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { Biome, Resource, Equipment, Player, InventoryItem } from "@shared/schema";
+import { useFishingRequirements, useCanCollectResource } from "@/hooks/use-fishing-requirements";
 
 interface ExpeditionSystemProps {
   isOpen: boolean;
@@ -21,6 +23,7 @@ interface ExpeditionSystemProps {
   isMinimized?: boolean;
   activeExpedition?: ActiveExpedition | null;
   onExpeditionUpdate?: (expedition: ActiveExpedition | null) => void;
+  inventoryItems: InventoryItem[];
 }
 
 interface ActiveExpedition {
@@ -46,7 +49,8 @@ export default function ExpeditionSystem({
   onExpeditionComplete,
   isMinimized = false,
   activeExpedition: parentActiveExpedition,
-  onExpeditionUpdate
+  onExpeditionUpdate,
+  inventoryItems
 }: ExpeditionSystemProps) {
   const [phase, setPhase] = useState<ExpeditionPhase>("setup");
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
@@ -59,6 +63,9 @@ export default function ExpeditionSystem({
   const activeExpedition = parentActiveExpedition || localActiveExpedition;
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
+
+  // Hook para verificar requisitos de pesca
+  const fishingRequirements = useFishingRequirements(player, equipment, inventoryItems);
 
   const calculateExpeditionTime = () => {
     const baseTime = 30; // 30 seconds base
@@ -307,9 +314,7 @@ export default function ExpeditionSystem({
 
       // Special case for fishing: requires fishing rod AND bait in inventory
       if (resource.requiredTool === "fishing_rod") {
-        const hasFishingRod = equippedTool && equippedTool.toolType === "fishing_rod";
-        // TODO: Check for bait in inventory (will be validated on server)
-        return !!hasFishingRod;
+        return fishingRequirements.hasRequirements;
       }
 
       // Special case for hunting large animals: requires weapon AND knife
