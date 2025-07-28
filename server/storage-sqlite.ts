@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { db, sqlite } from "./db-sqlite";
 import { 
@@ -112,7 +112,7 @@ export class SQLiteStorage implements IStorage {
               inventoryWeight: playerBackup.inventoryWeight,
               maxInventoryWeight: playerBackup.maxInventoryWeight,
               autoStorage: playerBackup.autoStorage,
-              craftedItemsDestination: playerBackup.craftedItemsDestination,
+              // craftedItemsDestination: playerBackup.craftedItemsDestination, // Removed - not in schema
               equippedHelmet: playerBackup.equippedHelmet,
               equippedChestplate: playerBackup.equippedChestplate,
               equippedLeggings: playerBackup.equippedLeggings,
@@ -417,7 +417,7 @@ export class SQLiteStorage implements IStorage {
     const result = await Promise.all(rawStorage.map(async (item) => {
       if (item.itemType === 'equipment') {
         // Equipment item
-        const equipment = await this.getEquipment(item.resourceId);
+        const equipment = await this.getEquipmentById(item.resourceId);
         return {
           ...item,
           name: equipment?.name || 'Unknown Equipment',
@@ -520,11 +520,18 @@ export class SQLiteStorage implements IStorage {
     return expedition || undefined;
   }
 
-  async createExpedition(insertExpedition: InsertExpedition): Promise<Expedition> {
+  async createExpedition(expedition: InsertExpedition): Promise<Expedition> {
     const id = randomUUID();
     const [newExpedition] = await db.insert(expeditions).values({
-      ...insertExpedition,
-      id
+      id,
+      playerId: expedition.playerId,
+      biomeId: expedition.biomeId,
+      selectedResources: expedition.selectedResources,
+      selectedEquipment: expedition.selectedEquipment,
+      status: 'in_progress',
+      startTime: Math.floor(Date.now() / 1000),
+      progress: 0,
+      collectedResources: {}
     }).returning();
     return newExpedition;
   }
@@ -541,6 +548,11 @@ export class SQLiteStorage implements IStorage {
   // Equipment methods
   async getAllEquipment(): Promise<Equipment[]> {
     return await db.select().from(equipment);
+  }
+
+  async getEquipmentById(id: string): Promise<Equipment | undefined> {
+    const [equipmentItem] = await db.select().from(equipment).where(eq(equipment.id, id));
+    return equipmentItem || undefined;
   }
 
   async createEquipment(insertEquipment: InsertEquipment): Promise<Equipment> {
@@ -588,7 +600,7 @@ export class SQLiteStorage implements IStorage {
 
   async getPlayerQuest(playerId: string, questId: string): Promise<PlayerQuest | undefined> {
     const [playerQuest] = await db.select().from(playerQuests)
-      .where(eq(playerQuests.playerId, playerId));
+      .where(and(eq(playerQuests.playerId, playerId), eq(playerQuests.questId, questId)));
     return playerQuest || undefined;
   }
 

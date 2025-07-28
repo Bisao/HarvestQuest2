@@ -446,8 +446,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Item crafted successfully!", recipe, quantity });
     } catch (error) {
       console.error("Craft error:", error);
-      console.error("Error details:", error.message, error.stack);
-      res.status(500).json({ message: "Failed to craft item", error: error.message });
+      console.error("Error details:", error instanceof Error ? error.message : 'Unknown error', error instanceof Error ? error.stack : '');
+      res.status(500).json({ message: "Failed to craft item", error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 

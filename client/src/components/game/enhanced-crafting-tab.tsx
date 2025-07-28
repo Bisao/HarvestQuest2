@@ -20,12 +20,11 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
-    "Materiais Básicos": true,
+    "Materiais": true,
     "Ferramentas": true,
     "Armas": false,
-    "Equipamentos": false,
-    "Utensílios de Cozinha": false,
-    "Comidas e Bebidas": false,
+    "Utensílios": false,
+    "Comidas": false,
   });
 
   // State for craft quantities
@@ -183,9 +182,8 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       "Materiais": [],
       "Ferramentas": [],
       "Armas": [],
-      "Equipamentos": [],
       "Utensílios": [],
-      "Consumíveis": []
+      "Comidas": []
     };
 
     recipes.forEach(recipe => {
@@ -195,27 +193,23 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       if (name.includes("barbante") || name.includes("corda") || name.includes("isca")) {
         categories["Materiais"].push(recipe);
       }
-      // Ferramentas de trabalho
-      else if (name.includes("machado") || name.includes("picareta") || name.includes("foice") || name.includes("balde") || name.includes("vara")) {
+      // Ferramentas de trabalho (inclui equipamentos de proteção)
+      else if (name.includes("machado") || name.includes("picareta") || name.includes("foice") || name.includes("balde") || name.includes("vara") || name.includes("mochila")) {
         categories["Ferramentas"].push(recipe);
       }
       // Armas
       else if (name.includes("arco") || name.includes("lança") || name.includes("faca")) {
         categories["Armas"].push(recipe);
       }
-      // Equipamentos pessoais
-      else if (name.includes("mochila") || name.includes("capacete") || name.includes("peitoral") || name.includes("calças") || name.includes("botas")) {
-        categories["Equipamentos"].push(recipe);
-      }
-      // Utensílios de cozinha
+      // Utensílios (cozinha e outros)
       else if (name.includes("panela") || name.includes("garrafa")) {
         categories["Utensílios"].push(recipe);
       }
       // Comidas e bebidas
       else if (name.includes("suco") || name.includes("assados") || name.includes("grelhado") || name.includes("assada") || name.includes("ensopado")) {
-        categories["Consumíveis"].push(recipe);
+        categories["Comidas"].push(recipe);
       }
-      // Fallback
+      // Fallback para materiais
       else {
         categories["Materiais"].push(recipe);
       }
@@ -354,10 +348,11 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
             >
               <div className="flex items-center space-x-3">
                 <span className="text-lg">
+                  {categoryName === "Materiais" && "🧵"}
                   {categoryName === "Ferramentas" && "🔧"}
-                  {categoryName === "Equipamentos" && "⚔️"}
-                  {categoryName === "Consumíveis" && "🍽️"}
-                  {categoryName === "Itens Especiais" && "✨"}
+                  {categoryName === "Armas" && "⚔️"}
+                  {categoryName === "Utensílios" && "🍳"}
+                  {categoryName === "Comidas" && "🍽️"}
                 </span>
                 <h4 className="text-lg font-semibold text-gray-800">{categoryName}</h4>
                 <span className="text-sm text-gray-500">({categoryRecipes.length})</span>
