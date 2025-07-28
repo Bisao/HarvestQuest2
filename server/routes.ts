@@ -318,7 +318,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Craft item
   app.post("/api/craft", async (req, res) => {
     try {
-      const { playerId, recipeId } = req.body;
+      const { playerId, recipeId, quantity = 1 } = req.body;
 
       const player = await storage.getPlayer(playerId);
       if (!player) {
@@ -337,25 +337,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get player's storage items
       const storageItems = await storage.getPlayerStorage(playerId);
 
-      // Check if player has enough ingredients in storage
+      // Check if player has enough ingredients in storage (multiplied by quantity)
       const ingredientEntries = Object.entries(recipe.ingredients as Record<string, number>);
       for (const [resourceId, requiredQuantity] of ingredientEntries) {
+        const totalRequired = requiredQuantity * quantity;
         const storageItem = storageItems.find(item => item.resourceId === resourceId);
         const availableQuantity = storageItem?.quantity || 0;
 
-        if (availableQuantity < requiredQuantity) {
+        if (availableQuantity < totalRequired) {
           const resource = await storage.getResource(resourceId);
           return res.status(400).json({ 
-            message: `Insufficient ${resource?.name || 'resource'} in storage. Need ${requiredQuantity}, have ${availableQuantity}` 
+            message: `Insufficient ${resource?.name || 'resource'} in storage. Need ${totalRequired}, have ${availableQuantity}` 
           });
         }
       }
 
-      // Consume ingredients from storage
+      // Consume ingredients from storage (multiplied by quantity)
       for (const [resourceId, requiredQuantity] of ingredientEntries) {
+        const totalRequired = requiredQuantity * quantity;
         const storageItem = storageItems.find(item => item.resourceId === resourceId);
         if (storageItem) {
-          const newQuantity = storageItem.quantity - requiredQuantity;
+          const newQuantity = storageItem.quantity - totalRequired;
           if (newQuantity <= 0) {
             await storage.removeStorageItem(storageItem.id);
           } else {
@@ -368,7 +370,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const destination = player.craftedItemsDestination || 'storage';
       const outputEntries = Object.entries(recipe.output as Record<string, number>);
 
-      for (const [itemType, quantity] of outputEntries) {
+      for (const [itemType, baseQuantity] of outputEntries) {
+        const totalOutput = baseQuantity * quantity;
         // First check if it's a resource (like Barbante)
         const allResources = await storage.getAllResources();
         const resourceItem = allResources.find(r => r.id === itemType);
@@ -379,17 +382,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           if (existingStorageItem) {
             await storage.updateStorageItem(existingStorageItem.id, {
-              quantity: existingStorageItem.quantity + quantity
+              quantity: existingStorageItem.quantity + totalOutput
             });
           } else {
             await storage.addStorageItem({
               playerId,
               resourceId: resourceItem.id,
-              quantity
+              quantity: totalOutput
             });
           }
 
-          console.log(`Added ${quantity}x ${resourceItem.name} to storage for player ${playerId}`);
+          console.log(`Added ${totalOutput}x ${resourceItem.name} to storage for player ${playerId}`);
         } else {
           // Check if itemType is actually an equipment ID
           const allEquipment = await storage.getAllEquipment();
@@ -403,34 +406,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
                 if (existingInventoryItem) {
                   await storage.updateInventoryItem(existingInventoryItem.id, {
-                    quantity: existingInventoryItem.quantity + quantity
+                    quantity: existingInventoryItem.quantity + totalOutput
                   });
                 } else {
                   await storage.addInventoryItem({
                     playerId,
                     resourceId: equipmentItem.id,
-                    quantity
+                    quantity: totalOutput
                   });
                 }
 
                 // Update player inventory weight
-                const newWeight = player.inventoryWeight + (equipmentItem.weight * quantity);
+                const newWeight = player.inventoryWeight + (equipmentItem.weight * totalOutput);
                 await storage.updatePlayer(playerId, { inventoryWeight: newWeight });
 
-                console.log(`Added ${quantity}x ${equipmentItem.name} to inventory for player ${playerId}`);
+                console.log(`Added ${totalOutput}x ${equipmentItem.name} to inventory for player ${playerId}`);
               } else {
                 // Add to storage (default behavior)
                 const existingStorageItem = storageItems.find(item => item.resourceId === equipmentItem.id);
 
                 if (existingStorageItem) {
                   await storage.updateStorageItem(existingStorageItem.id, {
-                    quantity: existingStorageItem.quantity + quantity
+                    quantity: existingStorageItem.quantity + totalOutput
                   });
                 } else {
                   await storage.addStorageItem({
                     playerId,
                     resourceId: equipmentItem.id,
-                    quantity
+                    quantity: totalOutput
                   });
                 }
 
@@ -455,7 +458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       invalidateInventoryCache(playerId);
       invalidatePlayerCache(playerId);
       
-      res.json({ message: "Item crafted successfully!", recipe });
+      res.json({ message: "Item crafted successfully!", recipe, quantity });
     } catch (error) {
       console.error("Craft error:", error);
       res.status(500).json({ message: "Failed to craft item" });

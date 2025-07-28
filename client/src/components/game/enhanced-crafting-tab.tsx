@@ -1,10 +1,12 @@
 import { useState } from "react";
 import type { Recipe, Resource, StorageItem } from "@shared/schema";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Minus } from "lucide-react";
 
 interface CraftingTabProps {
   recipes: Recipe[];
@@ -25,6 +27,9 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     "Utensílios": false,
     "Consumíveis": false,
   });
+  
+  // State for craft quantities
+  const [craftQuantities, setCraftQuantities] = useState<Record<string, number>>({});
 
   // Get storage items to check available resources
   const { data: storageItems = [] } = useQuery<StorageItem[]>({
@@ -33,11 +38,11 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   });
 
   const craftMutation = useMutation({
-    mutationFn: async ({ recipeId }: { recipeId: string }) => {
+    mutationFn: async ({ recipeId, quantity = 1 }: { recipeId: string; quantity?: number }) => {
       const response = await fetch("/api/craft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId, recipeId }),
+        body: JSON.stringify({ playerId, recipeId, quantity }),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -46,10 +51,13 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       return response.json();
     },
     onSuccess: (data) => {
+      const quantity = data.quantity || 1;
       toast({
         title: "Item Craftado!",
-        description: `${data.recipe.name} foi criado com sucesso!`,
+        description: `${quantity}x ${data.recipe.name} foi criado com sucesso!`,
       });
+      // Reset craft quantity for this recipe
+      setCraftQuantities(prev => ({ ...prev, [data.recipe.id]: 1 }));
       // Real-time updates for all related data after crafting
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
@@ -128,11 +136,21 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     }));
   };
 
-  const canCraftRecipe = (recipe: Recipe) => {
+  const canCraftRecipe = (recipe: Recipe, quantity = 1) => {
     if (playerLevel < recipe.requiredLevel) return false;
     
     const ingredients = getRecipeIngredients(recipe);
-    return ingredients.every(ingredient => ingredient.hasEnough);
+    return ingredients.every(ingredient => ingredient.available >= (ingredient.quantity * quantity));
+  };
+
+  const getMaxCraftableQuantity = (recipe: Recipe) => {
+    if (playerLevel < recipe.requiredLevel) return 0;
+    
+    const ingredients = getRecipeIngredients(recipe);
+    const maxQuantities = ingredients.map(ingredient => 
+      Math.floor(ingredient.available / ingredient.quantity)
+    );
+    return Math.min(...maxQuantities, 99); // Cap at 99 for UI reasons
   };
 
   const isRecipeUnlocked = (recipe: Recipe) => {
@@ -140,8 +158,17 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   };
 
   const handleCraft = (recipe: Recipe) => {
-    if (!canCraftRecipe(recipe)) return;
-    craftMutation.mutate({ recipeId: recipe.id });
+    const quantity = craftQuantities[recipe.id] || 1;
+    if (!canCraftRecipe(recipe, quantity)) return;
+    craftMutation.mutate({ recipeId: recipe.id, quantity });
+  };
+
+  const updateCraftQuantity = (recipeId: string, quantity: number) => {
+    setCraftQuantities(prev => ({ ...prev, [recipeId]: Math.max(1, quantity) }));
+  };
+
+  const getCraftQuantity = (recipeId: string) => {
+    return craftQuantities[recipeId] || 1;
   };
 
   const toggleCategory = (category: string) => {
@@ -202,7 +229,9 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   const renderRecipeCard = (recipe: Recipe) => {
     const ingredients = getRecipeIngredients(recipe);
     const unlocked = isRecipeUnlocked(recipe);
-    const canCraft = canCraftRecipe(recipe);
+    const maxQuantity = getMaxCraftableQuantity(recipe);
+    const currentQuantity = getCraftQuantity(recipe.id);
+    const canCraft = canCraftRecipe(recipe, currentQuantity);
 
     return (
       <div
@@ -248,7 +277,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
               <div
                 key={resource.id}
                 className={`flex items-center justify-between text-sm ${
-                  hasEnough ? "text-green-600" : "text-red-600"
+                  available >= (quantity * currentQuantity) ? "text-green-600" : "text-red-600"
                 }`}
               >
                 <span className="flex items-center space-x-1">
@@ -256,23 +285,74 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
                   <span>{resource.name}</span>
                 </span>
                 <span className="font-semibold">
-                  {available}/{quantity}
+                  {available}/{quantity * currentQuantity}
                 </span>
               </div>
             )
           ))}
         </div>
 
+        {/* Quantity Selector */}
+        {unlocked && maxQuantity > 1 && (
+          <div className="mb-4">
+            <Label className="text-sm font-semibold text-gray-700 mb-2 block">
+              Quantidade: (Máx: {maxQuantity})
+            </Label>
+            <div className="flex items-center space-x-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => updateCraftQuantity(recipe.id, currentQuantity - 1)}
+                disabled={currentQuantity <= 1}
+                className="w-8 h-8 p-0"
+              >
+                <Minus className="w-3 h-3" />
+              </Button>
+              <Input
+                type="number"
+                min="1"
+                max={maxQuantity}
+                value={currentQuantity}
+                onChange={(e) => {
+                  const value = Math.min(maxQuantity, Math.max(1, parseInt(e.target.value) || 1));
+                  updateCraftQuantity(recipe.id, value);
+                }}
+                className="text-center w-16 h-8 text-sm"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => updateCraftQuantity(recipe.id, currentQuantity + 1)}
+                disabled={currentQuantity >= maxQuantity}
+                className="w-8 h-8 p-0"
+              >
+                <Plus className="w-3 h-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => updateCraftQuantity(recipe.id, maxQuantity)}
+                disabled={currentQuantity >= maxQuantity}
+                className="text-xs px-2 h-8"
+              >
+                Max
+              </Button>
+            </div>
+          </div>
+        )}
+
         <Button
           onClick={() => handleCraft(recipe)}
-          disabled={!canCraft || craftMutation.isPending || isBlocked}
+          disabled={!canCraft || craftMutation.isPending || isBlocked || maxQuantity === 0}
           className={`w-full ${
             canCraft 
               ? "bg-green-600 hover:bg-green-700 text-white" 
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
-          {craftMutation.isPending ? "Craftando..." : isBlocked ? "🚫 Bloqueado" : canCraft ? "🔨 Craftar" : "Indisponível"}
+          {craftMutation.isPending ? "Craftando..." : 
+           isBlocked ? "🚫 Bloqueado" : 
+           canCraft ? `🔨 Craftar ${currentQuantity}x` : "Indisponível"}
         </Button>
       </div>
     );
