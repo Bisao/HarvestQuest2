@@ -377,97 +377,101 @@ export default function Game() {
 
       <main className="container mx-auto px-2 md:px-4 py-3 md:py-6">
         <div className="bg-white rounded-lg shadow-lg mb-4 md:mb-6">
-          {/* Tab Navigation */}
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-1 overflow-x-auto scrollbar-hide">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-1 md:space-x-2 px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? "border-forest text-forest"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  <span className="text-base md:text-lg">{tab.emoji}</span>
-                  <span className="hidden sm:inline">{tab.label}</span>
-                  <span className="sm:hidden">{tab.id === "biomes" ? "Biomas" : tab.id === "quests" ? "Quests" : tab.id === "inventory" ? "Inv." : tab.id === "storage" ? "Arm." : "Craft"}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
+          {/* Horizontal Category Tabs */}
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
+                      isActive 
+                        ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
+                        : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
+                    }`}
+                  >
+                    <span className="text-lg">{tab.emoji}</span>
+                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span className="sm:hidden">{tab.id === "biomes" ? "Biomas" : tab.id === "quests" ? "Quests" : tab.id === "inventory" ? "Inv." : tab.id === "storage" ? "Arm." : "Craft"}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-          {/* Tab Content */}
-          <div className="p-3 md:p-6">
-            {activeTab === "biomes" && (
-              <BiomesTab
-                biomes={biomes?.map(biome => {
-                  // Get last expedition resources from localStorage
-                  const lastExpeditions = typeof window !== 'undefined' 
-                    ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
-                    : {};
-                  
-                  return {
-                    ...biome,
-                    autoRepeatEnabled: autoRepeatSettings[biome.id]?.enabled || false,
-                    autoRepeatCountdown: autoRepeatSettings[biome.id]?.countdown || 0,
-                    lastExpeditionResources: lastExpeditions[biome.id] || []
-                  };
-                }) || []}
-                player={player}
-                resources={resources}
-                activeExpedition={activeExpedition ? {
-                  biomeId: activeExpedition.biomeId,
-                  progress: activeExpedition.progress || 0,
-                  selectedResources: activeExpedition.selectedResources
-                } : null}
-                onExploreBiome={handleExploreBiome}
-                onCompleteExpedition={(expeditionId) => {
-                  if (activeExpedition) {
-                    handleCompleteExpedition();
-                  }
-                }}
-                onToggleAutoRepeat={handleToggleAutoRepeat}
-              />
-            )}
+            {/* Content for Active Category */}
+            <div className="p-3 md:p-6">
+              {activeTab === "biomes" && (
+                <BiomesTab
+                  biomes={biomes?.map(biome => {
+                    // Get last expedition resources from localStorage
+                    const lastExpeditions = typeof window !== 'undefined' 
+                      ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
+                      : {};
+                    
+                    return {
+                      ...biome,
+                      autoRepeatEnabled: autoRepeatSettings[biome.id]?.enabled || false,
+                      autoRepeatCountdown: autoRepeatSettings[biome.id]?.countdown || 0,
+                      lastExpeditionResources: lastExpeditions[biome.id] || []
+                    };
+                  }) || []}
+                  player={player}
+                  resources={resources}
+                  activeExpedition={activeExpedition ? {
+                    biomeId: activeExpedition.biomeId,
+                    progress: activeExpedition.progress || 0,
+                    selectedResources: activeExpedition.selectedResources
+                  } : null}
+                  onExploreBiome={handleExploreBiome}
+                  onCompleteExpedition={(expeditionId) => {
+                    if (activeExpedition) {
+                      handleCompleteExpedition();
+                    }
+                  }}
+                  onToggleAutoRepeat={handleToggleAutoRepeat}
+                />
+              )}
 
-            {activeTab === "quests" && (
-              <QuestsTab
-                player={player}
-              />
-            )}
+              {activeTab === "quests" && (
+                <QuestsTab
+                  player={player}
+                />
+              )}
 
-            {activeTab === "inventory" && (
-              <EnhancedInventory
-                playerId={player.id}
-                resources={resources}
-                equipment={equipment}
-                player={player}
-                isBlocked={!!activeExpedition}
-              />
-            )}
+              {activeTab === "inventory" && (
+                <EnhancedInventory
+                  playerId={player.id}
+                  resources={resources}
+                  equipment={equipment}
+                  player={player}
+                  isBlocked={!!activeExpedition}
+                />
+              )}
 
-            {activeTab === "storage" && (
-              <StorageTab
-                playerId={player.id}
-                resources={resources}
-                equipment={equipment}
-                autoStorage={player.autoStorage}
-                player={player}
-                isBlocked={!!activeExpedition}
-              />
-            )}
+              {activeTab === "storage" && (
+                <StorageTab
+                  playerId={player.id}
+                  resources={resources}
+                  equipment={equipment}
+                  autoStorage={player.autoStorage}
+                  player={player}
+                  isBlocked={!!activeExpedition}
+                />
+              )}
 
-            {activeTab === "crafting" && (
-              <EnhancedCraftingTab
-                recipes={recipes}
-                resources={resources}
-                playerLevel={player.level}
-                playerId={player.id}
-                isBlocked={!!activeExpedition}
-              />
-            )}
+              {activeTab === "crafting" && (
+                <EnhancedCraftingTab
+                  recipes={recipes}
+                  resources={resources}
+                  playerLevel={player.level}
+                  playerId={player.id}
+                  isBlocked={!!activeExpedition}
+                />
+              )}
+            </div>
           </div>
         </div>
       </main>
