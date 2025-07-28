@@ -1131,6 +1131,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completedAt: Math.floor(Date.now() / 1000)
       });
 
+      // Invalidate cache
+      const { invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidatePlayerCache(playerId);
+
       res.json({
         quest: completedPlayerQuest,
         rewards: rewards,
@@ -1139,6 +1143,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Complete quest error:", error);
       res.status(500).json({ message: "Failed to complete quest", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
+  // Reset/repeat a completed quest
+  app.post("/api/player/:playerId/quests/:questId/repeat", async (req, res) => {
+    try {
+      const { playerId, questId } = req.params;
+      
+      // Get player quest
+      const playerQuest = await storage.getPlayerQuest(playerId, questId);
+      if (!playerQuest || playerQuest.status !== 'completed') {
+        return res.status(400).json({ message: "Quest not completed or doesn't exist" });
+      }
+
+      // Get quest to validate
+      const quest = await storage.getQuest(questId);
+      if (!quest) {
+        return res.status(404).json({ message: "Quest not found" });
+      }
+
+      // Reset the quest to active status with empty progress
+      const resetPlayerQuest = await storage.updatePlayerQuest(playerQuest.id, {
+        status: 'active',
+        progress: {},
+        startedAt: Math.floor(Date.now() / 1000),
+        completedAt: null
+      });
+
+      // Invalidate cache
+      const { invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidatePlayerCache(playerId);
+
+      res.json({ message: "Quest reset successfully", playerQuest: resetPlayerQuest });
+    } catch (error) {
+      console.error("Reset quest error:", error);
+      res.status(500).json({ message: "Failed to reset quest" });
     }
   });
 

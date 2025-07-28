@@ -41,6 +41,15 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     queryKey: [`/api/player/${player.id}/quests`],
   });
 
+  // Get resources and equipment data to resolve names for rewards
+  const { data: resources = [] } = useQuery({
+    queryKey: ['/api/resources']
+  });
+
+  const { data: equipment = [] } = useQuery({
+    queryKey: ['/api/equipment']
+  });
+
   // Group quests by category and status
   const questsByCategory = quests.reduce((acc, quest) => {
     const category = quest.category || 'outros';
@@ -116,6 +125,32 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     },
   });
 
+  const repeatQuestMutation = useMutation({
+    mutationFn: async (questId: string) => {
+      const response = await fetch(`/api/player/${player.id}/quests/${questId}/repeat`, {
+        method: 'POST'
+      });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}/quests`] });
+      toast({
+        title: "Quest Reiniciada!",
+        description: "A quest foi reiniciada e está pronta para ser completada novamente.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível reiniciar a quest.",
+      });
+    },
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'available':
@@ -146,6 +181,22 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     return quest.canComplete === true;
   };
 
+  const getItemName = (itemId: string) => {
+    // First check resources
+    const resource = (resources as any[]).find((r: any) => r.id === itemId);
+    if (resource) {
+      return `${resource.emoji} ${resource.name}`;
+    }
+    
+    // Then check equipment
+    const equip = (equipment as any[]).find((e: any) => e.id === itemId);
+    if (equip) {
+      return `${equip.emoji} ${equip.name}`;
+    }
+    
+    return "Item Desconhecido";
+  };
+
   const formatRewards = (rewards: Quest['rewards']) => {
     const parts = [];
     
@@ -158,8 +209,9 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     }
     
     if (rewards.items) {
-      for (const [item, quantity] of Object.entries(rewards.items)) {
-        parts.push(`📦 ${quantity}x ${item}`);
+      for (const [itemId, quantity] of Object.entries(rewards.items)) {
+        const itemName = getItemName(itemId);
+        parts.push(`${quantity}x ${itemName}`);
       }
     }
     
@@ -340,11 +392,26 @@ export default function QuestsTab({ player }: QuestsTabProps) {
                         <div>
                           <h3 className="font-semibold">{quest.name}</h3>
                           <p className="text-sm text-muted-foreground">{quest.description}</p>
+                          <div className="mt-2">
+                            <p className="text-xs text-muted-foreground">
+                              Recompensas: {formatRewards(quest.rewards)}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                      <Badge variant="outline">
-                        ✅ Completa
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">
+                          ✅ Completa
+                        </Badge>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => repeatQuestMutation.mutate(quest.id)}
+                          disabled={repeatQuestMutation.isPending}
+                        >
+                          {repeatQuestMutation.isPending ? "Reiniciando..." : "🔄 Repetir"}
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
