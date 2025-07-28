@@ -1,48 +1,6 @@
 // Resource data management module
 import type { InsertResource } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// Pre-defined UUIDs for resources to ensure consistency across systems
-export const RESOURCE_IDS = {
-  // Basic resources
-  FIBRA: "8bd33b18-a241-4859-ae9f-870fab5673d0",
-  PEDRA: "7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12",
-  PEDRAS_SOLTAS: "5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-  GRAVETOS: "2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-  AGUA_FRESCA: "4b7e1a9c-5d8f-4e32-9a76-8c2e5f1b9d48",
-  BAMBU: "6d3a8e5c-1f9b-4e72-8a05-4c7e9f2b1d59",
-  MADEIRA: "8e5c2a9f-7b1d-4e63-9a84-6f1c8e5a2b6a",
-  ARGILA: "1c9e5a7b-3f8d-4e52-9a73-8e2c6f9b1d7b",
-  FERRO_FUNDIDO: "9f7b3e1a-5d8c-4e41-9a62-2c6e8f1b5d8c",
-  COURO: "3e1a9f7b-8d5c-4e30-9a51-6c8e2f9b3d9d",
-  CARNE: "7b5e3a1f-1d9c-4e29-9a40-8c2e6f7b5dae",
-  OSSOS: "5a3f7b1e-9d8c-4e18-9a39-2c6e8f3b7dbf",
-  PELO: "1f7b5a3e-8c9d-4e17-9a28-6c2e8f5b1dc0",
-  BARBANTE: "9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
-  
-  // Animals 
-  COELHO: "a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
-  VEADO: "c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3",
-  JAVALI: "f7a1c9e5-3d8b-4e13-9a24-8c6e2f9b7de4",
-  PEIXE_PEQUENO: "a1c9f7e5-8b3d-4e12-9a23-2c8e6f5b9df5",
-  PEIXE_GRANDE: "c9e5a1f7-3d8b-4e11-9a22-6c2e8f9b5de6",
-  SALMAO: "e5a1c9f7-8b3d-4e10-9a21-8c6e2f7b9df7",
-  COGUMELOS: "a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-  FRUTAS_SILVESTRES: "f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-  
-  // Unique resources
-  MADEIRA_FLORESTA: "c9a1f7e5-3d8b-4e07-9a18-8c6e2f9b7dea",
-  AREIA: "a1e5f7c9-8b3d-4e06-9a17-2c8e6f7b5deb",
-  CRISTAIS: "e5f7a1c9-3d8b-4e05-9a16-6c2e8f9b7dec",
-  CONCHAS: "f7a1e5c9-8b3d-4e04-9a15-8c6e2f5b9ded",
-  
-  // Food resources
-  SUCO_FRUTAS: "a1c9e5f7-3b8d-4e03-9a14-2c8e6f9b7dee",
-  COGUMELOS_ASSADOS: "c9e5a1f7-8d3b-4e02-9a13-6c2e8f7b5def",
-  PEIXE_GRELHADO: "e5a1c9f7-3d8b-4e01-9a12-8c6e2f9b7de0",
-  CARNE_ASSADA: "a1f7e5c9-8b3d-4e00-9a11-2c8e6f5b9df1",
-  ENSOPADO_CARNE: "f7e5a1c9-3d8b-4e99-9a10-6c2e8f9b7df2"
-};
+import { RESOURCE_IDS } from "@shared/constants/game-ids";
 
 export function createResourcesWithIds(): InsertResource[] {
   return [

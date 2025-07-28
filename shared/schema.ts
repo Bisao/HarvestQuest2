@@ -59,6 +59,7 @@ export const storageItems = sqliteTable("storage_items", {
   playerId: text("player_id").notNull(),
   resourceId: text("resource_id").notNull(),
   quantity: integer("quantity").notNull().default(0),
+  itemType: text("item_type").notNull().default("resource"), // "resource" or "equipment"
 });
 
 export const expeditions = sqliteTable("expeditions", {

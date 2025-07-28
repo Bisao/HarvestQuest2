@@ -1,6 +1,6 @@
 // Biome data management module
 import type { InsertBiome } from "@shared/schema";
-import { RESOURCE_IDS } from "./resources";
+import { RESOURCE_IDS, BIOME_IDS } from "@shared/constants/game-ids";
 
 export interface BiomeConfig {
   name: string;
@@ -44,6 +44,7 @@ export const BIOME_CONFIGS: BiomeConfig[] = [
 export function createBiomeData(): InsertBiome[] {
   return [
     {
+      id: BIOME_IDS.FLORESTA,
       name: "Floresta",
       emoji: "🌲",
       requiredLevel: 1,
@@ -67,6 +68,7 @@ export function createBiomeData(): InsertBiome[] {
       ],
     },
     {
+      id: BIOME_IDS.DESERTO,
       name: "Deserto",
       emoji: "🏜️",
       requiredLevel: 20,
@@ -79,6 +81,7 @@ export function createBiomeData(): InsertBiome[] {
       ],
     },
     {
+      id: BIOME_IDS.MONTANHA,
       name: "Montanha",
       emoji: "🏔️",
       requiredLevel: 50,
@@ -91,6 +94,7 @@ export function createBiomeData(): InsertBiome[] {
       ],
     },
     {
+      id: BIOME_IDS.OCEANO,
       name: "Oceano",
       emoji: "🌊",
       requiredLevel: 75,
