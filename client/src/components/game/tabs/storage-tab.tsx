@@ -31,9 +31,21 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
     mutationFn: ({ storageItemId, quantity }: { storageItemId: string; quantity: number }) =>
       apiRequest("POST", "/api/storage/withdraw", { playerId, storageItemId, quantity }),
     onSuccess: () => {
+      // CRITICAL: Force immediate cache removal and refetch for real-time sync
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Force fresh data fetch
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Additional forced refetch to ensure UI updates immediately
+      queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
+      
       setWithdrawDialogOpen(false);
       setWithdrawAmount(1);
       toast({
@@ -60,10 +72,21 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate all related caches for real-time updates
+      // CRITICAL: Force immediate cache removal and refetch for real-time sync
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Force fresh data fetch
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Additional forced refetch to ensure UI updates immediately
+      queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
+      
       toast({
         title: "Item equipado!",
         description: "Equipamento foi equipado com sucesso.",
@@ -84,11 +107,21 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
       return response.json();
     },
     onSuccess: (data: any) => {
-      // Real-time updates for all player data after consuming
+      // CRITICAL: Force immediate cache removal and refetch for real-time sync
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Force fresh data fetch with immediate refetch
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
+      
+      // Additional forced refetch to ensure UI updates immediately
+      queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
+      
       toast({
         title: "Item consumido!",
         description: `Fome: +${data.hungerRestored} | Sede: +${data.thirstRestored}`,
@@ -109,11 +142,21 @@ export default function StorageTab({ playerId, resources, equipment, autoStorage
       return response.json();
     },
     onSuccess: (data: any) => {
-      // Real-time updates for all player data after consuming water
+      // CRITICAL: Force immediate cache removal and refetch for real-time sync
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Force fresh data fetch with immediate refetch
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
+      
+      // Additional forced refetch to ensure UI updates immediately
+      queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
+      
       toast({
         title: "Água consumida!",
         description: `Sede: +${data.thirstRestored}`,

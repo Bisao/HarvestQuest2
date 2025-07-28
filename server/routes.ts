@@ -633,6 +633,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updatePlayer(playerId, { inventoryWeight: newWeight });
       }
 
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+      const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateStorageCache(playerId);
+      invalidateInventoryCache(playerId);
+      invalidatePlayerCache(playerId);
+      
       res.json({ 
         success: true, 
         hungerRestored: hungerRestore * quantity,
@@ -671,6 +677,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         waterStorage: newWaterStorage
       });
 
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+      const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateStorageCache(playerId);
+      invalidateInventoryCache(playerId);
+      invalidatePlayerCache(playerId);
+      
       res.json({ 
         success: true, 
         thirstRestored: thirstRestore * quantity,
@@ -691,6 +703,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { playerId, quantity } = req.body;
 
       await gameService.moveToStorage(playerId, inventoryItemId, quantity);
+      
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+      const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateStorageCache(playerId);
+      invalidateInventoryCache(playerId);
+      invalidatePlayerCache(playerId);
+      
       res.json({ message: "Item stored successfully" });
     } catch (error) {
       console.error('Storage error:', error);
@@ -728,6 +747,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update player inventory weight
       await storage.updatePlayer(playerId, { inventoryWeight: 0 });
 
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+      const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateStorageCache(playerId);
+      invalidateInventoryCache(playerId);
+      invalidatePlayerCache(playerId);
+
       res.json({ message: "All items stored successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to store items" });
@@ -758,6 +783,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       await gameService.moveToInventory(playerId, storageItemId, quantity);
+      
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+      const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateStorageCache(playerId);
+      invalidateInventoryCache(playerId);
+      invalidatePlayerCache(playerId);
+      
       res.json({ message: "Items withdrawn successfully" });
     } catch (error) {
       console.error('Withdraw error:', error);
