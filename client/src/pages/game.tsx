@@ -158,28 +158,8 @@ export default function Game() {
             }
           }));
           
-          // Start new countdown timer
-          const countdownInterval = setInterval(() => {
-            setAutoRepeatSettings(prevSettings => {
-              const currentCountdown = prevSettings[currentBiomeId]?.countdown || 0;
-              if (currentCountdown <= 1) {
-                clearInterval(countdownInterval);
-                return {
-                  ...prevSettings,
-                  [currentBiomeId]: { ...prevSettings[currentBiomeId], countdown: 0 }
-                };
-              }
-              return {
-                ...prevSettings,
-                [currentBiomeId]: { ...prevSettings[currentBiomeId], countdown: currentCountdown - 1 }
-              };
-            });
-          }, 1000);
-          
-          setAutoRepeatTimers(prev => ({
-            ...prev,
-            [currentBiomeId]: countdownInterval
-          }));
+          // Use the new startCountdownTimer function
+          startCountdownTimer(currentBiomeId);
         }, 1000);
       }
     }
@@ -194,95 +174,88 @@ export default function Game() {
     }
   }, []);
 
+  // Clear timer for a specific biome
+  const clearBiomeTimer = (biomeId: string) => {
+    if (autoRepeatTimers[biomeId]) {
+      clearInterval(autoRepeatTimers[biomeId]);
+      setAutoRepeatTimers(prev => {
+        const { [biomeId]: _, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  // Start countdown timer for a biome
+  const startCountdownTimer = (biomeId: string) => {
+    // Clear any existing timer first
+    clearBiomeTimer(biomeId);
+    
+    const countdownInterval = setInterval(() => {
+      setAutoRepeatSettings(prevSettings => {
+        const currentCountdown = prevSettings[biomeId]?.countdown || 0;
+        if (currentCountdown <= 1) {
+          clearInterval(countdownInterval);
+          // Remove from timers registry
+          setAutoRepeatTimers(prev => {
+            const { [biomeId]: _, ...rest } = prev;
+            return rest;
+          });
+          return {
+            ...prevSettings,
+            [biomeId]: { ...prevSettings[biomeId], countdown: 0 }
+          };
+        }
+        return {
+          ...prevSettings,
+          [biomeId]: { ...prevSettings[biomeId], countdown: currentCountdown - 1 }
+        };
+      });
+    }, 1000);
+    
+    setAutoRepeatTimers(prev => ({
+      ...prev,
+      [biomeId]: countdownInterval
+    }));
+  };
+
   const handleToggleAutoRepeat = (biomeId: string) => {
     console.log('Toggle auto-repeat for biome:', biomeId);
     
+    // Get last expedition resources
+    const lastExpeditions = typeof window !== 'undefined' 
+      ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
+      : {};
+    
+    console.log('Last expeditions:', lastExpeditions);
+    
     setAutoRepeatSettings(prev => {
       const newSettings = { ...prev };
-      
-      // Get last expedition resources
-      const lastExpeditions = typeof window !== 'undefined' 
-        ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
-        : {};
-      
-      console.log('Last expeditions:', lastExpeditions);
-      console.log('Current settings:', newSettings[biomeId]);
       
       if (newSettings[biomeId]) {
         // Toggle the enabled state
         newSettings[biomeId].enabled = !newSettings[biomeId].enabled;
         
-        // If we're enabling auto-repeat, start the countdown immediately
         if (newSettings[biomeId].enabled) {
-          newSettings[biomeId].countdown = 10; // Start 10-second countdown
+          // Starting auto-repeat
+          newSettings[biomeId].countdown = 10;
           console.log('Starting countdown for biome:', biomeId);
-          
-          // Start the countdown timer immediately
-          const countdownInterval = setInterval(() => {
-            setAutoRepeatSettings(prevSettings => {
-              const currentCountdown = prevSettings[biomeId]?.countdown || 0;
-              if (currentCountdown <= 1) {
-                clearInterval(countdownInterval);
-                return {
-                  ...prevSettings,
-                  [biomeId]: { ...prevSettings[biomeId], countdown: 0 }
-                };
-              }
-              return {
-                ...prevSettings,
-                [biomeId]: { ...prevSettings[biomeId], countdown: currentCountdown - 1 }
-              };
-            });
-          }, 1000);
-          
-          setAutoRepeatTimers(prev => ({
-            ...prev,
-            [biomeId]: countdownInterval
-          }));
+          startCountdownTimer(biomeId);
         } else {
-          // If disabling, clear any existing timer and countdown
-          if (autoRepeatTimers[biomeId]) {
-            clearTimeout(autoRepeatTimers[biomeId]);
-            setAutoRepeatTimers(prev => {
-              const { [biomeId]: _, ...rest } = prev;
-              return rest;
-            });
-          }
+          // Disabling auto-repeat
+          clearBiomeTimer(biomeId);
           newSettings[biomeId].countdown = 0;
           console.log('Disabled auto-repeat for biome:', biomeId);
         }
       } else {
-        // First time enabling - only if there are last expedition resources
+        // First time enabling - check for last expedition resources
         if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
           newSettings[biomeId] = { 
             enabled: true, 
             resources: lastExpeditions[biomeId], 
-            countdown: 10 // Start countdown immediately
+            countdown: 10
           };
           console.log('First time enabling auto-repeat for biome:', biomeId);
-          
-          // Start the countdown timer immediately
-          const countdownInterval = setInterval(() => {
-            setAutoRepeatSettings(prevSettings => {
-              const currentCountdown = prevSettings[biomeId]?.countdown || 0;
-              if (currentCountdown <= 1) {
-                clearInterval(countdownInterval);
-                return {
-                  ...prevSettings,
-                  [biomeId]: { ...prevSettings[biomeId], countdown: 0 }
-                };
-              }
-              return {
-                ...prevSettings,
-                [biomeId]: { ...prevSettings[biomeId], countdown: currentCountdown - 1 }
-              };
-            });
-          }, 1000);
-          
-          setAutoRepeatTimers(prev => ({
-            ...prev,
-            [biomeId]: countdownInterval
-          }));
+          startCountdownTimer(biomeId);
         } else {
           console.log('No last expedition resources found for biome:', biomeId);
         }
