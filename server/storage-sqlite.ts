@@ -410,13 +410,22 @@ export class SQLiteStorage implements IStorage {
 
   // Storage methods
   async getPlayerStorage(playerId: string): Promise<StorageItem[]> {
-    // Get all storage items and join with resources and equipment to get names
+    // Get all storage items for the player
     const rawStorage = await db.select().from(storageItems).where(eq(storageItems.playerId, playerId));
     
     // Transform storage items to include proper resource/equipment information
     const result = await Promise.all(rawStorage.map(async (item) => {
-      if (item.resourceId && item.resourceId !== '') {
-        // Resource item
+      if (item.itemType === 'equipment') {
+        // Equipment item
+        const equipment = await this.getEquipment(item.resourceId);
+        return {
+          ...item,
+          name: equipment?.name || 'Unknown Equipment',
+          emoji: equipment?.emoji || '❓',
+          type: 'equipment' as const
+        };
+      } else {
+        // Resource item (default)
         const resource = await this.getResource(item.resourceId);
         return {
           ...item,
@@ -424,17 +433,7 @@ export class SQLiteStorage implements IStorage {
           emoji: resource?.emoji || '❓',
           type: 'resource' as const
         };
-      } else if (item.equipmentId) {
-        // Equipment item
-        const equipment = await this.getEquipment(item.equipmentId);
-        return {
-          ...item,
-          name: equipment?.name || 'Unknown Equipment',
-          emoji: equipment?.emoji || '❓',
-          type: 'equipment' as const
-        };
       }
-      return item;
     }));
     
     return result;
@@ -446,7 +445,10 @@ export class SQLiteStorage implements IStorage {
       .from(storageItems)
       .where(eq(storageItems.playerId, item.playerId));
     
-    const existingItem = existingItems.find(existing => existing.resourceId === item.resourceId);
+    const existingItem = existingItems.find(existing => 
+      existing.resourceId === item.resourceId && 
+      existing.itemType === (item.itemType || 'resource')
+    );
 
     if (existingItem) {
       const [updatedItem] = await db
@@ -459,7 +461,7 @@ export class SQLiteStorage implements IStorage {
       const id = randomUUID();
       const [newItem] = await db
         .insert(storageItems)
-        .values({ ...item, id })
+        .values({ ...item, id, itemType: item.itemType || 'resource' })
         .returning();
       return newItem;
     }

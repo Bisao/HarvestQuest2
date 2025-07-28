@@ -156,6 +156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       res.json(storageItems);
     } catch (error) {
+      console.error("Get storage error:", error);
       res.status(500).json({ message: "Failed to get storage" });
     }
   });
@@ -739,6 +740,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             playerId,
             resourceId: invItem.resourceId,
             quantity: invItem.quantity,
+            itemType: 'resource' // Default to resource for now
           });
         }
 
@@ -756,6 +758,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "All items stored successfully" });
     } catch (error) {
+      console.error("Store all items error:", error);
       res.status(500).json({ message: "Failed to store items" });
     }
   });
