@@ -24,6 +24,7 @@ interface ExpeditionSystemProps {
   isMinimized?: boolean;
   activeExpedition?: ActiveExpedition | null;
   onExpeditionUpdate?: (expedition: ActiveExpedition | null) => void;
+  onExpeditionStart?: () => void;
 }
 
 interface ActiveExpedition {
@@ -49,6 +50,7 @@ export default function ExpeditionSystem({
   isMinimized = false,
   activeExpedition: parentActiveExpedition,
   onExpeditionUpdate,
+  onExpeditionStart,
 }: ExpeditionSystemProps) {
   // State management
   const [selectedResources, setSelectedResources] = useState<string[]>([]);
@@ -138,7 +140,13 @@ export default function ExpeditionSystem({
       }
 
       startProgressSimulation(newActiveExpedition);
-      onMinimize(); // Minimize to show progress in minimized window
+      
+      // Call onExpeditionStart to close modal and show minimized window
+      if (onExpeditionStart) {
+        onExpeditionStart();
+      } else {
+        onClose();
+      }
       
       toast({
         title: "Expedição Iniciada",

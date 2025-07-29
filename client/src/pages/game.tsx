@@ -502,6 +502,10 @@ export default function Game() {
           setSelectedBiome(null);
           setActiveExpedition(null);
         }}
+        onExpeditionStart={() => {
+          setExpeditionModalOpen(false);
+          setExpeditionMinimized(true);
+        }}
         onMinimize={handleMinimizeExpedition}
         biome={selectedBiome}
         resources={resources}
