@@ -169,6 +169,24 @@ export default function SimpleInventory({
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Storage Capacity Bar */}
+          <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-amber-800">Capacidade de Armazenamento</span>
+              <span className="text-sm text-amber-700">{Math.round((player.inventoryWeight / player.maxInventoryWeight) * 100)}%</span>
+            </div>
+            <div className="w-full bg-amber-200 rounded-full h-3 overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-amber-400 to-amber-600 h-full transition-all duration-300"
+                style={{ width: `${Math.min((player.inventoryWeight / player.maxInventoryWeight) * 100, 100)}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-xs text-amber-600 mt-1">
+              <span>{player.inventoryWeight}kg</span>
+              <span>{player.maxInventoryWeight}kg</span>
+            </div>
+          </div>
+          
           {/* Inventory Grid */}
           <div className="grid grid-cols-6 md:grid-cols-9 gap-1 md:gap-2 mb-4">
             {Array.from({ length: totalSlots }, (_, i) => renderInventorySlot(i))}
