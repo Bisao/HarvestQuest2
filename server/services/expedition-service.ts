@@ -1,6 +1,6 @@
-// Expedition service for expedition-related business logic
+// Refactored Expedition Service - Clean, modular and optimized
 import type { IStorage } from "../storage";
-import type { Player, Expedition, Resource, Equipment, Biome } from "@shared/types";
+import type { Player, Expedition, Resource, Equipment } from "@shared/types";
 import { GameService } from "./game-service";
 import { QuestService } from "./quest-service";
 
@@ -13,12 +13,13 @@ export class ExpeditionService {
     this.questService = new QuestService(storage);
   }
 
-  // Start a new expedition
+  // EXPEDITION LIFECYCLE METHODS
+
   async startExpedition(
     playerId: string, 
     biomeId: string, 
     selectedResources: string[], 
-    selectedEquipment: string[]
+    selectedEquipment: string[] = []
   ): Promise<Expedition> {
     const player = await this.storage.getPlayer(playerId);
     if (!player) throw new Error("Player not found");
@@ -66,7 +67,6 @@ export class ExpeditionService {
     return expedition;
   }
 
-  // Update expedition progress
   async updateExpeditionProgress(expeditionId: string): Promise<Expedition> {
     const expedition = await this.storage.getExpedition(expeditionId);
     if (!expedition) throw new Error("Expedition not found");
@@ -94,7 +94,6 @@ export class ExpeditionService {
     return updatedExpedition;
   }
 
-  // Complete expedition and distribute rewards
   async completeExpedition(expeditionId: string): Promise<Expedition> {
     const expedition = await this.storage.getExpedition(expeditionId);
     if (!expedition) throw new Error("Expedition not found");
@@ -134,7 +133,8 @@ export class ExpeditionService {
     });
   }
 
-  // Calculate expedition rewards based on selected resources and equipment
+  // PRIVATE HELPER METHODS
+
   private async calculateExpeditionRewards(expedition: Expedition): Promise<Record<string, number>> {
     const rewards: Record<string, number> = {};
     const player = await this.storage.getPlayer(expedition.playerId);
@@ -400,17 +400,15 @@ export class ExpeditionService {
     return Math.floor(totalValue * 0.1); // 10% of resource value as coins
   }
 
-  // Cancel expedition
+  async getActiveExpedition(playerId: string): Promise<Expedition | null> {
+    const expeditions = await this.storage.getPlayerExpeditions(playerId);
+    return expeditions.find(exp => exp.status === "in_progress") || null;
+  }
+
   async cancelExpedition(expeditionId: string): Promise<void> {
     await this.storage.updateExpedition(expeditionId, {
       status: "cancelled",
       endTime: Math.floor(Date.now() / 1000)
     });
-  }
-
-  // Get active expedition for player
-  async getActiveExpedition(playerId: string): Promise<Expedition | null> {
-    const expeditions = await this.storage.getPlayerExpeditions(playerId);
-    return expeditions.find(exp => exp.status === "in_progress") || null;
   }
 }
