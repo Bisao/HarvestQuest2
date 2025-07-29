@@ -227,7 +227,8 @@ export class MemStorage implements IStorage {
   }
 
   async createResource(insertResource: InsertResource): Promise<Resource> {
-    const id = randomUUID();
+    // Use predefined ID if provided, otherwise generate random UUID
+    const id = insertResource.id || randomUUID();
     const resource: Resource = {
       id,
       name: insertResource.name,
@@ -253,7 +254,8 @@ export class MemStorage implements IStorage {
   }
 
   async createBiome(insertBiome: InsertBiome): Promise<Biome> {
-    const id = randomUUID();
+    // Use predefined ID if provided, otherwise generate random UUID
+    const id = insertBiome.id || randomUUID();
     const biome: Biome = {
       id,
       name: insertBiome.name,
