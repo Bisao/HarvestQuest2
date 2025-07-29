@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import EquipmentTab from "@/components/game/equipment-tab";
 import StatusTab from "@/components/game/status-tab";
-import EnhancedInventory from "@/components/game/enhanced-inventory";
+import SimpleInventory from "@/components/game/simple-inventory";
 import type { Player, Resource, Equipment } from "@shared/types";
 
 interface EnhancedInventoryWithTabsProps {
@@ -29,8 +29,8 @@ export default function EnhancedInventoryWithTabs({
 
   return (
     <div className="space-y-6">
-      {/* Sub-tabs Navigation */}
-      <div className="flex border-b border-gray-200">
+      {/* Sub-tabs Navigation - Following main tabs style */}
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
         {subTabs.map((tab) => {
           const isActive = activeSubTab === tab.id;
           
@@ -38,14 +38,19 @@ export default function EnhancedInventoryWithTabs({
             <button
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id)}
-              className={`flex items-center space-x-2 px-4 py-3 font-medium transition-all border-b-2 ${
+              className={`relative flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
                 isActive 
-                  ? "border-blue-500 text-blue-600 bg-blue-50" 
-                  : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"
+                  ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
+                  : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
               }`}
             >
               <span className="text-lg">{tab.emoji}</span>
-              <span>{tab.label}</span>
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{
+                tab.id === "equipment" ? "Equip." : 
+                tab.id === "status" ? "Status" : 
+                "Inv."
+              }</span>
             </button>
           );
         })}
@@ -67,7 +72,7 @@ export default function EnhancedInventoryWithTabs({
         )}
 
         {activeSubTab === "inventory" && (
-          <EnhancedInventory
+          <SimpleInventory
             playerId={playerId}
             resources={resources}
             equipment={equipment}
