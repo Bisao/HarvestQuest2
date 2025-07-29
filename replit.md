@@ -8,13 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 29, 2025 - TABS REORGANIZED WITH NEW EQUIPMENT & STATUS SECTIONS**
-- **New Tab Layout**: Reorganized interface with Equipment → Status → Inventory as dedicated tabs
-- **Equipment Tab**: Complete equipment management interface showing all 6 equipment slots (helmet, chestplate, leggings, boots, weapon, tool)
-- **Status Tab**: Comprehensive player status display with health bars, inventory capacity, and character information
-- **Enhanced User Experience**: Clear visual separation of character equipment, stats, and inventory management
-- **Equipment Bonuses**: Added equipment stats summary showing attack, defense, speed, and accuracy bonuses
-- **Visual Equipment Display**: Each equipment slot shows equipped item with ability to unequip directly from interface
+**January 29, 2025 - EXPEDITION PROGRESS MOVED TO MAIN SCREEN + INVENTORY REORGANIZED**
+- **Main Screen Progress Display**: Expedition progress now shows directly on biome cards in main screen instead of modal window
+- **Enhanced Biome Cards**: Active expeditions display resource collection progress, progress bar, and completion status directly on biome interface
+- **No More Progress Modals**: Removed intrusive progress modal - players can see expedition status without popup interruptions
+- **Inventory Sub-tabs**: Reorganized Equipment → Status → Inventory as sub-tabs within main Inventory tab
+- **Clean Inventory Interface**: Removed "Ações Rápidas" from inventory sub-tab to show only main inventory grid
+- **Consistent UI Design**: Sub-tabs follow same visual style as main tabs for unified interface experience
+- **Improved User Flow**: Start expedition → modal closes → progress visible on main screen → complete from biome card
 
 **January 29, 2025 - EXPEDITION SYSTEM ENHANCED + WATER COLLECTION REQUIREMENTS IMPLEMENTED**
 - **Water Collection Requirements**: Implemented proper validation requiring balde (bucket) or garrafa de bambu (bamboo bottle) for collecting água fresca

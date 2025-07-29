@@ -133,7 +133,7 @@ export default function ExpeditionSystem({
       }
 
       startProgressSimulation(newActiveExpedition);
-      onMinimize(); // Auto-minimize when expedition starts
+      onClose(); // Close modal completely - progress shows on main screen
       
       toast({
         title: "Expedição Iniciada",
