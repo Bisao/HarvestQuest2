@@ -174,7 +174,8 @@ export default function EnhancedStorageTab({
 
   // Sub-tabs configuration
   const subTabs = [
-    { id: "items", label: "Itens & Água", emoji: "📦" },
+    { id: "items", label: "Itens", emoji: "📦" },
+    { id: "water", label: "Água", emoji: "💧" },
     { id: "stats", label: "Estatísticas", emoji: "📊" }
   ];
 
@@ -200,73 +201,9 @@ export default function EnhancedStorageTab({
         </div>
       </div>
 
-      {/* Items & Water Sub-tab */}
+      {/* Items Sub-tab */}
       {activeSubTab === "items" && (
         <div className="space-y-6">
-          {/* Water Storage Section */}
-          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-6">
-            <h3 className="font-bold text-blue-800 text-xl mb-4 flex items-center">
-              <span className="mr-3 text-2xl">💧</span>
-              Reservatório de Água
-            </h3>
-            
-            <div className="flex flex-col md:flex-row gap-6 items-center">
-              {/* Water Level Display */}
-              <div className="flex-1">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium text-blue-700">Nível Atual</span>
-                  <span className="text-sm text-blue-600">
-                    {player.waterStorage} / {player.maxWaterStorage} unidades
-                  </span>
-                </div>
-                <div className="relative">
-                  <div className="w-full bg-blue-200 rounded-full h-6 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-blue-500 to-cyan-600 h-6 rounded-full transition-all duration-500 ease-in-out"
-                      style={{ 
-                        width: `${Math.min((player.waterStorage / player.maxWaterStorage) * 100, 100)}%` 
-                      }}
-                    />
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm font-bold text-white drop-shadow-lg">
-                      {Math.round((player.waterStorage / player.maxWaterStorage) * 100)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Water Actions */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => consumeWaterMutation.mutate(10)}
-                  disabled={player.waterStorage < 10 || consumeWaterMutation.isPending || isBlocked}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center space-x-2"
-                >
-                  <span>💧</span>
-                  <span>Beber (10)</span>
-                </button>
-                
-                <button
-                  onClick={() => consumeWaterMutation.mutate(25)}
-                  disabled={player.waterStorage < 25 || consumeWaterMutation.isPending || isBlocked}
-                  className="bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center space-x-2"
-                >
-                  <span>🌊</span>
-                  <span>Beber (25)</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Water Storage Info */}
-            <div className="mt-4 p-4 bg-blue-100 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Informação:</strong> A água armazenada pode ser consumida para restaurar sua sede. 
-                Colete mais água em expedições usando um balde ou garrafa de bambu.
-              </p>
-            </div>
-          </div>
-
           {/* Storage Items Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {enhancedStorageData
@@ -354,6 +291,187 @@ export default function EnhancedStorageTab({
                 </p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Water Sub-tab */}
+      {activeSubTab === "water" && (
+        <div className="space-y-6">
+          {/* Water Tank Visualization */}
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-8">
+            <h3 className="font-bold text-blue-800 text-2xl mb-8 text-center flex items-center justify-center">
+              <span className="mr-3 text-3xl">💧</span>
+              Reservatório de Água
+            </h3>
+            
+            <div className="flex flex-col lg:flex-row gap-8 items-center justify-center">
+              {/* Vertical Water Tank */}
+              <div className="flex flex-col items-center">
+                <div className="relative w-32 h-80 bg-gray-200 rounded-2xl border-4 border-gray-400 shadow-lg overflow-hidden">
+                  {/* Water level */}
+                  <div 
+                    className="absolute bottom-0 w-full bg-gradient-to-t from-blue-600 via-cyan-500 to-blue-400 transition-all duration-1000 ease-in-out rounded-b-xl"
+                    style={{ 
+                      height: `${Math.min((player.waterStorage / player.maxWaterStorage) * 100, 100)}%` 
+                    }}
+                  />
+                  
+                  {/* Water surface animation */}
+                  <div 
+                    className="absolute w-full h-2 bg-gradient-to-r from-cyan-300 to-blue-300 opacity-70 animate-pulse"
+                    style={{ 
+                      bottom: `${Math.min((player.waterStorage / player.maxWaterStorage) * 100, 100)}%`,
+                      transform: 'translateY(50%)'
+                    }}
+                  />
+                  
+                  {/* Tank markings */}
+                  <div className="absolute inset-0 flex flex-col justify-between py-2">
+                    {[100, 75, 50, 25, 0].map((mark) => (
+                      <div key={mark} className="flex items-center">
+                        <div className="w-4 h-0.5 bg-gray-500 ml-auto mr-2"></div>
+                        <span className="text-xs font-semibold text-gray-600 w-8">{mark}%</span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Current level indicator */}
+                  <div 
+                    className="absolute right-0 w-6 h-1 bg-red-500 shadow-lg"
+                    style={{ 
+                      bottom: `${Math.min((player.waterStorage / player.maxWaterStorage) * 100, 100)}%`,
+                      transform: 'translateY(50%)'
+                    }}
+                  />
+                </div>
+                
+                {/* Tank Info */}
+                <div className="mt-4 text-center">
+                  <div className="text-2xl font-bold text-blue-700 mb-1">
+                    {player.waterStorage} / {player.maxWaterStorage}
+                  </div>
+                  <div className="text-sm text-gray-600">unidades de água</div>
+                  <div className="text-lg font-semibold text-cyan-600 mt-2">
+                    {Math.round((player.waterStorage / player.maxWaterStorage) * 100)}% preenchido
+                  </div>
+                </div>
+              </div>
+
+              {/* Water Controls and Info */}
+              <div className="flex-1 max-w-md">
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-blue-100 mb-6">
+                  <h4 className="font-bold text-gray-800 text-lg mb-4 flex items-center">
+                    <span className="mr-2">🚰</span>
+                    Controles de Água
+                  </h4>
+                  
+                  <div className="space-y-4">
+                    {/* Consumption buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => consumeWaterMutation.mutate(10)}
+                        disabled={player.waterStorage < 10 || consumeWaterMutation.isPending || isBlocked}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex flex-col items-center space-y-1"
+                      >
+                        <span className="text-lg">💧</span>
+                        <span className="text-sm">Beber 10</span>
+                      </button>
+                      
+                      <button
+                        onClick={() => consumeWaterMutation.mutate(25)}
+                        disabled={player.waterStorage < 25 || consumeWaterMutation.isPending || isBlocked}
+                        className="bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex flex-col items-center space-y-1"
+                      >
+                        <span className="text-lg">🌊</span>
+                        <span className="text-sm">Beber 25</span>
+                      </button>
+                    </div>
+                    
+                    {/* Custom amount */}
+                    <div className="pt-2 border-t border-gray-200">
+                      <label className="text-sm font-medium text-gray-700 block mb-2">
+                        Quantidade personalizada:
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={player.waterStorage}
+                          placeholder="Quantidade"
+                          className="flex-1"
+                        />
+                        <button
+                          disabled={isBlocked || consumeWaterMutation.isPending}
+                          className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                        >
+                          Beber
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Water Info */}
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-cyan-100">
+                  <h4 className="font-bold text-gray-800 text-lg mb-4 flex items-center">
+                    <span className="mr-2">ℹ️</span>
+                    Informações da Água
+                  </h4>
+                  
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Capacidade máxima:</span>
+                      <span className="font-semibold text-gray-800">{player.maxWaterStorage} unidades</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Disponível:</span>
+                      <span className="font-semibold text-blue-600">{player.waterStorage} unidades</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Espaço livre:</span>
+                      <span className="font-semibold text-green-600">
+                        {player.maxWaterStorage - player.waterStorage} unidades
+                      </span>
+                    </div>
+                    
+                    <div className="pt-3 border-t border-gray-200">
+                      <p className="text-gray-700 text-xs leading-relaxed">
+                        <strong>Dica:</strong> A água pode ser coletada em expedições usando um balde ou garrafa de bambu. 
+                        Beber água restaura sua sede e é essencial para expedições longas.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Water Statistics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-blue-100">
+              <div className="text-4xl font-bold text-blue-600 mb-2">{player.waterStorage}</div>
+              <div className="text-sm text-gray-600 font-medium">Água Disponível</div>
+              <div className="text-xs text-gray-500 mt-1">unidades no tanque</div>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-cyan-100">
+              <div className="text-4xl font-bold text-cyan-600 mb-2">
+                {Math.round((player.waterStorage / player.maxWaterStorage) * 100)}%
+              </div>
+              <div className="text-sm text-gray-600 font-medium">Nível do Tanque</div>
+              <div className="text-xs text-gray-500 mt-1">capacidade utilizada</div>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-green-100">
+              <div className="text-4xl font-bold text-green-600 mb-2">
+                {player.maxWaterStorage - player.waterStorage}
+              </div>
+              <div className="text-sm text-gray-600 font-medium">Espaço Livre</div>
+              <div className="text-xs text-gray-500 mt-1">unidades disponíveis</div>
+            </div>
           </div>
         </div>
       )}

@@ -8,6 +8,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 29, 2025 - STORAGE SYSTEM ENHANCED WITH THREE SUB-TABS + VERTICAL WATER TANK**
+- **Three-Tab Storage Interface**: Enhanced storage system now features separate sub-tabs for Itens, Água, and Estatísticas
+- **Vertical Water Tank Visualization**: Implemented realistic vertical water tank with animated water level, surface effects, and level indicators
+- **Interactive Water Management**: Dedicated water tab with consumption controls, custom amount input, and detailed water information
+- **Real-Time Water Tank**: Tank level updates dynamically with animated transitions and percentage indicators
+- **Enhanced Water Controls**: Multiple consumption options (10, 25, or custom amounts) with proper validation
+- **Complete Storage Statistics**: Comprehensive statistics tab with detailed breakdowns, efficiency metrics, and capacity information
+- **Clean Architecture**: Refactored storage system with proper separation of concerns and real-time synchronization
+- **Modern UI Design**: Gradient backgrounds, shadow effects, and smooth animations for enhanced user experience
+
 **January 29, 2025 - EXPEDITION INTERFACE REDESIGNED: UNIFIED MINIMIZED WINDOW SYSTEM**
 - **Complete Interface Redesign**: Expedition progress and completion now handled exclusively through minimized window system
 - **Unified Minimized Window**: Single expandable window shows both progress (Estado 2) and completion (Estado 3) states
