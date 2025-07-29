@@ -619,14 +619,10 @@ export default function Game() {
 
               {/* Rewards Summary */}
               <div className="bg-green-50 p-3 rounded border">
-                <div className="grid grid-cols-2 gap-3 text-center">
+                <div className="text-center">
                   <div>
                     <div className="text-lg">🎯</div>
                     <div className="text-sm font-semibold text-blue-600">+{(activeExpedition.selectedResources?.length || 0) * 15} XP</div>
-                  </div>
-                  <div>
-                    <div className="text-lg">🪙</div>
-                    <div className="text-sm font-semibold text-yellow-600">+{(activeExpedition.selectedResources?.length || 0) * 8}</div>
                   </div>
                 </div>
               </div>

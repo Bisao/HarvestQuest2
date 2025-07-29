@@ -386,19 +386,7 @@ export class ExpeditionService {
     }
   }
 
-  // Calculate coin reward from collected resources
-  private calculateCoinReward(rewards: Record<string, number>, resources: Resource[]): number {
-    let totalValue = 0;
-    
-    for (const [resourceId, quantity] of Object.entries(rewards)) {
-      const resource = resources.find(r => r.id === resourceId);
-      if (resource) {
-        totalValue += resource.value * quantity;
-      }
-    }
-    
-    return Math.floor(totalValue * 0.1); // 10% of resource value as coins
-  }
+  // Note: Coin rewards removed - financial system to be implemented later
 
   async getActiveExpedition(playerId: string): Promise<Expedition | null> {
     const expeditions = await this.storage.getPlayerExpeditions(playerId);

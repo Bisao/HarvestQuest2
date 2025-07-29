@@ -8,9 +8,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 29, 2025 - MIGRATION TO REPLIT ENVIRONMENT COMPLETED SUCCESSFULLY**
+**January 29, 2025 - MIGRATION TO REPLIT ENVIRONMENT COMPLETED SUCCESSFULLY + COIN SYSTEM REMOVED**
 - **Project Migration Completed**: Successfully migrated "Coletor Adventures" from Replit Agent to standard Replit environment
 - **All Systems Verified Working**: Expedition system, resource collection, animal processing, crafting, inventory, storage, and quests all functional
+- **Coin System Removed**: Eliminated coin rewards from expeditions as requested - financial system to be implemented later
 - **Performance Optimized**: In-memory storage system providing instant response times with 0-2ms API calls
 - **Security Enhanced**: Proper client/server separation with robust middleware for CORS, rate limiting, and security headers
 - **Production Ready**: All game mechanics verified working with comprehensive resource management and quest progression
