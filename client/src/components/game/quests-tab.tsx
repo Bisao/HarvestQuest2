@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
-import type { Player } from "@shared/schema";
+import type { Player } from "@shared/types";
 
 interface Quest {
   id: string;

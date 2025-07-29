@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import type { Biome, Resource, Equipment } from "@shared/schema";
+import type { Biome, Resource, Equipment } from "@shared/types";
 
 interface ExpeditionModalProps {
   isOpen: boolean;

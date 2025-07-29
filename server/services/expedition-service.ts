@@ -1,6 +1,6 @@
 // Expedition service for expedition-related business logic
 import type { IStorage } from "../storage";
-import type { Player, Expedition, Resource, Equipment, Biome } from "@shared/schema";
+import type { Player, Expedition, Resource, Equipment, Biome } from "@shared/types";
 import { GameService } from "./game-service";
 import { QuestService } from "./quest-service";
 

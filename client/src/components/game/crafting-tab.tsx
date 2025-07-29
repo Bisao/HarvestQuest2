@@ -1,4 +1,4 @@
-import type { Recipe, Resource } from "@shared/schema";
+import type { Recipe, Resource } from "@shared/types";
 
 interface CraftingTabProps {
   recipes: Recipe[];

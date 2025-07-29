@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { InventoryItem, Resource } from "@shared/schema";
+import type { InventoryItem, Resource } from "@shared/types";
 
 interface InventoryTabProps {
   playerId: string;

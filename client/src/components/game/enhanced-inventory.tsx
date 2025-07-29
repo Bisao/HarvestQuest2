@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import EquipmentSelectorModal from "./equipment-selector-modal";
-import type { Resource, Equipment, Player } from "@shared/schema";
+import type { Resource, Equipment, Player } from "@shared/types";
 
 interface InventoryItem {
   id: string;

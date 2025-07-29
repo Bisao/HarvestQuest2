@@ -1,6 +1,6 @@
 // Game service for business logic
 import type { IStorage } from "../storage";
-import type { Player, Resource, Equipment, InventoryItem, StorageItem } from "@shared/schema";
+import type { Player, Resource, Equipment, InventoryItem, StorageItem } from "@shared/types";
 
 export class GameService {
   constructor(private storage: IStorage) {}

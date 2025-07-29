@@ -1,5 +1,5 @@
 // Resource data management module
-import type { InsertResource } from "@shared/schema";
+import type { InsertResource } from "@shared/types";
 import { RESOURCE_IDS } from "@shared/constants/game-ids";
 
 export function createResourcesWithIds(): InsertResource[] {

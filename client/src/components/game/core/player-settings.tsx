@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import type { Player } from "@shared/schema";
+import type { Player } from "@shared/types";
 import { Settings, Package, Archive } from "lucide-react";
 
 interface PlayerSettingsProps {

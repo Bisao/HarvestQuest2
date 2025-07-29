@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { Biome, Resource, Equipment, Player, InventoryItem } from "@shared/schema";
+import type { Biome, Resource, Equipment, Player, InventoryItem } from "@shared/types";
 import { useFishingRequirements, useCanCollectResource } from "@/hooks/use-fishing-requirements";
 
 interface ExpeditionSystemProps {

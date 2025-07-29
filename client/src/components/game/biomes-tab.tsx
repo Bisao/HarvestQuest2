@@ -1,4 +1,4 @@
-import type { Biome, Resource, Equipment, Player } from "@shared/schema";
+import type { Biome, Resource, Equipment, Player } from "@shared/types";
 
 interface ActiveExpedition {
   biomeId: string;

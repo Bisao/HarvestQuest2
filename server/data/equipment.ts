@@ -1,5 +1,5 @@
 // Equipment data management module
-import type { InsertEquipment } from "@shared/schema";
+import type { InsertEquipment } from "@shared/types";
 import { EQUIPMENT_IDS } from "@shared/constants/game-ids";
 
 export function createEquipmentWithIds(): InsertEquipment[] {

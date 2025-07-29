@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import type { Player } from "@shared/schema";
+import type { Player } from "@shared/types";
 
 export default function GameSimple() {
   const [location] = useLocation();

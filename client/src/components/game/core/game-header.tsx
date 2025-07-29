@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Player } from "@shared/schema";
+import type { Player } from "@shared/types";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import PlayerSettings from "./player-settings";

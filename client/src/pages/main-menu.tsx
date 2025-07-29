@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
-import type { Player } from "@shared/schema";
+import type { Player } from "@shared/types";
 
 interface SaveSlot {
   id: string;

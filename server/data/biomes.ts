@@ -1,5 +1,5 @@
 // Biome data management module
-import type { InsertBiome } from "@shared/schema";
+import type { InsertBiome } from "@shared/types";
 import { RESOURCE_IDS, BIOME_IDS } from "@shared/constants/game-ids";
 
 export interface BiomeConfig {

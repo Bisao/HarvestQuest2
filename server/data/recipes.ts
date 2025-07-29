@@ -1,5 +1,5 @@
 // Recipe data management module
-import type { InsertRecipe } from "@shared/schema";
+import type { InsertRecipe } from "@shared/types";
 import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from "@shared/constants/game-ids";
 
 export function createRecipeData(): InsertRecipe[] {

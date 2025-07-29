@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Recipe, Resource, StorageItem } from "@shared/schema";
+import type { Recipe, Resource, StorageItem } from "@shared/types";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";

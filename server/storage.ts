@@ -19,7 +19,7 @@ import {
   type InsertQuest,
   type PlayerQuest,
   type InsertPlayerQuest
-} from "@shared/schema";
+} from "@shared/types";
 import { randomUUID } from "crypto";
 import { ALL_RESOURCES } from "./data/resources";
 import { ALL_EQUIPMENT } from "./data/equipment";
@@ -120,7 +120,7 @@ export class MemStorage implements IStorage {
     }
 
     // Initialize biomes using modular data
-    const biomesData = createBiomeData(resourceIds);
+    const biomesData = createBiomeData();
     for (const biome of biomesData) {
       await this.createBiome(biome);
     }
@@ -131,7 +131,7 @@ export class MemStorage implements IStorage {
     }
 
     // Initialize recipes using modular data
-    const recipesData = createRecipeData(resourceIds);
+    const recipesData = createRecipeData();
     for (const recipe of recipesData) {
       await this.createRecipe(recipe);
     }
@@ -311,6 +311,7 @@ export class MemStorage implements IStorage {
       playerId: insertItem.playerId,
       resourceId: insertItem.resourceId,
       quantity: insertItem.quantity ?? 0,
+      itemType: insertItem.itemType ?? 'resource',
     };
     this.storageItems.set(id, item);
     return item;
@@ -507,8 +508,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use SQLite database storage for better Replit compatibility
-import { SQLiteStorage } from "./storage-sqlite";
-
-export const storage = new SQLiteStorage();
-console.log("🚀 Coletor Adventures using SQLite Database Storage");
+// Use in-memory storage - no database dependencies
+export const storage = new MemStorage();
+console.log("🚀 Coletor Adventures using In-Memory Storage");

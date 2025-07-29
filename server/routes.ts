@@ -1,9 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertExpeditionSchema } from "@shared/schema";
+import { insertExpeditionSchema, updatePlayerSchema } from "@shared/types";
 import { z } from "zod";
-import type { Player } from "@shared/schema";
+import type { Player } from "@shared/types";
 import { GameService } from "./services/game-service";
 import { ExpeditionService } from "./services/expedition-service";
 import { QuestService } from "./services/quest-service";
@@ -398,28 +398,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const equipmentItem = allEquipment.find(eq => eq.id === itemType);
 
           if (equipmentItem) {
-            // Add equipment to storage using SQLite database
-            const { sqlite } = await import("./db-sqlite");
-            
-            // Check if equipment already exists in storage
-            const existingEquipment = sqlite.prepare(`
-              SELECT * FROM storage_items 
-              WHERE player_id = ? AND equipment_id = ? AND item_type = 'equipment'
-            `).get(playerId, equipmentItem.id);
+            // Add equipment to storage using memory storage
+            const existingEquipmentItem = storageItems.find(item => 
+              item.resourceId === equipmentItem.id && item.itemType === 'equipment'
+            );
 
-            if (existingEquipment) {
-              // Update existing equipment quantity
-              sqlite.prepare(`
-                UPDATE storage_items 
-                SET quantity = quantity + ? 
-                WHERE player_id = ? AND equipment_id = ? AND item_type = 'equipment'
-              `).run(totalOutput, playerId, equipmentItem.id);
+            if (existingEquipmentItem) {
+              await storage.updateStorageItem(existingEquipmentItem.id, {
+                quantity: existingEquipmentItem.quantity + totalOutput
+              });
             } else {
-              // Insert new equipment storage item
-              sqlite.prepare(`
-                INSERT INTO storage_items (id, player_id, equipment_id, quantity, item_type, resource_id) 
-                VALUES (?, ?, ?, ?, 'equipment', '')
-              `).run(randomUUID(), playerId, equipmentItem.id, totalOutput);
+              await storage.addStorageItem({
+                playerId,
+                resourceId: equipmentItem.id,
+                quantity: totalOutput,
+                itemType: 'equipment'
+              });
             }
 
             console.log(`Added ${totalOutput}x ${equipmentItem.name} to storage for player ${playerId}`);

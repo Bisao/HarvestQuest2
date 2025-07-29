@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import type { Biome, Resource, Equipment, Player } from "@shared/schema";
+import type { Biome, Resource, Equipment, Player } from "@shared/types";
 
 interface ExpeditionSystemProps {
   isOpen: boolean;

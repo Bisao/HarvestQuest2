@@ -7,7 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import type { Biome, Resource, Equipment, Player } from '@shared/schema';
+import type { Biome, Resource, Equipment, Player } from '@shared/types';
 
 interface SimpleExpeditionSystemProps {
   isOpen: boolean;

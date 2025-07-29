@@ -4,7 +4,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import type { StorageItem, Resource, Equipment } from "@shared/schema";
+import type { StorageItem, Resource, Equipment } from "@shared/types";
 
 interface StorageTabProps {
   playerId: string;

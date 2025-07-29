@@ -4,7 +4,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { Resource, Equipment } from "@shared/schema";
+import type { Resource, Equipment } from "@shared/types";
 
 interface InventoryItem {
   id: string;
