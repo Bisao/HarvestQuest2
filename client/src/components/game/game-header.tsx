@@ -35,7 +35,7 @@ export default function GameHeader({ player }: GameHeaderProps) {
               </div>
               <div className="flex items-center space-x-1 md:space-x-2">
                 <span className="text-sm md:text-lg">💰</span>
-                <span className="font-semibold">{player.coins.toLocaleString()}</span>
+                <span className="font-semibold">{(player.coins || 0).toLocaleString()}</span>
               </div>
               <Button
                 variant="ghost"

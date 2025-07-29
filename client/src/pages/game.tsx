@@ -56,7 +56,7 @@ export default function Game() {
     enabled: !!player?.id,
   });
 
-  const { data: quests = [] } = useQuery({
+  const { data: quests = [] } = useQuery<any[]>({
     queryKey: [`/api/player/${player?.id}/quests`],
     enabled: !!player?.id,
   });
@@ -506,7 +506,6 @@ export default function Game() {
         onExpeditionComplete={handleCompleteExpedition}
         activeExpedition={activeExpedition}
         onExpeditionUpdate={setActiveExpedition}
-        inventoryItems={inventoryItems}
       />
 
       {/* Minimized Expedition Window */}
