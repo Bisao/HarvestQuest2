@@ -8,14 +8,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 29, 2025 - EXPEDITION PROGRESS MOVED TO MAIN SCREEN + INVENTORY REORGANIZED**
-- **Main Screen Progress Display**: Expedition progress now shows directly on biome cards in main screen instead of modal window
-- **Enhanced Biome Cards**: Active expeditions display resource collection progress, progress bar, and completion status directly on biome interface
-- **No More Progress Modals**: Removed intrusive progress modal - players can see expedition status without popup interruptions
+**January 29, 2025 - EXPEDITION INTERFACE REDESIGNED: UNIFIED MINIMIZED WINDOW SYSTEM**
+- **Complete Interface Redesign**: Expedition progress and completion now handled exclusively through minimized window system
+- **Unified Minimized Window**: Single expandable window shows both progress (Estado 2) and completion (Estado 3) states
+- **Modal Auto-Close**: Main expedition modal closes automatically when expedition starts, showing only minimized window
+- **Expandable Interface**: Minimized window has expand button that opens detailed view with progress bar and resource list
+- **Real-Time Progress**: Expanded view shows live progress bar, estimated resource quantities, and collection status
+- **Completion State**: Same expanded window shows final results, collected resources, and finalize button when expedition completes
+- **No More Main Modal States**: Removed progress and completion states from main modal - all handled in minimized interface
+- **Streamlined User Flow**: Start expedition → modal closes → minimized window appears → expand for details → complete from expanded view
 - **Inventory Sub-tabs**: Reorganized Equipment → Status → Inventory as sub-tabs within main Inventory tab
 - **Clean Inventory Interface**: Removed "Ações Rápidas" from inventory sub-tab to show only main inventory grid
 - **Consistent UI Design**: Sub-tabs follow same visual style as main tabs for unified interface experience
-- **Improved User Flow**: Start expedition → modal closes → progress visible on main screen → complete from biome card
 
 **January 29, 2025 - EXPEDITION SYSTEM ENHANCED + WATER COLLECTION REQUIREMENTS IMPLEMENTED**
 - **Water Collection Requirements**: Implemented proper validation requiring balde (bucket) or garrafa de bambu (bamboo bottle) for collecting água fresca
