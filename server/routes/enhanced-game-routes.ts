@@ -151,6 +151,11 @@ export function registerEnhancedGameRoutes(
         const ingredients = recipe.ingredients as Record<string, number>;
         const playerStorage = await storage.getPlayerStorage(playerId);
         
+        // Check if ingredients exists and is valid
+        if (!ingredients || typeof ingredients !== 'object') {
+          throw new InvalidOperationError(`Recipe ${recipe.name} has no valid ingredients defined`);
+        }
+        
         for (const [ingredientId, requiredAmount] of Object.entries(ingredients)) {
           const totalRequired = requiredAmount * quantity;
           const available = playerStorage.find(item => item.resourceId === ingredientId)?.quantity || 0;
@@ -178,6 +183,11 @@ export function registerEnhancedGameRoutes(
         // Add crafted items to storage (always storage as per requirement)
         const output = recipe.output as Record<string, number>;
         const items = [];
+        
+        // Check if output exists and is valid
+        if (!output || typeof output !== 'object') {
+          throw new InvalidOperationError(`Recipe ${recipe.name} has no valid output defined`);
+        }
         
         for (const [itemId, baseAmount] of Object.entries(output)) {
           const totalAmount = baseAmount * quantity;
