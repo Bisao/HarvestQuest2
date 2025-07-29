@@ -240,7 +240,7 @@ export class MemStorage implements IStorage {
       attributes: insertResource.attributes ?? { durability: 100, efficiency: 1.0, rarity: 'common' },
       
       // Resource Classification  
-      category: insertResource.category ?? 'resource',
+      category: insertResource.category ?? 'raw_materials',
       subcategory: insertResource.subcategory ?? 'basic',
       
       // Spawn Properties

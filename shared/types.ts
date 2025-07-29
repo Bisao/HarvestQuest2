@@ -50,23 +50,9 @@ export interface InsertPlayer {
 // Fundamental Item Attributes System
 export interface ItemAttributes {
   // Core Properties
-  durability?: number; // 0-100, items break when reaching 0
-  stackable: boolean; // can items stack in inventory
-  maxStack?: number; // maximum stack size (if stackable)
-  
-  // Value Properties  
-  baseValue: number; // base market value
-  rarityMultiplier: number; // multiplier based on rarity
-  
-  // Physical Properties
-  density: number; // weight per unit volume (affects weight calculation)
-  volume: number; // space taken in inventory
-  
-  // Functional Properties
-  toolEfficiency?: number; // 0-100, effectiveness as a tool
-  weaponDamage?: number; // damage if used as weapon
-  armorProtection?: number; // protection if used as armor
-  consumeEffect?: ConsumableEffect; // effect when consumed
+  durability: number; // 0-100, items break when reaching 0
+  efficiency: number; // 0-100, effectiveness rating
+  rarity: RarityLevel; // rarity level
 }
 
 export interface ConsumableEffect {
@@ -79,21 +65,36 @@ export interface Resource {
   id: string;
   name: string;
   emoji: string;
+  rarity: RarityLevel;
+  experienceValue: number;
   
   // Fundamental Attributes
   attributes: ItemAttributes;
   
-  // Classification
+  // Resource Classification  
   category: ResourceCategory;
   subcategory: string;
-  rarity: RarityLevel;
+  type?: string; // Legacy compatibility
   
-  // Collection Requirements
-  collectionRequirements: CollectionRequirement[];
-  experienceValue: number;
+  // Spawn Properties
+  spawnRate: number;
+  yieldAmount: number;
+  requiredTool?: string;
+  
+  // Economy
+  sellPrice: number;
+  buyPrice: number;
+  
+  // Physical Properties
+  weight: number;
+  stackable: boolean;
+  maxStackSize: number;
+  
+  // Effects & Tags
+  effects: string[];
+  tags: string[];
   
   // Derived Properties (calculated from attributes)
-  weight: number; // calculated from density * volume
   value: number; // calculated from baseValue * rarityMultiplier
 }
 
@@ -153,13 +154,34 @@ export interface InsertResource {
   id?: string;
   name: string;
   emoji: string;
-  
-  attributes: ItemAttributes;
-  category: ResourceCategory;
-  subcategory: string;
-  rarity: RarityLevel;
-  collectionRequirements?: CollectionRequirement[];
+  rarity?: RarityLevel;
   experienceValue?: number;
+  
+  // Fundamental Attributes
+  attributes?: ItemAttributes;
+  
+  // Resource Classification  
+  category?: ResourceCategory;
+  subcategory?: string;
+  type?: string; // Legacy compatibility
+  
+  // Spawn Properties
+  spawnRate?: number;
+  yieldAmount?: number;
+  requiredTool?: string;
+  
+  // Economy
+  sellPrice?: number;
+  buyPrice?: number;
+  
+  // Physical Properties
+  weight?: number;
+  stackable?: boolean;
+  maxStackSize?: number;
+  
+  // Effects & Tags
+  effects?: string[];
+  tags?: string[];
 }
 
 export interface Biome {
@@ -255,12 +277,14 @@ export interface InsertEquipment {
   name: string;
   emoji: string;
   
-  attributes: ItemAttributes;
+  attributes?: ItemAttributes;
   category: EquipmentCategory;
-  slot: EquipmentSlot;
+  slot?: EquipmentSlot;
   toolType?: ToolType;
   effects?: EquipmentEffect[];
   requirements?: EquipmentRequirement[];
+  weight?: number;
+  value?: number;
 }
 
 export interface Recipe {

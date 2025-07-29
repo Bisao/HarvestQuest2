@@ -11,6 +11,7 @@ import { randomUUID } from "crypto";
 import { registerHealthRoutes } from "./routes/health";
 import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
 import { registerAdminRoutes } from "./routes/admin";
+import { registerStorageRoutes } from "./routes/storage-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -29,6 +30,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register admin routes for development
   registerAdminRoutes(app);
+
+  // Register enhanced storage routes
+  registerStorageRoutes(app, storage);
 
   // Get player data - create default player if not found
   app.get("/api/player/:username", async (req, res) => {

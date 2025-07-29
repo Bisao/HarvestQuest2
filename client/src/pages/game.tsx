@@ -4,7 +4,7 @@ import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
 import QuestsTab from "@/components/game/quests-tab";
 import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
-import StorageTab from "@/components/game/storage-tab";
+import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 import ExpeditionSystem from "@/components/game/expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
@@ -471,11 +471,10 @@ export default function Game() {
               )}
 
               {activeTab === "storage" && (
-                <StorageTab
+                <EnhancedStorageTab
                   playerId={player.id}
                   resources={resources}
                   equipment={equipment}
-                  autoStorage={player.autoStorage}
                   player={player}
                   isBlocked={!!activeExpedition}
                 />
