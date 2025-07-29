@@ -528,7 +528,7 @@ export default function Game() {
                 <div>
                   <h4 className="font-semibold text-sm">Expedição na {selectedBiome.name}</h4>
                   <p className="text-xs text-gray-500">
-                    {activeExpedition.progress >= 100 ? 'Em andamento...' : 'Em andamento...'}
+                    {activeExpedition.progress >= 100 ? 'Concluída!' : 'Em andamento...'}
                   </p>
                 </div>
               </div>
@@ -542,18 +542,31 @@ export default function Game() {
               </button>
             </div>
             
-            {/* Barra de Progresso Compacta */}
+            {/* Conteúdo da janela minimizada */}
             <div className="mt-3 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Progresso</span>
-                <span>{Math.round(activeExpedition.progress || 0)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div 
-                  className="bg-green-500 h-2.5 rounded-full transition-all duration-300"
-                  style={{ width: `${activeExpedition.progress || 0}%` }}
-                ></div>
-              </div>
+              {activeExpedition.progress < 100 ? (
+                // Barra de Progresso - durante expedição ativa
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span>Progresso</span>
+                    <span>{Math.round(activeExpedition.progress || 0)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div 
+                      className="bg-green-500 h-2.5 rounded-full transition-all duration-300"
+                      style={{ width: `${activeExpedition.progress || 0}%` }}
+                    ></div>
+                  </div>
+                </>
+              ) : (
+                // Botão Finalizar - quando expedição completa
+                <button
+                  onClick={handleCompleteExpedition}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                >
+                  Finalizar
+                </button>
+              )}
             </div>
           </div>
         </div>
