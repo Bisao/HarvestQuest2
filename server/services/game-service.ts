@@ -66,6 +66,19 @@ export class GameService {
       return await this.hasBaitInInventory(playerId);
     }
     
+    // Special case for water collection: requires bucket OR bamboo bottle
+    if (resource.requiredTool === "bucket") {
+      const hasBucket = equipment.find(eq => 
+        eq.id === player.equippedTool && eq.toolType === "bucket"
+      );
+      
+      const hasBambooBottle = equipment.find(eq => 
+        eq.id === player.equippedTool && eq.toolType === "bamboo_bottle"
+      );
+      
+      return !!(hasBucket || hasBambooBottle);
+    }
+    
     // Special case for hunting large animals: requires weapon AND knife
     if (resource.requiredTool === "weapon_and_knife") {
       // Check if player has a weapon equipped (not a knife)

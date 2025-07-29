@@ -128,7 +128,7 @@ export type EquipmentSlot =
 
 export type ToolType = 
   | 'pickaxe' | 'axe' | 'shovel' | 'fishing_rod' 
-  | 'knife' | 'sickle' | 'bucket' | 'bait';
+  | 'knife' | 'sickle' | 'bucket' | 'bait' | 'bamboo_bottle';
 
 export interface EquipmentEffect {
   type: 'resource_boost' | 'skill_boost' | 'stat_boost' | 'special_ability';

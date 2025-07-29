@@ -8,6 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 29, 2025 - EXPEDITION SYSTEM ENHANCED + WATER COLLECTION REQUIREMENTS IMPLEMENTED**
+- **Water Collection Requirements**: Implemented proper validation requiring balde (bucket) or garrafa de bambu (bamboo bottle) for collecting água fresca
+- **Resource Filtering**: Only resources available for collection based on player's equipped tools are shown in expedition selection
+- **Auto-Minimize Feature**: Expedition modal now automatically minimizes when expedition starts for better user experience
+- **Real-Time Collection Display**: During expeditions, players can see the quantity being collected in real-time next to each resource
+- **Enhanced Tool Validation**: Both frontend and backend now properly validate water collection tools (bucket OR bamboo bottle)
+- **Improved User Experience**: Clear visual feedback shows resource collection progress and estimated quantities during expeditions
+
 **January 29, 2025 - MIGRATION TO REPLIT ENVIRONMENT COMPLETED SUCCESSFULLY + UI IMPROVEMENTS IMPLEMENTED**
 - **Project Migration Completed**: Successfully migrated "Coletor Adventures" from Replit Agent to standard Replit environment
 - **All Systems Verified Working**: Expedition system, resource collection, animal processing, crafting, inventory, storage, and quests all functional

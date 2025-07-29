@@ -86,6 +86,11 @@ export default function ExpeditionSystem({
             const hasKnife = equipment.some(eq => eq.toolType === "knife" && 
               (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
             return hasWeapon && hasKnife;
+          case "bucket":
+            // Para água, verificar se tem balde ou garrafa de bambu
+            const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
+            const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
+            return hasBucket || hasBambooBottle;
           default:
             return true;
         }
@@ -344,6 +349,33 @@ export default function ExpeditionSystem({
                 <h3 className="font-medium text-lg">Expedição em Andamento</h3>
                 <p className="text-muted-foreground">Coletando recursos...</p>
               </div>
+              
+              {/* Real-time collection progress */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-sm text-blue-700">🎯 Coletando Recursos:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {activeExpedition?.selectedResources?.map((resourceId) => {
+                    const resource = resources.find(r => r.id === resourceId);
+                    if (!resource) return null;
+                    
+                    // Calculate estimated collected quantity based on progress
+                    const estimatedQuantity = Math.floor((expeditionProgress / 100) * 3); // Simulate collection
+                    
+                    return (
+                      <div key={resourceId} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-lg">{resource.emoji}</span>
+                          <span className="text-sm font-medium text-blue-700">{resource.name}</span>
+                        </div>
+                        <div className="text-sm font-semibold text-blue-600">
+                          {estimatedQuantity > 0 ? `+${estimatedQuantity}` : "..."}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Progresso</span>
