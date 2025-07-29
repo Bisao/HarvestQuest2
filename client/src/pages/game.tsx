@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab";
 import QuestsTab from "@/components/game/quests-tab";
-import EnhancedInventory from "@/components/game/enhanced-inventory";
+import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
 import StorageTab from "@/components/game/storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 import ExpeditionSystem from "@/components/game/expedition-system";
@@ -403,7 +403,13 @@ export default function Game() {
                   >
                     <span className="text-lg">{tab.emoji}</span>
                     <span className="hidden sm:inline">{tab.label}</span>
-                    <span className="sm:hidden">{tab.id === "biomes" ? "Biomas" : tab.id === "quests" ? "Quests" : tab.id === "inventory" ? "Inv." : tab.id === "storage" ? "Arm." : "Craft"}</span>
+                    <span className="sm:hidden">{
+                      tab.id === "biomes" ? "Biomas" : 
+                      tab.id === "quests" ? "Quests" : 
+                      tab.id === "inventory" ? "Inv." : 
+                      tab.id === "storage" ? "Arm." : 
+                      "Craft"
+                    }</span>
                     {tab.hasNotification && (
                       <span className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-xs font-bold quest-notification shadow-lg">
                         !
@@ -455,7 +461,7 @@ export default function Game() {
               )}
 
               {activeTab === "inventory" && (
-                <EnhancedInventory
+                <EnhancedInventoryWithTabs
                   playerId={player.id}
                   resources={resources}
                   equipment={equipment}

@@ -8,6 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 29, 2025 - TABS REORGANIZED WITH NEW EQUIPMENT & STATUS SECTIONS**
+- **New Tab Layout**: Reorganized interface with Equipment → Status → Inventory as dedicated tabs
+- **Equipment Tab**: Complete equipment management interface showing all 6 equipment slots (helmet, chestplate, leggings, boots, weapon, tool)
+- **Status Tab**: Comprehensive player status display with health bars, inventory capacity, and character information
+- **Enhanced User Experience**: Clear visual separation of character equipment, stats, and inventory management
+- **Equipment Bonuses**: Added equipment stats summary showing attack, defense, speed, and accuracy bonuses
+- **Visual Equipment Display**: Each equipment slot shows equipped item with ability to unequip directly from interface
+
 **January 29, 2025 - EXPEDITION SYSTEM ENHANCED + WATER COLLECTION REQUIREMENTS IMPLEMENTED**
 - **Water Collection Requirements**: Implemented proper validation requiring balde (bucket) or garrafa de bambu (bamboo bottle) for collecting água fresca
 - **Resource Filtering**: Only resources available for collection based on player's equipped tools are shown in expedition selection
