@@ -69,30 +69,35 @@ export default function ExpeditionSystem({
   const getCollectableResources = () => {
     const biomeResources = getBiomeResources();
     return biomeResources.filter(resource => {
-      // Check tool requirements
-      if (resource.requiredTool) {
-        switch (resource.requiredTool) {
-          case "axe":
-            return equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
-          case "pickaxe":
-            return equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
-          case "fishing_rod":
-            return equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
-          case "knife":
-            return equipment.some(eq => eq.toolType === "knife" && 
-              (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
-          case "weapon_and_knife":
-            const hasWeapon = player.equippedWeapon;
-            const hasKnife = equipment.some(eq => eq.toolType === "knife" && 
-              (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
-            return hasWeapon && hasKnife;
-          case "bucket":
-            // Para água, verificar se tem balde ou garrafa de bambu
-            const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
-            const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
-            return hasBucket || hasBambooBottle;
-          default:
-            return true;
+      // Check tool requirements - using collectionRequirements from the new type system
+      const hasToolRequirement = resource.collectionRequirements?.some(req => req.type === 'tool');
+      if (hasToolRequirement) {
+        const toolReq = resource.collectionRequirements.find(req => req.type === 'tool');
+        if (toolReq) {
+          const requiredTool = toolReq.requirement as string;
+          switch (requiredTool) {
+            case "axe":
+              return equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
+            case "pickaxe":
+              return equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
+            case "fishing_rod":
+              return equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
+            case "knife":
+              return equipment.some(eq => eq.toolType === "knife" && 
+                (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
+            case "weapon_and_knife":
+              const hasWeapon = player.equippedWeapon;
+              const hasKnife = equipment.some(eq => eq.toolType === "knife" && 
+                (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
+              return hasWeapon && hasKnife;
+            case "bucket":
+              // Para água, verificar se tem balde ou garrafa de bambu
+              const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
+              const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
+              return hasBucket || hasBambooBottle;
+            default:
+              return true;
+          }
         }
       }
       return true; // No tool required
@@ -133,7 +138,7 @@ export default function ExpeditionSystem({
       }
 
       startProgressSimulation(newActiveExpedition);
-      onClose(); // Close modal completely - progress shows on main screen
+      onMinimize(); // Minimize to show progress in minimized window
       
       toast({
         title: "Expedição Iniciada",
@@ -342,64 +347,15 @@ export default function ExpeditionSystem({
             </div>
           </div>
 
-          {/* Active Expedition Progress */}
-          {isExpeditionInProgress && (
-            <div className="space-y-4">
-              <div className="text-center">
-                <h3 className="font-medium text-lg">Expedição em Andamento</h3>
-                <p className="text-muted-foreground">Coletando recursos...</p>
-              </div>
-              
-              {/* Real-time collection progress */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-sm text-blue-700">🎯 Coletando Recursos:</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {activeExpedition?.selectedResources?.map((resourceId) => {
-                    const resource = resources.find(r => r.id === resourceId);
-                    if (!resource) return null;
-                    
-                    // Calculate estimated collected quantity based on progress
-                    const estimatedQuantity = Math.floor((expeditionProgress / 100) * 3); // Simulate collection
-                    
-                    return (
-                      <div key={resourceId} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-lg">{resource.emoji}</span>
-                          <span className="text-sm font-medium text-blue-700">{resource.name}</span>
-                        </div>
-                        <div className="text-sm font-semibold text-blue-600">
-                          {estimatedQuantity > 0 ? `+${estimatedQuantity}` : "..."}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Progresso</span>
-                  <span>{Math.round(expeditionProgress)}%</span>
-                </div>
-                <Progress value={expeditionProgress} className="w-full" />
-              </div>
-              <div className="flex space-x-2">
-                <Button onClick={onMinimize} variant="outline" className="flex-1">
-                  Minimizar
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Expedition Complete */}
-          {isExpeditionComplete && (
+          {/* Progress and completion states are now handled in the minimized window */}
+          {(isExpeditionInProgress || isExpeditionComplete) && (
             <div className="space-y-4 text-center">
               <div>
-                <h3 className="font-medium text-lg text-green-600">Expedição Concluída!</h3>
-                <p className="text-muted-foreground">Recursos coletados com sucesso</p>
+                <h3 className="font-medium text-lg text-blue-600">Expedição Ativa</h3>
+                <p className="text-muted-foreground">Veja o progresso na janela minimizada</p>
               </div>
-              <Button onClick={handleCompleteExpedition} className="w-full">
-                Finalizar Expedição
+              <Button onClick={onMinimize} variant="outline" className="w-full">
+                Minimizar para ver progresso
               </Button>
             </div>
           )}
