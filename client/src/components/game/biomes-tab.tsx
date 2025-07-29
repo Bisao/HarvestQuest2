@@ -59,16 +59,16 @@ export default function BiomesTab({ biomes, resources, player, activeExpedition,
         icons.push("🪣");
         break;
       case "Coelho":
-        icons.push("🔪");
+        icons.push("🏹", "🔪"); // Arco + Faca
         break;
       case "Veado":
       case "Javali":
-        icons.push("🏹", "🔱", "🔪");
+        icons.push("🏹", "🔱", "🔪"); // Arco/Lança + Faca
         break;
       case "Peixe Pequeno":
       case "Peixe Grande":
       case "Salmão":
-        icons.push("🎣");
+        icons.push("🎣", "🪱"); // Vara de Pesca + Isca
         break;
       case "Areia":
         icons.push("🗿");
@@ -150,26 +150,31 @@ export default function BiomesTab({ biomes, resources, player, activeExpedition,
               </div>
             ) : (
               <div className="mb-4">
-                <h4 className={`font-semibold text-sm mb-2 ${unlocked ? "text-gray-700" : "text-gray-500"}`}>
-                  Recursos Disponíveis:
+                <h4 className={`font-semibold text-sm mb-1 ${unlocked ? "text-gray-700" : "text-gray-500"}`}>
+                  Recursos:
                 </h4>
-                <div className={`grid grid-cols-1 gap-1 text-sm ${unlocked ? "" : "text-gray-500"}`}>
-                  {biomeResources.map((resource) => {
-                    const toolIcons = getToolIcons(resource);
-                    return (
-                      <div key={resource.id} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-1">
-                          <span>{resource.emoji}</span>
-                          <span>{resource.name}</span>
+                <p className={`text-xs mb-2 ${unlocked ? "text-gray-500" : "text-gray-400"}`}>
+                  Itens necessários
+                </p>
+                <div className={`max-h-32 overflow-y-auto pr-1 ${unlocked ? "" : "text-gray-500"}`}>
+                  <div className="grid grid-cols-1 gap-1 text-sm">
+                    {biomeResources.map((resource) => {
+                      const toolIcons = getToolIcons(resource);
+                      return (
+                        <div key={resource.id} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-1">
+                            <span>{resource.emoji}</span>
+                            <span>{resource.name}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            {toolIcons.map((icon, index) => (
+                              <span key={index} className="text-xs">{icon}</span>
+                            ))}
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          {toolIcons.map((icon, index) => (
-                            <span key={index} className="text-xs">{icon}</span>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
