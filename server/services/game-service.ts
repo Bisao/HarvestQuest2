@@ -43,69 +43,88 @@ export class GameService {
     return maxWeight;
   }
 
-  // Check if player has required tool for resource
+  // Check if player has required tool for resource using new collectionRequirements system
   async hasRequiredTool(playerId: string, resourceId: string): Promise<boolean> {
     const resource = await this.storage.getResource(resourceId);
-    if (!resource || !resource.requiredTool) return true;
+    if (!resource || !resource.collectionRequirements || resource.collectionRequirements.length === 0) return true;
     
     const player = await this.storage.getPlayer(playerId);
     if (!player) return false;
     
     const equipment = await this.storage.getAllEquipment();
     
-    // Special case for fishing: requires fishing rod AND bait in inventory
-    if (resource.requiredTool === "fishing_rod") {
-      // Check if player has fishing rod equipped
-      const equippedTool = equipment.find(eq => 
-        eq.id === player.equippedTool && eq.toolType === "fishing_rod"
-      );
-      
-      if (!equippedTool) return false;
-      
-      // Check if player has bait in inventory
-      return await this.hasBaitInInventory(playerId);
+    // Check each collection requirement
+    for (const requirement of resource.collectionRequirements) {
+      if (requirement.type === 'tool') {
+        const requiredTool = requirement.requirement as string;
+        
+        switch (requiredTool) {
+          case "fishing_rod":
+            // Check if player has fishing rod equipped
+            const equippedFishingRod = equipment.find(eq => 
+              eq.id === player.equippedTool && eq.toolType === "fishing_rod"
+            );
+            
+            if (!equippedFishingRod) return false;
+            
+            // Check if player has bait in inventory
+            return await this.hasBaitInInventory(playerId);
+            
+          case "bucket":
+            // For water collection: requires bucket OR bamboo bottle
+            const hasBucket = equipment.find(eq => 
+              eq.id === player.equippedTool && eq.toolType === "bucket"
+            );
+            
+            const hasBambooBottle = equipment.find(eq => 
+              eq.id === player.equippedTool && eq.toolType === "bamboo_bottle"
+            );
+            
+            if (!(hasBucket || hasBambooBottle)) return false;
+            break;
+            
+          case "weapon_and_knife":
+            // For hunting large animals: requires weapon AND knife
+            const equippedWeapon = equipment.find(eq => 
+              eq.id === player.equippedWeapon && eq.slot === "weapon"
+            );
+            const hasNonKnifeWeapon = !!(equippedWeapon && equippedWeapon.toolType !== "knife");
+            
+            // Check for knife in both tool and weapon slots
+            const hasKnife = equipment.some(eq => 
+              (eq.id === player.equippedTool || eq.id === player.equippedWeapon) && 
+              eq.toolType === "knife"
+            );
+            
+            if (!(hasNonKnifeWeapon && hasKnife)) return false;
+            break;
+            
+          case "knife":
+            // Check for knife in both tool and weapon slots
+            const knifeEquipped = equipment.some(eq => 
+              (eq.id === player.equippedTool || eq.id === player.equippedWeapon) && 
+              eq.toolType === "knife"
+            );
+            if (!knifeEquipped) return false;
+            break;
+            
+          default:
+            // Regular tool checks - check both tool and weapon slots
+            const equippedTool = equipment.find(eq => 
+              eq.id === player.equippedTool && eq.toolType === requiredTool
+            );
+            
+            const equippedWeaponTool = equipment.find(eq => 
+              eq.id === player.equippedWeapon && eq.toolType === requiredTool
+            );
+            
+            if (!(equippedTool || equippedWeaponTool)) return false;
+            break;
+        }
+      }
     }
     
-    // Special case for water collection: requires bucket OR bamboo bottle
-    if (resource.requiredTool === "bucket") {
-      const hasBucket = equipment.find(eq => 
-        eq.id === player.equippedTool && eq.toolType === "bucket"
-      );
-      
-      const hasBambooBottle = equipment.find(eq => 
-        eq.id === player.equippedTool && eq.toolType === "bamboo_bottle"
-      );
-      
-      return !!(hasBucket || hasBambooBottle);
-    }
-    
-    // Special case for hunting large animals: requires weapon AND knife
-    if (resource.requiredTool === "weapon_and_knife") {
-      // Check if player has a weapon equipped (not a knife)
-      const equippedWeapon = equipment.find(eq => 
-        eq.id === player.equippedWeapon && eq.slot === "weapon"
-      );
-      const hasNonKnifeWeapon = !!(equippedWeapon && equippedWeapon.toolType !== "knife");
-      
-      // Check for knife in both tool and weapon slots
-      const hasKnife = equipment.some(eq => 
-        (eq.id === player.equippedTool || eq.id === player.equippedWeapon) && 
-        eq.toolType === "knife"
-      );
-      
-      return hasNonKnifeWeapon && hasKnife;
-    }
-    
-    // Regular tool checks - check both tool and weapon slots
-    const equippedTool = equipment.find(eq => 
-      eq.id === player.equippedTool && eq.toolType === resource.requiredTool
-    );
-    
-    const equippedWeapon = equipment.find(eq => 
-      eq.id === player.equippedWeapon && eq.toolType === resource.requiredTool
-    );
-    
-    return !!(equippedTool || equippedWeapon);
+    return true; // All requirements met
   }
 
   // Check if player has bait in inventory

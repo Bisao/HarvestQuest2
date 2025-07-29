@@ -40,14 +40,25 @@ export class ExpeditionService {
       throw new Error("Player level too low for this biome");
     }
 
-    // Validate selected resources are available in biome
+    // Validate selected resources are available in biome AND player has required tools
     const availableResources = Array.isArray(biome.availableResources) ? biome.availableResources : [];
-    const validResources = selectedResources.filter(resourceId => 
+    const biomeValidResources = selectedResources.filter(resourceId => 
       availableResources.includes(resourceId)
     );
 
+    // Additional validation: check if player has required tools for each resource
+    const validResources = [];
+    for (const resourceId of biomeValidResources) {
+      const hasRequiredTool = await this.gameService.hasRequiredTool(playerId, resourceId);
+      if (hasRequiredTool) {
+        validResources.push(resourceId);
+      } else {
+        console.log(`Player lacks required tool/weapon for resource: ${resourceId}`);
+      }
+    }
+
     if (validResources.length === 0) {
-      throw new Error("No valid resources selected for this biome");
+      throw new Error("Você não possui as ferramentas ou armas necessárias para coletar os recursos selecionados neste bioma.");
     }
 
     // Create expedition
