@@ -47,27 +47,118 @@ export interface InsertPlayer {
   equippedTool?: string | null;
 }
 
+// Fundamental Item Attributes System
+export interface ItemAttributes {
+  // Core Properties
+  durability?: number; // 0-100, items break when reaching 0
+  stackable: boolean; // can items stack in inventory
+  maxStack?: number; // maximum stack size (if stackable)
+  
+  // Value Properties  
+  baseValue: number; // base market value
+  rarityMultiplier: number; // multiplier based on rarity
+  
+  // Physical Properties
+  density: number; // weight per unit volume (affects weight calculation)
+  volume: number; // space taken in inventory
+  
+  // Functional Properties
+  toolEfficiency?: number; // 0-100, effectiveness as a tool
+  weaponDamage?: number; // damage if used as weapon
+  armorProtection?: number; // protection if used as armor
+  consumeEffect?: ConsumableEffect; // effect when consumed
+}
+
+export interface ConsumableEffect {
+  type: 'hunger' | 'thirst' | 'health' | 'experience' | 'temporary_buff';
+  value: number;
+  duration?: number; // in seconds, for temporary effects
+}
+
 export interface Resource {
   id: string;
   name: string;
   emoji: string;
-  weight: number;
-  value: number;
-  type: string; // 'basic', 'animals', 'fish', 'plants', 'unique'
-  rarity: string; // 'common', 'uncommon', 'rare', 'epic', 'legendary'
-  requiredTool: string | null; // tool type needed to collect this resource
-  experienceValue: number; // XP gained per item collected
+  
+  // Fundamental Attributes
+  attributes: ItemAttributes;
+  
+  // Classification
+  category: ResourceCategory;
+  subcategory: string;
+  rarity: RarityLevel;
+  
+  // Collection Requirements
+  collectionRequirements: CollectionRequirement[];
+  experienceValue: number;
+  
+  // Derived Properties (calculated from attributes)
+  weight: number; // calculated from density * volume
+  value: number; // calculated from baseValue * rarityMultiplier
+}
+
+// Enums for better type safety
+export type ResourceCategory = 
+  | 'raw_materials'     // Fibra, Pedra, Madeira
+  | 'processed_materials' // Barbante, Ferro Fundido
+  | 'organic'           // Carne, Couro, Ossos
+  | 'consumables'       // Food, Potions
+  | 'liquids'           // Água, Suco
+  | 'creatures'         // Live animals
+  | 'treasures';        // Cristais, Conchas
+
+export type RarityLevel = 
+  | 'common'      // White - 1.0x value
+  | 'uncommon'    // Green - 1.5x value  
+  | 'rare'        // Blue - 2.0x value
+  | 'epic'        // Purple - 3.0x value
+  | 'legendary';  // Orange - 5.0x value
+
+// Equipment system types
+export type EquipmentCategory = 
+  | 'tools'       // Picareta, Machado, Vara de Pesca
+  | 'weapons'     // Arco, Lança, Faca
+  | 'armor'       // Capacete, Peitoral, Calças, Botas
+  | 'accessories' // Mochila, Garrafa, Corda
+  | 'containers'; // Balde, Panela
+
+export type EquipmentSlot = 
+  | 'tool' | 'weapon' | 'helmet' | 'chestplate' 
+  | 'leggings' | 'boots' | 'accessory';
+
+export type ToolType = 
+  | 'pickaxe' | 'axe' | 'shovel' | 'fishing_rod' 
+  | 'knife' | 'sickle' | 'bucket' | 'bait';
+
+export interface EquipmentEffect {
+  type: 'resource_boost' | 'skill_boost' | 'stat_boost' | 'special_ability';
+  target?: string; // resource type, skill name, or stat name
+  value: number; // multiplier or flat bonus
+  description: string;
+}
+
+export interface EquipmentRequirement {
+  type: 'level' | 'skill' | 'resource' | 'other_equipment';
+  requirement: string | number;
+  description: string;
+}
+
+export interface CollectionRequirement {
+  type: 'tool' | 'skill_level' | 'equipment_combo' | 'biome_specific';
+  requirement: string | string[]; // tool type, level number, or equipment IDs
+  description: string;
 }
 
 export interface InsertResource {
   id?: string;
   name: string;
   emoji: string;
-  weight?: number;
-  value?: number;
-  type: string;
-  rarity?: string;
-  requiredTool?: string | null;
+  
+  attributes: ItemAttributes;
+  category: ResourceCategory;
+  subcategory: string;
+  rarity: RarityLevel;
+  collectionRequirements?: CollectionRequirement[];
   experienceValue?: number;
 }
 
@@ -139,40 +230,122 @@ export interface Equipment {
   id: string;
   name: string;
   emoji: string;
-  effect: string; // description of the effect
-  bonus: Record<string, any>; // object with bonus type and value
-  slot: string; // helmet, chestplate, leggings, boots, weapon, tool
-  toolType: string | null; // pickaxe, axe, shovel, etc. (for tools only)
-  weight: number;
+  
+  // Fundamental Attributes
+  attributes: ItemAttributes;
+  
+  // Equipment Classification
+  category: EquipmentCategory;
+  slot: EquipmentSlot;
+  toolType?: ToolType;
+  
+  // Equipment Effects
+  effects: EquipmentEffect[];
+  
+  // Requirements to use
+  requirements: EquipmentRequirement[];
+  
+  // Derived Properties
+  weight: number; // calculated from attributes
+  value: number; // calculated from attributes
 }
 
 export interface InsertEquipment {
   id?: string;
   name: string;
   emoji: string;
-  effect: string;
-  bonus: Record<string, any>;
-  slot: string;
-  toolType?: string | null;
-  weight?: number;
+  
+  attributes: ItemAttributes;
+  category: EquipmentCategory;
+  slot: EquipmentSlot;
+  toolType?: ToolType;
+  effects?: EquipmentEffect[];
+  requirements?: EquipmentRequirement[];
 }
 
 export interface Recipe {
   id: string;
   name: string;
   emoji: string;
+  
+  // Recipe Classification
+  category: RecipeCategory;
+  subcategory: string;
+  difficulty: RecipeDifficulty;
+  
+  // Requirements
   requiredLevel: number;
-  ingredients: Record<string, number>; // object with resourceId: quantity
-  output: Record<string, number>; // object with resourceId: quantity
+  requiredSkills?: SkillRequirement[];
+  requiredTools?: ToolRequirement[];
+  
+  // Recipe Data
+  ingredients: RecipeIngredient[];
+  outputs: RecipeOutput[];
+  
+  // Process Information
+  craftingTime: number; // in seconds
+  experienceGained: number;
+  successRate: number; // 0-100, chance of success
+}
+
+// Recipe system types
+export type RecipeCategory = 
+  | 'basic_materials'   // Barbante, processed resources
+  | 'tools'            // Picareta, Machado, Vara de Pesca
+  | 'weapons'          // Arco, Lança, Faca
+  | 'armor'            // Capacete, Peitoral, Calças, Botas
+  | 'consumables'      // Food, Potions
+  | 'containers'       // Balde, Panela, Garrafa
+  | 'advanced';        // Complex recipes
+
+export type RecipeDifficulty = 
+  | 'trivial'    // Always succeeds, instant
+  | 'easy'       // 95% success, 5 seconds
+  | 'medium'     // 85% success, 15 seconds
+  | 'hard'       // 70% success, 30 seconds
+  | 'expert';    // 50% success, 60 seconds
+
+export interface SkillRequirement {
+  skill: string; // skill name
+  level: number; // required level
+}
+
+export interface ToolRequirement {
+  toolType: ToolType;
+  description: string;
+}
+
+export interface RecipeIngredient {
+  itemId: string; // resource or equipment ID
+  quantity: number;
+  consumed: boolean; // true if item is consumed, false if just required
+}
+
+export interface RecipeOutput {
+  itemId: string; // resource or equipment ID
+  quantity: number;
+  chance: number; // 0-100, chance of getting this output
 }
 
 export interface InsertRecipe {
   id?: string;
   name: string;
   emoji: string;
+  
+  category: RecipeCategory;
+  subcategory?: string;
+  difficulty?: RecipeDifficulty;
+  
   requiredLevel?: number;
-  ingredients: Record<string, number>;
-  output: Record<string, number>;
+  requiredSkills?: SkillRequirement[];
+  requiredTools?: ToolRequirement[];
+  
+  ingredients: RecipeIngredient[];
+  outputs: RecipeOutput[];
+  
+  craftingTime?: number;
+  experienceGained?: number;
+  successRate?: number;
 }
 
 export interface Quest {

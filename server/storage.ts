@@ -233,12 +233,33 @@ export class MemStorage implements IStorage {
       id,
       name: insertResource.name,
       emoji: insertResource.emoji,
-      weight: insertResource.weight ?? 1,
-      value: insertResource.value ?? 1,
-      type: insertResource.type,
       rarity: insertResource.rarity ?? 'common',
-      requiredTool: insertResource.requiredTool || null,
       experienceValue: insertResource.experienceValue ?? 1,
+      
+      // Fundamental Attributes
+      attributes: insertResource.attributes ?? { durability: 100, efficiency: 1.0, rarity: 'common' },
+      
+      // Resource Classification  
+      category: insertResource.category ?? 'resource',
+      subcategory: insertResource.subcategory ?? 'basic',
+      
+      // Spawn Properties
+      spawnRate: insertResource.spawnRate ?? 0.5,
+      yieldAmount: insertResource.yieldAmount ?? 1,
+      requiredTool: insertResource.requiredTool,
+      
+      // Economy
+      sellPrice: insertResource.sellPrice ?? 1,
+      buyPrice: insertResource.buyPrice ?? 2,
+      
+      // Physical Properties
+      weight: insertResource.weight ?? 1,
+      stackable: insertResource.stackable ?? true,
+      maxStackSize: insertResource.maxStackSize ?? 99,
+      
+      // Effects & Tags
+      effects: insertResource.effects ?? [],
+      tags: insertResource.tags ?? [],
     };
     this.resources.set(id, resource);
     return resource;
@@ -408,16 +429,30 @@ export class MemStorage implements IStorage {
   }
 
   async createEquipment(insertEquipment: InsertEquipment): Promise<Equipment> {
-    const id = randomUUID();
+    // Use predefined ID if provided, otherwise generate random UUID
+    const id = insertEquipment.id || randomUUID();
     const equipment: Equipment = {
       id,
       name: insertEquipment.name,
       emoji: insertEquipment.emoji,
-      effect: insertEquipment.effect,
-      bonus: insertEquipment.bonus,
-      slot: insertEquipment.slot,
-      toolType: insertEquipment.toolType || null,
-      weight: insertEquipment.weight || 2,
+      
+      // Fundamental Attributes
+      attributes: insertEquipment.attributes ?? { durability: 100, efficiency: 1.0, rarity: 'common' },
+      
+      // Equipment Classification
+      category: insertEquipment.category,
+      slot: insertEquipment.slot ?? 'tool',
+      toolType: insertEquipment.toolType,
+      
+      // Equipment Effects
+      effects: insertEquipment.effects ?? [],
+      
+      // Requirements to use
+      requirements: insertEquipment.requirements ?? [],
+      
+      // Derived Properties
+      weight: insertEquipment.weight ?? 1,
+      value: insertEquipment.value ?? 1,
     };
     this.equipment.set(id, equipment);
     return equipment;
@@ -439,8 +474,23 @@ export class MemStorage implements IStorage {
       name: insertRecipe.name,
       emoji: insertRecipe.emoji,
       requiredLevel: insertRecipe.requiredLevel ?? 1,
+      // Recipe Data - support both old and new formats
+      category: insertRecipe.category ?? 'basic_materials',
+      subcategory: insertRecipe.subcategory ?? '',
+      difficulty: insertRecipe.difficulty ?? 'trivial',
+      
+      // Requirements
+      requiredSkills: insertRecipe.requiredSkills ?? [],
+      requiredTools: insertRecipe.requiredTools ?? [],
+      
+      // Recipe Data
       ingredients: insertRecipe.ingredients,
-      output: insertRecipe.output,
+      outputs: insertRecipe.outputs,
+      
+      // Process Information
+      craftingTime: insertRecipe.craftingTime ?? 5,
+      experienceGained: insertRecipe.experienceGained ?? 10,
+      successRate: insertRecipe.successRate ?? 100,
     };
     this.recipes.set(id, recipe);
     return recipe;

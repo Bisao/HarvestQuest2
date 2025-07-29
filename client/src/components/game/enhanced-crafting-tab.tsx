@@ -142,8 +142,24 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   };
 
   const getRecipeIngredients = (recipe: Recipe) => {
-    const ingredients = recipe.ingredients as Record<string, number>;
-    return Object.entries(ingredients).map(([resourceId, quantity]) => ({
+    // Handle both old Record format and new RecipeIngredient[] format
+    let ingredients: Array<{resourceId: string, quantity: number}>;
+    
+    if (Array.isArray(recipe.ingredients)) {
+      // New format: RecipeIngredient[]
+      ingredients = recipe.ingredients.map(ing => ({
+        resourceId: ing.itemId,
+        quantity: ing.quantity
+      }));
+    } else {
+      // Old format: Record<string, number>
+      ingredients = Object.entries(recipe.ingredients as Record<string, number>).map(([resourceId, quantity]) => ({
+        resourceId,
+        quantity
+      }));
+    }
+    
+    return ingredients.map(({resourceId, quantity}) => ({
       resource: getResourceData(resourceId),
       quantity,
       available: getStorageQuantity(resourceId),
