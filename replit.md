@@ -8,10 +8,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 29, 2025 - MIGRATION TO REPLIT ENVIRONMENT COMPLETED SUCCESSFULLY + COIN SYSTEM REMOVED**
+**January 29, 2025 - MIGRATION TO REPLIT ENVIRONMENT COMPLETED SUCCESSFULLY + UI IMPROVEMENTS IMPLEMENTED**
 - **Project Migration Completed**: Successfully migrated "Coletor Adventures" from Replit Agent to standard Replit environment
 - **All Systems Verified Working**: Expedition system, resource collection, animal processing, crafting, inventory, storage, and quests all functional
 - **Coin System Removed**: Eliminated coin rewards from expeditions as requested - financial system to be implemented later
+- **Tool Icons Added**: Implemented visual tool indicators next to resources (🤚 for Fibra, ⛏️ for Pedra, 🏹🔱🔪 for hunting animals)
+- **Knife Reclassified**: Moved knife from weapon to tool category for better game balance
+- **Modal Auto-Minimize**: Expedition modal now automatically minimizes when expedition starts for better UX
+- **Selection Buttons**: Added "Marcar Tudo" and "Desmarcar Tudo" buttons in expedition resource selection
+- **Repeat Functionality**: Added "Repetir Última" button for quick expedition setup
 - **Performance Optimized**: In-memory storage system providing instant response times with 0-2ms API calls
 - **Security Enhanced**: Proper client/server separation with robust middleware for CORS, rate limiting, and security headers
 - **Production Ready**: All game mechanics verified working with comprehensive resource management and quest progression

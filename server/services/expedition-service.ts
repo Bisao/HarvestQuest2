@@ -116,7 +116,7 @@ export class ExpeditionService {
     await this.storage.updatePlayer(expedition.playerId, {
       experience: levelData.newExp,
       level: levelData.newLevel,
-      coins: player.coins + this.calculateCoinReward(rewards, resources)
+      coins: player.coins // Coin system removed as requested
     });
 
     // Update quest progress for expedition completion
