@@ -518,93 +518,18 @@ export default function Game() {
         onExpeditionUpdate={setActiveExpedition}
       />
 
-      {/* Enhanced Minimized Expedition Window - ESTADO 2: PROGRESSO EM ANDAMENTO */}
-      {expeditionMinimized && activeExpedition && selectedBiome && activeExpedition.progress < 100 && (
+      {/* Janela Minimizada Compacta - Como Foto 1 */}
+      {expeditionMinimized && activeExpedition && selectedBiome && !expeditionMinimizedExpanded && (
         <div className="fixed bottom-4 left-4 z-50">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 min-w-[320px] max-w-[400px]">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-[300px]">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">{selectedBiome.emoji}</span>
+                <span className="text-xl">{selectedBiome.emoji}</span>
                 <div>
                   <h4 className="font-semibold text-sm">Expedição na {selectedBiome.name}</h4>
-                  <p className="text-xs text-gray-500">Em andamento...</p>
-                </div>
-              </div>
-              <button
-                onClick={handleMinimizeExpedition}
-                className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                </svg>
-              </button>
-            </div>
-            
-            <div className="space-y-3">
-              {/* Barra de Progresso */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Progresso</span>
-                  <span>{Math.round(activeExpedition.progress || 0)}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-forest h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${activeExpedition.progress || 0}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Lista de recursos sendo coletados com quantidades em tempo real */}
-              <div>
-                <h4 className="font-semibold text-xs mb-2 text-blue-700">🎯 Coletando Recursos:</h4>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {activeExpedition.selectedResources?.map((resourceId: string) => {
-                    const resource = resources?.find(r => r.id === resourceId);
-                    if (!resource) return null;
-                    
-                    // Calculate estimated collected quantity based on progress
-                    const estimatedQuantity = Math.floor((activeExpedition.progress / 100) * 3);
-                    
-                    return (
-                      <div key={resourceId} className="flex items-center justify-between p-2 bg-blue-50 rounded text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{resource.emoji}</span>
-                          <span className="text-blue-700">{resource.name}</span>
-                        </div>
-                        <div className="text-blue-600 font-semibold">
-                          {estimatedQuantity > 0 ? `+${estimatedQuantity}` : "..."}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Botões */}
-              <div className="flex space-x-2">
-                <button
-                  onClick={handleMinimizeExpedition}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-3 rounded-lg transition-colors text-sm"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Enhanced Minimized Expedition Window - ESTADO 3: EXPEDIÇÃO CONCLUÍDA */}
-      {activeExpedition && selectedBiome && activeExpedition.progress >= 100 && expeditionMinimized && !expeditionMinimizedExpanded && (
-        <div className="fixed bottom-4 left-4 z-50">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 min-w-[320px] max-w-[400px]">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{selectedBiome.emoji}</span>
-                <div>
-                  <h4 className="font-semibold text-sm">Expedição na {selectedBiome.name}</h4>
-                  <p className="text-xs text-green-600 font-medium">Concluída!</p>
+                  <p className="text-xs text-gray-500">
+                    {activeExpedition.progress >= 100 ? 'Em andamento...' : 'Em andamento...'}
+                  </p>
                 </div>
               </div>
               <button
@@ -617,45 +542,18 @@ export default function Game() {
               </button>
             </div>
             
-            <div className="space-y-3">
-              {/* Resumo dos recursos coletados */}
-              <div>
-                <h4 className="font-semibold text-xs mb-2 text-green-700">✅ Recursos Coletados:</h4>
-                <div className="space-y-1 max-h-24 overflow-y-auto">
-                  {activeExpedition.selectedResources?.map((resourceId: string) => {
-                    const resource = resources?.find(r => r.id === resourceId);
-                    if (!resource) return null;
-                    
-                    return (
-                      <div key={resourceId} className="flex items-center justify-between p-2 bg-green-50 rounded text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{resource.emoji}</span>
-                          <span className="text-green-700">{resource.name}</span>
-                        </div>
-                        <div className="text-green-600 font-semibold">
-                          +3
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+            {/* Barra de Progresso Compacta */}
+            <div className="mt-3 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Progresso</span>
+                <span>{Math.round(activeExpedition.progress || 0)}%</span>
               </div>
-
-              {/* Recompensas de XP */}
-              <div className="bg-green-50 p-3 rounded border">
-                <div className="text-center">
-                  <div className="text-lg">🎯</div>
-                  <div className="text-sm font-semibold text-green-600">+{(activeExpedition.selectedResources?.length || 0) * 15} XP</div>
-                </div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-green-500 h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${activeExpedition.progress || 0}%` }}
+                ></div>
               </div>
-
-              {/* Botão Finalizar Expedição */}
-              <button
-                onClick={handleCompleteExpedition}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-              >
-                ✅ Finalizar Expedição
-              </button>
             </div>
           </div>
         </div>
