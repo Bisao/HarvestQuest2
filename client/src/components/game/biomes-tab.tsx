@@ -137,25 +137,13 @@ export default function BiomesTab({ biomes, resources, player, activeExpedition,
                   })}
                 </div>
 
-                {/* Progress Bar */}
-                <div className="space-y-2">
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
-                      style={{ width: `${activeExpedition.progress}%` }}
-                    />
-                  </div>
-                  <p className="text-xs text-blue-600 text-center">Progresso: {Math.floor(activeExpedition.progress || 0)}%</p>
-                </div>
+                
               </div>
             ) : (
               <div className="mb-4">
                 <h4 className={`font-semibold text-sm mb-1 ${unlocked ? "text-gray-700" : "text-gray-500"}`}>
                   Recursos:
                 </h4>
-                <p className={`text-xs mb-2 ${unlocked ? "text-gray-500" : "text-gray-400"}`}>
-                  Itens necessários
-                </p>
                 <div className={`max-h-32 overflow-y-auto pr-1 ${unlocked ? "" : "text-gray-500"}`}>
                   <div className="grid grid-cols-1 gap-1 text-sm">
                     {biomeResources.map((resource) => {
