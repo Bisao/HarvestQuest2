@@ -58,7 +58,7 @@ export function createEquipmentWithIds(): InsertEquipment[] {
     {
       id: EQUIPMENT_IDS.FACA,
       name: "Faca",
-      emoji: "🗡️",
+      emoji: "🔪",
       effect: "Permite esfolar animais",
       bonus: { type: "skinning", value: 1 },
       slot: "tool",

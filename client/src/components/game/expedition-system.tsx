@@ -251,6 +251,57 @@ export default function ExpeditionSystem({
     );
   };
 
+  // Function to get tool icons required for each resource
+  const getToolIcons = (resource: any) => {
+    const icons: string[] = [];
+    
+    switch (resource.name) {
+      case "Fibra":
+        icons.push("🤚");
+        break;
+      case "Pedra":
+      case "Ferro Fundido":
+      case "Cristais":
+        icons.push("⛏️");
+        break;
+      case "Pedras Soltas":
+      case "Gravetos":
+      case "Cogumelos":
+      case "Frutas Silvestres":
+      case "Conchas":
+      case "Argila":
+        icons.push("🤚");
+        break;
+      case "Madeira":
+      case "Bambu":
+        icons.push("🪓");
+        break;
+      case "Água Fresca":
+        icons.push("🪣");
+        break;
+      case "Coelho":
+        icons.push("🔪");
+        break;
+      case "Veado":
+      case "Javali":
+        icons.push("🏹", "🔱", "🔪");
+        break;
+      case "Peixe Pequeno":
+      case "Peixe Grande":
+      case "Salmão":
+        icons.push("🎣");
+        break;
+      case "Areia":
+        icons.push("🗿");
+        break;
+      default:
+        icons.push("🤚");
+        break;
+    }
+    
+    return icons;
+  };
+
   if (!biome) return null;
 
   const collectableResources = getCollectableResources();
@@ -325,26 +376,56 @@ export default function ExpeditionSystem({
           {!activeExpedition && (
             <div className="space-y-4">
               <div>
-                <h3 className="font-medium text-lg mb-3">Recursos Disponíveis</h3>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-medium text-lg">Recursos Disponíveis</h3>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setSelectedResources(collectableResources.map(r => r.id))}
+                      variant="outline"
+                      size="sm"
+                      disabled={selectedResources.length === collectableResources.length}
+                    >
+                      ✅ Marcar Tudo
+                    </Button>
+                    <Button
+                      onClick={() => setSelectedResources([])}
+                      variant="outline"
+                      size="sm"
+                      disabled={selectedResources.length === 0}
+                    >
+                      ❌ Desmarcar Tudo
+                    </Button>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
-                  {collectableResources.map((resource) => (
-                    <div key={resource.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50">
-                      <Checkbox
-                        checked={selectedResources.includes(resource.id)}
-                        onCheckedChange={() => toggleResourceSelection(resource.id)}
-                      />
-                      <div className="flex items-center space-x-2 flex-1">
-                        <span className="text-lg">{resource.emoji}</span>
-                        <div>
-                          <div className="font-medium">{resource.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            +{resource.experienceValue} XP • {resource.value} moedas
+                  {collectableResources.map((resource) => {
+                    const toolIcons = getToolIcons(resource);
+                    return (
+                      <div key={resource.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50">
+                        <Checkbox
+                          checked={selectedResources.includes(resource.id)}
+                          onCheckedChange={() => toggleResourceSelection(resource.id)}
+                        />
+                        <div className="flex items-center space-x-2 flex-1">
+                          <span className="text-lg">{resource.emoji}</span>
+                          <div className="flex-1">
+                            <div className="flex justify-between items-center">
+                              <div className="font-medium">{resource.name}</div>
+                              <div className="flex items-center space-x-1">
+                                {toolIcons.map((icon, index) => (
+                                  <span key={index} className="text-xs">{icon}</span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              +{resource.experienceValue} XP
+                            </div>
                           </div>
                         </div>
+                        <Badge variant="secondary">{resource.rarity}</Badge>
                       </div>
-                      <Badge variant="secondary">{resource.rarity}</Badge>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -358,6 +439,17 @@ export default function ExpeditionSystem({
               <div className="flex space-x-2">
                 <Button onClick={onClose} variant="outline" className="flex-1">
                   Cancelar
+                </Button>
+                <Button
+                  onClick={() => {
+                    // Auto-select all resources for repeat functionality
+                    setSelectedResources(collectableResources.map(r => r.id));
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={collectableResources.length === 0}
+                >
+                  🔄 Repetir Última
                 </Button>
                 <Button 
                   onClick={handleStartExpedition} 

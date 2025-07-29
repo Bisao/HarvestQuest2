@@ -30,6 +30,57 @@ export default function BiomesTab({ biomes, resources, player, activeExpedition,
 
   const isUnlocked = (biome: Biome) => (player?.level || 0) >= biome.requiredLevel;
 
+  // Function to get tool icons required for each resource
+  const getToolIcons = (resource: Resource) => {
+    const icons: string[] = [];
+    
+    switch (resource.name) {
+      case "Fibra":
+        icons.push("🤚");
+        break;
+      case "Pedra":
+      case "Ferro Fundido":
+      case "Cristais":
+        icons.push("⛏️");
+        break;
+      case "Pedras Soltas":
+      case "Gravetos":
+      case "Cogumelos":
+      case "Frutas Silvestres":
+      case "Conchas":
+      case "Argila":
+        icons.push("🤚");
+        break;
+      case "Madeira":
+      case "Bambu":
+        icons.push("🪓");
+        break;
+      case "Água Fresca":
+        icons.push("🪣");
+        break;
+      case "Coelho":
+        icons.push("🔪");
+        break;
+      case "Veado":
+      case "Javali":
+        icons.push("🏹", "🔱", "🔪");
+        break;
+      case "Peixe Pequeno":
+      case "Peixe Grande":
+      case "Salmão":
+        icons.push("🎣");
+        break;
+      case "Areia":
+        icons.push("🗿");
+        break;
+      default:
+        icons.push("🤚");
+        break;
+    }
+    
+    return icons;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {biomes.map((biome) => {
@@ -102,102 +153,56 @@ export default function BiomesTab({ biomes, resources, player, activeExpedition,
                 <h4 className={`font-semibold text-sm mb-2 ${unlocked ? "text-gray-700" : "text-gray-500"}`}>
                   Recursos Disponíveis:
                 </h4>
-                <div className={`grid grid-cols-2 gap-2 text-sm ${unlocked ? "" : "text-gray-500"}`}>
-                  {biomeResources.map((resource) => (
-                    <div key={resource.id} className="flex items-center space-x-1">
-                      <span>{resource.emoji}</span>
-                      <span>{resource.name}</span>
-                    </div>
-                  ))}
+                <div className={`grid grid-cols-1 gap-1 text-sm ${unlocked ? "" : "text-gray-500"}`}>
+                  {biomeResources.map((resource) => {
+                    const toolIcons = getToolIcons(resource);
+                    return (
+                      <div key={resource.id} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-1">
+                          <span>{resource.emoji}</span>
+                          <span>{resource.name}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          {toolIcons.map((icon, index) => (
+                            <span key={index} className="text-xs">{icon}</span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             <div className="space-y-2">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    if (hasActiveExpedition && activeExpedition.progress >= 100) {
-                      onCompleteExpedition('current-expedition');
-                    } else if (unlocked && !hasActiveExpedition) {
-                      onExploreBiome(biome);
-                    }
-                  }}
-                  disabled={!unlocked || (hasActiveExpedition && activeExpedition.progress < 100) || (!!activeExpedition && !hasActiveExpedition)}
-                  className={`flex-1 font-semibold py-3 px-4 rounded-lg transition-colors ${
-                    hasActiveExpedition && activeExpedition.progress >= 100
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : hasActiveExpedition
-                      ? "bg-orange-500 text-white cursor-not-allowed"
-                      : unlocked
-                      ? "bg-green-600 hover:bg-green-700 text-white"
-                      : "bg-gray-400 text-gray-600 cursor-not-allowed"
-                  }`}
-                >
-                  {hasActiveExpedition && activeExpedition.progress >= 100
-                    ? "✅ Finalizar Expedição"
-                    : hasActiveExpedition
-                    ? "⏳ Em Andamento..."
-                    : unlocked
-                    ? "🧭 Explorar Bioma"
-                    : "🔒 Bloqueado"
+              <button
+                onClick={() => {
+                  if (hasActiveExpedition && activeExpedition.progress >= 100) {
+                    onCompleteExpedition('current-expedition');
+                  } else if (unlocked && !hasActiveExpedition) {
+                    onExploreBiome(biome);
                   }
-                </button>
-                
-                {/* Repeat Expedition Button - Always visible but conditionally enabled */}
-                {unlocked && !hasActiveExpedition && (
-                  <button
-                    onClick={() => onToggleAutoRepeat?.(biome.id)}
-                    disabled={!biome.lastExpeditionResources || biome.lastExpeditionResources.length === 0}
-                    className={`px-3 py-3 rounded-lg transition-colors font-semibold ${
-                      biome.autoRepeatEnabled
-                        ? "bg-purple-600 hover:bg-purple-700 text-white"
-                        : biome.lastExpeditionResources && biome.lastExpeditionResources.length > 0
-                        ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    }`}
-                    title={
-                      !biome.lastExpeditionResources || biome.lastExpeditionResources.length === 0
-                        ? "Faça uma expedição primeiro"
-                        : biome.autoRepeatEnabled 
-                        ? "Desativar repetição automática" 
-                        : "Repetir última expedição"
-                    }
-                  >
-                    🔄
-                  </button>
-                )}
-              </div>
-              
-              {/* Auto Repeat Countdown */}
-              {biome.autoRepeatEnabled && (biome.autoRepeatCountdown || 0) > 0 && (
-                <div className="text-center bg-purple-50 border border-purple-200 rounded-lg p-2">
-                  <div className="text-sm text-purple-700 font-medium">
-                    ⏰ Próxima expedição em {biome.autoRepeatCountdown || 0}s
-                  </div>
-                  <div className="w-full bg-purple-200 rounded-full h-1 mt-1">
-                    <div 
-                      className="bg-purple-600 h-1 rounded-full transition-all duration-1000"
-                      style={{ width: `${((10 - (biome.autoRepeatCountdown || 0)) / 10) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-              
-              {/* Show last expedition info when auto-repeat is enabled but not counting down */}
-              {biome.autoRepeatEnabled && biome.autoRepeatCountdown === 0 && biome.lastExpeditionResources && biome.lastExpeditionResources.length > 0 && (
-                <div className="text-center bg-purple-50 border border-purple-200 rounded-lg p-2">
-                  <div className="text-xs text-purple-700 font-medium mb-1">
-                    🔄 Repetição automática ativa
-                  </div>
-                  <div className="text-xs text-purple-600">
-                    Última expedição: {biome.lastExpeditionResources.map(resourceId => {
-                      const resource = resources.find(r => r.id === resourceId);
-                      return resource ? resource.emoji : '?';
-                    }).join(' ')}
-                  </div>
-                </div>
-              )}
+                }}
+                disabled={!unlocked || (hasActiveExpedition && activeExpedition.progress < 100) || (!!activeExpedition && !hasActiveExpedition)}
+                className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors ${
+                  hasActiveExpedition && activeExpedition.progress >= 100
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : hasActiveExpedition
+                    ? "bg-orange-500 text-white cursor-not-allowed"
+                    : unlocked
+                    ? "bg-green-600 hover:bg-green-700 text-white"
+                    : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                }`}
+              >
+                {hasActiveExpedition && activeExpedition.progress >= 100
+                  ? "✅ Finalizar Expedição"
+                  : hasActiveExpedition
+                  ? "⏳ Em Andamento..."
+                  : unlocked
+                  ? "🧭 Explorar Bioma"
+                  : "🔒 Bloqueado"
+                }
+              </button>
             </div>
           </div>
         );
