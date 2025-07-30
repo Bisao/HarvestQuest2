@@ -267,7 +267,16 @@ export default function ExpeditionModal({
             </div>
             <ScrollArea className="h-64 border rounded-lg p-3">
               <div className="space-y-2">
-                {collectableResources.map((resource) => (
+                {collectableResources
+                  .sort((a, b) => {
+                    // First sort by availability (collectible first)
+                    if (a.canCollect && !b.canCollect) return -1;
+                    if (!a.canCollect && b.canCollect) return 1;
+                    
+                    // Then sort by experience value (higher first)
+                    return b.experienceValue - a.experienceValue;
+                  })
+                  .map((resource) => (
                   <div
                     key={resource.id}
                     className={`flex items-center justify-between p-3 rounded-lg border ${
