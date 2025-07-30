@@ -245,21 +245,6 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
             
           </div>
           
-          {/* Mount and Action Buttons */}
-          <div className="mt-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-amber-700">Mount</span>
-              <div className="flex space-x-1">
-                <Button size="sm" variant="outline" className="h-6 px-2 text-xs bg-amber-100">
-                  Stock
-                </Button>
-                <Button size="sm" variant="outline" className="h-6 px-2 text-xs bg-amber-100">
-                  Sort
-                </Button>
-              </div>
-            </div>
-          </div>
-          
         </CardContent>
       </Card>
 
