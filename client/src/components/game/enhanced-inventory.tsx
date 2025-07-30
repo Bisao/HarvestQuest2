@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import EquipmentSelectorModal from "./equipment-selector-modal";
+import { isConsumable, getConsumableDescription } from "@shared/utils/consumable-utils";
 import type { Resource, Equipment, Player } from "@shared/types";
 
 interface InventoryItem {
@@ -541,24 +542,23 @@ export default function EnhancedInventory({
                             </div>
                           </div>
                           <div className="flex flex-col gap-2">
-                            {/* Show consume button for food items */}
-                            {itemData && (itemData.name === "Frutas Silvestres" || 
-                              itemData.name === "Cogumelos" || 
-                              itemData.name === "Suco de Frutas" ||
-                              itemData.name === "Cogumelos Assados" ||
-                              itemData.name === "Peixe Grelhado" ||
-                              itemData.name === "Carne Assada" ||
-                              itemData.name === "Ensopado de Carne" ||
-                              itemData.name === "Água Fresca") && (
-                              <Button
-                                variant="default"
-                                size="sm"
-                                onClick={() => consumeMutation.mutate(selectedItem.id)}
-                                disabled={consumeMutation.isPending || isBlocked}
-                                className="bg-green-600 hover:bg-green-700"
-                              >
-                                {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
-                              </Button>
+                            {/* Show consume button for consumable items */}
+                            {itemData && isConsumable(itemData) && (
+                              <div className="space-y-1">
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() => consumeMutation.mutate(selectedItem.resourceId)}
+                                  disabled={consumeMutation.isPending || isBlocked}
+                                  className="bg-green-600 hover:bg-green-700 w-full"
+                                  data-testid="button-consume-item"
+                                >
+                                  {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
+                                </Button>
+                                <p className="text-xs text-gray-600 text-center">
+                                  {getConsumableDescription(itemData)}
+                                </p>
+                              </div>
                             )}
                             <Button
                               variant="outline"

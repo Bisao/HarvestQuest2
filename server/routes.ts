@@ -437,41 +437,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Resource not found" });
       }
 
-      // Calculate hunger and thirst restoration based on food type
-      let hungerRestore = 0;
-      let thirstRestore = 0;
-
-      switch (resource.name) {
-        case "Frutas Silvestres":
-          hungerRestore = 10;
-          thirstRestore = 5;
-          break;
-        case "Cogumelos":
-          hungerRestore = 8;
-          break;
-        case "Suco de Frutas":
-          thirstRestore = 20;
-          hungerRestore = 5;
-          break;
-        case "Cogumelos Assados":
-          hungerRestore = 15;
-          break;
-        case "Peixe Grelhado":
-          hungerRestore = 25;
-          break;
-        case "Carne Assada":
-          hungerRestore = 30;
-          break;
-        case "Ensopado de Carne":
-          hungerRestore = 40;
-          thirstRestore = 10;
-          break;
-        case "Água Fresca":
-          thirstRestore = 30;
-          break;
-        default:
-          return res.status(400).json({ error: "Item is not consumable" });
+      // Use dynamic consumption system for effects calculation
+      const { isConsumable, getConsumableEffects, validateConsumption } = await import("../shared/utils/consumable-utils");
+      
+      // Validate that item is consumable
+      const validation = validateConsumption(resource, quantity);
+      if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
       }
+
+      // Get consumption effects dynamically from item attributes or fallback patterns
+      const effects = getConsumableEffects(resource);
+      const hungerRestore = effects.hungerRestore;
+      const thirstRestore = effects.thirstRestore;
 
       // Update player stats
       const newHunger = Math.min(player.maxHunger, player.hunger + (hungerRestore * quantity));
