@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import EquipmentSelectorModal from "./equipment-selector-modal";
 import { ItemDetailsModal } from "./item-details-modal";
-import { isConsumable, getConsumableDescription } from "@shared/utils/consumable-utils";
+import { isConsumable, getConsumableDescription, getConsumableEffects } from "@shared/utils/consumable-utils";
 import type { Resource, Equipment, Player } from "@shared/types";
 
 interface InventoryItem {
@@ -196,9 +196,20 @@ export default function EnhancedInventory({
 
   const consumeMutation = useMutation({
     mutationFn: async (itemId: string) => {
+      const item = inventory.find(i => i.id === itemId);
+      if (!item) throw new Error("Item não encontrado");
+      
+      const itemData = getItemById(item.resourceId);
+      if (!itemData) throw new Error("Dados do item não encontrados");
+      
+      const effects = getConsumableEffects(itemData);
+      
       const response = await apiRequest('POST', `/api/player/${playerId}/consume`, {
         itemId,
-        quantity: 1
+        quantity: 1,
+        location: 'inventory',
+        hungerRestore: effects.hungerRestore,
+        thirstRestore: effects.thirstRestore
       });
       return response.json();
     },

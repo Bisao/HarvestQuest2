@@ -8,99 +8,77 @@ export interface ConsumableEffects {
 }
 
 /**
- * Dynamically determines if an item is consumable based on category and attributes
+ * Check if an item is consumable
  */
-export function isConsumable(item: Resource | Equipment | any): boolean {
-  // Check if item has consumable category
-  if ('category' in item && item.category === 'consumable') {
+export function isConsumable(item: any): boolean {
+  if (!item) return false;
+
+  // Check by category and subcategory
+  if (item.category === 'consumable') {
     return true;
   }
 
-  // Check for modern item structure with attributes
-  if ('attributes' in item && item.attributes) {
-    return !!(item.attributes.hunger_restore || item.attributes.thirst_restore);
+  // Check by attributes (backup method)
+  if (item.attributes && (
+    item.attributes.hunger_restore > 0 || 
+    item.attributes.thirst_restore > 0
+  )) {
+    return true;
   }
 
-  // Legacy support: check for specific consumable tags
-  if ('tags' in item && Array.isArray(item.tags)) {
-    return item.tags.includes('consumable') || item.tags.includes('food') || item.tags.includes('drink');
+  // Check by effects array
+  if (item.effects && Array.isArray(item.effects)) {
+    const consumableEffects = ['hunger_restore', 'thirst_restore', 'minor_health_regen'];
+    if (item.effects.some(effect => consumableEffects.includes(effect))) {
+      return true;
+    }
   }
 
-  // Fallback: check for consumable patterns in name (for legacy items)
-  if ('name' in item && typeof item.name === 'string') {
-    const consumablePatterns = [
-      'água', 'water', 'carne', 'meat', 'peixe', 'fish', 
-      'cogumelo', 'mushroom', 'fruta', 'fruit', 'suco', 'juice',
-      'assado', 'cooked', 'grelhado', 'grilled', 'ensopado', 'stew'
-    ];
-    const itemName = item.name.toLowerCase();
-    return consumablePatterns.some(pattern => itemName.includes(pattern));
-  }
+  // Fallback: check by name for existing items (legacy support)
+  const consumableNames = [
+    'Carne Assada',
+    'Água Fresca', 
+    'Cogumelos Assados',
+    'Peixe Grelhado',
+    'Ensopado de Carne',
+    'cooked_meat',
+    'fresh_water',
+    'cooked_mushrooms',
+    'grilled_fish',
+    'meat_stew'
+  ];
 
-  return false;
+  return consumableNames.includes(item.name || item.displayName);
 }
 
-/**
- * Extract consumption effects from item attributes
- */
-export function getConsumableEffects(item: Resource | Equipment | any): ConsumableEffects {
-  const defaultEffects: ConsumableEffects = {
-    hungerRestore: 0,
-    thirstRestore: 0,
-    effects: []
-  };
+export function getConsumableEffects(item: any): ConsumableEffects {
+  if (!item) {
+    return { hungerRestore: 0, thirstRestore: 0 };
+  }
 
-  // Modern item structure with attributes
-  if ('attributes' in item && item.attributes) {
+  // Try to get from attributes first (modern system)
+  if (item.attributes) {
     return {
       hungerRestore: item.attributes.hunger_restore || 0,
-      thirstRestore: item.attributes.thirst_restore || 0,
-      effects: item.effects || []
+      thirstRestore: item.attributes.thirst_restore || 0
     };
   }
 
-  // Legacy fallback: determine effects based on item name/type
-  if ('name' in item && typeof item.name === 'string') {
-    const itemName = item.name.toLowerCase();
-    
-    // Water and drinks
-    if (itemName.includes('água') || itemName.includes('water') || itemName.includes('suco') || itemName.includes('juice')) {
-      return {
-        hungerRestore: 0,
-        thirstRestore: 20,
-        effects: ['thirst_restore']
-      };
-    }
-    
-    // Meat and fish
-    if (itemName.includes('carne') || itemName.includes('meat') || itemName.includes('peixe') || itemName.includes('fish')) {
-      return {
-        hungerRestore: 25,
-        thirstRestore: 5,
-        effects: ['hunger_restore', 'minor_health_regen']
-      };
-    }
-    
-    // Mushrooms and vegetables
-    if (itemName.includes('cogumelo') || itemName.includes('mushroom') || itemName.includes('fruta') || itemName.includes('fruit')) {
-      return {
-        hungerRestore: 15,
-        thirstRestore: 10,
-        effects: ['hunger_restore']
-      };
-    }
-    
-    // Stews and complex foods
-    if (itemName.includes('ensopado') || itemName.includes('stew')) {
-      return {
-        hungerRestore: 35,
-        thirstRestore: 15,
-        effects: ['hunger_restore', 'satiation_bonus']
-      };
-    }
-  }
+  // Fallback to hardcoded values for existing items (legacy support)
+  const hardcodedEffects: Record<string, ConsumableEffects> = {
+    'Carne Assada': { hungerRestore: 25, thirstRestore: 5 },
+    'cooked_meat': { hungerRestore: 25, thirstRestore: 5 },
+    'Água Fresca': { hungerRestore: 0, thirstRestore: 20 },
+    'fresh_water': { hungerRestore: 0, thirstRestore: 20 },
+    'Cogumelos Assados': { hungerRestore: 15, thirstRestore: 0 },
+    'cooked_mushrooms': { hungerRestore: 15, thirstRestore: 0 },
+    'Peixe Grelhado': { hungerRestore: 20, thirstRestore: 3 },
+    'grilled_fish': { hungerRestore: 20, thirstRestore: 3 },
+    'Ensopado de Carne': { hungerRestore: 35, thirstRestore: 10 },
+    'meat_stew': { hungerRestore: 35, thirstRestore: 10 }
+  };
 
-  return defaultEffects;
+  return hardcodedEffects[item.name || item.displayName] || { hungerRestore: 0, thirstRestore: 0 };
 }
 
 /**

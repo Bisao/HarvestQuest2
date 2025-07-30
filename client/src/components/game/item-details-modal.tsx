@@ -73,10 +73,16 @@ export function ItemDetailsModal({
   const consumeMutation = useMutation({
     mutationFn: async () => {
       if (!item) throw new Error("Item não encontrado");
+      if (!itemData) throw new Error("Dados do item não encontrados");
+      
+      const effects = getConsumableEffects(itemData);
       
       const response = await apiRequest('POST', `/api/player/${playerId}/consume`, {
         itemId: item.id,
-        quantity: consumeQuantity
+        quantity: consumeQuantity,
+        location: 'inventory',
+        hungerRestore: effects.hungerRestore,
+        thirstRestore: effects.thirstRestore
       });
       return response.json();
     },

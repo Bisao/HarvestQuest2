@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { isConsumable, getConsumableDescription } from "@shared/utils/consumable-utils";
+import { isConsumable, getConsumableDescription, getConsumableEffects } from "@shared/utils/consumable-utils";
 import { ItemDetailsModal } from "./item-details-modal";
 import type { Resource, Equipment, Player } from "@shared/types";
 
@@ -111,9 +111,20 @@ export default function SimpleInventory({
 
   const consumeMutation = useMutation({
     mutationFn: async (itemId: string) => {
+      const item = inventory.find(i => i.id === itemId);
+      if (!item) throw new Error("Item não encontrado");
+      
+      const itemData = getItemById(item.resourceId);
+      if (!itemData) throw new Error("Dados do item não encontrados");
+      
+      const effects = getConsumableEffects(itemData);
+      
       const response = await apiRequest('POST', `/api/player/${playerId}/consume`, {
         itemId,
-        quantity: 1
+        quantity: 1,
+        location: 'inventory',
+        hungerRestore: effects.hungerRestore,
+        thirstRestore: effects.thirstRestore
       });
       return response.json();
     },
