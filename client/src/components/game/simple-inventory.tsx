@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { isConsumable, getConsumableDescription } from "@shared/utils/consumable-utils";
+import { ItemDetailsModal } from "./item-details-modal";
 import type { Resource, Equipment, Player } from "@shared/types";
 
 interface InventoryItem {
@@ -30,6 +31,8 @@ export default function SimpleInventory({
   isBlocked = false
 }: SimpleInventoryProps) {
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [showItemModal, setShowItemModal] = useState(false);
+  const [modalItem, setModalItem] = useState<InventoryItem | null>(null);
   const { toast } = useToast();
 
   const { data: inventoryData = [] } = useQuery<InventoryItem[]>({
@@ -151,7 +154,8 @@ export default function SimpleInventory({
         }`}
         onClick={() => {
           if (item) {
-            setSelectedItem(isSelected ? null : item);
+            setModalItem(item);
+            setShowItemModal(true);
           }
         }}
       >
@@ -298,6 +302,19 @@ export default function SimpleInventory({
           )}
         </CardContent>
       </Card>
+
+      {/* Item Details Modal */}
+      <ItemDetailsModal
+        isOpen={showItemModal}
+        onClose={() => {
+          setShowItemModal(false);
+          setModalItem(null);
+        }}
+        item={modalItem}
+        itemData={modalItem ? getItemById(modalItem.resourceId) || null : null}
+        playerId={playerId}
+        player={player}
+      />
     </div>
   );
 }

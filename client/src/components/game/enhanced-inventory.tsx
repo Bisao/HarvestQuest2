@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import EquipmentSelectorModal from "./equipment-selector-modal";
+import { ItemDetailsModal } from "./item-details-modal";
 import { isConsumable, getConsumableDescription } from "@shared/utils/consumable-utils";
 import type { Resource, Equipment, Player } from "@shared/types";
 
@@ -36,6 +37,8 @@ export default function EnhancedInventory({
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [equipmentModalOpen, setEquipmentModalOpen] = useState(false);
+  const [showItemModal, setShowItemModal] = useState(false);
+  const [modalItem, setModalItem] = useState<InventoryItem | null>(null);
   const [selectedEquipmentSlot, setSelectedEquipmentSlot] = useState<{
     id: string;
     name: string;
@@ -301,7 +304,14 @@ export default function EnhancedInventory({
         <Tooltip>
           <TooltipTrigger asChild>
             <div
-              onClick={() => handleSlotClick(`inv-${slotIndex}`, "inventory")}
+              onClick={() => {
+                if (item) {
+                  setModalItem(item);
+                  setShowItemModal(true);
+                } else {
+                  handleSlotClick(`inv-${slotIndex}`, "inventory");
+                }
+              }}
               className={`
                 aspect-square border-2 rounded-lg flex flex-col items-center justify-center
                 cursor-pointer transition-all hover:scale-105 relative
@@ -630,6 +640,19 @@ export default function EnhancedInventory({
           currentEquipped={selectedEquipmentSlot.equipped}
         />
       )}
+
+      {/* Item Details Modal */}
+      <ItemDetailsModal
+        isOpen={showItemModal}
+        onClose={() => {
+          setShowItemModal(false);
+          setModalItem(null);
+        }}
+        item={modalItem}
+        itemData={modalItem ? getItemById(modalItem.resourceId) || null : null}
+        playerId={playerId}
+        player={player}
+      />
     </div>
   );
 }
