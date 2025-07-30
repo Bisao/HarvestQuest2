@@ -304,14 +304,7 @@ export default function ExpeditionModal({
             </ScrollArea>
           </div>
 
-          {/* Selection summary */}
-          {selectedResources.length > 0 && (
-            <div className="bg-green-50 p-3 rounded-lg">
-              <p className="text-sm font-medium text-green-800">
-                {selectedResources.length} recurso(s) selecionado(s) para coleta
-              </p>
-            </div>
-          )}
+          
 
           {/* Action buttons */}
           <div className="flex justify-between">
