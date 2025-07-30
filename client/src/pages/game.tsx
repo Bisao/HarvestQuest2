@@ -8,6 +8,7 @@ import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 import ExpeditionSystem from "@/components/game/expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
+import { useAutoRepeat } from "@/hooks/use-auto-repeat";
 import { queryClient } from "@/lib/queryClient";
 import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
 
@@ -18,8 +19,6 @@ export default function Game() {
   const [expeditionMinimizedExpanded, setExpeditionMinimizedExpanded] = useState(false);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
   const [activeExpedition, setActiveExpedition] = useState<any>(null);
-  const [autoRepeatSettings, setAutoRepeatSettings] = useState<{[biomeId: string]: {enabled: boolean, resources: string[], countdown: number}}>({});
-  const [autoRepeatTimers, setAutoRepeatTimers] = useState<Record<string, NodeJS.Timeout>>({});
 
   const { gameState, updateGameState } = useGameState();
 
@@ -63,6 +62,32 @@ export default function Game() {
 
   // Check if there are any completable quests
   const hasCompletableQuests = quests.some((quest: any) => quest.canComplete === true);
+
+  // Função para iniciar expedição via auto-repeat 
+  const handleAutoStartExpedition = (biomeId: string, resources: string[]) => {
+    const biome = biomes.find(b => b.id === biomeId);
+    if (!biome) return;
+
+    setSelectedBiome(biome);
+    setExpeditionModalOpen(true);
+    setExpeditionMinimized(false);
+    
+    // Disparar evento para auto-iniciar a expedição
+    setTimeout(() => {
+      const event = new CustomEvent('autoStartExpedition', { 
+        detail: { resources } 
+      });
+      window.dispatchEvent(event);
+    }, 500);
+  };
+
+  // Hook de auto-repetição
+  const { autoRepeatSettings, toggleAutoRepeat, restartCountdown } = useAutoRepeat({
+    player,
+    biomes,
+    activeExpedition,
+    onStartExpedition: handleAutoStartExpedition
+  });
 
   const tabs = [
     { id: "biomes", label: "Biomas", emoji: "🌍" },
@@ -143,7 +168,6 @@ export default function Game() {
     onSuccess: (result: any) => {
       // Check if auto-repeat is enabled for current biome before clearing expedition
       const currentBiomeId = activeExpedition?.biomeId;
-      const shouldRestartAutoRepeat = currentBiomeId && autoRepeatSettings[currentBiomeId]?.enabled;
       
       setActiveExpedition(null);
       setExpeditionModalOpen(false);
@@ -152,23 +176,9 @@ export default function Game() {
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       
       // Restart auto-repeat countdown if it was enabled
-      if (shouldRestartAutoRepeat && currentBiomeId) {
+      if (currentBiomeId) {
         console.log('Expedition completed - restarting auto-repeat countdown for biome:', currentBiomeId);
-        
-        // Add small delay to allow expedition state to clear, then restart countdown
-        setTimeout(() => {
-          setAutoRepeatSettings(prev => ({
-            ...prev,
-            [currentBiomeId]: { 
-              ...prev[currentBiomeId], 
-              countdown: 10,
-              enabled: true 
-            }
-          }));
-          
-          // Use the new startCountdownTimer function
-          startCountdownTimer(currentBiomeId);
-        }, 1000);
+        restartCountdown(currentBiomeId);
       }
     }
   });
@@ -199,177 +209,6 @@ export default function Game() {
       window.removeEventListener('expeditionStarted', handleExpeditionStarted as EventListener);
     };
   }, []);
-
-  // Clear timer for a specific biome
-  const clearBiomeTimer = (biomeId: string) => {
-    if (autoRepeatTimers[biomeId]) {
-      clearInterval(autoRepeatTimers[biomeId]);
-      setAutoRepeatTimers(prev => {
-        const { [biomeId]: _, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  // Start countdown timer for a biome
-  const startCountdownTimer = (biomeId: string) => {
-    // Clear any existing timer first
-    clearBiomeTimer(biomeId);
-    
-    const countdownInterval = setInterval(() => {
-      setAutoRepeatSettings(prevSettings => {
-        const currentCountdown = prevSettings[biomeId]?.countdown || 0;
-        if (currentCountdown <= 1) {
-          clearInterval(countdownInterval);
-          // Remove from timers registry
-          setAutoRepeatTimers(prev => {
-            const { [biomeId]: _, ...rest } = prev;
-            return rest;
-          });
-          return {
-            ...prevSettings,
-            [biomeId]: { ...prevSettings[biomeId], countdown: 0 }
-          };
-        }
-        return {
-          ...prevSettings,
-          [biomeId]: { ...prevSettings[biomeId], countdown: currentCountdown - 1 }
-        };
-      });
-    }, 1000);
-    
-    setAutoRepeatTimers(prev => ({
-      ...prev,
-      [biomeId]: countdownInterval
-    }));
-  };
-
-  const handleToggleAutoRepeat = (biomeId: string) => {
-    console.log('Toggle auto-repeat for biome:', biomeId);
-    
-    // Get last expedition resources
-    const lastExpeditions = typeof window !== 'undefined' 
-      ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
-      : {};
-    
-    console.log('Last expeditions:', lastExpeditions);
-    
-    setAutoRepeatSettings(prev => {
-      const newSettings = { ...prev };
-      
-      if (newSettings[biomeId]) {
-        // Toggle the enabled state
-        newSettings[biomeId].enabled = !newSettings[biomeId].enabled;
-        
-        if (newSettings[biomeId].enabled) {
-          // Starting auto-repeat
-          newSettings[biomeId].countdown = 10;
-          console.log('Starting countdown for biome:', biomeId);
-          startCountdownTimer(biomeId);
-        } else {
-          // Disabling auto-repeat
-          clearBiomeTimer(biomeId);
-          newSettings[biomeId].countdown = 0;
-          console.log('Disabled auto-repeat for biome:', biomeId);
-        }
-      } else {
-        // First time enabling - check for last expedition resources
-        if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
-          newSettings[biomeId] = { 
-            enabled: true, 
-            resources: lastExpeditions[biomeId], 
-            countdown: 10
-          };
-          console.log('First time enabling auto-repeat for biome:', biomeId);
-          startCountdownTimer(biomeId);
-        } else {
-          console.log('No last expedition resources found for biome:', biomeId);
-        }
-      }
-      
-      console.log('New settings:', newSettings);
-      return newSettings;
-    });
-  };
-
-  // Auto-repeat expedition logic - watch for countdown reaching 0 and start expedition
-  useEffect(() => {
-    console.log('Auto-repeat useEffect triggered. autoRepeatSettings:', autoRepeatSettings, 'activeExpedition:', !!activeExpedition);
-    
-    const enabledBiome = Object.entries(autoRepeatSettings).find(([_, settings]) => 
-      settings.enabled && settings.countdown === 0 && !activeExpedition
-    );
-    
-    console.log('Found enabled biome for auto-start:', enabledBiome);
-    
-    if (enabledBiome) {
-      const [biomeId, settings] = enabledBiome;
-      const biome = biomes?.find(b => b.id === biomeId);
-      
-      console.log('Biome found:', biome?.name, 'Player stats:', { 
-        hunger: player?.hunger, 
-        thirst: player?.thirst,
-        canStart: biome && player && player.hunger >= 30 && player.thirst >= 30 
-      });
-      
-      if (biome && player && player.hunger >= 30 && player.thirst >= 30) {
-        console.log('All conditions met - Auto-starting expedition for biome:', biomeId);
-        
-        // Get last expedition resources
-        const lastExpeditions = typeof window !== 'undefined' 
-          ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
-          : {};
-          
-        if (lastExpeditions[biomeId] && lastExpeditions[biomeId].length > 0) {
-          console.log('Auto-starting expedition for biome:', biomeId, 'with resources:', lastExpeditions[biomeId]);
-          
-          // Set selected biome first
-          setSelectedBiome(biome);
-          
-          // Then open modal and minimize it to show the expedition in progress
-          setTimeout(() => {
-            console.log('Opening expedition modal - setting states');
-            setExpeditionModalOpen(true);
-            setExpeditionMinimized(false);
-            
-            console.log('Modal states set - expeditionModalOpen: true, expeditionMinimized: false');
-            
-            // Auto-start expedition with last resources after modal opens
-            setTimeout(() => {
-              console.log('Dispatching autoStartExpedition event');
-              const event = new CustomEvent('autoStartExpedition', { 
-                detail: { resources: lastExpeditions[biomeId] } 
-              });
-              window.dispatchEvent(event);
-            }, 500);
-          }, 100);
-          
-          // Reset the auto-repeat countdown for next cycle
-          setAutoRepeatSettings(prev => ({
-            ...prev,
-            [biomeId]: { ...prev[biomeId], countdown: 10 }
-          }));
-        }
-      } else {
-        // Disable auto-repeat if conditions aren't met
-        setAutoRepeatSettings(prev => ({
-          ...prev,
-          [biomeId]: { ...prev[biomeId], enabled: false }
-        }));
-      }
-    }
-  }, [autoRepeatSettings, activeExpedition, biomes, player]);
-
-  // Cleanup timers on unmount
-  useEffect(() => {
-    return () => {
-      Object.values(autoRepeatTimers).forEach(timer => {
-        if (timer) {
-          clearTimeout(timer);
-        }
-      });
-    };
-  }, [autoRepeatTimers]);
 
   if (!player) {
     return (
@@ -402,273 +241,138 @@ export default function Game() {
                     }`}
                   >
                     <span className="text-lg">{tab.emoji}</span>
-                    <span className="hidden sm:inline">{tab.label}</span>
-                    <span className="sm:hidden">{
-                      tab.id === "biomes" ? "Biomas" : 
-                      tab.id === "quests" ? "Quests" : 
-                      tab.id === "inventory" ? "Inv." : 
-                      tab.id === "storage" ? "Arm." : 
-                      "Craft"
-                    }</span>
+                    <span>{tab.label}</span>
                     {tab.hasNotification && (
-                      <span className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-xs font-bold quest-notification shadow-lg">
-                        !
-                      </span>
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     )}
                   </button>
                 );
               })}
             </div>
 
-            {/* Content for Active Category */}
-            <div className="p-3 md:p-6">
+            {/* Tab Content */}
+            <div className="px-6 pb-6">
               {activeTab === "biomes" && (
                 <BiomesTab
-                  biomes={biomes?.map(biome => {
-                    // Get last expedition resources from localStorage
-                    const lastExpeditions = typeof window !== 'undefined' 
-                      ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
-                      : {};
-                    
-                    return {
-                      ...biome,
-                      autoRepeatEnabled: autoRepeatSettings[biome.id]?.enabled || false,
-                      autoRepeatCountdown: autoRepeatSettings[biome.id]?.countdown || 0,
-                      lastExpeditionResources: lastExpeditions[biome.id] || []
-                    };
-                  }) || []}
-                  player={player}
-                  resources={resources}
-                  activeExpedition={activeExpedition ? {
-                    biomeId: activeExpedition.biomeId,
-                    progress: activeExpedition.progress || 0,
-                    selectedResources: activeExpedition.selectedResources
-                  } : null}
-                  onExploreBiome={handleExploreBiome}
-                  onCompleteExpedition={(expeditionId) => {
-                    if (activeExpedition) {
-                      handleCompleteExpedition();
-                    }
-                  }}
-                  onToggleAutoRepeat={handleToggleAutoRepeat}
-                />
-              )}
-
-              {activeTab === "quests" && (
-                <QuestsTab
-                  player={player}
-                />
-              )}
-
-              {activeTab === "inventory" && (
-                <EnhancedInventoryWithTabs
-                  playerId={player.id}
+                  biomes={biomes}
                   resources={resources}
                   equipment={equipment}
                   player={player}
-                  isBlocked={!!activeExpedition}
+                  onExpeditionStart={handleExploreBiome}
+                  autoRepeatSettings={autoRepeatSettings}
+                  onToggleAutoRepeat={toggleAutoRepeat}
                 />
               )}
-
+              {activeTab === "quests" && (
+                <QuestsTab
+                  quests={quests}
+                  playerId={player.id}
+                />
+              )}
+              {activeTab === "inventory" && (
+                <EnhancedInventoryWithTabs
+                  inventoryItems={inventoryItems}
+                  equipment={equipment}
+                  resources={resources}
+                  playerId={player.id}
+                  playerEquipment={player.equipment}
+                />
+              )}
               {activeTab === "storage" && (
                 <EnhancedStorageTab
                   playerId={player.id}
-                  resources={resources}
                   equipment={equipment}
-                  player={player}
-                  isBlocked={!!activeExpedition}
+                  resources={resources}
                 />
               )}
-
               {activeTab === "crafting" && (
                 <EnhancedCraftingTab
                   recipes={recipes}
-                  resources={resources}
-                  playerLevel={player.level}
                   playerId={player.id}
-                  isBlocked={!!activeExpedition}
+                  resources={resources}
+                  equipment={equipment}
                 />
               )}
             </div>
           </div>
         </div>
-      </main>
 
-      <ExpeditionSystem
-        isOpen={expeditionModalOpen}
-        onClose={() => {
-          setExpeditionModalOpen(false);
-          setSelectedBiome(null);
-          setActiveExpedition(null);
-        }}
-        onExpeditionStart={() => {
-          setExpeditionModalOpen(false);
-          setExpeditionMinimized(true);
-        }}
-        onMinimize={handleMinimizeExpedition}
-        biome={selectedBiome}
-        resources={resources}
-        equipment={equipment}
-        playerId={player.id}
-        player={player}
-        isMinimized={expeditionMinimized}
-        onExpeditionComplete={handleCompleteExpedition}
-        activeExpedition={activeExpedition}
-        onExpeditionUpdate={setActiveExpedition}
-      />
-
-      {/* Janela Minimizada Compacta - Como Foto 1 */}
-      {expeditionMinimized && activeExpedition && selectedBiome && !expeditionMinimizedExpanded && (
-        <div className="fixed bottom-4 left-4 z-50">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-[300px]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{selectedBiome.emoji}</span>
-                <div>
-                  <h4 className="font-semibold text-sm">Expedição na {selectedBiome.name}</h4>
-                  <p className="text-xs text-gray-500">
-                    {activeExpedition.progress >= 100 ? 'Concluída!' : 'Em andamento...'}
-                  </p>
+        {/* Minimized Expedition Window */}
+        {activeExpedition && expeditionMinimized && (
+          <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg border-2 z-50 max-w-sm">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2">
+                  <h3 className="font-bold text-sm">Expedição Ativa</h3>
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                    {biomes.find(b => b.id === activeExpedition.biomeId)?.name}
+                  </span>
                 </div>
-              </div>
-              <button
-                onClick={() => setExpeditionMinimizedExpanded(true)}
-                className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 10l5 5 5-5" />
-                </svg>
-              </button>
-            </div>
-            
-            {/* Conteúdo da janela minimizada */}
-            <div className="mt-3 space-y-2">
-              {activeExpedition.progress < 100 ? (
-                // Barra de Progresso - durante expedição ativa
-                <>
-                  <div className="flex justify-between text-sm">
-                    <span>Progresso</span>
-                    <span>{Math.round(activeExpedition.progress || 0)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div 
-                      className="bg-green-500 h-2.5 rounded-full transition-all duration-300"
-                      style={{ width: `${activeExpedition.progress || 0}%` }}
-                    ></div>
-                  </div>
-                </>
-              ) : (
-                // Botão Finalizar - quando expedição completa
                 <button
-                  onClick={handleCompleteExpedition}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  onClick={handleMinimizeExpedition}
+                  className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded"
                 >
-                  Finalizar
+                  {expeditionMinimizedExpanded ? "▼" : "▲"}
                 </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Janela Expandida Unificada - Estados 2 e 3 */}
-      {expeditionMinimizedExpanded && activeExpedition && selectedBiome && (
-        <div className="fixed bottom-4 left-4 z-50">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 min-w-[400px] max-w-[450px]">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{selectedBiome.emoji}</span>
-                <div>
-                  <h4 className="font-semibold">Expedição na {selectedBiome.name}</h4>
-                  <p className="text-xs text-gray-500">
-                    {activeExpedition.progress >= 100 ? 'Concluída!' : 'Em andamento...'}
-                  </p>
-                </div>
               </div>
-              <button
-                onClick={() => setExpeditionMinimizedExpanded(false)}
-                className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              {/* Barra de Progresso - apenas durante expedição ativa */}
-              {activeExpedition.progress < 100 && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Progresso</span>
-                    <span>{Math.round(activeExpedition.progress || 0)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
-                      className="bg-green-500 h-3 rounded-full transition-all duration-300"
-                      style={{ width: `${activeExpedition.progress || 0}%` }}
-                    ></div>
-                  </div>
-                </div>
-              )}
 
-              {/* Lista de Recursos */}
-              <div>
-                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+              {expeditionMinimizedExpanded && (
+                <div className="space-y-3 border-t pt-3">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Progresso:</span>
+                      <span>{Math.round(activeExpedition.progress)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${activeExpedition.progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
                   {activeExpedition.progress >= 100 ? (
-                    <>
-                      <span className="text-green-600">✅</span>
-                      <span className="text-green-700">Recursos Coletados:</span>
-                    </>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-green-600">Expedição Concluída!</p>
+                      <button
+                        onClick={handleCompleteExpedition}
+                        className="w-full bg-green-600 text-white py-2 px-4 rounded text-sm hover:bg-green-700"
+                        disabled={completeExpeditionMutation.isPending}
+                      >
+                        {completeExpeditionMutation.isPending ? "Finalizando..." : "Finalizar Expedição"}
+                      </button>
+                    </div>
                   ) : (
-                    <>
-                      <span className="text-blue-600">🎯</span>
-                      <span className="text-blue-700">Coletando Recursos:</span>
-                    </>
+                    <p className="text-xs text-gray-600">
+                      Tempo restante: {Math.ceil(((activeExpedition.estimatedDuration - (Date.now() - activeExpedition.startTime)) / 1000) / 60)} min
+                    </p>
                   )}
-                </h4>
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {activeExpedition.selectedResources?.map((resourceId: string) => {
-                    const resource = resources?.find(r => r.id === resourceId);
-                    if (!resource) return null;
-                    
-                    const estimatedQuantity = Math.floor((activeExpedition.progress / 100) * 3);
-                    
-                    return (
-                      <div key={resourceId} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{resource.emoji}</span>
-                          <span className="text-sm text-blue-700">{resource.name}</span>
-                        </div>
-                        <div className="text-sm font-semibold text-blue-600">
-                          {activeExpedition.progress >= 100 ? '+2' : estimatedQuantity > 0 ? `+${estimatedQuantity}` : "..."}
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
-              </div>
-
-              {/* Botão de Ação */}
-              {activeExpedition.progress >= 100 ? (
-                <button
-                  onClick={handleCompleteExpedition}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                >
-                  ✅ Finalizar Expedição
-                </button>
-              ) : (
-                <button
-                  onClick={() => setExpeditionMinimizedExpanded(false)}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-3 rounded-lg transition-colors"
-                >
-                  Fechar
-                </button>
               )}
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Expedition Modal */}
+        <ExpeditionSystem
+          isOpen={expeditionModalOpen}
+          onClose={() => setExpeditionModalOpen(false)}
+          onMinimize={handleMinimizeExpedition}
+          biome={selectedBiome}
+          resources={resources}
+          equipment={equipment}
+          playerId={player.id}
+          player={player}
+          onExpeditionComplete={handleCompleteExpedition}
+          isMinimized={expeditionMinimized}
+          activeExpedition={activeExpedition}
+          onExpeditionUpdate={setActiveExpedition}
+          onExpeditionStart={() => {
+            setExpeditionModalOpen(false);
+            setExpeditionMinimized(true);
+          }}
+        />
+      </main>
     </div>
   );
 }
