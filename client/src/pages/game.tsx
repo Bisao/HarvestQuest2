@@ -84,21 +84,22 @@ export default function Game() {
       <GameHeader player={player} />
 
       {/* Tab Navigation - Fixed below header */}
-      <div className="fixed top-20 left-0 right-0 z-40 bg-white shadow-lg border-b">
-        <div className="container mx-auto px-4">
-          <div className="flex border-b">
+      <div className="fixed top-16 md:top-20 left-0 right-0 z-40 bg-white shadow-lg border-b">
+        <div className="container mx-auto px-2 md:px-4">
+          <div className="flex border-b overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                className={`flex-shrink-0 px-2 md:px-4 py-2 md:py-3 text-xs md:text-sm font-medium transition-colors min-w-0 ${
                   activeTab === tab.id
                     ? "bg-blue-50 text-blue-700 border-b-2 border-blue-500"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
-                <span className="mr-2">{tab.emoji}</span>
-                {tab.label}
+                <span className="mr-1 md:mr-2 text-sm md:text-base">{tab.emoji}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.slice(0, 4)}</span>
               </button>
             ))}
           </div>
@@ -106,10 +107,10 @@ export default function Game() {
       </div>
 
       {/* Main content with fixed height and scrolling */}
-      <main className="fixed top-32 left-0 right-0 bottom-0 overflow-hidden">
-        <div className="container mx-auto px-4 h-full py-6">
+      <main className="fixed top-24 md:top-32 left-0 right-0 bottom-0 overflow-hidden">
+        <div className="container mx-auto px-2 md:px-4 h-full py-2 md:py-6">
           {/* Tab Content - Scrollable container */}
-          <div className="bg-white rounded-lg shadow-lg h-full overflow-y-auto p-6">
+          <div className="bg-white rounded-lg shadow-lg h-full overflow-y-auto p-3 md:p-6">
             {activeTab === "biomes" && (
               <BiomesTab
                 biomes={biomes}

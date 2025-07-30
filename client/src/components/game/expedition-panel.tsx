@@ -127,48 +127,48 @@ export default function ExpeditionPanel({
   const timeRemainingMinutes = Math.ceil(timeRemaining / 1000 / 60);
 
   return (
-    <div className="fixed bottom-4 left-4 bg-white rounded-lg shadow-lg border-2 border-blue-200 z-50 min-w-80">
+    <div className="fixed bottom-2 md:bottom-4 left-2 md:left-4 bg-white rounded-lg shadow-lg border-2 border-blue-200 z-50 w-72 md:w-80 max-w-[calc(100vw-1rem)]">
       {/* Minimized header */}
-      <div className="p-3 flex items-center justify-between bg-blue-50 rounded-t-lg">
-        <div className="flex items-center space-x-2">
-          <span className="font-medium text-sm">Expedição Ativa</span>
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">
+      <div className="p-2 md:p-3 flex items-center justify-between bg-blue-50 rounded-t-lg">
+        <div className="flex items-center space-x-1 md:space-x-2">
+          <span className="font-medium text-xs md:text-sm">Expedição Ativa</span>
+          <span className="text-xs bg-blue-100 text-blue-800 px-1.5 md:px-2 py-0.5 md:py-1 rounded font-medium">
             {biome?.name}
           </span>
-          <span className="text-lg">{biome?.emoji}</span>
+          <span className="text-base md:text-lg">{biome?.emoji}</span>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="h-6 w-6 p-0"
+          className="h-5 w-5 md:h-6 md:w-6 p-0"
         >
           {isExpanded ? (
-            <ChevronDown className="h-3 w-3" />
+            <ChevronDown className="h-3 w-3 md:h-4 md:w-4" />
           ) : (
-            <ChevronUp className="h-3 w-3" />
+            <ChevronUp className="h-3 w-3 md:h-4 md:w-4" />
           )}
         </Button>
       </div>
 
       {/* Progress bar or finalize button when minimized */}
       {!isExpanded && !isCompleted && (
-        <div className="px-3 pb-2">
+        <div className="px-2 md:px-3 pb-1.5 md:pb-2">
           <div className="flex justify-between text-xs mb-1">
             <span>Progresso</span>
             <span>{Math.round(currentProgress)}%</span>
           </div>
-          <Progress value={currentProgress} className="h-2" />
+          <Progress value={currentProgress} className="h-1.5 md:h-2" />
         </div>
       )}
       
       {/* Finalize button when completed and minimized */}
       {!isExpanded && isCompleted && (
-        <div className="px-3 pb-2">
+        <div className="px-2 md:px-3 pb-1.5 md:pb-2">
           <Button
             onClick={handleCompleteExpedition}
             disabled={completeExpeditionMutation.isPending}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-green-600 hover:bg-green-700 text-white text-xs md:text-sm"
             size="sm"
           >
             {completeExpeditionMutation.isPending ? "Finalizando..." : "🎯 Finalizar Expedição"}
@@ -178,7 +178,7 @@ export default function ExpeditionPanel({
 
       {/* Expanded content */}
       {isExpanded && (
-        <div className="border-t border-gray-200 p-3 space-y-3">
+        <div className="border-t border-gray-200 p-2 md:p-3 space-y-2 md:space-y-3">
           {!isCompleted ? (
             <>
               {/* Time remaining */}

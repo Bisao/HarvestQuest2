@@ -28,9 +28,9 @@ export default function EnhancedInventoryWithTabs({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Sub-tabs Navigation - Following main tabs style */}
-      <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
+      <div className="flex overflow-x-auto gap-1 md:gap-2 mb-4 md:mb-6 border-b border-gray-200 scrollbar-hide">
         {subTabs.map((tab) => {
           const isActive = activeSubTab === tab.id;
           
@@ -38,13 +38,13 @@ export default function EnhancedInventoryWithTabs({
             <button
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id)}
-              className={`relative flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
+              className={`relative flex items-center space-x-1 md:space-x-2 px-2 md:px-4 py-2 md:py-3 rounded-t-lg font-medium transition-all flex-shrink-0 text-xs md:text-sm ${
                 isActive 
                   ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
                   : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
               }`}
             >
-              <span className="text-lg">{tab.emoji}</span>
+              <span className="text-base md:text-lg">{tab.emoji}</span>
               <span className="hidden sm:inline">{tab.label}</span>
               <span className="sm:hidden">{
                 tab.id === "equipment" ? "Equip." : 
@@ -57,7 +57,7 @@ export default function EnhancedInventoryWithTabs({
       </div>
 
       {/* Sub-tab Content */}
-      <div className="min-h-[400px]">
+      <div className="min-h-[300px] md:min-h-[400px]">
         {activeSubTab === "equipment" && (
           <EquipmentTab
             player={player}

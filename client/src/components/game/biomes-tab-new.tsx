@@ -114,8 +114,8 @@ export default function BiomesTab({
 
   return (
     <>
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-4 md:space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {biomes.map((biome) => {
             const biomeResources = getResourcesForBiome(biome);
             const unlocked = isUnlocked(biome);
@@ -123,24 +123,24 @@ export default function BiomesTab({
             return (
               <Card 
                 key={biome.id} 
-                className={`transition-all ${unlocked ? 'hover:shadow-lg cursor-pointer' : 'opacity-60'} min-h-[300px]`}
+                className={`transition-all ${unlocked ? 'hover:shadow-lg cursor-pointer' : 'opacity-60'} min-h-[280px] md:min-h-[300px]`}
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-2xl">{biome.emoji}</span>
-                      <CardTitle className="text-xl">{biome.name}</CardTitle>
+                <CardHeader className="pb-2 md:pb-3">
+                  <div className="flex items-center justify-between mb-1 md:mb-2">
+                    <div className="flex items-center space-x-2 md:space-x-3">
+                      <span className="text-xl md:text-2xl">{biome.emoji}</span>
+                      <CardTitle className="text-lg md:text-xl">{biome.name}</CardTitle>
                     </div>
-                    <Badge variant={unlocked ? "default" : "secondary"}>
+                    <Badge variant={unlocked ? "default" : "secondary"} className="text-xs">
                       Nível {biome.requiredLevel}
                     </Badge>
                   </div>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-xs md:text-sm">
                     Explore este bioma para coletar recursos únicos
                   </CardDescription>
                 </CardHeader>
                 
-                <CardContent className="space-y-4 pt-0">
+                <CardContent className="space-y-3 md:space-y-4 pt-0">
                   {/* Progress bar for locked biomes */}
                   {!unlocked && (
                     <div className="bg-gray-50 p-3 rounded-lg">
@@ -156,18 +156,18 @@ export default function BiomesTab({
                   )}
 
                   {/* Resources available */}
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-sm mb-3 text-blue-800">Recursos Disponíveis:</h4>
-                    <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-blue-50 p-2 md:p-3 rounded-lg">
+                    <h4 className="font-medium text-xs md:text-sm mb-2 md:mb-3 text-blue-800">Recursos Disponíveis:</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 md:gap-2">
                       {biomeResources.slice(0, 4).map((resource) => (
-                        <div key={resource.id} className="flex items-center space-x-2 text-xs bg-white p-2 rounded">
-                          <span className="text-base">{resource.emoji}</span>
-                          <span className="truncate text-gray-700">{resource.name}</span>
+                        <div key={resource.id} className="flex items-center space-x-1 md:space-x-2 text-xs bg-white p-1.5 md:p-2 rounded">
+                          <span className="text-sm md:text-base">{resource.emoji}</span>
+                          <span className="truncate text-gray-700 text-xs">{resource.name}</span>
                         </div>
                       ))}
                     </div>
                     {biomeResources.length > 4 && (
-                      <div className="text-xs text-blue-600 mt-2 text-center">
+                      <div className="text-xs text-blue-600 mt-1 md:mt-2 text-center">
                         +{biomeResources.length - 4} outros recursos...
                       </div>
                     )}
@@ -185,11 +185,11 @@ export default function BiomesTab({
                   )}
 
                   {/* Explore button */}
-                  <div className="pt-2">
+                  <div className="pt-1 md:pt-2">
                     <Button 
                       onClick={() => handleExploreBiome(biome)}
                       disabled={isButtonDisabled(biome, unlocked)}
-                      className="w-full h-12 text-base font-medium"
+                      className="w-full h-10 md:h-12 text-sm md:text-base font-medium"
                       variant={getButtonVariant(biome, unlocked)}
                     >
                       {getButtonText(biome, unlocked)}
