@@ -157,7 +157,7 @@ export function registerEnhancedGameRoutes(
         if (Array.isArray(recipe.ingredients)) {
           // Convert array format to object format
           for (const ingredient of recipe.ingredients) {
-            ingredients[ingredient.resourceId] = ingredient.quantity;
+            ingredients[ingredient.itemId] = ingredient.quantity;
           }
         } else if (typeof recipe.ingredients === 'object' && recipe.ingredients !== null) {
           ingredients = recipe.ingredients as Record<string, number>;
