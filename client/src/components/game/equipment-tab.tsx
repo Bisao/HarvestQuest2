@@ -263,31 +263,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
         </CardContent>
       </Card>
 
-      {/* Equipment Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <span>📋</span>
-            <span>Details</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Total Slots:</span>
-              <span>10</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Equipped:</span>
-              <span>{equipmentSlots.filter(s => s.equippedId).length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Available:</span>
-              <span>{equipmentSlots.filter(s => !s.equippedId && !["bag", "cape", "potion", "food"].includes(s.slot)).length}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      
 
       {/* Equipment Selection Modal */}
       <Dialog open={equipModalOpen} onOpenChange={setEquipModalOpen}>
