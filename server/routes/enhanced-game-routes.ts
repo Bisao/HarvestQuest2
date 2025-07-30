@@ -205,17 +205,26 @@ export function registerEnhancedGameRoutes(
             tanksUnlocked: updatedPlayer.waterTanks,
             barrelsCrafted: quantity
           });
-        } else {
-          // Add crafted items to storage (always storage as per requirement)
-          const output = recipe.outputs as Record<string, number>;
-          const items = [];
-          
-          // Check if output exists and is valid
-          if (!output || typeof output !== 'object') {
-            throw new InvalidOperationError(`Recipe ${recipe.name} has no valid output defined`);
+        }
+        
+        // Add crafted items to storage (always storage as per requirement)
+        let outputs: Record<string, number> = {};
+        const items = [];
+        
+        if (!isBarrelCrafting) {
+          // Handle recipe outputs - check if it's array or object format
+          if (Array.isArray(recipe.outputs)) {
+            // Convert array format to object format
+            for (const output of recipe.outputs) {
+              outputs[output.itemId] = output.quantity;
+            }
+          } else if (typeof recipe.outputs === 'object' && recipe.outputs !== null) {
+            outputs = recipe.outputs as Record<string, number>;
+          } else {
+            throw new InvalidOperationError(`Recipe ${recipe.name} has no valid outputs defined`);
           }
           
-          for (const [itemId, baseAmount] of Object.entries(output)) {
+          for (const [itemId, baseAmount] of Object.entries(outputs)) {
             const totalAmount = baseAmount * quantity;
             
             // Always add to storage (items craftados sempre vão para o armazém)
@@ -262,7 +271,7 @@ export function registerEnhancedGameRoutes(
         const activeQuests = await storage.getPlayerQuests(playerId);
         const activePlayerQuests = activeQuests.filter(pq => pq.status === 'active');
         
-        for (const [craftedItemId, craftedAmount] of Object.entries(output || {})) {
+        for (const [craftedItemId, craftedAmount] of Object.entries(outputs || {})) {
           const totalCraftedAmount = (craftedAmount as number) * quantity; // This is the total amount crafted
           
           for (const playerQuest of activePlayerQuests) {
