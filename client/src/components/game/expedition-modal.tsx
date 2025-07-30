@@ -233,7 +233,38 @@ export default function ExpeditionModal({
 
           {/* Resource selection */}
           <div>
-            <h4 className="font-medium mb-3">Recursos Disponíveis para Coleta:</h4>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium">Recursos Disponíveis para Coleta:</h4>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const availableResources = collectableResources.filter(r => r.canCollect);
+                  const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
+                  
+                  if (allAvailableSelected) {
+                    // Desmarcar todos os disponíveis
+                    setSelectedResources(prev => prev.filter(id => !availableResources.some(r => r.id === id)));
+                  } else {
+                    // Marcar todos os disponíveis
+                    const newSelected = [...selectedResources];
+                    availableResources.forEach(resource => {
+                      if (!newSelected.includes(resource.id)) {
+                        newSelected.push(resource.id);
+                      }
+                    });
+                    setSelectedResources(newSelected);
+                  }
+                }}
+                className="text-xs"
+              >
+                {(() => {
+                  const availableResources = collectableResources.filter(r => r.canCollect);
+                  const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
+                  return allAvailableSelected ? "❌ Desmarcar Tudo" : "✅ Marcar Tudo";
+                })()}
+              </Button>
+            </div>
             <ScrollArea className="h-64 border rounded-lg p-3">
               <div className="space-y-2">
                 {collectableResources.map((resource) => (
