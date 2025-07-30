@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { isConsumable, getConsumableEffects } from "@shared/utils/consumable-utils";
@@ -78,7 +79,8 @@ export function ItemDetailsModal({
       const effects = getConsumableEffects(itemData);
 
       const response = await apiRequest('POST', `/api/player/${playerId}/consume`, {
-        itemId: item.id,
+        itemId: item.resourceId,
+        inventoryItemId: item.id,
         quantity: consumeQuantity,
         location: 'inventory',
         hungerRestore: effects.hungerRestore,
@@ -174,50 +176,58 @@ export function ItemDetailsModal({
           <div className="space-y-3">
             {/* Consume Action */}
             {itemIsConsumable && (
-              <div className="space-y-2">
-                <Label htmlFor="consume-quantity">Consumir</Label>
-                <div className="flex space-x-2">
-                  <Input
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label htmlFor="consume-quantity">Consumir: {consumeQuantity}</Label>
+                  <Slider
                     id="consume-quantity"
-                    type="number"
-                    min="1"
+                    min={1}
                     max={maxConsumeQuantity}
-                    value={consumeQuantity}
-                    onChange={(e) => setConsumeQuantity(Math.min(Math.max(1, parseInt(e.target.value) || 1), maxConsumeQuantity))}
-                    className="flex-1"
+                    step={1}
+                    value={[consumeQuantity]}
+                    onValueChange={(value) => setConsumeQuantity(value[0])}
+                    className="w-full"
                   />
-                  <Button 
-                    onClick={() => consumeMutation.mutate()}
-                    disabled={consumeMutation.isPending || consumeQuantity > maxConsumeQuantity}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    {consumeMutation.isPending ? "Consumindo..." : "Consumir"}
-                  </Button>
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>1</span>
+                    <span>{maxConsumeQuantity}</span>
+                  </div>
                 </div>
+                <Button 
+                  onClick={() => consumeMutation.mutate()}
+                  disabled={consumeMutation.isPending || consumeQuantity > maxConsumeQuantity}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  {consumeMutation.isPending ? "Consumindo..." : `Consumir ${consumeQuantity}x`}
+                </Button>
               </div>
             )}
 
             {/* Move to Storage Action */}
-            <div className="space-y-2">
-              <Label htmlFor="move-quantity">Mover para Armazém</Label>
-              <div className="flex space-x-2">
-                <Input
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="move-quantity">Mover para Armazém: {moveQuantity}</Label>
+                <Slider
                   id="move-quantity"
-                  type="number"
-                  min="1"
+                  min={1}
                   max={maxMoveQuantity}
-                  value={moveQuantity}
-                  onChange={(e) => setMoveQuantity(Math.min(Math.max(1, parseInt(e.target.value) || 1), maxMoveQuantity))}
-                  className="flex-1"
+                  step={1}
+                  value={[moveQuantity]}
+                  onValueChange={(value) => setMoveQuantity(value[0])}
+                  className="w-full"
                 />
-                <Button 
-                  onClick={() => moveToStorageMutation.mutate()}
-                  disabled={moveToStorageMutation.isPending || moveQuantity > maxMoveQuantity}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {moveToStorageMutation.isPending ? "Movendo..." : "→ Armazém"}
-                </Button>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>1</span>
+                  <span>{maxMoveQuantity}</span>
+                </div>
               </div>
+              <Button 
+                onClick={() => moveToStorageMutation.mutate()}
+                disabled={moveToStorageMutation.isPending || moveQuantity > maxMoveQuantity}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                {moveToStorageMutation.isPending ? "Movendo..." : `→ Armazém ${moveQuantity}x`}
+              </Button>
             </div>
           </div>
 

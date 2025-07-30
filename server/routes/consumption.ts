@@ -11,9 +11,16 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       const { playerId } = req.params;
       const { itemId, location, hungerRestore, thirstRestore } = req.body;
 
+      // Get quantity from request, default to 1
+      const quantity = parseInt(req.body.quantity) || 1;
+
       // Validate input
       if (!itemId || !location || typeof hungerRestore !== 'number' || typeof thirstRestore !== 'number') {
         return res.status(400).json({ error: 'Missing required fields or invalid types' });
+      }
+
+      if (quantity <= 0) {
+        return res.status(400).json({ error: 'Quantity must be greater than 0' });
       }
 
       if (!['inventory', 'storage'].includes(location)) {
@@ -29,13 +36,17 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       // Check if item exists in specified location
       let hasItem = false;
       let itemQuantity = 0;
+      let inventoryItemId = req.body.inventoryItemId;
 
       if (location === 'inventory') {
         const inventoryItems = await storage.getPlayerInventory(playerId);
-        const inventoryItem = inventoryItems.find((item: any) => item.resourceId === itemId);
+        const inventoryItem = inventoryItems.find((item: any) => 
+          item.resourceId === itemId || (inventoryItemId && item.id === inventoryItemId)
+        );
         if (inventoryItem && inventoryItem.quantity > 0) {
           hasItem = true;
           itemQuantity = inventoryItem.quantity;
+          inventoryItemId = inventoryItem.id; // Ensure we have the correct ID
         }
       } else {
         const storageItems = await storage.getPlayerStorage(playerId);
@@ -50,9 +61,16 @@ export function createConsumptionRoutes(storage: IStorage): Router {
         return res.status(400).json({ error: 'Item not found in specified location or insufficient quantity' });
       }
 
+      // Validate quantity available
+      if (quantity > itemQuantity) {
+        return res.status(400).json({ error: 'Insufficient quantity available' });
+      }
+
       // Calculate new hunger and thirst (don't exceed max values)
-      const newHunger = Math.min(player.hunger + hungerRestore, player.maxHunger);
-      const newThirst = Math.min(player.thirst + thirstRestore, player.maxThirst);
+      const totalHungerRestore = hungerRestore * quantity;
+      const totalThirstRestore = thirstRestore * quantity;
+      const newHunger = Math.min(player.hunger + totalHungerRestore, player.maxHunger);
+      const newThirst = Math.min(player.thirst + totalThirstRestore, player.maxThirst);
 
       // Update player stats
       await storage.updatePlayer(playerId, {
@@ -60,25 +78,29 @@ export function createConsumptionRoutes(storage: IStorage): Router {
         thirst: newThirst
       });
 
-      // Remove one unit of the consumed item
+      // Remove consumed quantity of the item
       if (location === 'inventory') {
         const inventoryItems = await storage.getPlayerInventory(playerId);
-        const inventoryItem = inventoryItems.find((item: any) => item.resourceId === itemId);
+        const inventoryItem = inventoryItems.find((item: any) => 
+          item.resourceId === itemId || (inventoryItemId && item.id === inventoryItemId)
+        );
         if (inventoryItem) {
-          if (inventoryItem.quantity === 1) {
+          const newQuantity = inventoryItem.quantity - quantity;
+          if (newQuantity <= 0) {
             await storage.removeInventoryItem(inventoryItem.id);
           } else {
-            await storage.updateInventoryItem(inventoryItem.id, { quantity: inventoryItem.quantity - 1 });
+            await storage.updateInventoryItem(inventoryItem.id, { quantity: newQuantity });
           }
         }
       } else {
         const storageItems = await storage.getPlayerStorage(playerId);
         const storageItem = storageItems.find((item: any) => item.resourceId === itemId && item.itemType === 'resource');
         if (storageItem) {
-          if (storageItem.quantity === 1) {
+          const newQuantity = storageItem.quantity - quantity;
+          if (newQuantity <= 0) {
             await storage.removeStorageItem(storageItem.id);
           } else {
-            await storage.updateStorageItem(storageItem.id, { quantity: storageItem.quantity - 1 });
+            await storage.updateStorageItem(storageItem.id, { quantity: newQuantity });
           }
         }
       }
