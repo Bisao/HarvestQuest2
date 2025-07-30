@@ -44,6 +44,11 @@ export default function EnhancedStorageTab({
     amount: number;
   }>({ open: false, item: null, amount: 1 });
 
+  // Filter states
+  const [searchFilter, setSearchFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState<"all" | "resource" | "equipment">("all");
+  const [rarityFilter, setRarityFilter] = useState<"all" | "common" | "uncommon" | "rare" | "epic" | "legendary">("all");
+
   // Fetch storage data with enhanced information
   const { data: storageItems = [], isLoading } = useQuery<StorageItem[]>({
     queryKey: ["/api/storage", playerId],
@@ -87,6 +92,28 @@ export default function EnhancedStorageTab({
 
   // Water storage item (if exists)
   const waterStorageItem = enhancedStorageData.find(item => item.itemData.name === "Água Fresca");
+
+  // Filter items for display
+  const filteredStorageData = enhancedStorageData
+    .filter(item => item.itemData.name !== "Água Fresca") // Water handled separately
+    .filter(item => {
+      // Search filter
+      if (searchFilter && !item.itemData.name.toLowerCase().includes(searchFilter.toLowerCase())) {
+        return false;
+      }
+      
+      // Type filter
+      if (typeFilter !== "all" && item.itemData.type !== typeFilter) {
+        return false;
+      }
+      
+      // Rarity filter
+      if (rarityFilter !== "all" && item.itemData.rarity !== rarityFilter) {
+        return false;
+      }
+      
+      return true;
+    });
 
   // Withdraw item mutation
   const withdrawMutation = useMutation({
@@ -204,11 +231,102 @@ export default function EnhancedStorageTab({
       {/* Items Sub-tab */}
       {activeSubTab === "items" && (
         <div className="space-y-6">
+          {/* Filter Controls */}
+          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <h3 className="font-bold text-gray-800 text-lg mb-4 flex items-center">
+              <span className="mr-3 text-xl">🔍</span>
+              Filtros de Itens
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Search Filter */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 block mb-2">
+                  Buscar por nome:
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Digite o nome do item..."
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Type Filter */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 block mb-2">
+                  Tipo de item:
+                </label>
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value as any)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Todos os tipos</option>
+                  <option value="resource">🌿 Recursos</option>
+                  <option value="equipment">⚔️ Equipamentos</option>
+                </select>
+              </div>
+
+              {/* Rarity Filter */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 block mb-2">
+                  Raridade:
+                </label>
+                <select
+                  value={rarityFilter}
+                  onChange={(e) => setRarityFilter(e.target.value as any)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Todas as raridades</option>
+                  <option value="common">Comum</option>
+                  <option value="uncommon">Incomum</option>
+                  <option value="rare">Raro</option>
+                  <option value="epic">Épico</option>
+                  <option value="legendary">Lendário</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            {(searchFilter || typeFilter !== "all" || rarityFilter !== "all") && (
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => {
+                    setSearchFilter("");
+                    setTypeFilter("all");
+                    setRarityFilter("all");
+                  }}
+                  className="text-sm bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                  Limpar Filtros
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Results Summary */}
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Mostrando <span className="font-semibold text-gray-800">{filteredStorageData.length}</span> de{" "}
+              <span className="font-semibold text-gray-800">
+                {enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length}
+              </span> itens
+            </div>
+            
+            {filteredStorageData.length > 0 && (
+              <div className="text-sm text-gray-600">
+                Valor total filtrado: <span className="font-semibold text-green-600">
+                  {filteredStorageData.reduce((sum, item) => sum + item.totalValue, 0).toLocaleString()} moedas
+                </span>
+              </div>
+            )}
+          </div>
+
           {/* Storage Items Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {enhancedStorageData
-              .filter(item => item.itemData.name !== "Água Fresca") // Water handled separately
-              .map((item) => (
+            {filteredStorageData.map((item) => (
                 <div
                   key={item.id}
                   className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all duration-200"
@@ -282,13 +400,34 @@ export default function EnhancedStorageTab({
               ))}
 
             {/* Empty State */}
-            {enhancedStorageData.length === 0 && (
+            {filteredStorageData.length === 0 && enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length === 0 && (
               <div className="col-span-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-12 text-center">
                 <div className="text-6xl text-gray-400 mb-4">📦</div>
                 <h3 className="text-lg font-semibold text-gray-600 mb-2">Armazém Vazio</h3>
                 <p className="text-gray-500">
                   Colete recursos em expedições para começar a encher seu armazém!
                 </p>
+              </div>
+            )}
+
+            {/* No Results State */}
+            {filteredStorageData.length === 0 && enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length > 0 && (
+              <div className="col-span-full bg-yellow-50 border-2 border-dashed border-yellow-300 rounded-xl p-12 text-center">
+                <div className="text-6xl text-yellow-400 mb-4">🔍</div>
+                <h3 className="text-lg font-semibold text-yellow-600 mb-2">Nenhum Item Encontrado</h3>
+                <p className="text-yellow-600 mb-4">
+                  Nenhum item corresponde aos filtros selecionados.
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchFilter("");
+                    setTypeFilter("all");
+                    setRarityFilter("all");
+                  }}
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                >
+                  Limpar Filtros
+                </button>
               </div>
             )}
           </div>
