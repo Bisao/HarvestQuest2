@@ -8,6 +8,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 30, 2025 - DYNAMIC CONSUMABLES SYSTEM IMPLEMENTED + MIGRATION COMPLETED**
+- **Dynamic Consumables Detection**: Replaced hardcoded item name checks with attribute-based consumable detection system
+- **Unified Consumption Utilities**: Created shared/utils/consumable-utils.ts with isConsumable(), getConsumableEffects(), and validation functions
+- **Enhanced Frontend Components**: Updated both enhanced-inventory.tsx and simple-inventory.tsx to use dynamic detection
+- **Improved Backend Logic**: Consumption route now uses item attributes (hunger_restore, thirst_restore) instead of hardcoded switch statements
+- **Legacy Compatibility**: System supports both modern item attributes and legacy name-based detection as fallback
+- **Better User Experience**: Consumption effects are now displayed dynamically based on actual item properties
+- **Migration to Replit Completed**: Successfully migrated from Replit Agent to standard Replit environment with all systems operational
+
 **January 30, 2025 - CONSUMPTION TAB REMOVED + EXPEDITION UI IMPROVEMENTS**
 - **Complete Consumption Tab Removal**: Eliminated "Consumir" tab per user request - consumption functionality now handled directly in inventory and storage tabs
 - **Modal Elements Resized**: Reduced size of all elements in expedition modal for better fit within modal boundaries
