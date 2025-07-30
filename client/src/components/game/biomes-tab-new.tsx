@@ -89,7 +89,7 @@ export default function BiomesTab({
                 </div>
 
                 {/* Main Content */}
-                <div className="p-3 flex flex-col h-full">
+                <div className="p-3 flex flex-col h-full justify-between">
                   
                   {/* Progress for locked biomes */}
                   {!unlocked && (
@@ -108,11 +108,11 @@ export default function BiomesTab({
                   )}
 
                   {/* Resources Section */}
-                  <div className="flex-1">
+                  <div className="flex-1 overflow-hidden">
                     <h4 className="font-semibold text-sm text-amber-900 mb-2 border-b border-amber-300 pb-1">
                       Recursos Disponíveis
                     </h4>
-                    <ScrollArea className="h-48 pr-2">
+                    <ScrollArea className="h-32 pr-2">
                       <div className="space-y-1">
                         {biomeResources.map((resource) => (
                           <div key={resource.id} className="flex items-center justify-between bg-amber-50 rounded-md p-2 border border-amber-200">
@@ -133,11 +133,11 @@ export default function BiomesTab({
                   </div>
 
                   {/* Action Button */}
-                  <div className="mt-3">
+                  <div className="mt-3 flex-shrink-0">
                     <button 
                       onClick={() => handleExploreBiome(biome)}
                       disabled={!unlocked}
-                      className={`w-full font-bold text-sm py-2 px-4 rounded-lg transition-all duration-200 ${
+                      className={`w-full font-bold text-sm py-3 px-4 rounded-lg transition-all duration-200 ${
                         unlocked
                           ? 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white shadow-md hover:shadow-lg active:scale-95'
                           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
