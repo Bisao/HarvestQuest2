@@ -36,6 +36,56 @@ export default function BiomesTab({
     return resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
   };
 
+  const getToolIcons = (resource: Resource) => {
+    const icons: string[] = [];
+    
+    switch (resource.name) {
+      case "Fibra":
+        icons.push("🤚");
+        break;
+      case "Pedra":
+      case "Ferro Fundido":
+      case "Cristais":
+        icons.push("⛏️");
+        break;
+      case "Pedras Soltas":
+      case "Gravetos":
+      case "Cogumelos":
+      case "Frutas Silvestres":
+      case "Conchas":
+      case "Argila":
+        icons.push("🤚");
+        break;
+      case "Madeira":
+      case "Bambu":
+        icons.push("🪓");
+        break;
+      case "Água Fresca":
+        icons.push("🪣");
+        break;
+      case "Coelho":
+        icons.push("🏹", "🔪");
+        break;
+      case "Veado":
+      case "Javali":
+        icons.push("🏹", "🔱", "🔪");
+        break;
+      case "Peixe Pequeno":
+      case "Peixe Grande":
+      case "Salmão":
+        icons.push("🎣", "🪱");
+        break;
+      case "Areia":
+        icons.push("🗿");
+        break;
+      default:
+        icons.push("🤚");
+        break;
+    }
+    
+    return icons;
+  };
+
   const isUnlocked = (biome: Biome) => player.level >= biome.requiredLevel;
 
   const handleExploreBiome = (biome: Biome) => {
@@ -155,22 +205,32 @@ export default function BiomesTab({
                     </div>
                   )}
 
-                  {/* Resources available */}
+                  {/* Resources available - Scrollable */}
                   <div className="bg-blue-50 p-2 md:p-3 rounded-lg">
                     <h4 className="font-medium text-xs md:text-sm mb-2 md:mb-3 text-blue-800">Recursos Disponíveis:</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 md:gap-2">
-                      {biomeResources.slice(0, 4).map((resource) => (
-                        <div key={resource.id} className="flex items-center space-x-1 md:space-x-2 text-xs bg-white p-1.5 md:p-2 rounded">
-                          <span className="text-sm md:text-base">{resource.emoji}</span>
-                          <span className="truncate text-gray-700 text-xs">{resource.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                    {biomeResources.length > 4 && (
-                      <div className="text-xs text-blue-600 mt-1 md:mt-2 text-center">
-                        +{biomeResources.length - 4} outros recursos...
+                    <div className="max-h-32 md:max-h-40 overflow-y-auto pr-1">
+                      <div className="space-y-1 md:space-y-2">
+                        {biomeResources.map((resource) => {
+                          const toolIcons = getToolIcons(resource);
+                          return (
+                            <div key={resource.id} className="flex items-center justify-between bg-white p-1.5 md:p-2 rounded text-xs">
+                              <div className="flex items-center space-x-1 md:space-x-2 flex-1 min-w-0">
+                                <span className="text-sm md:text-base">{resource.emoji}</span>
+                                <span className="truncate text-gray-700 text-xs">{resource.name}</span>
+                              </div>
+                              <div className="flex items-center space-x-1 ml-2">
+                                {toolIcons.map((icon, index) => (
+                                  <span key={index} className="text-xs" title="Ferramenta necessária">{icon}</span>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
+                    </div>
+                    <div className="text-xs text-blue-600 mt-1 md:mt-2 text-center">
+                      {biomeResources.length} recursos disponíveis
+                    </div>
                   </div>
 
                   
