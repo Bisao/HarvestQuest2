@@ -133,7 +133,7 @@ export default function BiomesTab({
                   </div>
 
                   {/* Action Button */}
-                  <div className="mt-3 flex-shrink-0">
+                  <div className="flex-shrink-0 mt-[63px] mb-[63px]">
                     <button 
                       onClick={() => handleExploreBiome(biome)}
                       disabled={!unlocked}
@@ -148,7 +148,6 @@ export default function BiomesTab({
                   </div>
                 </div>
               </div>
-
               {/* Corner Decorations */}
               {unlocked && (
                 <>
@@ -162,7 +161,6 @@ export default function BiomesTab({
           );
         })}
       </div>
-
       {/* Expedition Modal */}
       <ExpeditionModal
         isOpen={expeditionModalOpen}
