@@ -134,17 +134,17 @@ export default function BiomesTab({
 
                   {/* Action Button */}
                   <div className="mt-3">
-                    <Button 
+                    <button 
                       onClick={() => handleExploreBiome(biome)}
                       disabled={!unlocked}
-                      className={`w-full font-bold text-sm py-2 rounded-lg transition-all duration-200 ${
+                      className={`w-full font-bold text-sm py-2 px-4 rounded-lg transition-all duration-200 ${
                         unlocked
-                          ? 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white shadow-md hover:shadow-lg'
+                          ? 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white shadow-md hover:shadow-lg active:scale-95'
                           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }`}
                     >
                       {unlocked ? "⚔️ EXPLORAR" : `🔒 Nível ${biome.requiredLevel} Requerido`}
-                    </Button>
+                    </button>
                   </div>
                 </div>
               </div>
