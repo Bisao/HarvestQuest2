@@ -177,3 +177,6 @@ export function validateConsumption(item: any, quantity: number = 1): {
   const effects = getConsumableEffects(item);
   return { valid: true, effects };
 }
+```
+
+There is no code to replace. So, I will skip this task.

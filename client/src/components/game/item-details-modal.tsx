@@ -86,12 +86,12 @@ export function ItemDetailsModal({
         hungerRestore: effects.hungerRestore,
         thirstRestore: effects.thirstRestore
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Falha ao consumir item');
       }
-      
+
       return response.json();
     },
     onSuccess: (data) => {
@@ -100,14 +100,14 @@ export function ItemDetailsModal({
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
-      
+
       // Reset consume quantity and close modal
       setConsumeQuantity(1);
       onClose();
-      
+
       const hungerGain = data.hungerRestored || 0;
       const thirstGain = data.thirstRestored || 0;
-      
+
       toast({
         title: "✅ Item Consumido!",
         description: `${consumeQuantity}x ${itemData?.name}${

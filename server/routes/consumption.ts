@@ -14,9 +14,16 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       // Get quantity from request, default to 1
       const quantity = parseInt(req.body.quantity) || 1;
 
-      // Validate input
+      // Import validation from shared utils
+      const { isValidItemId } = await import('../../shared/utils/consumable-utils');
+
+      // Validate input with centralized ID system
       if (!itemId || !location || typeof hungerRestore !== 'number' || typeof thirstRestore !== 'number') {
         return res.status(400).json({ error: 'Missing required fields or invalid types' });
+      }
+
+      if (!isValidItemId(itemId)) {
+        return res.status(400).json({ error: 'Invalid item ID format' });
       }
 
       if (quantity <= 0) {
@@ -41,7 +48,7 @@ export function createConsumptionRoutes(storage: IStorage): Router {
 
       if (location === 'inventory') {
         const inventoryItems = await storage.getPlayerInventory(playerId);
-        // First try to find by inventoryItemId, then by resourceId
+        // Prioritize specific inventory item ID, fallback to item ID lookup
         targetItem = inventoryItemId ? 
           inventoryItems.find((item: any) => item.id === inventoryItemId) :
           inventoryItems.find((item: any) => item.resourceId === itemId);
@@ -49,11 +56,15 @@ export function createConsumptionRoutes(storage: IStorage): Router {
         if (targetItem && targetItem.quantity > 0) {
           hasItem = true;
           itemQuantity = targetItem.quantity;
-          inventoryItemId = targetItem.id;
+          inventoryItemId = targetItem.id; // Ensure we have the inventory record ID
         }
-      } else {
+      } else if (location === 'storage') {
         const storageItems = await storage.getPlayerStorage(playerId);
-        targetItem = storageItems.find((item: any) => item.resourceId === itemId && item.itemType === 'resource');
+        // Use standardized item ID for storage lookup
+        targetItem = storageItems.find((item: any) => 
+          item.resourceId === itemId && 
+          (item.itemType === 'resource' || !item.itemType) // Handle legacy records
+        );
         if (targetItem && targetItem.quantity > 0) {
           hasItem = true;
           itemQuantity = targetItem.quantity;
