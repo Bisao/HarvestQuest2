@@ -82,3 +82,10 @@ app.use((req, res, next) => {
     log(`serving on port ${port}`);
   });
 })();
+// Import consumption routes
+import { createConsumptionRoutes } from "./routes/consumption";
+// Use routes
+app.use("/api", routes);
+app.use("/api", createStorageRoutes(storage));
+app.use("/api", createEnhancedGameRoutes(storage));
+app.use("/api", createConsumptionRoutes(storage));

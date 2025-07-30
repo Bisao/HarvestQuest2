@@ -37,23 +37,26 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       let hasItem = false;
       let itemQuantity = 0;
       let inventoryItemId = req.body.inventoryItemId;
+      let targetItem: any = null;
 
       if (location === 'inventory') {
         const inventoryItems = await storage.getPlayerInventory(playerId);
-        const inventoryItem = inventoryItems.find((item: any) => 
-          item.resourceId === itemId || (inventoryItemId && item.id === inventoryItemId)
-        );
-        if (inventoryItem && inventoryItem.quantity > 0) {
+        // First try to find by inventoryItemId, then by resourceId
+        targetItem = inventoryItemId ? 
+          inventoryItems.find((item: any) => item.id === inventoryItemId) :
+          inventoryItems.find((item: any) => item.resourceId === itemId);
+        
+        if (targetItem && targetItem.quantity > 0) {
           hasItem = true;
-          itemQuantity = inventoryItem.quantity;
-          inventoryItemId = inventoryItem.id; // Ensure we have the correct ID
+          itemQuantity = targetItem.quantity;
+          inventoryItemId = targetItem.id;
         }
       } else {
         const storageItems = await storage.getPlayerStorage(playerId);
-        const storageItem = storageItems.find((item: any) => item.resourceId === itemId && item.itemType === 'resource');
-        if (storageItem && storageItem.quantity > 0) {
+        targetItem = storageItems.find((item: any) => item.resourceId === itemId && item.itemType === 'resource');
+        if (targetItem && targetItem.quantity > 0) {
           hasItem = true;
-          itemQuantity = storageItem.quantity;
+          itemQuantity = targetItem.quantity;
         }
       }
 
@@ -79,34 +82,34 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       });
 
       // Remove consumed quantity of the item
-      if (location === 'inventory') {
-        const inventoryItems = await storage.getPlayerInventory(playerId);
-        const inventoryItem = inventoryItems.find((item: any) => 
-          item.resourceId === itemId || (inventoryItemId && item.id === inventoryItemId)
-        );
-        if (inventoryItem) {
-          const newQuantity = inventoryItem.quantity - quantity;
-          if (newQuantity <= 0) {
-            await storage.removeInventoryItem(inventoryItem.id);
-          } else {
-            await storage.updateInventoryItem(inventoryItem.id, { quantity: newQuantity });
-          }
+      if (location === 'inventory' && targetItem) {
+        const newQuantity = targetItem.quantity - quantity;
+        if (newQuantity <= 0) {
+          await storage.removeInventoryItem(targetItem.id);
+        } else {
+          await storage.updateInventoryItem(targetItem.id, { quantity: newQuantity });
         }
-      } else {
-        const storageItems = await storage.getPlayerStorage(playerId);
-        const storageItem = storageItems.find((item: any) => item.resourceId === itemId && item.itemType === 'resource');
-        if (storageItem) {
-          const newQuantity = storageItem.quantity - quantity;
-          if (newQuantity <= 0) {
-            await storage.removeStorageItem(storageItem.id);
-          } else {
-            await storage.updateStorageItem(storageItem.id, { quantity: newQuantity });
-          }
+      } else if (location === 'storage' && targetItem) {
+        const newQuantity = targetItem.quantity - quantity;
+        if (newQuantity <= 0) {
+          await storage.removeStorageItem(targetItem.id);
+        } else {
+          await storage.updateStorageItem(targetItem.id, { quantity: newQuantity });
         }
       }
 
       // Return updated player data
       const updatedPlayer = await storage.getPlayer(playerId);
+      
+      // Invalidate cache to ensure frontend sees updated data
+      try {
+        const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("../cache/memory-cache");
+        invalidateStorageCache(playerId);
+        invalidateInventoryCache(playerId);
+        invalidatePlayerCache(playerId);
+      } catch (error) {
+        console.warn('Cache invalidation failed:', error);
+      }
       
       res.json({
         success: true,
@@ -114,9 +117,13 @@ export function createConsumptionRoutes(storage: IStorage): Router {
         consumed: {
           itemId,
           location,
+          quantity: quantity,
           hungerRestored: newHunger - player.hunger,
           thirstRestored: newThirst - player.thirst
-        }
+        },
+        // Return values for frontend display
+        hungerRestored: newHunger - player.hunger,
+        thirstRestored: newThirst - player.thirst
       });
 
     } catch (error) {
