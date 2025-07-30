@@ -173,16 +173,7 @@ export default function BiomesTab({
                     )}
                   </div>
 
-                  {/* Progress bar for active expedition */}
-                  {activeExpedition && activeExpedition.biomeId === biome.id && activeExpedition.progress < 100 && (
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="font-medium text-green-800">Expedição em Andamento</span>
-                        <span className="text-green-600">{activeExpedition.progress}%</span>
-                      </div>
-                      <Progress value={activeExpedition.progress} className="w-full h-2" />
-                    </div>
-                  )}
+                  
 
                   {/* Explore button */}
                   <div className="pt-1 md:pt-2">
