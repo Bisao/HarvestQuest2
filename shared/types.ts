@@ -186,9 +186,6 @@ export interface InsertResource {
   // Effects & Tags
   effects?: string[];
   tags?: string[];
-  
-  // Derived Properties (calculated from attributes)
-  value?: number;
 }
 
 export interface Biome {

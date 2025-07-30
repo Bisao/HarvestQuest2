@@ -8,19 +8,6 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 30, 2025 - FIXED HEADER & TAB NAVIGATION + SCROLLING INTERFACE COMPLETED**
-- **Fixed Header Layout**: Game header now positioned fixed at top of screen, stays visible during scrolling
-- **Fixed Tab Navigation**: Tab navigation positioned fixed below header, outside scrolling content area for better accessibility
-- **Scrollable Content Area**: Main content area now has proper scrolling within fixed container, preventing element overlapping
-- **Improved Biomes Layout**: Enhanced biomes tab with better card spacing, background sections, and minimum heights to prevent overlapping
-- **Dynamic Expedition Button States**: Biome exploration buttons now show real-time expedition status ("Em Andamento...", "Finalizar Expedição", "Expedição Ativa")
-- **Real-Time Progress Tracking**: Added live progress bars and percentage indicators on biome cards during active expeditions
-- **Smart Button Disabling**: Buttons automatically disable during expeditions and enable only the appropriate biome when expedition completes
-- **Active Expedition API**: New `/api/player/:playerId/active-expedition` endpoint for real-time expedition status checking
-- **Completion Integration**: "Finalizar Expedição" button directly completes expeditions from biome cards without needing separate modals
-- **Migration Successfully Completed**: Project fully migrated from Replit Agent to standard Replit environment with all systems operational
-- **Enhanced User Experience**: Clear visual feedback shows expedition progress and prevents multiple expeditions running simultaneously
-
 **January 30, 2025 - CONSUMPTION TAB REMOVED + EXPEDITION UI IMPROVEMENTS**
 - **Complete Consumption Tab Removal**: Eliminated "Consumir" tab per user request - consumption functionality now handled directly in inventory and storage tabs
 - **Modal Elements Resized**: Reduced size of all elements in expedition modal for better fit within modal boundaries
