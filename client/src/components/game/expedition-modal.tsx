@@ -229,18 +229,7 @@ export default function ExpeditionModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Requirements check */}
-          <div className="bg-blue-50 p-3 rounded-lg">
-            <h4 className="font-medium text-sm mb-1">Requisitos:</h4>
-            <div className="flex items-center space-x-4 text-sm">
-              <span className={player.hunger >= 5 ? "text-green-600" : "text-red-600"}>
-                Fome: {player.hunger}/100 {player.hunger >= 5 ? "✓" : "✗"}
-              </span>
-              <span className={player.thirst >= 5 ? "text-green-600" : "text-red-600"}>
-                Sede: {player.thirst}/100 {player.thirst >= 5 ? "✓" : "✗"}
-              </span>
-            </div>
-          </div>
+          
 
           {/* Resource selection */}
           <div>
