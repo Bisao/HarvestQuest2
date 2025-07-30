@@ -73,7 +73,7 @@ export default function ExpeditionModal({
     if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
       return {
         canCollect: true,
-        requirementText: "Coletável à mão",
+        requirementText: "",
         toolIcon: "🤚",
       };
     }
