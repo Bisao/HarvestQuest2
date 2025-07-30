@@ -86,7 +86,7 @@ export default function Game() {
       {/* Tab Navigation - Fixed below header */}
       <div className="fixed top-16 md:top-20 left-0 right-0 z-40 bg-gray-50 shadow-lg border-b border-gray-200">
         <div className="container mx-auto px-2 md:px-4">
-          <div className="flex overflow-x-auto gap-2 md:gap-4 py-3 md:py-4 scrollbar-hide">
+          <div className="flex overflow-x-auto gap-1 md:gap-2 py-2 scrollbar-hide">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               
@@ -94,15 +94,15 @@ export default function Game() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex flex-col items-center justify-center space-y-1 md:space-y-2 px-3 md:px-6 py-3 md:py-4 rounded-lg font-medium transition-all flex-shrink-0 text-xs md:text-sm min-w-[80px] md:min-w-[120px] h-16 md:h-20 ${
+                  className={`relative flex items-center space-x-1 md:space-x-2 px-2 md:px-4 py-2 md:py-3 rounded-t-lg font-medium transition-all flex-shrink-0 text-xs md:text-sm ${
                     isActive 
-                      ? "bg-white border-2 border-blue-300 text-blue-700 shadow-md transform scale-105" 
-                      : "bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md"
+                      ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px shadow-sm" 
+                      : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
                   }`}
                 >
-                  <span className="text-xl md:text-2xl">{tab.emoji}</span>
-                  <span className="hidden sm:inline font-semibold">{tab.label}</span>
-                  <span className="sm:hidden font-semibold">{
+                  <span className="text-base md:text-lg">{tab.emoji}</span>
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{
                     tab.id === "biomes" ? "Biom" :
                     tab.id === "inventory" ? "Inv." :
                     tab.id === "storage" ? "Arm." :
