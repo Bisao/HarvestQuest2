@@ -26,7 +26,7 @@ export default function BiomesTab({
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
 
   // Fetch active expedition
-  const { data: activeExpedition } = useQuery({
+  const { data: activeExpedition } = useQuery<Expedition | null>({
     queryKey: [`/api/player/${player.id}/active-expedition`],
     refetchInterval: 1000, // Refetch every second to update progress
   });
