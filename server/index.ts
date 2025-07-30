@@ -84,8 +84,3 @@ app.use((req, res, next) => {
 })();
 // Import consumption routes
 import { createConsumptionRoutes } from "./routes/consumption";
-// Use routes
-app.use("/api", routes);
-app.use("/api", createStorageRoutes(storage));
-app.use("/api", createEnhancedGameRoutes(storage));
-app.use("/api", createConsumptionRoutes(storage));
