@@ -48,6 +48,7 @@ export default function EnhancedStorageTab({
   const [searchFilter, setSearchFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "resource" | "equipment">("all");
   const [rarityFilter, setRarityFilter] = useState<"all" | "common" | "uncommon" | "rare" | "epic" | "legendary">("all");
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   // Fetch storage data with enhanced information
   const { data: storageItems = [], isLoading } = useQuery<StorageItem[]>({
@@ -231,77 +232,101 @@ export default function EnhancedStorageTab({
       {/* Items Sub-tab */}
       {activeSubTab === "items" && (
         <div className="space-y-6">
-          {/* Filter Controls */}
-          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-            <h3 className="font-bold text-gray-800 text-lg mb-4 flex items-center">
-              <span className="mr-3 text-xl">🔍</span>
-              Filtros de Itens
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Search Filter */}
-              <div>
-                <label className="text-sm font-medium text-gray-700 block mb-2">
-                  Buscar por nome:
-                </label>
-                <Input
-                  type="text"
-                  placeholder="Digite o nome do item..."
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter(e.target.value)}
-                  className="w-full"
-                />
+          {/* Filter Controls - Collapsible */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+            {/* Minimized Header */}
+            <div className="p-4 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <span className="text-xl">🔍</span>
+                <h3 className="font-bold text-gray-800 text-lg">Filtros de Itens</h3>
+                {/* Active Filters Indicator */}
+                {(searchFilter || typeFilter !== "all" || rarityFilter !== "all") && (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-xs text-blue-600 font-medium">Filtros ativos</span>
+                  </div>
+                )}
               </div>
-
-              {/* Type Filter */}
-              <div>
-                <label className="text-sm font-medium text-gray-700 block mb-2">
-                  Tipo de item:
-                </label>
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value as any)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="all">Todos os tipos</option>
-                  <option value="resource">🌿 Recursos</option>
-                  <option value="equipment">⚔️ Equipamentos</option>
-                </select>
-              </div>
-
-              {/* Rarity Filter */}
-              <div>
-                <label className="text-sm font-medium text-gray-700 block mb-2">
-                  Raridade:
-                </label>
-                <select
-                  value={rarityFilter}
-                  onChange={(e) => setRarityFilter(e.target.value as any)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="all">Todas as raridades</option>
-                  <option value="common">Comum</option>
-                  <option value="uncommon">Incomum</option>
-                  <option value="rare">Raro</option>
-                  <option value="epic">Épico</option>
-                  <option value="legendary">Lendário</option>
-                </select>
-              </div>
+              
+              <button
+                onClick={() => setFiltersExpanded(!filtersExpanded)}
+                className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <span className={`text-gray-600 transform transition-transform duration-200 ${filtersExpanded ? 'rotate-180' : ''}`}>
+                  ▼
+                </span>
+              </button>
             </div>
 
-            {/* Clear Filters Button */}
-            {(searchFilter || typeFilter !== "all" || rarityFilter !== "all") && (
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={() => {
-                    setSearchFilter("");
-                    setTypeFilter("all");
-                    setRarityFilter("all");
-                  }}
-                  className="text-sm bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                >
-                  Limpar Filtros
-                </button>
+            {/* Expanded Filter Controls */}
+            {filtersExpanded && (
+              <div className="px-6 pb-6 border-t border-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                  {/* Search Filter */}
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 block mb-2">
+                      Buscar por nome:
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Digite o nome do item..."
+                      value={searchFilter}
+                      onChange={(e) => setSearchFilter(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* Type Filter */}
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 block mb-2">
+                      Tipo de item:
+                    </label>
+                    <select
+                      value={typeFilter}
+                      onChange={(e) => setTypeFilter(e.target.value as any)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="all">Todos os tipos</option>
+                      <option value="resource">🌿 Recursos</option>
+                      <option value="equipment">⚔️ Equipamentos</option>
+                    </select>
+                  </div>
+
+                  {/* Rarity Filter */}
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 block mb-2">
+                      Raridade:
+                    </label>
+                    <select
+                      value={rarityFilter}
+                      onChange={(e) => setRarityFilter(e.target.value as any)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="all">Todas as raridades</option>
+                      <option value="common">Comum</option>
+                      <option value="uncommon">Incomum</option>
+                      <option value="rare">Raro</option>
+                      <option value="epic">Épico</option>
+                      <option value="legendary">Lendário</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Clear Filters Button */}
+                {(searchFilter || typeFilter !== "all" || rarityFilter !== "all") && (
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => {
+                        setSearchFilter("");
+                        setTypeFilter("all");
+                        setRarityFilter("all");
+                      }}
+                      className="text-sm bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Limpar Filtros
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
