@@ -77,7 +77,16 @@ export default function SimpleInventory({
   });
 
   const moveToStorageMutation = useMutation({
-    mutationFn: (itemId: string) => apiRequest("POST", `/api/storage/store/${playerId}/${itemId}`),
+    mutationFn: async (itemId: string) => {
+      const item = inventory.find(i => i.id === itemId);
+      if (!item) throw new Error("Item não encontrado");
+      
+      const response = await apiRequest('POST', `/api/storage/store/${itemId}`, {
+        playerId,
+        quantity: item.quantity
+      });
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
