@@ -274,59 +274,57 @@ export default function Game() {
           </div>
         </div>
 
-        {/* Minimized Expedition Window */}
+        {/* Minimized Expedition Panel */}
         {activeExpedition && expeditionMinimized && (
-          <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg border-2 z-50 max-w-sm">
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-2">
-                  <h3 className="font-bold text-sm">Expedição Ativa</h3>
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    {biomes.find(b => b.id === activeExpedition.biomeId)?.name}
-                  </span>
-                </div>
+          <div className="fixed top-20 left-4 bg-white rounded-lg shadow-lg border border-gray-300 z-50">
+            <div className="px-4 py-2 flex items-center space-x-3">
+              <span className="text-sm font-medium text-gray-700">Expedição Ativa</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">
+                  {biomes.find(b => b.id === activeExpedition.biomeId)?.name}
+                </span>
                 <button
-                  onClick={handleMinimizeExpedition}
-                  className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded"
+                  onClick={() => setExpeditionMinimizedExpanded(!expeditionMinimizedExpanded)}
+                  className="text-gray-500 hover:text-gray-700 text-xs"
                 >
-                  {expeditionMinimizedExpanded ? "▼" : "▲"}
+                  ▼
                 </button>
               </div>
-
-              {expeditionMinimizedExpanded && (
-                <div className="space-y-3 border-t pt-3">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Progresso:</span>
-                      <span>{Math.round(activeExpedition.progress)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${activeExpedition.progress}%` }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  {activeExpedition.progress >= 100 ? (
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-green-600">Expedição Concluída!</p>
-                      <button
-                        onClick={handleCompleteExpedition}
-                        className="w-full bg-green-600 text-white py-2 px-4 rounded text-sm hover:bg-green-700"
-                        disabled={completeExpeditionMutation.isPending}
-                      >
-                        {completeExpeditionMutation.isPending ? "Finalizando..." : "Finalizar Expedição"}
-                      </button>
-                    </div>
-                  ) : (
-                    <p className="text-xs text-gray-600">
-                      Tempo restante: {Math.ceil(((activeExpedition.estimatedDuration - (Date.now() - activeExpedition.startTime)) / 1000) / 60)} min
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
+            
+            {expeditionMinimizedExpanded && (
+              <div className="border-t border-gray-200 px-4 py-3 space-y-3">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Progresso:</span>
+                    <span>{Math.round(activeExpedition.progress)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${activeExpedition.progress}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {activeExpedition.progress >= 100 ? (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-green-600">Expedição Concluída!</p>
+                    <button
+                      onClick={handleCompleteExpedition}
+                      className="w-full bg-green-600 text-white py-2 px-4 rounded text-sm hover:bg-green-700"
+                      disabled={completeExpeditionMutation.isPending}
+                    >
+                      {completeExpeditionMutation.isPending ? "Finalizando..." : "Finalizar Expedição"}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-600">
+                    Tempo restante: {Math.ceil(((activeExpedition.estimatedDuration - (Date.now() - activeExpedition.startTime)) / 1000) / 60)} min
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
 

@@ -71,38 +71,43 @@ export default function ExpeditionSystem({
   const getCollectableResources = () => {
     const biomeResources = getBiomeResources();
     return biomeResources.filter(resource => {
-      // Check tool requirements - using collectionRequirements from the new type system
-      const hasToolRequirement = resource.collectionRequirements?.some(req => req.type === 'tool');
-      if (hasToolRequirement) {
-        const toolReq = resource.collectionRequirements.find(req => req.type === 'tool');
-        if (toolReq) {
-          const requiredTool = toolReq.requirement as string;
-          switch (requiredTool) {
-            case "axe":
-              return equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
-            case "pickaxe":
-              return equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
-            case "fishing_rod":
-              return equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
-            case "knife":
-              return equipment.some(eq => eq.toolType === "knife" && 
-                (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
-            case "weapon_and_knife":
-              const hasWeapon = player.equippedWeapon;
-              const hasKnife = equipment.some(eq => eq.toolType === "knife" && 
-                (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
-              return hasWeapon && hasKnife;
-            case "bucket":
-              // Para água, verificar se tem balde ou garrafa de bambu
-              const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
-              const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
-              return hasBucket || hasBambooBottle;
-            default:
-              return true;
-          }
-        }
+      // Simplified tool checking based on resource name
+      const resourceName = resource.name;
+      
+      // Basic resources (no tools required)
+      if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
+        return true;
       }
-      return true; // No tool required
+      
+      // Tool required resources
+      if (['Madeira', 'Bambu'].includes(resourceName)) {
+        return equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
+      }
+      
+      if (['Pedra', 'Ferro Fundido', 'Cristais'].includes(resourceName)) {
+        return equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
+      }
+      
+      if (resourceName === 'Água Fresca') {
+        const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
+        const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
+        return hasBucket || hasBambooBottle;
+      }
+      
+      // Fish resources
+      if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName)) {
+        return equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
+      }
+      
+      // Animals - require weapons and knife
+      if (['Coelho', 'Veado', 'Javali'].includes(resourceName)) {
+        const hasWeapon = player.equippedWeapon !== null;
+        const hasKnife = equipment.some(eq => eq.toolType === "knife" && 
+          (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
+        return hasWeapon && hasKnife;
+      }
+      
+      return true; // Default to collectible
     });
   };
 
