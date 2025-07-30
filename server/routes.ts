@@ -395,6 +395,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get active expedition for player
+  app.get("/api/player/:playerId/active-expedition", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
+      res.json(activeExpedition);
+    } catch (error) {
+      console.error("Get active expedition error:", error);
+      res.status(500).json({ error: "Failed to get active expedition" });
+    }
+  });
+
   // Consume food or drink
   app.post("/api/player/:playerId/consume", async (req, res) => {
     try {

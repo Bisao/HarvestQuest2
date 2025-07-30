@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import ExpeditionModal from "./expedition-modal";
-import type { Biome, Resource, Equipment, Player } from "@shared/types";
+import type { Biome, Resource, Equipment, Player, Expedition } from "@shared/types";
 
 interface BiomesTabProps {
   biomes: Biome[];
@@ -24,6 +25,12 @@ export default function BiomesTab({
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
 
+  // Fetch active expedition
+  const { data: activeExpedition } = useQuery({
+    queryKey: [`/api/player/${player.id}/active-expedition`],
+    refetchInterval: 1000, // Refetch every second to update progress
+  });
+
   const getResourcesForBiome = (biome: Biome) => {
     const resourceIds = biome.availableResources as string[];
     return resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
@@ -32,10 +39,71 @@ export default function BiomesTab({
   const isUnlocked = (biome: Biome) => player.level >= biome.requiredLevel;
 
   const handleExploreBiome = (biome: Biome) => {
-    if (!isUnlocked(biome)) return;
+    if (!isUnlocked(biome) || (activeExpedition && activeExpedition.progress < 100)) return;
+    
+    // If there's a completed expedition for this biome, complete it
+    if (activeExpedition && activeExpedition.biomeId === biome.id && activeExpedition.progress >= 100) {
+      handleCompleteExpedition(activeExpedition.id);
+      return;
+    }
     
     setSelectedBiome(biome);
     setExpeditionModalOpen(true);
+  };
+
+  const handleCompleteExpedition = async (expeditionId: string) => {
+    try {
+      const response = await fetch(`/api/expeditions/${expeditionId}/complete`, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to complete expedition');
+      }
+      // Refresh data after completion
+      location.reload(); // Simple refresh for now
+    } catch (error) {
+      console.error('Error completing expedition:', error);
+    }
+  };
+
+  const getButtonText = (biome: Biome, unlocked: boolean) => {
+    if (!unlocked) {
+      return `Desbloqueado no Nível ${biome.requiredLevel}`;
+    }
+    
+    if (activeExpedition) {
+      if (activeExpedition.biomeId === biome.id) {
+        return activeExpedition.progress >= 100 ? "Finalizar Expedição" : "Em Andamento...";
+      }
+      return "Expedição Ativa";
+    }
+    
+    return "Explorar";
+  };
+
+  const getButtonVariant = (biome: Biome, unlocked: boolean) => {
+    if (!unlocked) return "secondary";
+    
+    if (activeExpedition) {
+      if (activeExpedition.biomeId === biome.id && activeExpedition.progress >= 100) {
+        return "default"; // Green for completion
+      }
+      return "secondary"; // Disabled state
+    }
+    
+    return "default";
+  };
+
+  const isButtonDisabled = (biome: Biome, unlocked: boolean) => {
+    if (!unlocked) return true;
+    
+    // If there's an active expedition and it's not for this biome, disable
+    if (activeExpedition && activeExpedition.biomeId !== biome.id) return true;
+    
+    // If there's an active expedition for this biome but not completed, disable
+    if (activeExpedition && activeExpedition.biomeId === biome.id && activeExpedition.progress < 100) return true;
+    
+    return false;
   };
 
   const handleExpeditionStart = (expeditionData: any) => {
@@ -105,12 +173,22 @@ export default function BiomesTab({
                 {/* Explore button */}
                 <Button 
                   onClick={() => handleExploreBiome(biome)}
-                  disabled={!unlocked}
+                  disabled={isButtonDisabled(biome, unlocked)}
                   className="w-full"
-                  variant={unlocked ? "default" : "secondary"}
+                  variant={getButtonVariant(biome, unlocked)}
                 >
-                  {unlocked ? "Explorar" : `Desbloqueado no Nível ${biome.requiredLevel}`}
+                  {getButtonText(biome, unlocked)}
                 </Button>
+
+                {/* Progress bar for active expedition */}
+                {activeExpedition && activeExpedition.biomeId === biome.id && activeExpedition.progress < 100 && (
+                  <div className="mt-2">
+                    <Progress value={activeExpedition.progress} className="w-full" />
+                    <p className="text-xs text-gray-600 text-center mt-1">
+                      Progresso: {activeExpedition.progress}%
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           );

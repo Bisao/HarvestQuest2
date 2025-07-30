@@ -8,6 +8,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 30, 2025 - EXPEDITION BUTTON STATUS SYSTEM IMPLEMENTED + MIGRATION COMPLETED**
+- **Dynamic Expedition Button States**: Biome exploration buttons now show real-time expedition status ("Em Andamento...", "Finalizar Expedição", "Expedição Ativa")
+- **Real-Time Progress Tracking**: Added live progress bars and percentage indicators on biome cards during active expeditions
+- **Smart Button Disabling**: Buttons automatically disable during expeditions and enable only the appropriate biome when expedition completes
+- **Active Expedition API**: New `/api/player/:playerId/active-expedition` endpoint for real-time expedition status checking
+- **Completion Integration**: "Finalizar Expedição" button directly completes expeditions from biome cards without needing separate modals
+- **Migration Successfully Completed**: Project fully migrated from Replit Agent to standard Replit environment with all systems operational
+- **Enhanced User Experience**: Clear visual feedback shows expedition progress and prevents multiple expeditions running simultaneously
+
 **January 30, 2025 - CONSUMPTION TAB REMOVED + EXPEDITION UI IMPROVEMENTS**
 - **Complete Consumption Tab Removal**: Eliminated "Consumir" tab per user request - consumption functionality now handled directly in inventory and storage tabs
 - **Modal Elements Resized**: Reduced size of all elements in expedition modal for better fit within modal boundaries
