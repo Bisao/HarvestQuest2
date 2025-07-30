@@ -47,7 +47,7 @@ export default function BiomesTab({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {biomes.map((biome) => {
           const biomeResources = getResourcesForBiome(biome);
           const unlocked = isUnlocked(biome);
@@ -69,7 +69,7 @@ export default function BiomesTab({
               }}
             >
               {/* Card Frame Border */}
-              <div className="absolute inset-3 bg-white rounded-lg border-2 border-amber-600 overflow-hidden">
+              <div className="absolute inset-2 bg-white rounded-lg border-2 border-amber-600 overflow-hidden">
                 
                 {/* Header Section */}
                 <div className="relative bg-gradient-to-r from-amber-200 to-yellow-200 p-3 border-b-2 border-amber-600">
@@ -89,7 +89,7 @@ export default function BiomesTab({
                 </div>
 
                 {/* Main Content */}
-                <div className="p-4 flex flex-col h-full">
+                <div className="p-3 flex flex-col h-full">
                   
                   {/* Progress for locked biomes */}
                   {!unlocked && (
