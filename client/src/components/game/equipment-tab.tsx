@@ -234,16 +234,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
             </div>
           </div>
           
-          {/* Currency/Resource Bars */}
-          <div className="mt-4 space-y-2">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-amber-700">Gold</span>
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div className="bg-yellow-500 h-2 rounded-full" style={{ width: "0%" }}></div>
-              </div>
-            </div>
-            
-          </div>
+          
           
         </CardContent>
       </Card>
