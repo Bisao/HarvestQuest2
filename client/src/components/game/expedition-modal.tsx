@@ -231,86 +231,122 @@ export default function ExpeditionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden">
-        <DialogHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 -m-6 mb-6 p-6 rounded-t-lg">
+      <DialogContent className="max-w-3xl max-h-[85vh] bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden">
+        <DialogHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 -m-6 mb-4 p-4 rounded-t-lg">
           <DialogTitle className="flex items-center justify-between text-white">
-            <div className="flex items-center space-x-3">
-              <span className="text-3xl">{biome?.emoji}</span>
-              <span className="text-2xl font-bold">Explorar {biome?.name}</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">{biome?.emoji}</span>
+              <span className="text-lg font-bold">Explorar {biome?.name}</span>
             </div>
-            <div className="text-sm bg-white/20 px-3 py-1 rounded-full">
+            <div className="text-xs bg-white/20 px-2 py-1 rounded-full">
               Nível {biome?.requiredLevel}
             </div>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 overflow-y-auto max-h-[70vh]">
-          
+        <div className="space-y-3 overflow-y-auto max-h-[68vh]">
+          {/* Requirements check */}
+          <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg border border-blue-200 shadow-sm">
+            <h4 className="font-medium text-gray-800 mb-2 flex items-center text-sm">
+              <span className="mr-1">📋</span> Status do Explorador
+            </h4>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className={`flex items-center justify-between p-2 rounded-lg border ${
+                player.hunger >= 5 ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700"
+              }`}>
+                <div className="flex items-center space-x-1">
+                  <span>🍖</span>
+                  <span className="font-medium">Fome</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="font-bold">{player.hunger}/100</span>
+                  <span>{player.hunger >= 5 ? "✅" : "❌"}</span>
+                </div>
+              </div>
+              <div className={`flex items-center justify-between p-2 rounded-lg border ${
+                player.thirst >= 5 ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700"
+              }`}>
+                <div className="flex items-center space-x-1">
+                  <span>💧</span>
+                  <span className="font-medium">Sede</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="font-bold">{player.thirst}/100</span>
+                  <span>{player.thirst >= 5 ? "✅" : "❌"}</span>
+                </div>
+              </div>
+            </div>
+            {(player.hunger < 5 || player.thirst < 5) && (
+              <div className="mt-2 p-2 bg-red-100 border border-red-200 rounded-lg">
+                <p className="text-red-700 text-xs font-medium">⚠️ Você precisa de pelo menos 5 de fome e sede para explorar</p>
+              </div>
+            )}
+          </div>
 
           {/* Resource selection */}
-          <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border-2 border-blue-200 shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-gray-800 flex items-center text-lg">
-                <span className="mr-2">🎯</span> Selecione os Recursos para Coletar
+          <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg border border-blue-200 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium text-gray-800 flex items-center text-sm">
+                <span className="mr-1">🎯</span> Selecione os Recursos para Coletar
               </h4>
               <div className="flex space-x-2">
                 <button
                   onClick={handleSelectAll}
                   disabled={availableResources.length === 0}
-                  className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  ✅ Selecionar Tudo
+                  ✅ Tudo
                 </button>
                 <button
                   onClick={handleDeselectAll}
                   disabled={selectedResources.length === 0}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  ❌ Desmarcar Tudo
+                  ❌ Nada
                 </button>
               </div>
             </div>
             
             {availableResources.length > 0 ? (
-              <ScrollArea className="h-80 border-2 border-blue-200 rounded-xl bg-white/60 p-1">
-                <div className="p-3 space-y-2">
+              <ScrollArea className="h-48 border border-blue-200 rounded-lg bg-white/60 p-1">
+                <div className="p-2 space-y-1">
                   {availableResources.map((resource) => (
                     <div
                       key={resource.id}
-                      className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer hover:shadow-md ${
+                      className={`flex items-center justify-between p-2 rounded-lg border transition-all duration-200 cursor-pointer hover:shadow-sm ${
                         selectedResources.includes(resource.id)
                           ? "bg-blue-50 border-blue-300 shadow-sm"
                           : "bg-white/90 border-gray-200 hover:border-blue-200"
                       }`}
                       onClick={() => toggleResourceSelection(resource.id)}
                     >
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-2">
                         <Checkbox
                           checked={selectedResources.includes(resource.id)}
                           onCheckedChange={() => toggleResourceSelection(resource.id)}
-                          className="scale-125"
+                          className="scale-90"
                         />
-                        <div className="flex items-center space-x-4">
-                          <span className="text-3xl drop-shadow-md">{resource.emoji}</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-lg">{resource.emoji}</span>
                           <div>
-                            <p className="font-bold text-gray-800 text-lg">{resource.name}</p>
-                            <div className="flex items-center space-x-4 text-sm text-gray-600">
-                              <span>⭐ XP: {resource.experienceValue}</span>
-                              <span>💰 Valor: {resource.value}</span>
+                            <p className="font-semibold text-gray-800 text-sm">{resource.name}</p>
+                            <div className="flex items-center space-x-2 text-xs text-gray-600">
+                              <span>⭐ {resource.experienceValue} XP</span>
+                              <span>💰 {resource.value}</span>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className="flex flex-col items-center space-y-2">
-                        <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 ${
+                      <div className="flex flex-col items-center space-y-1">
+                        <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${
                           resource.canCollect ? "bg-green-100 border-green-300 text-green-700" : "bg-red-100 border-red-300 text-red-700"
                         }`}>
-                          <span className="text-2xl">{resource.toolIcon}</span>
+                          <span className="text-sm">{resource.toolIcon}</span>
                         </div>
                         <span className={`text-xs font-medium ${
                           resource.canCollect ? "text-green-700" : "text-red-700"
                         }`}>
-                          {resource.canCollect ? "Disponível" : "Bloqueado"}
+                          {resource.canCollect ? "OK" : "X"}
                         </span>
                       </div>
                     </div>
@@ -328,24 +364,24 @@ export default function ExpeditionModal({
 
           {/* Selection summary */}
           {selectedResources.length > 0 && (
-            <div className="bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-sm p-5 rounded-xl border-2 border-green-300 shadow-lg">
-              <div className="flex items-center space-x-3 mb-3">
-                <span className="text-2xl">🎒</span>
+            <div className="bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-sm p-3 rounded-lg border border-green-300 shadow-sm">
+              <div className="flex items-center space-x-2 mb-2">
+                <span className="text-lg">🎒</span>
                 <div>
-                  <p className="font-bold text-green-800 text-lg">
+                  <p className="font-semibold text-green-800 text-sm">
                     {selectedResources.length} recurso(s) selecionado(s)
                   </p>
-                  <p className="text-sm text-green-700">Prontos para coleta durante a expedição</p>
+                  <p className="text-xs text-green-700">Prontos para coleta</p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1">
                 {selectedResources.map(resourceId => {
                   const resource = availableResources.find(r => r.id === resourceId);
                   return resource ? (
-                    <div key={resourceId} className="inline-flex items-center space-x-2 bg-white/80 border border-green-300 text-green-800 px-3 py-2 rounded-lg shadow-sm">
-                      <span className="text-lg">{resource.emoji}</span>
+                    <div key={resourceId} className="inline-flex items-center space-x-1 bg-white/80 border border-green-300 text-green-800 px-2 py-1 rounded text-xs">
+                      <span>{resource.emoji}</span>
                       <span className="font-medium">{resource.name}</span>
-                      <span className="text-xs bg-green-200 px-2 py-1 rounded-full">+{resource.experienceValue} XP</span>
+                      <span className="bg-green-200 px-1 rounded">+{resource.experienceValue} XP</span>
                     </div>
                   ) : null;
                 })}
@@ -354,10 +390,10 @@ export default function ExpeditionModal({
           )}
 
           {/* Action buttons */}
-          <div className="flex justify-between gap-4 pt-4 border-t-2 border-blue-200">
+          <div className="flex justify-between gap-3 pt-3 border-t border-blue-200">
             <button
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl transition-colors"
+              className="flex-1 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium rounded-lg transition-colors text-sm"
             >
               ❌ Cancelar
             </button>
@@ -369,16 +405,16 @@ export default function ExpeditionModal({
                 player.thirst < 5 ||
                 startExpeditionMutation.isPending
               }
-              className="flex-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:cursor-not-allowed disabled:shadow-none"
+              className="flex-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md disabled:cursor-not-allowed disabled:shadow-none text-sm"
             >
               {startExpeditionMutation.isPending ? (
-                <span className="flex items-center justify-center space-x-2">
-                  <span className="animate-spin text-xl">⚡</span>
-                  <span>Iniciando Expedição...</span>
+                <span className="flex items-center justify-center space-x-1">
+                  <span className="animate-spin">⚡</span>
+                  <span>Iniciando...</span>
                 </span>
               ) : (
-                <span className="flex items-center justify-center space-x-2">
-                  <span className="text-xl">🚀</span>
+                <span className="flex items-center justify-center space-x-1">
+                  <span>🚀</span>
                   <span>Iniciar Expedição</span>
                 </span>
               )}
