@@ -532,7 +532,10 @@ export default function EnhancedInventory({
                             <div>
                               <h4 className="font-semibold text-lg">{itemData.name}</h4>
                               <p className="text-sm text-gray-600">
-                                Quantidade: {selectedItem.quantity} • Peso total: {itemData.weight * selectedItem.quantity}kg
+                                Quantidade: {selectedItem.quantity} • Peso total: {(() => {
+                                  const totalWeight = itemData.weight * selectedItem.quantity;
+                                  return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
+                                })()}
                               </p>
                               {isResource && 'value' in itemData && (
                                 <p className="text-sm text-gray-600">

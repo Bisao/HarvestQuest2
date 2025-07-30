@@ -73,9 +73,13 @@ export default function InventoryTab({ playerId, resources, currentWeight, maxWe
           <h3 className="text-lg font-semibold text-gray-800">🎒 Inventário</h3>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600">Peso:</span>
-            <span className="font-bold text-orange-600">{currentWeight}</span>
+            <span className="font-bold text-orange-600">
+              {currentWeight >= 1000 ? `${(currentWeight / 1000).toFixed(1)}kg` : `${currentWeight}g`}
+            </span>
             <span className="text-gray-500">/</span>
-            <span className="font-bold text-gray-700">{maxWeight} kg</span>
+            <span className="font-bold text-gray-700">
+              {maxWeight >= 1000 ? `${(maxWeight / 1000).toFixed(1)}kg` : `${maxWeight}g`}
+            </span>
           </div>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-3">

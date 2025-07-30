@@ -16,7 +16,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🌾",
       category: "resource",
       subcategory: "plant_fiber",
-      weight: 0.1,
+      weight: 15, // 15 gramas por fibra
       stackable: true,
       maxStackSize: 99,
       rarity: "common",
@@ -38,7 +38,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🪨",
       category: "resource",
       subcategory: "mineral",
-      weight: 3.0,
+      weight: 1300, // 1.3 kg = 1300 gramas
       stackable: true,
       maxStackSize: 50,
       rarity: "common",
@@ -60,7 +60,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🗿",
       category: "resource",
       subcategory: "mineral",
-      weight: 1.0,
+      weight: 350, // 350 gramas por pedra solta
       stackable: true,
       maxStackSize: 99,
       rarity: "common",
@@ -82,7 +82,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🪵",
       category: "resource",
       subcategory: "wood",
-      weight: 3.0,
+      weight: 2500, // 2.5 kg = 2500 gramas por tronco
       stackable: true,
       maxStackSize: 64,
       rarity: "common",
@@ -106,7 +106,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🪓",
       category: "tool",
       subcategory: "cutting",
-      weight: 4.0,
+      weight: 1800, // 1.8 kg = 1800 gramas
       stackable: false,
       maxStackSize: 1,
       rarity: "common",
@@ -134,7 +134,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "⛏️",
       category: "tool",
       subcategory: "mining",
-      weight: 3.0,
+      weight: 1500, // 1.5 kg = 1500 gramas
       stackable: false,
       maxStackSize: 1,
       rarity: "common",
@@ -162,7 +162,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🎣",
       category: "tool",
       subcategory: "fishing",
-      weight: 2.0,
+      weight: 800, // 800 gramas
       stackable: false,
       maxStackSize: 1,
       rarity: "common",
@@ -192,7 +192,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🐰",
       category: "resource",
       subcategory: "small_game",
-      weight: 3.0,
+      weight: 1200, // 1.2 kg = 1200 gramas (coelho médio)
       stackable: false,
       maxStackSize: 5,
       rarity: "common",
@@ -222,7 +222,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🦌",
       category: "resource",
       subcategory: "medium_game",
-      weight: 8.0,
+      weight: 35000, // 35 kg = 35000 gramas (veado médio)
       stackable: false,
       maxStackSize: 3,
       rarity: "uncommon",
@@ -253,7 +253,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🍄",
       category: "consumable",
       subcategory: "food",
-      weight: 1.0,
+      weight: 200, // 200 gramas por cogumelo
       stackable: true,
       maxStackSize: 50,
       rarity: "common",
@@ -279,7 +279,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🫐",
       category: "consumable",
       subcategory: "food",
-      weight: 0.5,
+      weight: 80, // 80 gramas por porção de frutas
       stackable: true,
       maxStackSize: 99,
       rarity: "common",
@@ -308,7 +308,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🍖",
       category: "consumable",
       subcategory: "food",
-      weight: 2.0,
+      weight: 250, // 250 gramas por porção de carne
       stackable: true,
       maxStackSize: 20,
       rarity: "common",
@@ -335,7 +335,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "💧",
       category: "consumable",
       subcategory: "drink",
-      weight: 1.0,
+      weight: 500, // 500 gramas por 500ml de água
       stackable: true,
       maxStackSize: 50,
       rarity: "common",
@@ -363,7 +363,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🧵",
       category: "material",
       subcategory: "cordage",
-      weight: 0.1,
+      weight: 25, // 25 gramas por metro de barbante
       stackable: true,
       maxStackSize: 99,
       rarity: "common",
@@ -389,7 +389,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🔩",
       category: "material",
       subcategory: "metal",
-      weight: 4.0,
+      weight: 2800, // 2.8 kg = 2800 gramas por barra de ferro
       stackable: true,
       maxStackSize: 20,
       rarity: "uncommon",

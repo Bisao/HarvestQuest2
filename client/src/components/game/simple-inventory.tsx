@@ -216,8 +216,12 @@ export default function SimpleInventory({
               />
             </div>
             <div className="flex justify-between text-xs text-amber-600 mt-1">
-              <span>{player.inventoryWeight}kg</span>
-              <span>{player.maxInventoryWeight}kg</span>
+              <span>
+                {player.inventoryWeight >= 1000 ? `${(player.inventoryWeight / 1000).toFixed(1)}kg` : `${player.inventoryWeight}g`}
+              </span>
+              <span>
+                {player.maxInventoryWeight >= 1000 ? `${(player.maxInventoryWeight / 1000).toFixed(1)}kg` : `${player.maxInventoryWeight}g`}
+              </span>
             </div>
           </div>
           
@@ -242,7 +246,10 @@ export default function SimpleInventory({
                           <div>
                             <h4 className="font-semibold text-lg">{itemData.name}</h4>
                             <p className="text-sm text-gray-600">
-                              Quantidade: {selectedItem.quantity} • Peso total: {itemData.weight * selectedItem.quantity}kg
+                              Quantidade: {selectedItem.quantity} • Peso total: {(() => {
+                                const totalWeight = itemData.weight * selectedItem.quantity;
+                                return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
+                              })()}
                             </p>
                             {isResource && 'value' in itemData && (
                               <p className="text-sm text-gray-600">

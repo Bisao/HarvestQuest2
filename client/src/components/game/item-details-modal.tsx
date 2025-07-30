@@ -151,12 +151,19 @@ export function ItemDetailsModal({
 
             <div className="flex justify-between">
               <span className="text-gray-600">Peso unitário:</span>
-              <span className="font-semibold">{itemData.weight}kg</span>
+              <span className="font-semibold">
+                {itemData.weight >= 1000 ? `${(itemData.weight / 1000).toFixed(1)}kg` : `${itemData.weight}g`}
+              </span>
             </div>
 
             <div className="flex justify-between">
               <span className="text-gray-600">Peso total:</span>
-              <span className="font-semibold">{(itemData.weight * item.quantity).toFixed(1)}kg</span>
+              <span className="font-semibold">
+                {(() => {
+                  const totalWeight = itemData.weight * item.quantity;
+                  return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
+                })()}
+              </span>
             </div>
 
             <div className="flex justify-between">

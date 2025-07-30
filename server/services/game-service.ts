@@ -5,22 +5,22 @@ import type { Player, Resource, Equipment, InventoryItem, StorageItem } from "@s
 export class GameService {
   constructor(private storage: IStorage) {}
 
-  // Calculate total inventory weight
+  // Calculate total inventory weight in grams
   async calculateInventoryWeight(playerId: string): Promise<number> {
     const inventory = await this.storage.getPlayerInventory(playerId);
     const resources = await this.storage.getAllResources();
     const equipment = await this.storage.getAllEquipment();
     
-    let totalWeight = 0;
+    let totalWeightInGrams = 0;
     
     for (const item of inventory) {
       const resource = resources.find(r => r.id === item.resourceId);
       if (resource) {
-        totalWeight += resource.weight * item.quantity;
+        totalWeightInGrams += resource.weight * item.quantity;
       }
     }
     
-    return totalWeight;
+    return totalWeightInGrams;
   }
 
   // Check if player can carry more items

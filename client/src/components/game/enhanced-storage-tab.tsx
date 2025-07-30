@@ -383,7 +383,9 @@ export default function EnhancedStorageTab({
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Peso unitário:</span>
-                      <span className="font-semibold">{item.itemData.weight}kg</span>
+                      <span className="font-semibold">
+                        {item.itemData.weight >= 1000 ? `${(item.itemData.weight / 1000).toFixed(1)}kg` : `${item.itemData.weight}g`}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Valor unitário:</span>
@@ -391,7 +393,12 @@ export default function EnhancedStorageTab({
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Peso total:</span>
-                      <span className="font-semibold">{(item.itemData.weight * item.quantity).toFixed(1)}kg</span>
+                      <span className="font-semibold">
+                        {(() => {
+                          const totalWeight = item.itemData.weight * item.quantity;
+                          return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
+                        })()}
+                      </span>
                     </div>
                   </div>
 
