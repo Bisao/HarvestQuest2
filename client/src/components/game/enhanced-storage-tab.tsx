@@ -774,20 +774,20 @@ export default function EnhancedStorageTab({
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-cyan-100">
-                <div className="text-4xl font-bold text-cyan-600 mb-2">{player.waterStorage}</div>
+                <div className="text-4xl font-bold text-cyan-600 mb-2">{player.waterStorage || 0}</div>
                 <div className="text-sm text-gray-600 font-medium">Água Atual</div>
                 <div className="text-xs text-gray-500 mt-1">unidades disponíveis</div>
               </div>
               
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-blue-100">
-                <div className="text-4xl font-bold text-blue-600 mb-2">{player.maxWaterStorage}</div>
+                <div className="text-4xl font-bold text-blue-600 mb-2">{player.maxWaterStorage || 0}</div>
                 <div className="text-sm text-gray-600 font-medium">Capacidade Total</div>
                 <div className="text-xs text-gray-500 mt-1">máximo permitido</div>
               </div>
               
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-green-100">
                 <div className="text-4xl font-bold text-green-600 mb-2">
-                  {Math.round((player.waterStorage / player.maxWaterStorage) * 100)}%
+                  {player.maxWaterStorage > 0 ? Math.round((player.waterStorage / player.maxWaterStorage) * 100) : 0}%
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Taxa de Ocupação</div>
                 <div className="text-xs text-gray-500 mt-1">do reservatório</div>
@@ -799,7 +799,7 @@ export default function EnhancedStorageTab({
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-cyan-700">Nível do Reservatório</span>
                 <span className="text-sm text-cyan-600">
-                  {player.waterStorage} / {player.maxWaterStorage} unidades
+                  {player.waterStorage || 0} / {player.maxWaterStorage || 0} unidades
                 </span>
               </div>
               <div className="relative">
@@ -807,13 +807,13 @@ export default function EnhancedStorageTab({
                   <div 
                     className="bg-gradient-to-r from-cyan-500 to-blue-600 h-4 rounded-full transition-all duration-500 ease-in-out"
                     style={{ 
-                      width: `${Math.min((player.waterStorage / player.maxWaterStorage) * 100, 100)}%` 
+                      width: `${player.maxWaterStorage > 0 ? Math.min((player.waterStorage / player.maxWaterStorage) * 100, 100) : 0}%` 
                     }}
                   />
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-xs font-medium text-cyan-800">
-                    {Math.round((player.waterStorage / player.maxWaterStorage) * 100)}%
+                    {player.maxWaterStorage > 0 ? Math.round((player.waterStorage / player.maxWaterStorage) * 100) : 0}%
                   </span>
                 </div>
               </div>
