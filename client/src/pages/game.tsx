@@ -84,24 +84,35 @@ export default function Game() {
       <GameHeader player={player} />
 
       {/* Tab Navigation - Fixed below header */}
-      <div className="fixed top-16 md:top-20 left-0 right-0 z-40 bg-white shadow-lg border-b">
+      <div className="fixed top-16 md:top-20 left-0 right-0 z-40 bg-gray-50 shadow-lg border-b border-gray-200">
         <div className="container mx-auto px-2 md:px-4">
-          <div className="flex border-b overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 px-2 md:px-4 py-2 md:py-3 text-xs md:text-sm font-medium transition-colors min-w-0 ${
-                  activeTab === tab.id
-                    ? "bg-blue-50 text-blue-700 border-b-2 border-blue-500"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
-              >
-                <span className="mr-1 md:mr-2 text-sm md:text-base">{tab.emoji}</span>
-                <span className="hidden sm:inline">{tab.label}</span>
-                <span className="sm:hidden">{tab.label.slice(0, 4)}</span>
-              </button>
-            ))}
+          <div className="flex overflow-x-auto gap-1 md:gap-2 py-2 scrollbar-hide">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`relative flex items-center space-x-1 md:space-x-2 px-2 md:px-4 py-2 md:py-3 rounded-t-lg font-medium transition-all flex-shrink-0 text-xs md:text-sm ${
+                    isActive 
+                      ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px shadow-sm" 
+                      : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
+                  }`}
+                >
+                  <span className="text-base md:text-lg">{tab.emoji}</span>
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{
+                    tab.id === "biomes" ? "Biom" :
+                    tab.id === "inventory" ? "Inv." :
+                    tab.id === "storage" ? "Arm." :
+                    tab.id === "crafting" ? "Craft" :
+                    tab.id === "quests" ? "Miss" :
+                    tab.label.slice(0, 4)
+                  }</span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
