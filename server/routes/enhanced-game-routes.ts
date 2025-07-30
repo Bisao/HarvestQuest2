@@ -18,6 +18,7 @@ import { usernameParamSchema, playerIdParamSchema, idParamSchema } from "../midd
 import type { IStorage } from "../storage";
 import { GameService } from "../services/game-service";
 import { ExpeditionService } from "../services/expedition-service";
+import { RESOURCE_IDS, EQUIPMENT_IDS, BIOME_IDS, RECIPE_IDS } from "@shared/constants/game-ids";
 
 export function registerEnhancedGameRoutes(
   app: Express, 
@@ -147,12 +148,20 @@ export function registerEnhancedGameRoutes(
           );
         }
 
-        // Check ingredients availability
-        const ingredients = recipe.ingredients as Record<string, number>;
+        // Check and consume ingredients from storage
         const playerStorage = await storage.getPlayerStorage(playerId);
         
-        // Check if ingredients exists and is valid
-        if (!ingredients || typeof ingredients !== 'object') {
+        // Handle recipe ingredients - check if it's array or object format
+        let ingredients: Record<string, number> = {};
+        
+        if (Array.isArray(recipe.ingredients)) {
+          // Convert array format to object format
+          for (const ingredient of recipe.ingredients) {
+            ingredients[ingredient.resourceId] = ingredient.quantity;
+          }
+        } else if (typeof recipe.ingredients === 'object' && recipe.ingredients !== null) {
+          ingredients = recipe.ingredients as Record<string, number>;
+        } else {
           throw new InvalidOperationError(`Recipe ${recipe.name} has no valid ingredients defined`);
         }
         
@@ -180,54 +189,72 @@ export function registerEnhancedGameRoutes(
           }
         }
 
-        // Add crafted items to storage (always storage as per requirement)
-        const output = recipe.output as Record<string, number>;
-        const items = [];
+        // Handle special crafting: Water Tank Unlock
+        const isBarrelCrafting = recipe.id === RECIPE_IDS.BARRIL_IMPROVISADO;
         
-        // Check if output exists and is valid
-        if (!output || typeof output !== 'object') {
-          throw new InvalidOperationError(`Recipe ${recipe.name} has no valid output defined`);
-        }
-        
-        for (const [itemId, baseAmount] of Object.entries(output)) {
-          const totalAmount = baseAmount * quantity;
+        if (isBarrelCrafting) {
+          // Instead of adding barrel to inventory/storage, unlock a water tank
+          const updatedPlayer = await storage.updatePlayer(playerId, {
+            waterTanks: player.waterTanks + quantity, // Each barrel crafted unlocks one tank
+            maxWaterStorage: player.maxWaterStorage + (50 * quantity) // Each barrel adds 50 capacity
+          });
           
-          // Always add to storage (items craftados sempre vão para o armazém)
-          // Check if this is equipment or resource
-          const allResources = await storage.getAllResources();
-          const allEquipment = await storage.getAllEquipment();
+          return res.json({
+            message: `${quantity} Barril(s) criado(s) com sucesso! ${quantity} novo(s) tanque(s) de água desbloqueado(s). Capacidade total: ${updatedPlayer.maxWaterStorage} unidades.`,
+            player: updatedPlayer,
+            tanksUnlocked: updatedPlayer.waterTanks,
+            barrelsCrafted: quantity
+          });
+        } else {
+          // Add crafted items to storage (always storage as per requirement)
+          const output = recipe.outputs as Record<string, number>;
+          const items = [];
           
-          const isResource = allResources.some(r => r.id === itemId);
-          const isEquipment = allEquipment.some(eq => eq.id === itemId);
-          const itemType = isEquipment ? 'equipment' : 'resource';
-          
-          // Refresh player storage to get current state
-          const currentStorage = await storage.getPlayerStorage(playerId);
-          const existingItem = currentStorage.find(item => 
-            item.resourceId === itemId && item.itemType === itemType
-          );
-          
-          if (existingItem) {
-            await storage.updateStorageItem(existingItem.id, {
-              quantity: existingItem.quantity + totalAmount
-            });
-          } else {
-            // Create new storage item to avoid foreign key issues
-            await storage.addStorageItem({
-              playerId,
-              resourceId: itemId,
-              quantity: totalAmount,
-              itemType
-            });
+          // Check if output exists and is valid
+          if (!output || typeof output !== 'object') {
+            throw new InvalidOperationError(`Recipe ${recipe.name} has no valid output defined`);
           }
           
-          // Log for debugging
-          const itemName = isResource 
-            ? allResources.find(r => r.id === itemId)?.name 
-            : allEquipment.find(e => e.id === itemId)?.name;
-          console.log(`DEBUG: Crafted ${totalAmount}x ${itemName} (${itemType}) with ID ${itemId} added to storage for player ${playerId}`);
-          
-          items.push({ itemId, quantity: totalAmount });
+          for (const [itemId, baseAmount] of Object.entries(output)) {
+            const totalAmount = baseAmount * quantity;
+            
+            // Always add to storage (items craftados sempre vão para o armazém)
+            // Check if this is equipment or resource
+            const allResources = await storage.getAllResources();
+            const allEquipment = await storage.getAllEquipment();
+            
+            const isResource = allResources.some(r => r.id === itemId);
+            const isEquipment = allEquipment.some(eq => eq.id === itemId);
+            const itemType = isEquipment ? 'equipment' : 'resource';
+            
+            // Refresh player storage to get current state
+            const currentStorage = await storage.getPlayerStorage(playerId);
+            const existingItem = currentStorage.find(item => 
+              item.resourceId === itemId && item.itemType === itemType
+            );
+            
+            if (existingItem) {
+              await storage.updateStorageItem(existingItem.id, {
+                quantity: existingItem.quantity + totalAmount
+              });
+            } else {
+              // Create new storage item to avoid foreign key issues
+              await storage.addStorageItem({
+                playerId,
+                resourceId: itemId,
+                quantity: totalAmount,
+                itemType
+              });
+            }
+            
+            // Log for debugging
+            const itemName = isResource 
+              ? allResources.find(r => r.id === itemId)?.name 
+              : allEquipment.find(e => e.id === itemId)?.name;
+            console.log(`DEBUG: Crafted ${totalAmount}x ${itemName} (${itemType}) with ID ${itemId} added to storage for player ${playerId}`);
+            
+            items.push({ itemId, quantity: totalAmount });
+          }
         }
 
         // Update quest progress for crafting (only for active quests)
@@ -235,8 +262,8 @@ export function registerEnhancedGameRoutes(
         const activeQuests = await storage.getPlayerQuests(playerId);
         const activePlayerQuests = activeQuests.filter(pq => pq.status === 'active');
         
-        for (const [craftedItemId, craftedAmount] of Object.entries(output)) {
-          const totalCraftedAmount = craftedAmount * quantity; // This is the total amount crafted
+        for (const [craftedItemId, craftedAmount] of Object.entries(output || {})) {
+          const totalCraftedAmount = (craftedAmount as number) * quantity; // This is the total amount crafted
           
           for (const playerQuest of activePlayerQuests) {
             const quest = await storage.getQuest(playerQuest.questId);
@@ -273,7 +300,7 @@ export function registerEnhancedGameRoutes(
             name: recipe.name
           },
           quantity,
-          items,
+          items: items || [],
           destination: 'storage'
         }, `Successfully crafted ${quantity}x ${recipe.name}`);
 

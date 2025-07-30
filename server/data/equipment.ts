@@ -221,6 +221,16 @@ export function createEquipmentWithIds(): InsertEquipment[] {
       toolType: "backpack",
       weight: 2,
     },
+    {
+      id: EQUIPMENT_IDS.BARRIL_IMPROVISADO,
+      name: "Barril Improvisado",
+      emoji: "🛢️",
+      effect: "Desbloqueie um tanque de água (50 unidades)",
+      bonus: { type: "water_tank_unlock", value: 50 },
+      slot: "container",
+      toolType: "barrel",
+      weight: 8,
+    },
   ];
 }
 

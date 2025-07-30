@@ -16,6 +16,7 @@ export interface Player {
   craftedItemsDestination: 'inventory' | 'storage';
   waterStorage: number;
   maxWaterStorage: number;
+  waterTanks: number; // Number of unlocked water tanks
   equippedHelmet: string | null;
   equippedChestplate: string | null;
   equippedLeggings: string | null;
@@ -39,6 +40,7 @@ export interface InsertPlayer {
   craftedItemsDestination?: 'inventory' | 'storage';
   waterStorage?: number;
   maxWaterStorage?: number;
+  waterTanks?: number;
   equippedHelmet?: string | null;
   equippedChestplate?: string | null;
   equippedLeggings?: string | null;

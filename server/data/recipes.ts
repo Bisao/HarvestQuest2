@@ -177,6 +177,20 @@ export function createRecipeData(): InsertRecipe[] {
       requiredLevel: 4,
       ingredients: { [RESOURCE_IDS.CARNE]: 2, [RESOURCE_IDS.AGUA_FRESCA]: 3 },
       output: { [RESOURCE_IDS.ENSOPADO_CARNE]: 1 }
+    },
+    
+    // WATER TANK UNLOCKING
+    {
+      id: RECIPE_IDS.BARRIL_IMPROVISADO,
+      name: "Barril Improvisado",
+      emoji: "🛢️",
+      requiredLevel: 3,
+      ingredients: { 
+        [RESOURCE_IDS.MADEIRA]: 10, 
+        [EQUIPMENT_IDS.CORDA]: 4, 
+        [RESOURCE_IDS.FIBRA]: 10 
+      },
+      output: { [EQUIPMENT_IDS.BARRIL_IMPROVISADO]: 1 }
     }
   ];
 }

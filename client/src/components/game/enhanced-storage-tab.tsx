@@ -298,181 +298,263 @@ export default function EnhancedStorageTab({
       {/* Water Sub-tab */}
       {activeSubTab === "water" && (
         <div className="space-y-6">
-          {/* Water Tank Visualization */}
+          {/* Water Tank System */}
           <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-8">
             <h3 className="font-bold text-blue-800 text-2xl mb-8 text-center flex items-center justify-center">
               <span className="mr-3 text-3xl">💧</span>
-              Reservatório de Água
+              Sistema de Reservatórios
             </h3>
             
+            {/* Tank Status Info */}
+            <div className="mb-8 text-center">
+              <div className="text-lg font-semibold text-gray-700 mb-2">
+                Tanques Desbloqueados: {player.waterTanks || 0} / 10
+              </div>
+              <div className="text-sm text-gray-600">
+                {player.waterTanks === 0 && "Crie um Barril Improvisado para desbloquear seu primeiro tanque!"}
+                {(player.waterTanks || 0) > 0 && `Capacidade total: ${player.maxWaterStorage} unidades`}
+              </div>
+            </div>
+            
             <div className="flex flex-col lg:flex-row gap-8 items-center justify-center">
-              {/* Vertical Water Tank */}
-              <div className="flex flex-col items-center">
-                <div className="relative w-32 h-80 bg-gray-200 rounded-2xl border-4 border-gray-400 shadow-lg overflow-hidden">
-                  {/* Water level */}
-                  <div 
-                    className="absolute bottom-0 w-full bg-gradient-to-t from-blue-600 via-cyan-500 to-blue-400 transition-all duration-1000 ease-in-out rounded-b-xl"
-                    style={{ 
-                      height: `${Math.min((player.waterStorage / player.maxWaterStorage) * 100, 100)}%` 
-                    }}
-                  />
+              {/* Multiple Water Tanks */}
+              <div className="flex flex-wrap gap-4 items-end justify-center">
+                {Array.from({ length: Math.max(3, player.waterTanks || 0) }, (_, index) => {
+                  const tankCapacity = 50;
+                  const tankNumber = index + 1;
+                  const isUnlocked = tankNumber <= (player.waterTanks || 0);
                   
-                  {/* Water surface animation */}
-                  <div 
-                    className="absolute w-full h-2 bg-gradient-to-r from-cyan-300 to-blue-300 opacity-70 animate-pulse"
-                    style={{ 
-                      bottom: `${Math.min((player.waterStorage / player.maxWaterStorage) * 100, 100)}%`,
-                      transform: 'translateY(50%)'
-                    }}
-                  />
+                  // Calculate water for this specific tank (sequential filling)
+                  let tankWater = 0;
+                  if (isUnlocked) {
+                    const waterForPreviousTanks = (tankNumber - 1) * tankCapacity;
+                    const remainingWater = Math.max(0, player.waterStorage - waterForPreviousTanks);
+                    tankWater = Math.min(remainingWater, tankCapacity);
+                  }
                   
-                  {/* Tank markings */}
-                  <div className="absolute inset-0 flex flex-col justify-between py-2">
-                    {[100, 75, 50, 25, 0].map((mark) => (
-                      <div key={mark} className="flex items-center">
-                        <div className="w-4 h-0.5 bg-gray-500 ml-auto mr-2"></div>
-                        <span className="text-xs font-semibold text-gray-600 w-8">{mark}%</span>
+                  const fillPercentage = isUnlocked ? (tankWater / tankCapacity) * 100 : 0;
+                  
+                  return (
+                    <div key={index} className="flex flex-col items-center">
+                      <div className="text-xs font-semibold text-gray-600 mb-2">
+                        Tanque {tankNumber}
                       </div>
-                    ))}
-                  </div>
-                  
-                  {/* Current level indicator */}
-                  <div 
-                    className="absolute right-0 w-6 h-1 bg-red-500 shadow-lg"
-                    style={{ 
-                      bottom: `${Math.min((player.waterStorage / player.maxWaterStorage) * 100, 100)}%`,
-                      transform: 'translateY(50%)'
-                    }}
-                  />
-                </div>
-                
-                {/* Tank Info */}
-                <div className="mt-4 text-center">
-                  <div className="text-2xl font-bold text-blue-700 mb-1">
-                    {player.waterStorage} / {player.maxWaterStorage}
-                  </div>
-                  <div className="text-sm text-gray-600">unidades de água</div>
-                  <div className="text-lg font-semibold text-cyan-600 mt-2">
-                    {Math.round((player.waterStorage / player.maxWaterStorage) * 100)}% preenchido
-                  </div>
-                </div>
+                      <div className={`relative w-20 h-48 rounded-xl border-3 shadow-md overflow-hidden ${
+                        isUnlocked 
+                          ? 'bg-gray-100 border-blue-400' 
+                          : 'bg-gray-300 border-gray-500 opacity-50'
+                      }`}>
+                        {isUnlocked ? (
+                          <>
+                            {/* Water level */}
+                            <div 
+                              className="absolute bottom-0 w-full bg-gradient-to-t from-blue-600 via-cyan-500 to-blue-400 transition-all duration-1000 ease-in-out rounded-b-lg"
+                              style={{ height: `${fillPercentage}%` }}
+                            />
+                            
+                            {/* Water surface animation */}
+                            {tankWater > 0 && (
+                              <div 
+                                className="absolute w-full h-1 bg-gradient-to-r from-cyan-300 to-blue-300 opacity-70 animate-pulse"
+                                style={{ 
+                                  bottom: `${fillPercentage}%`,
+                                  transform: 'translateY(50%)'
+                                }}
+                              />
+                            )}
+                            
+                            {/* Tank markings */}
+                            <div className="absolute inset-0 flex flex-col justify-between py-2">
+                              {[100, 50, 0].map((mark) => (
+                                <div key={mark} className="flex items-center">
+                                  <div className="w-2 h-0.5 bg-gray-500 ml-auto mr-1"></div>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-center">
+                              <div className="text-2xl mb-1">🔒</div>
+                              <div className="text-xs text-gray-600 font-semibold">Bloqueado</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Tank Water Amount */}
+                      <div className="mt-2 text-center">
+                        <div className="text-xs font-bold text-blue-700">
+                          {isUnlocked ? `${tankWater}/${tankCapacity}` : '0/50'}
+                        </div>
+                        <div className="text-xs text-gray-500">unidades</div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Water Controls and Info */}
               <div className="flex-1 max-w-md">
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-blue-100 mb-6">
-                  <h4 className="font-bold text-gray-800 text-lg mb-4 flex items-center">
-                    <span className="mr-2">🚰</span>
-                    Controles de Água
-                  </h4>
-                  
-                  <div className="space-y-4">
-                    {/* Consumption buttons */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        onClick={() => consumeWaterMutation.mutate(10)}
-                        disabled={player.waterStorage < 10 || consumeWaterMutation.isPending || isBlocked}
-                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex flex-col items-center space-y-1"
-                      >
-                        <span className="text-lg">💧</span>
-                        <span className="text-sm">Beber 10</span>
-                      </button>
+                {(player.waterTanks || 0) > 0 ? (
+                  <>
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-blue-100 mb-6">
+                      <h4 className="font-bold text-gray-800 text-lg mb-4 flex items-center">
+                        <span className="mr-2">🚰</span>
+                        Controles de Água
+                      </h4>
                       
-                      <button
-                        onClick={() => consumeWaterMutation.mutate(25)}
-                        disabled={player.waterStorage < 25 || consumeWaterMutation.isPending || isBlocked}
-                        className="bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex flex-col items-center space-y-1"
-                      >
-                        <span className="text-lg">🌊</span>
-                        <span className="text-sm">Beber 25</span>
-                      </button>
-                    </div>
-                    
-                    {/* Custom amount */}
-                    <div className="pt-2 border-t border-gray-200">
-                      <label className="text-sm font-medium text-gray-700 block mb-2">
-                        Quantidade personalizada:
-                      </label>
-                      <div className="flex gap-2">
-                        <Input
-                          type="number"
-                          min={1}
-                          max={player.waterStorage}
-                          placeholder="Quantidade"
-                          className="flex-1"
-                        />
-                        <button
-                          disabled={isBlocked || consumeWaterMutation.isPending}
-                          className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-                        >
-                          Beber
-                        </button>
+                      <div className="space-y-4">
+                        {/* Consumption buttons */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            onClick={() => consumeWaterMutation.mutate(10)}
+                            disabled={player.waterStorage < 10 || consumeWaterMutation.isPending || isBlocked}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex flex-col items-center space-y-1"
+                          >
+                            <span className="text-lg">💧</span>
+                            <span className="text-sm">Beber 10</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => consumeWaterMutation.mutate(25)}
+                            disabled={player.waterStorage < 25 || consumeWaterMutation.isPending || isBlocked}
+                            className="bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex flex-col items-center space-y-1"
+                          >
+                            <span className="text-lg">🌊</span>
+                            <span className="text-sm">Beber 25</span>
+                          </button>
+                        </div>
+                        
+                        {/* Custom amount */}
+                        <div className="pt-2 border-t border-gray-200">
+                          <label className="text-sm font-medium text-gray-700 block mb-2">
+                            Quantidade personalizada:
+                          </label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              min={1}
+                              max={player.waterStorage}
+                              placeholder="Quantidade"
+                              className="flex-1"
+                            />
+                            <button
+                              disabled={isBlocked || consumeWaterMutation.isPending}
+                              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                            >
+                              Beber
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* Water Info */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-cyan-100">
-                  <h4 className="font-bold text-gray-800 text-lg mb-4 flex items-center">
-                    <span className="mr-2">ℹ️</span>
-                    Informações da Água
-                  </h4>
-                  
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Capacidade máxima:</span>
-                      <span className="font-semibold text-gray-800">{player.maxWaterStorage} unidades</span>
+                    {/* Water Info */}
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-cyan-100">
+                      <h4 className="font-bold text-gray-800 text-lg mb-4 flex items-center">
+                        <span className="mr-2">ℹ️</span>
+                        Informações da Água
+                      </h4>
+                      
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Tanques ativos:</span>
+                          <span className="font-semibold text-gray-800">{player.waterTanks} tanques</span>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Capacidade total:</span>
+                          <span className="font-semibold text-gray-800">{player.maxWaterStorage} unidades</span>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Água disponível:</span>
+                          <span className="font-semibold text-blue-600">{player.waterStorage} unidades</span>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Espaço livre:</span>
+                          <span className="font-semibold text-green-600">
+                            {player.maxWaterStorage - player.waterStorage} unidades
+                          </span>
+                        </div>
+                        
+                        <div className="pt-3 border-t border-gray-200">
+                          <p className="text-gray-700 text-xs leading-relaxed">
+                            <strong>Sistema de enchimento sequencial:</strong> Os tanques enchem um por vez, completamente, antes de passar para o próximo.
+                          </p>
+                        </div>
+                      </div>
                     </div>
+                  </>
+                ) : (
+                  <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
+                    <h4 className="font-bold text-orange-800 text-lg mb-4 flex items-center">
+                      <span className="mr-2">🔒</span>
+                      Sistema Bloqueado
+                    </h4>
                     
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Disponível:</span>
-                      <span className="font-semibold text-blue-600">{player.waterStorage} unidades</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Espaço livre:</span>
-                      <span className="font-semibold text-green-600">
-                        {player.maxWaterStorage - player.waterStorage} unidades
-                      </span>
-                    </div>
-                    
-                    <div className="pt-3 border-t border-gray-200">
-                      <p className="text-gray-700 text-xs leading-relaxed">
-                        <strong>Dica:</strong> A água pode ser coletada em expedições usando um balde ou garrafa de bambu. 
-                        Beber água restaura sua sede e é essencial para expedições longas.
+                    <div className="space-y-4 text-sm text-orange-700">
+                      <p className="leading-relaxed">
+                        Você ainda não possui tanques de água desbloqueados. Para começar a armazenar água, você precisa craftar um <strong>Barril Improvisado</strong>.
+                      </p>
+                      
+                      <div className="bg-orange-100 rounded-lg p-4">
+                        <h5 className="font-semibold mb-2">🛢️ Barril Improvisado</h5>
+                        <p className="text-xs mb-2">Ingredientes necessários:</p>
+                        <ul className="text-xs space-y-1">
+                          <li>• 10x Madeira</li>
+                          <li>• 4x Corda</li>
+                          <li>• 10x Fibra (para filtrar a água)</li>
+                        </ul>
+                        <p className="text-xs mt-2 font-semibold">
+                          Cada barril desbloqueie 1 tanque com capacidade de 50 unidades.
+                        </p>
+                      </div>
+                      
+                      <p className="text-xs">
+                        Vá até a aba <strong>Criação</strong> para craftar seu primeiro barril e começar a armazenar água!
                       </p>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
 
           {/* Water Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-blue-100">
-              <div className="text-4xl font-bold text-blue-600 mb-2">{player.waterStorage}</div>
-              <div className="text-sm text-gray-600 font-medium">Água Disponível</div>
-              <div className="text-xs text-gray-500 mt-1">unidades no tanque</div>
-            </div>
-            
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-cyan-100">
-              <div className="text-4xl font-bold text-cyan-600 mb-2">
-                {Math.round((player.waterStorage / player.maxWaterStorage) * 100)}%
+          {(player.waterTanks || 0) > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-purple-100">
+                <div className="text-4xl font-bold text-purple-600 mb-2">{player.waterTanks}</div>
+                <div className="text-sm text-gray-600 font-medium">Tanques Ativos</div>
+                <div className="text-xs text-gray-500 mt-1">desbloqueados</div>
               </div>
-              <div className="text-sm text-gray-600 font-medium">Nível do Tanque</div>
-              <div className="text-xs text-gray-500 mt-1">capacidade utilizada</div>
-            </div>
-            
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-green-100">
-              <div className="text-4xl font-bold text-green-600 mb-2">
-                {player.maxWaterStorage - player.waterStorage}
+              
+              <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-blue-100">
+                <div className="text-4xl font-bold text-blue-600 mb-2">{player.waterStorage}</div>
+                <div className="text-sm text-gray-600 font-medium">Água Disponível</div>
+                <div className="text-xs text-gray-500 mt-1">unidades armazenadas</div>
               </div>
-              <div className="text-sm text-gray-600 font-medium">Espaço Livre</div>
-              <div className="text-xs text-gray-500 mt-1">unidades disponíveis</div>
+              
+              <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-cyan-100">
+                <div className="text-4xl font-bold text-cyan-600 mb-2">
+                  {player.maxWaterStorage > 0 ? Math.round((player.waterStorage / player.maxWaterStorage) * 100) : 0}%
+                </div>
+                <div className="text-sm text-gray-600 font-medium">Sistema Preenchido</div>
+                <div className="text-xs text-gray-500 mt-1">capacidade utilizada</div>
+              </div>
+              
+              <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-green-100">
+                <div className="text-4xl font-bold text-green-600 mb-2">
+                  {player.maxWaterStorage - player.waterStorage}
+                </div>
+                <div className="text-sm text-gray-600 font-medium">Espaço Livre</div>
+                <div className="text-xs text-gray-500 mt-1">unidades disponíveis</div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 

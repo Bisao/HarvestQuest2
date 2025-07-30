@@ -71,6 +71,7 @@ export const EQUIPMENT_IDS = {
   
   // Storage/Utility
   MOCHILA: "eq-util-78901234-5678-9012-1234-567890123456",
+  BARRIL_IMPROVISADO: "eq-container-makeshift-barrel-001",
 } as const;
 
 // Update BIOME_IDS with correct actual database IDs
@@ -107,7 +108,8 @@ export const RECIPE_IDS = {
   COGUMELOS_ASSADOS: "recipe-cogumelos-001",
   PEIXE_GRELHADO: "recipe-peixe-001",
   CARNE_ASSADA: "recipe-carne-001",
-  ENSOPADO_CARNE: "recipe-ensopado-001"
+  ENSOPADO_CARNE: "recipe-ensopado-001",
+  BARRIL_IMPROVISADO: "recipe-barril-001"
 } as const;
 
 // Helper functions for type safety

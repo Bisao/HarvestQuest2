@@ -115,7 +115,10 @@ export class MemStorage implements IStorage {
     const resourceIds: string[] = [];
 
     for (const resource of ALL_RESOURCES) {
-      const created = await this.createResource(resource);
+      const created = await this.createResource({
+        ...resource,
+        value: resource.attributes?.baseValue || 10
+      });
       resourceIds.push(created.id);
     }
 
@@ -157,6 +160,7 @@ export class MemStorage implements IStorage {
       craftedItemsDestination: 'storage',
       waterStorage: 0,
       maxWaterStorage: 500,
+      waterTanks: 0, // No tanks unlocked initially
       equippedHelmet: null,
       equippedChestplate: null,
       equippedLeggings: null,
