@@ -117,7 +117,7 @@ export class MemStorage implements IStorage {
     for (const resource of ALL_RESOURCES) {
       const created = await this.createResource({
         ...resource,
-        value: resource.attributes?.baseValue || 10
+        value: resource.sellPrice || 10
       });
       resourceIds.push(created.id);
     }
@@ -201,7 +201,7 @@ export class MemStorage implements IStorage {
       craftedItemsDestination: insertPlayer.craftedItemsDestination ?? 'storage',
       waterStorage: insertPlayer.waterStorage ?? 0,
       maxWaterStorage: insertPlayer.maxWaterStorage ?? 500,
-      waterTanks: insertPlayer.waterTanks ?? [],
+      waterTanks: insertPlayer.waterTanks ?? 1,
       equippedHelmet: insertPlayer.equippedHelmet || null,
       equippedChestplate: insertPlayer.equippedChestplate || null,
       equippedLeggings: insertPlayer.equippedLeggings || null,
@@ -242,7 +242,7 @@ export class MemStorage implements IStorage {
       experienceValue: insertResource.experienceValue ?? 1,
       
       // Fundamental Attributes
-      attributes: insertResource.attributes ?? { durability: 100, efficiency: 1.0, rarity: 'common', baseValue: insertResource.sellPrice ?? 1 },
+      attributes: insertResource.attributes ?? { durability: 100, efficiency: 1.0, rarity: 'common' },
       
       // Resource Classification  
       category: insertResource.category ?? 'raw_materials',
