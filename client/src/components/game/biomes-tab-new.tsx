@@ -36,6 +36,24 @@ export default function BiomesTab({
     return resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
   };
 
+  const getBiomeStory = (biome: Biome) => {
+    const stories: { [key: string]: string } = {
+      "Floresta Temperada": "Esta antiga floresta sussurra segredos de séculos passados. Entre suas árvores majestosas, raios de sol dourado filtram através das copas verdes, criando um mosaico de luz e sombra no chão coberto de folhas. O ar é fresco e úmido, carregado com o aroma de terra rica e madeira. Pequenos riachos serpenteiam entre as raízes, onde animais selvagens vêm beber água cristalina. Cogumelos coloridos brotam em troncos caídos, enquanto o canto dos pássaros ecoa suavemente pela vegetação densa.",
+      
+      "Montanhas Rochosas": "Picos imponentes se erguem em direção às nuvens, suas faces de pedra esculpidas pelos ventos e pelo tempo. O ar aqui é rarefeito e puro, com uma frieza que desperta os sentidos. Cachoeiras despencam de grandes alturas, criando uma sinfonia natural que ressoa pelos vales. Entre as rochas, cristais raros capturam a luz do sol, brilhando como estrelas terrestres. Águias planam majestosamente sobre os penhascos, enquanto cabras montesas navegam com agilidade pelos terrenos escarpados.",
+      
+      "Pântano Sombrio": "Neblina densa paira sobre águas escuras e misteriosas, onde árvores retorcidas emergem como guardiões ancestrais. O ambiente é úmido e misterioso, com sons estranhos ecoando na distância. Plantas carnívoras se escondem entre a vegetação aquática, enquanto sapos e insetos criam uma orquestra noturna constante. Lendas falam de tesouros perdidos nas profundezas lamacentas e de criaturas antigas que habitam os recantos mais sombrios deste reino aquático.",
+      
+      "Deserto Árido": "Sob o sol escaldante, dunas douradas se estendem até o horizonte, mudando constantemente com os ventos quentes. O silêncio é profundo, quebrado apenas pelo sussurro da areia em movimento. Oásis raros aparecem como miragens verdadeiras, cercados por palmeiras que oferecem sombra preciosa. Animais adaptados emergem durante a noite fresca, quando as estrelas brilham com intensidade incomparável no céu límpido. Antigas ruínas meio enterradas contam histórias de civilizações perdidas.",
+      
+      "Tundra Gelada": "Uma vastidão branca se estende infinitamente, onde o vento gelado sopra através da paisagem congelada. O ar é tão puro que cada respiração queima os pulmões com frieza cristalina. Auroras boreais dançam no céu noturno, pintando a escuridão com cores místicas. Animais peludos deixam pegadas na neve fresca, seguindo rotas ancestrais de sobrevivência. O gelo craque e geme, criando uma música natural única deste mundo congelado.",
+      
+      "Costa Rochosa": "Onde a terra encontra o mar, falésias dramáticas resistem ao abraço eterno das ondas. O ar salgado carrega o perfume do oceano, misturado com o aroma de algas marinhas. Gaivotas gritam enquanto mergulham em busca de peixes, e o som rítmico das ondas cria uma melodia hipnotizante. Poças de maré revelam pequenos mundos aquáticos cheios de vida colorida. Faróis antigos se erguem como sentinelas, guiando navegadores através das águas traiçoeiras."
+    };
+    
+    return stories[biome.name] || "Um lugar misterioso e inexplorado, cheio de segredos esperando para serem descobertos. As lendas falam de grandes aventuras que aguardam os corajosos que se atrevem a explorar estes territórios desconhecidos.";
+  };
+
   const getToolIcons = (resource: Resource) => {
     const icons: string[] = [];
     
@@ -205,31 +223,13 @@ export default function BiomesTab({
                     </div>
                   )}
 
-                  {/* Resources available - Scrollable */}
-                  <div className="bg-blue-50 p-2 md:p-3 rounded-lg">
-                    <h4 className="font-medium text-xs md:text-sm mb-2 md:mb-3 text-blue-800">Recursos Disponíveis:</h4>
+                  {/* Biome Story */}
+                  <div className="bg-amber-50 p-2 md:p-3 rounded-lg">
+                    <h4 className="font-medium text-xs md:text-sm mb-2 md:mb-3 text-amber-800">História do Local:</h4>
                     <div className="max-h-32 md:max-h-40 overflow-y-auto pr-1">
-                      <div className="space-y-1 md:space-y-2">
-                        {biomeResources.map((resource) => {
-                          const toolIcons = getToolIcons(resource);
-                          return (
-                            <div key={resource.id} className="flex items-center justify-between bg-white p-1.5 md:p-2 rounded text-xs">
-                              <div className="flex items-center space-x-1 md:space-x-2 flex-1 min-w-0">
-                                <span className="text-sm md:text-base">{resource.emoji}</span>
-                                <span className="truncate text-gray-700 text-xs">{resource.name}</span>
-                              </div>
-                              <div className="flex items-center space-x-1 ml-2">
-                                {toolIcons.map((icon, index) => (
-                                  <span key={index} className="text-xs" title="Ferramenta necessária">{icon}</span>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    <div className="text-xs text-blue-600 mt-1 md:mt-2 text-center">
-                      {biomeResources.length} recursos disponíveis
+                      <p className="text-xs md:text-sm text-amber-700 leading-relaxed">
+                        {getBiomeStory(biome)}
+                      </p>
                     </div>
                   </div>
 
