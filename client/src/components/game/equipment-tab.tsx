@@ -212,19 +212,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                         </div>
                       ) : (
                         <div className="text-xs text-gray-500">
-                          {isDisabled ? "Em Breve" : (
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="text-xs h-6 px-2 mt-1"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEquipSlotClick(slotKey, false);
-                              }}
-                            >
-                              Equipar
-                            </Button>
-                          )}
+                          {isDisabled ? "Em Breve" : "Vazio"}
                         </div>
                       )}
                     </div>
