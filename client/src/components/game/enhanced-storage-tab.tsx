@@ -331,23 +331,25 @@ export default function EnhancedStorageTab({
             )}
           </div>
 
-          {/* Results Summary */}
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              Mostrando <span className="font-semibold text-gray-800">{filteredStorageData.length}</span> de{" "}
-              <span className="font-semibold text-gray-800">
-                {enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length}
-              </span> itens
-            </div>
-            
-            {filteredStorageData.length > 0 && (
+          {/* Results Summary - Only show when there are items */}
+          {enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length > 0 && (
+            <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
-                Valor total filtrado: <span className="font-semibold text-green-600">
-                  {filteredStorageData.reduce((sum, item) => sum + item.totalValue, 0).toLocaleString()} moedas
-                </span>
+                Mostrando <span className="font-semibold text-gray-800">{filteredStorageData.length}</span> de{" "}
+                <span className="font-semibold text-gray-800">
+                  {enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length}
+                </span> itens
               </div>
-            )}
-          </div>
+              
+              {filteredStorageData.length > 0 && (
+                <div className="text-sm text-gray-600">
+                  Valor total filtrado: <span className="font-semibold text-green-600">
+                    {filteredStorageData.reduce((sum, item) => sum + item.totalValue, 0).toLocaleString()} moedas
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Storage Items Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
