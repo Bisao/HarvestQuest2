@@ -18,6 +18,11 @@ export function isConsumable(item: any): boolean {
     return true;
   }
 
+  // Check by type for legacy items
+  if (item.type === 'food') {
+    return true;
+  }
+
   // Check by attributes (backup method)
   if (item.attributes && (
     item.attributes.hunger_restore > 0 || 
@@ -34,6 +39,22 @@ export function isConsumable(item: any): boolean {
     }
   }
 
+  // Check by ID - usando os IDs corretos do sistema
+  const consumableIds = [
+    'res-carne-assada-001',
+    'res-agua-fresca-001', 
+    'res-cogumelos-assados-001',
+    'res-peixe-grelhado-001',
+    'res-ensopado-carne-001',
+    'res-cogumelos-001',
+    'res-frutas-silvestres-001',
+    'res-suco-frutas-001'
+  ];
+
+  if (consumableIds.includes(item.id)) {
+    return true;
+  }
+
   // Fallback: check by name for existing items (legacy support)
   const consumableNames = [
     'Carne Assada',
@@ -41,6 +62,9 @@ export function isConsumable(item: any): boolean {
     'Cogumelos Assados',
     'Peixe Grelhado',
     'Ensopado de Carne',
+    'Cogumelos',
+    'Frutas Silvestres',
+    'Suco de Frutas',
     'cooked_meat',
     'fresh_water',
     'cooked_mushrooms',
@@ -75,7 +99,10 @@ export function getConsumableEffects(item: any): ConsumableEffects {
     'Peixe Grelhado': { hungerRestore: 20, thirstRestore: 3 },
     'grilled_fish': { hungerRestore: 20, thirstRestore: 3 },
     'Ensopado de Carne': { hungerRestore: 35, thirstRestore: 10 },
-    'meat_stew': { hungerRestore: 35, thirstRestore: 10 }
+    'meat_stew': { hungerRestore: 35, thirstRestore: 10 },
+    'Cogumelos': { hungerRestore: 10, thirstRestore: 0 },
+    'Frutas Silvestres': { hungerRestore: 8, thirstRestore: 5 },
+    'Suco de Frutas': { hungerRestore: 5, thirstRestore: 15 }
   };
 
   return hardcodedEffects[item.name || item.displayName] || { hungerRestore: 0, thirstRestore: 0 };

@@ -96,7 +96,7 @@ export function createModernGameItems(): InsertGameItem[] {
       effects: [],
       tags: ["wood", "construction", "flammable", "renewable"]
     },
-    
+
     // TOOLS - Equipment for resource gathering
     {
       id: EQUIPMENT_IDS.MACHADO,
@@ -182,7 +182,7 @@ export function createModernGameItems(): InsertGameItem[] {
       effects: ["fishing_enabled"],
       tags: ["tool", "fishing", "specialized", "craftable"]
     },
-    
+
     // ANIMALS - Huntable creatures
     {
       id: RESOURCE_IDS.COELHO,
@@ -244,7 +244,61 @@ export function createModernGameItems(): InsertGameItem[] {
       effects: [],
       tags: ["animal", "huntable", "medium", "valuable"]
     },
-    
+
+    {
+      id: RESOURCE_IDS.COGUMELOS,
+      name: "mushrooms",
+      displayName: "Cogumelos",
+      description: "Cogumelos silvestres, podem ser consumidos crus ou usados para crafting",
+      iconPath: "🍄",
+      category: "consumable",
+      subcategory: "food",
+      weight: 1.0,
+      stackable: true,
+      maxStackSize: 50,
+      rarity: "common",
+      xpReward: 2,
+      yieldAmount: 1,
+      requiredTool: null,
+      spawnRate: 0.5,
+      sellPrice: 6,
+      buyPrice: 12,
+      attributes: { 
+        harvestable: true,
+        hunger_restore: 10,
+        thirst_restore: 0
+      },
+      effects: ["hunger_restore"],
+      tags: ["natural", "edible", "craftable", "food"]
+    },
+    {
+      id: RESOURCE_IDS.FRUTAS_SILVESTRES,
+      name: "wild_berries",
+      displayName: "Frutas Silvestres",
+      description: "Pequenas frutas encontradas na natureza, doces e nutritivas",
+      iconPath: "🫐",
+      category: "consumable",
+      subcategory: "food",
+      weight: 0.5,
+      stackable: true,
+      maxStackSize: 99,
+      rarity: "common",
+      xpReward: 1,
+      yieldAmount: 3,
+      requiredTool: null,
+      spawnRate: 0.6,
+      sellPrice: 4,
+      buyPrice: 8,
+      attributes: { 
+        harvestable: true, 
+        perishable: true,
+        hunger_restore: 8,
+        thirst_restore: 5
+      },
+      effects: ["hunger_restore", "thirst_restore"],
+      tags: ["natural", "edible", "sweet", "food"]
+    },
+
     // CONSUMABLES - Food and potions
     {
       id: RESOURCE_IDS.CARNE_ASSADA,
@@ -299,7 +353,7 @@ export function createModernGameItems(): InsertGameItem[] {
       effects: ["thirst_restore", "cooling"],
       tags: ["drink", "essential", "pure", "renewable"]
     },
-    
+
     // MATERIALS - Crafting components
     {
       id: RESOURCE_IDS.BARBANTE,

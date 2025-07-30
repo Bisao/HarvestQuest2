@@ -44,7 +44,7 @@ export function ItemDetailsModal({
   const moveToStorageMutation = useMutation({
     mutationFn: async () => {
       if (!item) throw new Error("Item não encontrado");
-      
+
       const response = await apiRequest('POST', `/api/storage/store/${item.id}`, {
         playerId,
         quantity: moveQuantity
@@ -74,9 +74,9 @@ export function ItemDetailsModal({
     mutationFn: async () => {
       if (!item) throw new Error("Item não encontrado");
       if (!itemData) throw new Error("Dados do item não encontrados");
-      
+
       const effects = getConsumableEffects(itemData);
-      
+
       const response = await apiRequest('POST', `/api/player/${playerId}/consume`, {
         itemId: item.id,
         quantity: consumeQuantity,
@@ -129,22 +129,22 @@ export function ItemDetailsModal({
               <span className="text-gray-600">Quantidade:</span>
               <span className="font-semibold">{item.quantity}</span>
             </div>
-            
+
             <div className="flex justify-between">
               <span className="text-gray-600">Peso unitário:</span>
               <span className="font-semibold">{itemData.weight}kg</span>
             </div>
-            
+
             <div className="flex justify-between">
               <span className="text-gray-600">Peso total:</span>
               <span className="font-semibold">{(itemData.weight * item.quantity).toFixed(1)}kg</span>
             </div>
-            
+
             <div className="flex justify-between">
               <span className="text-gray-600">Valor unitário:</span>
               <span className="font-semibold">{itemData.value} moedas</span>
             </div>
-            
+
             <div className="flex justify-between">
               <span className="text-gray-600">Valor total:</span>
               <span className="font-semibold">{itemData.value * item.quantity} moedas</span>
