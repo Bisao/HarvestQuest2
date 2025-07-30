@@ -156,6 +156,17 @@ export default function ExpeditionModal({
     );
   };
 
+  // Select all available resources
+  const handleSelectAll = () => {
+    const allAvailableIds = availableResources.map(r => r.id);
+    setSelectedResources(allAvailableIds);
+  };
+
+  // Deselect all resources
+  const handleDeselectAll = () => {
+    setSelectedResources([]);
+  };
+
   // Start expedition mutation
   const startExpeditionMutation = useMutation({
     mutationFn: async (expeditionData: {
@@ -220,82 +231,143 @@ export default function ExpeditionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
-            <span>Explorar {biome?.name}</span>
-            <Badge variant="outline">{biome?.emoji}</Badge>
+      <DialogContent className="max-w-3xl max-h-[85vh] bg-gradient-to-br from-blue-50 to-indigo-100">
+        <DialogHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 -m-6 mb-4 p-4 rounded-t-lg">
+          <DialogTitle className="flex items-center space-x-3 text-white">
+            <span className="text-2xl">{biome?.emoji}</span>
+            <span className="text-xl font-bold">Explorar {biome?.name}</span>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Requirements check */}
-          <div className="bg-blue-50 p-3 rounded-lg">
-            <h4 className="font-medium text-sm mb-1">Requisitos:</h4>
-            <div className="flex items-center space-x-4 text-sm">
-              <span className={player.hunger >= 5 ? "text-green-600" : "text-red-600"}>
-                Fome: {player.hunger}/100 {player.hunger >= 5 ? "✓" : "✗"}
-              </span>
-              <span className={player.thirst >= 5 ? "text-green-600" : "text-red-600"}>
-                Sede: {player.thirst}/100 {player.thirst >= 5 ? "✓" : "✗"}
-              </span>
+          <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-blue-200 shadow-sm">
+            <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
+              <span className="mr-2">📋</span> Requisitos:
+            </h4>
+            <div className="flex items-center space-x-6 text-sm">
+              <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+                player.hunger >= 5 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+              }`}>
+                <span>🍖</span>
+                <span>Fome: {player.hunger}/100</span>
+                <span>{player.hunger >= 5 ? "✓" : "✗"}</span>
+              </div>
+              <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+                player.thirst >= 5 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+              }`}>
+                <span>💧</span>
+                <span>Sede: {player.thirst}/100</span>
+                <span>{player.thirst >= 5 ? "✓" : "✗"}</span>
+              </div>
             </div>
           </div>
 
           {/* Resource selection */}
-          <div>
-            <h4 className="font-medium mb-3">Recursos Disponíveis para Coleta:</h4>
-            <ScrollArea className="h-64 border rounded-lg p-3">
-              <div className="space-y-2">
-                {collectableResources.map((resource) => (
-                  <div
-                    key={resource.id}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${
-                      resource.canCollect 
-                        ? "bg-white hover:bg-gray-50" 
-                        : "bg-gray-100 opacity-60"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Checkbox
-                        checked={selectedResources.includes(resource.id)}
-                        onCheckedChange={() => toggleResourceSelection(resource.id)}
-                        disabled={!resource.canCollect}
-                      />
-                      <span className="text-lg">{resource.emoji}</span>
-                      <div>
-                        <p className="font-medium">{resource.name}</p>
-                        <p className="text-xs text-gray-600">
-                          XP: {resource.experienceValue} | Valor: {resource.value}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm">{resource.toolIcon}</span>
-                        <span className={`text-xs ${resource.canCollect ? "text-green-600" : "text-red-600"}`}>
-                          {resource.requirementText}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-blue-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-gray-800 flex items-center">
+                <span className="mr-2">🎯</span> Recursos Disponíveis para Coleta:
+              </h4>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSelectAll}
+                  disabled={availableResources.length === 0}
+                  className="text-xs"
+                >
+                  Selecionar Tudo
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDeselectAll}
+                  disabled={selectedResources.length === 0}
+                  className="text-xs"
+                >
+                  Desmarcar Tudo
+                </Button>
               </div>
-            </ScrollArea>
+            </div>
+            
+            {availableResources.length > 0 ? (
+              <ScrollArea className="h-72 border-2 border-blue-200 rounded-lg bg-white/50">
+                <div className="p-3 space-y-3">
+                  {availableResources.map((resource) => (
+                    <div
+                      key={resource.id}
+                      className="flex items-center justify-between p-4 rounded-xl bg-white/80 border-2 border-blue-100 hover:border-blue-300 hover:bg-white/90 transition-all duration-200 shadow-sm"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <Checkbox
+                          checked={selectedResources.includes(resource.id)}
+                          onCheckedChange={() => toggleResourceSelection(resource.id)}
+                          className="scale-110"
+                        />
+                        <div className="flex items-center space-x-3">
+                          <span className="text-2xl drop-shadow-sm">{resource.emoji}</span>
+                          <div>
+                            <p className="font-semibold text-gray-800">{resource.name}</p>
+                            <p className="text-sm text-gray-600">
+                              XP: {resource.experienceValue} | Valor: {resource.value} 💰
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+                          resource.canCollect ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                        }`}>
+                          <span className="text-lg">{resource.toolIcon}</span>
+                          <span className="text-sm font-medium">
+                            {resource.requirementText}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <span className="text-4xl mb-2 block">🔒</span>
+                <p className="font-medium">Nenhum recurso disponível para coleta</p>
+                <p className="text-sm">Você precisa equipar as ferramentas adequadas</p>
+              </div>
+            )}
           </div>
 
           {/* Selection summary */}
           {selectedResources.length > 0 && (
-            <div className="bg-green-50 p-3 rounded-lg">
-              <p className="text-sm font-medium text-green-800">
-                {selectedResources.length} recurso(s) selecionado(s) para coleta
-              </p>
+            <div className="bg-green-100/80 backdrop-blur-sm p-4 rounded-xl border-2 border-green-200 shadow-sm">
+              <div className="flex items-center space-x-2">
+                <span className="text-lg">✅</span>
+                <p className="font-semibold text-green-800">
+                  {selectedResources.length} recurso(s) selecionado(s) para coleta
+                </p>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {selectedResources.map(resourceId => {
+                  const resource = availableResources.find(r => r.id === resourceId);
+                  return resource ? (
+                    <span key={resourceId} className="inline-flex items-center space-x-1 bg-green-200 text-green-800 px-2 py-1 rounded-full text-xs">
+                      <span>{resource.emoji}</span>
+                      <span>{resource.name}</span>
+                    </span>
+                  ) : null;
+                })}
+              </div>
             </div>
           )}
 
           {/* Action buttons */}
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={onClose}>
+          <div className="flex justify-between pt-2">
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+              className="px-6 py-2 bg-white/80 hover:bg-white border-2 border-gray-300"
+            >
               Cancelar
             </Button>
             <Button 
@@ -306,8 +378,19 @@ export default function ExpeditionModal({
                 player.thirst < 5 ||
                 startExpeditionMutation.isPending
               }
+              className="px-8 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-lg"
             >
-              {startExpeditionMutation.isPending ? "Iniciando..." : "Iniciar Expedição"}
+              {startExpeditionMutation.isPending ? (
+                <span className="flex items-center space-x-2">
+                  <span className="animate-spin">⚡</span>
+                  <span>Iniciando...</span>
+                </span>
+              ) : (
+                <span className="flex items-center space-x-2">
+                  <span>🚀</span>
+                  <span>Iniciar Expedição</span>
+                </span>
+              )}
             </Button>
           </div>
         </div>

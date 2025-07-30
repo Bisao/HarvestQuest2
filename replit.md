@@ -8,15 +8,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 30, 2025 - AUTO-REPEAT SYSTEM COMPLETELY REMOVED + CONSUMPTION SYSTEM IMPLEMENTED**
-- **Complete Auto-Repeat System Removal**: Eliminated expedition auto-repeat system per user request including all hooks, components, and UI elements
-- **Clean Codebase**: Removed useAutoRepeat hooks, auto-repeat toggle buttons, countdown timers, and all related functionality
-- **Food & Drink Consumption System**: Implemented complete consumption system allowing players to consume items from inventory or storage
-- **Consumption Tab Added**: New "Consumir" tab integrated into main game interface with real-time hunger/thirst updates
-- **Backend API Routes**: Created /api/player/:playerId/consume endpoint with proper validation and game state updates
-- **Type Safety Improvements**: Fixed InsertResource interface issues and storage method compatibility
-- **All LSP Diagnostics Clear**: Resolved all TypeScript errors and ensured clean, production-ready codebase
-- **Game Systems Operational**: Expeditions, crafting, inventory, storage, quests, and consumption all working perfectly
+**January 30, 2025 - EXPEDITION SYSTEM COMPLETELY REDESIGNED + YU-GI-OH! CARD STYLING**
+- **Complete Expedition System Redesign**: Implemented new modal-based expedition system with resource selection and inventory verification
+- **Yu-Gi-Oh! Card Styling**: Redesigned biome cards to resemble Yu-Gi-Oh! cards with gradient backgrounds, decorative borders, and premium styling
+- **Enhanced Modal Interface**: Beautiful expedition modal with gradient backgrounds, organized resource display, and improved user experience
+- **Smart Resource Filtering**: Modal shows only collectible resources based on player's equipped tools and weapons
+- **Selection Controls**: Added "Selecionar Tudo" and "Desmarcar Tudo" buttons for better user control
+- **Scrollable Resource List**: Resources displayed in organized scrollable area within modal for better space utilization
+- **Bottom-Left Expedition Panel**: Minimized expedition tracking panel positioned in bottom-left corner as requested
+- **Real-Time Progress Tracking**: Live progress bar with expandable detailed view showing resource collection in real-time
+- **Completion State Management**: When expedition reaches 100%, shows results and finish button
+- **Auto-Repeat System Removed**: Completely eliminated old auto-repeat system and replaced with new modal-based approach
 
 **January 29, 2025 - STORAGE SYSTEM ENHANCED WITH THREE SUB-TABS + VERTICAL WATER TANK**
 - **Three-Tab Storage Interface**: Enhanced storage system now features separate sub-tabs for Itens, Água, and Estatísticas
