@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import ExpeditionModal from "./expedition-modal";
 import type { Biome, Resource, Equipment, Player } from "@shared/types";
 
@@ -47,120 +46,77 @@ export default function BiomesTab({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {biomes.map((biome) => {
           const biomeResources = getResourcesForBiome(biome);
           const unlocked = isUnlocked(biome);
           
           return (
-            <div
-              key={biome.id}
-              className={`relative bg-gradient-to-b from-amber-50 to-amber-100 rounded-xl border-4 transition-all duration-300 ${
-                unlocked 
-                  ? 'border-yellow-400 hover:border-yellow-500 hover:shadow-xl hover:scale-105 cursor-pointer shadow-lg' 
-                  : 'border-gray-400 opacity-70 shadow-sm'
-              }`}
-              style={{
-                aspectRatio: '3/4',
-                minHeight: '400px',
-                background: unlocked 
-                  ? 'linear-gradient(135deg, #fef3c7 0%, #fbbf24 20%, #f59e0b 100%)'
-                  : 'linear-gradient(135deg, #f3f4f6 0%, #d1d5db 20%, #9ca3af 100%)'
-              }}
+            <Card 
+              key={biome.id} 
+              className={`transition-all ${unlocked ? 'hover:shadow-lg cursor-pointer' : 'opacity-60'}`}
             >
-              {/* Card Frame Border */}
-              <div className="absolute inset-2 bg-white rounded-lg border-2 border-amber-600 overflow-hidden">
-                
-                {/* Header Section */}
-                <div className="relative bg-gradient-to-r from-amber-200 to-yellow-200 p-3 border-b-2 border-amber-600">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-3xl filter drop-shadow-md">{biome.emoji}</span>
-                      <h3 className="font-bold text-lg text-amber-900">{biome.name}</h3>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl">{biome.emoji}</span>
+                    <CardTitle className="text-lg">{biome.name}</CardTitle>
+                  </div>
+                  <Badge variant={unlocked ? "default" : "secondary"}>
+                    Nível {biome.requiredLevel}
+                  </Badge>
+                </div>
+                <CardDescription>Explore este bioma para coletar recursos únicos</CardDescription>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                {/* Progress bar for locked biomes */}
+                {!unlocked && (
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Progresso para desbloqueio</span>
+                      <span>{player.level}/{biome.requiredLevel}</span>
                     </div>
-                    <div className={`px-2 py-1 rounded-full text-xs font-bold ${
-                      unlocked 
-                        ? 'bg-green-200 text-green-800 border border-green-300'
-                        : 'bg-gray-200 text-gray-600 border border-gray-300'
-                    }`}>
-                      Nv.{biome.requiredLevel}
-                    </div>
+                    <Progress 
+                      value={(player.level / biome.requiredLevel) * 100} 
+                      className="h-2"
+                    />
+                  </div>
+                )}
+
+                {/* Resources available */}
+                <div>
+                  <h4 className="font-medium text-sm mb-2">Recursos Disponíveis:</h4>
+                  <div className="grid grid-cols-3 gap-2">
+                    {biomeResources.slice(0, 6).map((resource) => (
+                      <div key={resource.id} className="flex items-center space-x-1 text-xs">
+                        <span>{resource.emoji}</span>
+                        <span className="truncate">{resource.name}</span>
+                      </div>
+                    ))}
+                    {biomeResources.length > 6 && (
+                      <div className="text-xs text-gray-500 col-span-3">
+                        +{biomeResources.length - 6} outros recursos...
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Main Content */}
-                <div className="p-3 flex flex-col h-full justify-between">
-                  
-                  {/* Progress for locked biomes */}
-                  {!unlocked && (
-                    <div className="mb-3">
-                      <div className="flex justify-between text-xs mb-1 text-gray-600">
-                        <span>Progresso</span>
-                        <span>{player.level}/{biome.requiredLevel}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-amber-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${Math.min((player.level / biome.requiredLevel) * 100, 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Resources Section */}
-                  <div className="flex-1 overflow-hidden">
-                    <h4 className="font-semibold text-sm text-amber-900 mb-2 border-b border-amber-300 pb-1">
-                      Recursos Disponíveis
-                    </h4>
-                    <ScrollArea className="h-32 pr-2">
-                      <div className="space-y-1">
-                        {biomeResources.map((resource) => (
-                          <div key={resource.id} className="flex items-center justify-between bg-amber-50 rounded-md p-2 border border-amber-200">
-                            <div className="flex items-center space-x-2">
-                              <span className="text-lg">{resource.emoji}</span>
-                              <div className="flex flex-col">
-                                <span className="text-xs font-medium text-gray-800">{resource.name}</span>
-                                <span className="text-xs text-gray-500">XP: {resource.experienceValue}</span>
-                              </div>
-                            </div>
-                            <div className="text-xs text-amber-700 font-medium">
-                              {resource.value}💰
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
-
-                  {/* Action Button */}
-                  <div className="flex-shrink-0 mt-[63px] mb-[63px]">
-                    <button 
-                      onClick={() => handleExploreBiome(biome)}
-                      disabled={!unlocked}
-                      className={`w-full font-bold text-sm py-3 px-4 rounded-lg transition-all duration-200 ${
-                        unlocked
-                          ? 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white shadow-md hover:shadow-lg active:scale-95'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
-                    >
-                      {unlocked ? "⚔️ EXPLORAR" : `🔒 Nível ${biome.requiredLevel} Requerido`}
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {/* Corner Decorations */}
-              {unlocked && (
-                <>
-                  <div className="absolute top-1 left-1 w-3 h-3 bg-yellow-400 rounded-full"></div>
-                  <div className="absolute top-1 right-1 w-3 h-3 bg-yellow-400 rounded-full"></div>
-                  <div className="absolute bottom-1 left-1 w-3 h-3 bg-yellow-400 rounded-full"></div>
-                  <div className="absolute bottom-1 right-1 w-3 h-3 bg-yellow-400 rounded-full"></div>
-                </>
-              )}
-            </div>
+                {/* Explore button */}
+                <Button 
+                  onClick={() => handleExploreBiome(biome)}
+                  disabled={!unlocked}
+                  className="w-full"
+                  variant={unlocked ? "default" : "secondary"}
+                >
+                  {unlocked ? "Explorar" : `Desbloqueado no Nível ${biome.requiredLevel}`}
+                </Button>
+              </CardContent>
+            </Card>
           );
         })}
       </div>
+
       {/* Expedition Modal */}
       <ExpeditionModal
         isOpen={expeditionModalOpen}

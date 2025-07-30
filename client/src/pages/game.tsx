@@ -6,7 +6,7 @@ import QuestsTab from "@/components/game/quests-tab";
 import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
 import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
-import ConsumptionTab from "@/components/game/consumption-tab";
+
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
 import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
 
@@ -75,7 +75,6 @@ export default function Game() {
     { id: "inventory", label: "Inventário", emoji: "🎒" },
     { id: "storage", label: "Armazém", emoji: "🏠" },
     { id: "crafting", label: "Crafting", emoji: "🔨" },
-    { id: "consumir", label: "Consumir", emoji: "🍎" },
     { id: "quests", label: "Missões", emoji: "📜" },
   ];
 
@@ -121,6 +120,7 @@ export default function Game() {
                 player={player}
                 resources={resources}
                 equipment={equipment}
+                isBlocked={false}
               />
             )}
             {activeTab === "quests" && (
@@ -128,12 +128,7 @@ export default function Game() {
                 player={player}
               />
             )}
-            {activeTab === "consumir" && (
-              <ConsumptionTab
-                player={player}
-                resources={resources}
-              />
-            )}
+
             {activeTab === "storage" && (
               <EnhancedStorageTab
                 playerId={player.id}

@@ -151,14 +151,28 @@ export default function ExpeditionPanel({
         </Button>
       </div>
 
-      {/* Progress bar - always visible */}
-      {!isCompleted && (
+      {/* Progress bar or finalize button when minimized */}
+      {!isExpanded && !isCompleted && (
         <div className="px-3 pb-2">
           <div className="flex justify-between text-xs mb-1">
             <span>Progresso</span>
             <span>{Math.round(currentProgress)}%</span>
           </div>
           <Progress value={currentProgress} className="h-2" />
+        </div>
+      )}
+      
+      {/* Finalize button when completed and minimized */}
+      {!isExpanded && isCompleted && (
+        <div className="px-3 pb-2">
+          <Button
+            onClick={handleCompleteExpedition}
+            disabled={completeExpeditionMutation.isPending}
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            size="sm"
+          >
+            {completeExpeditionMutation.isPending ? "Finalizando..." : "🎯 Finalizar Expedição"}
+          </Button>
         </div>
       )}
 

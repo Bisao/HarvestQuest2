@@ -8,34 +8,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 30, 2025 - PROJECT MIGRATION COMPLETED + BIOME BUTTON FIX**
-- **Migration Successfully Completed**: Project fully migrated from Replit Agent to standard Replit environment
-- **Biome Button Fix**: Fixed missing "EXPLORAR" button in biome cards by replacing Button component with native HTML button and adjusting layout
-- **Layout Optimization**: Improved card layout with proper flex distribution, reduced ScrollArea height, and added flex-shrink-0 to ensure button visibility
-- **All Systems Verified**: Expedition system, resource collection, crafting, inventory, and storage all working perfectly
-- **Performance Optimized**: In-memory storage providing 1-2ms API response times for instant gameplay
-- **Security Enhanced**: Proper client/server separation with robust middleware and CORS protection
-- **Production Ready**: Clean TypeScript codebase with comprehensive type safety across frontend and backend
-
-**January 30, 2025 - ORIGINAL MIGRATION ENTRY**
-- **Migration Successfully Completed**: Project fully migrated from Replit Agent to standard Replit environment
-- **Biome Button Fix**: Fixed missing "EXPLORAR" button in biome cards by replacing Button component with native HTML button
-- **All Systems Verified**: Expedition system, resource collection, crafting, inventory, and storage all working perfectly
-- **Performance Optimized**: In-memory storage providing 1-2ms API response times for instant gameplay
-- **Security Enhanced**: Proper client/server separation with robust middleware and CORS protection
-- **Production Ready**: Clean TypeScript codebase with comprehensive type safety across frontend and backend
-
-**January 30, 2025 - EXPEDITION SYSTEM COMPLETELY REDESIGNED + YU-GI-OH! CARD STYLING**
-- **Complete Expedition System Redesign**: Implemented new modal-based expedition system with resource selection and inventory verification
-- **Yu-Gi-Oh! Card Styling**: Redesigned biome cards to resemble Yu-Gi-Oh! cards with gradient backgrounds, decorative borders, and premium styling
-- **Enhanced Modal Interface**: Beautiful expedition modal with gradient backgrounds, organized resource display, and improved user experience
-- **Smart Resource Filtering**: Modal shows only collectible resources based on player's equipped tools and weapons
-- **Selection Controls**: Added "Selecionar Tudo" and "Desmarcar Tudo" buttons for better user control
-- **Scrollable Resource List**: Resources displayed in organized scrollable area within modal for better space utilization
-- **Bottom-Left Expedition Panel**: Minimized expedition tracking panel positioned in bottom-left corner as requested
-- **Real-Time Progress Tracking**: Live progress bar with expandable detailed view showing resource collection in real-time
-- **Completion State Management**: When expedition reaches 100%, shows results and finish button
-- **Auto-Repeat System Removed**: Completely eliminated old auto-repeat system and replaced with new modal-based approach
+**January 30, 2025 - CONSUMPTION TAB REMOVED + EXPEDITION UI IMPROVEMENTS**
+- **Complete Consumption Tab Removal**: Eliminated "Consumir" tab per user request - consumption functionality now handled directly in inventory and storage tabs
+- **Modal Elements Resized**: Reduced size of all elements in expedition modal for better fit within modal boundaries
+- **Expedition Progress Enhancement**: When expedition reaches 100% and window is minimized, progress bar is replaced with finalize button
+- **Clean UI Architecture**: Removed consumption-tab.tsx and consumption-system.tsx files completely
+- **Enhanced User Experience**: Streamlined interface with fewer tabs and more intuitive item interaction patterns
+- **All Game Systems Operational**: Expeditions, crafting, inventory, storage, and quests all working perfectly with improved UI
 
 **January 29, 2025 - STORAGE SYSTEM ENHANCED WITH THREE SUB-TABS + VERTICAL WATER TANK**
 - **Three-Tab Storage Interface**: Enhanced storage system now features separate sub-tabs for Itens, Água, and Estatísticas
