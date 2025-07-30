@@ -310,19 +310,16 @@ export default function ExpeditionModal({
                           <div>
                             <p className="font-semibold text-gray-800">{resource.name}</p>
                             <p className="text-sm text-gray-600">
-                              XP: {resource.experienceValue} | Valor: {resource.value} 💰
+                              XP: {resource.experienceValue}
                             </p>
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+                        <div className={`flex items-center justify-center px-3 py-2 rounded-full ${
                           resource.canCollect ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
                         }`}>
-                          <span className="text-lg">{resource.toolIcon}</span>
-                          <span className="text-sm font-medium">
-                            {resource.requirementText}
-                          </span>
+                          <span className="text-xl">{resource.toolIcon}</span>
                         </div>
                       </div>
                     </div>
