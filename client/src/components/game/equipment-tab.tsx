@@ -242,12 +242,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                 <div className="bg-yellow-500 h-2 rounded-full" style={{ width: "0%" }}></div>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-600">Silver</span>
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div className="bg-gray-400 h-2 rounded-full" style={{ width: "0%" }}></div>
-              </div>
-            </div>
+            
           </div>
           
           {/* Mount and Action Buttons */}
