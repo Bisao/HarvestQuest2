@@ -105,10 +105,11 @@ export default function Game() {
         </div>
       </div>
 
-      {/* Main content with top padding to account for fixed header and tabs */}
-      <main className="container mx-auto px-4 py-6 pt-32">
-        {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+      {/* Main content with fixed height and scrolling */}
+      <main className="fixed top-32 left-0 right-0 bottom-0 overflow-hidden">
+        <div className="container mx-auto px-4 h-full py-6">
+          {/* Tab Content - Scrollable container */}
+          <div className="bg-white rounded-lg shadow-lg h-full overflow-y-auto p-6">
             {activeTab === "biomes" && (
               <BiomesTab
                 biomes={biomes}
@@ -149,17 +150,18 @@ export default function Game() {
                 playerLevel={player.level}
               />
             )}
-        </div>
+          </div>
 
-        {/* Active Expedition Panel */}
-        {activeExpedition && (
-          <ExpeditionPanel
-            expedition={activeExpedition}
-            biomes={biomes}
-            resources={resources}
-            onExpeditionComplete={handleExpeditionComplete}
-          />
-        )}
+          {/* Active Expedition Panel */}
+          {activeExpedition && (
+            <ExpeditionPanel
+              expedition={activeExpedition}
+              biomes={biomes}
+              resources={resources}
+              onExpeditionComplete={handleExpeditionComplete}
+            />
+          )}
+        </div>
       </main>
     </div>
   );

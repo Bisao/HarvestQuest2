@@ -114,85 +114,92 @@ export default function BiomesTab({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {biomes.map((biome) => {
-          const biomeResources = getResourcesForBiome(biome);
-          const unlocked = isUnlocked(biome);
-          
-          return (
-            <Card 
-              key={biome.id} 
-              className={`transition-all ${unlocked ? 'hover:shadow-lg cursor-pointer' : 'opacity-60'}`}
-            >
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl">{biome.emoji}</span>
-                    <CardTitle className="text-lg">{biome.name}</CardTitle>
-                  </div>
-                  <Badge variant={unlocked ? "default" : "secondary"}>
-                    Nível {biome.requiredLevel}
-                  </Badge>
-                </div>
-                <CardDescription>Explore este bioma para coletar recursos únicos</CardDescription>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                {/* Progress bar for locked biomes */}
-                {!unlocked && (
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Progresso para desbloqueio</span>
-                      <span>{player.level}/{biome.requiredLevel}</span>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {biomes.map((biome) => {
+            const biomeResources = getResourcesForBiome(biome);
+            const unlocked = isUnlocked(biome);
+            
+            return (
+              <Card 
+                key={biome.id} 
+                className={`transition-all ${unlocked ? 'hover:shadow-lg cursor-pointer' : 'opacity-60'} min-h-[300px]`}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-2xl">{biome.emoji}</span>
+                      <CardTitle className="text-xl">{biome.name}</CardTitle>
                     </div>
-                    <Progress 
-                      value={(player.level / biome.requiredLevel) * 100} 
-                      className="h-2"
-                    />
+                    <Badge variant={unlocked ? "default" : "secondary"}>
+                      Nível {biome.requiredLevel}
+                    </Badge>
                   </div>
-                )}
-
-                {/* Resources available */}
-                <div>
-                  <h4 className="font-medium text-sm mb-2">Recursos Disponíveis:</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    {biomeResources.slice(0, 6).map((resource) => (
-                      <div key={resource.id} className="flex items-center space-x-1 text-xs">
-                        <span>{resource.emoji}</span>
-                        <span className="truncate">{resource.name}</span>
+                  <CardDescription className="text-sm">
+                    Explore este bioma para coletar recursos únicos
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent className="space-y-4 pt-0">
+                  {/* Progress bar for locked biomes */}
+                  {!unlocked && (
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="font-medium">Progresso para desbloqueio</span>
+                        <span className="text-gray-600">{player.level}/{biome.requiredLevel}</span>
                       </div>
-                    ))}
-                    {biomeResources.length > 6 && (
-                      <div className="text-xs text-gray-500 col-span-3">
-                        +{biomeResources.length - 6} outros recursos...
+                      <Progress 
+                        value={(player.level / biome.requiredLevel) * 100} 
+                        className="h-2"
+                      />
+                    </div>
+                  )}
+
+                  {/* Resources available */}
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-sm mb-3 text-blue-800">Recursos Disponíveis:</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {biomeResources.slice(0, 4).map((resource) => (
+                        <div key={resource.id} className="flex items-center space-x-2 text-xs bg-white p-2 rounded">
+                          <span className="text-base">{resource.emoji}</span>
+                          <span className="truncate text-gray-700">{resource.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {biomeResources.length > 4 && (
+                      <div className="text-xs text-blue-600 mt-2 text-center">
+                        +{biomeResources.length - 4} outros recursos...
                       </div>
                     )}
                   </div>
-                </div>
 
-                {/* Explore button */}
-                <Button 
-                  onClick={() => handleExploreBiome(biome)}
-                  disabled={isButtonDisabled(biome, unlocked)}
-                  className="w-full"
-                  variant={getButtonVariant(biome, unlocked)}
-                >
-                  {getButtonText(biome, unlocked)}
-                </Button>
+                  {/* Progress bar for active expedition */}
+                  {activeExpedition && activeExpedition.biomeId === biome.id && activeExpedition.progress < 100 && (
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="font-medium text-green-800">Expedição em Andamento</span>
+                        <span className="text-green-600">{activeExpedition.progress}%</span>
+                      </div>
+                      <Progress value={activeExpedition.progress} className="w-full h-2" />
+                    </div>
+                  )}
 
-                {/* Progress bar for active expedition */}
-                {activeExpedition && activeExpedition.biomeId === biome.id && activeExpedition.progress < 100 && (
-                  <div className="mt-2">
-                    <Progress value={activeExpedition.progress} className="w-full" />
-                    <p className="text-xs text-gray-600 text-center mt-1">
-                      Progresso: {activeExpedition.progress}%
-                    </p>
+                  {/* Explore button */}
+                  <div className="pt-2">
+                    <Button 
+                      onClick={() => handleExploreBiome(biome)}
+                      disabled={isButtonDisabled(biome, unlocked)}
+                      className="w-full h-12 text-base font-medium"
+                      variant={getButtonVariant(biome, unlocked)}
+                    >
+                      {getButtonText(biome, unlocked)}
+                    </Button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
 
       {/* Expedition Modal */}

@@ -8,10 +8,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 30, 2025 - FIXED HEADER & TAB NAVIGATION + EXPEDITION STATUS SYSTEM COMPLETED**
+**January 30, 2025 - FIXED HEADER & TAB NAVIGATION + SCROLLING INTERFACE COMPLETED**
 - **Fixed Header Layout**: Game header now positioned fixed at top of screen, stays visible during scrolling
 - **Fixed Tab Navigation**: Tab navigation positioned fixed below header, outside scrolling content area for better accessibility
-- **Proper Content Spacing**: Main content area adjusted with correct top padding to account for fixed header and tab navigation
+- **Scrollable Content Area**: Main content area now has proper scrolling within fixed container, preventing element overlapping
+- **Improved Biomes Layout**: Enhanced biomes tab with better card spacing, background sections, and minimum heights to prevent overlapping
 - **Dynamic Expedition Button States**: Biome exploration buttons now show real-time expedition status ("Em Andamento...", "Finalizar Expedição", "Expedição Ativa")
 - **Real-Time Progress Tracking**: Added live progress bars and percentage indicators on biome cards during active expeditions
 - **Smart Button Disabling**: Buttons automatically disable during expeditions and enable only the appropriate biome when expedition completes
