@@ -246,7 +246,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await storage.addStorageItem({
               playerId,
               resourceId: currentEquippedId,
-              quantity: 1
+              quantity: 1,
+              itemType: 'equipment'
             });
           }
         }
@@ -271,7 +272,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await storage.addStorageItem({
               playerId,
               resourceId: currentEquippedId,
-              quantity: 1
+              quantity: 1,
+              itemType: 'equipment'
             });
           }
         }

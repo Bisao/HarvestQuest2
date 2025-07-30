@@ -61,17 +61,26 @@ export default function EquipmentSelectorModal({
   });
 
   // Filter equipment by slot type and check if available in storage
-  // Special handling for knife - it can be equipped in both weapon and tool slots
+  // Enhanced filtering based on both slot and category
   const availableEquipment = equipment
     .filter(eq => {
-      // Allow knife to appear in both weapon and tool slots
+      // Primary slot matching
+      if (eq.slot === slotType) return true;
+      
+      // Special handling for knife - it can be equipped in both weapon and tool slots
       if (eq.name === "Faca") {
-        return eq.slot === slotType || (slotType === "weapon" && eq.slot === "tool") || (slotType === "tool" && eq.slot === "weapon");
+        return (slotType === "weapon" && eq.slot === "tool") || (slotType === "tool" && eq.slot === "weapon");
       }
-      return eq.slot === slotType;
+      
+      // Category-based matching for better slot compatibility
+      if (slotType === "tool" && eq.category === "tools") return true;
+      if (slotType === "weapon" && eq.category === "weapons") return true;
+      if (["helmet", "chestplate", "leggings", "boots"].includes(slotType) && eq.category === "armor") return true;
+      
+      return false;
     })
     .map(eq => {
-      const storageItem = storageItems.find(item => item.resourceId === eq.id);
+      const storageItem = storageItems.find(item => item.resourceId === eq.id && item.itemType === 'equipment');
       return {
         ...eq,
         quantity: storageItem?.quantity || 0,
@@ -168,7 +177,7 @@ export default function EquipmentSelectorModal({
                         <div>
                           <p className="font-medium">{eq.name}</p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {eq.effect}
+                            {eq.effects && eq.effects.length > 0 ? eq.effects[0].description : 'Nenhum efeito'}
                           </p>
                           <Badge variant="secondary" className="text-xs">
                             {eq.quantity}x disponível

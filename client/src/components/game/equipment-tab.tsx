@@ -122,18 +122,27 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
       })
       .filter((item): item is Equipment & { quantity: number } => item !== null);
 
-    // Filter by equipment category based on slot
+    // Enhanced filtering by equipment category and slot compatibility
     return availableEquipment.filter(eq => {
+      // Primary slot matching
+      if (eq.slot === slotType) return true;
+      
+      // Special handling for knife - can be equipped in both weapon and tool slots
+      if (eq.name === "Faca") {
+        return (slotType === "weapon" && eq.slot === "tool") || (slotType === "tool" && eq.slot === "weapon");
+      }
+      
+      // Category-based matching for better compatibility
       switch (slotType) {
         case 'helmet':
         case 'chestplate':
         case 'leggings':
         case 'boots':
-          return eq.category === 'armor';
+          return eq.category === 'armor' && eq.slot === slotType;
         case 'weapon':
           return eq.category === 'weapons';
         case 'tool':
-          return eq.category === 'tools';
+          return eq.category === 'tools' || eq.category === 'containers';
         default:
           return false;
       }

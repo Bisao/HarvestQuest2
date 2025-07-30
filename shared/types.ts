@@ -127,11 +127,13 @@ export type EquipmentCategory =
 
 export type EquipmentSlot = 
   | 'tool' | 'weapon' | 'helmet' | 'chestplate' 
-  | 'leggings' | 'boots' | 'accessory';
+  | 'leggings' | 'boots' | 'accessory' | 'container';
 
 export type ToolType = 
   | 'pickaxe' | 'axe' | 'shovel' | 'fishing_rod' 
-  | 'knife' | 'sickle' | 'bucket' | 'bait' | 'bamboo_bottle';
+  | 'knife' | 'sickle' | 'bucket' | 'bait' | 'bamboo_bottle'
+  | 'pot' | 'rope' | 'clay_pot' | 'bow' | 'spear' | 'sword' 
+  | 'backpack' | 'barrel' | 'container';
 
 export interface EquipmentEffect {
   type: 'resource_boost' | 'skill_boost' | 'stat_boost' | 'special_ability';
