@@ -119,9 +119,10 @@ export default function EnhancedStorageTab({
   // Withdraw item mutation
   const withdrawMutation = useMutation({
     mutationFn: async ({ storageItemId, quantity }: { storageItemId: string; quantity: number }) => {
-      return apiRequest(`/api/storage/${playerId}/withdraw`, {
-        method: "POST",
-        body: { storageItemId, quantity }
+      return apiRequest("POST", "/api/storage/withdraw", {
+        playerId,
+        storageItemId, 
+        quantity
       });
     },
     onSuccess: () => {
