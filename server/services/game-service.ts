@@ -161,8 +161,8 @@ export class GameService {
 
   // Move item from inventory to storage
   async moveToStorage(playerId: string, inventoryItemId: string, quantity: number): Promise<void> {
-    const inventoryItem = await this.storage.getPlayerInventory(playerId);
-    const item = inventoryItem.find(i => i.id === inventoryItemId);
+    const inventoryItems = await this.storage.getPlayerInventory(playerId);
+    const item = inventoryItems.find(i => i.id === inventoryItemId);
     
     if (!item || item.quantity < quantity) {
       throw new Error("Insufficient quantity in inventory");
@@ -180,25 +180,25 @@ export class GameService {
       await this.storage.addStorageItem({
         playerId,
         resourceId: item.resourceId,
-        quantity
+        quantity,
+        itemType: 'resource'
       });
     }
 
-    // Update inventory
+    // Remove from inventory
     if (item.quantity === quantity) {
+      // Remove entire item if moving all quantity
       await this.storage.removeInventoryItem(inventoryItemId);
     } else {
+      // Reduce quantity if moving partial amount
       await this.storage.updateInventoryItem(inventoryItemId, {
         quantity: item.quantity - quantity
       });
     }
 
-    // Update player weight
-    const player = await this.storage.getPlayer(playerId);
-    if (player) {
-      const newWeight = await this.calculateInventoryWeight(playerId);
-      await this.storage.updatePlayer(playerId, { inventoryWeight: newWeight });
-    }
+    // Update player's inventory weight
+    const newWeight = await this.calculateInventoryWeight(playerId);
+    await this.storage.updatePlayer(playerId, { inventoryWeight: newWeight });
   }
 
   // Move item from storage to inventory

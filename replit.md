@@ -8,7 +8,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 30, 2025 - DYNAMIC CONSUMABLES SYSTEM IMPLEMENTED + MIGRATION COMPLETED**
+**January 30, 2025 - INVENTORY-STORAGE TRANSFER BUG FIXED + DYNAMIC CONSUMABLES SYSTEM COMPLETED**
+- **Critical Bug Fix**: Fixed moveToStorage() method that was adding items to storage but not removing from inventory
+- **Complete Transfer System**: Items now properly move between inventory and storage with quantity management
+- **Weight System Updated**: Player inventory weight correctly updates after transfers
 - **Dynamic Consumables Detection**: Replaced hardcoded item name checks with attribute-based consumable detection system
 - **Unified Consumption Utilities**: Created shared/utils/consumable-utils.ts with isConsumable(), getConsumableEffects(), and validation functions
 - **Enhanced Frontend Components**: Updated both enhanced-inventory.tsx and simple-inventory.tsx to use dynamic detection
