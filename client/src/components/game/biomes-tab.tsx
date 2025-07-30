@@ -1,5 +1,5 @@
 import type { Biome, Resource, Equipment, Player } from "@shared/types";
-import type { AutoRepeatSettings } from "@/hooks/use-auto-repeat";
+
 
 interface BiomesTabProps {
   biomes: Biome[];
@@ -7,8 +7,7 @@ interface BiomesTabProps {
   equipment: Equipment[];
   player: Player;
   onExpeditionStart: (biome: Biome) => void;
-  autoRepeatSettings: AutoRepeatSettings;
-  onToggleAutoRepeat: (biomeId: string) => void;
+
 }
 
 export default function BiomesTab({ 
@@ -16,9 +15,7 @@ export default function BiomesTab({
   resources, 
   equipment, 
   player, 
-  onExpeditionStart, 
-  autoRepeatSettings, 
-  onToggleAutoRepeat 
+  onExpeditionStart
 }: BiomesTabProps) {
   const getResourcesForBiome = (biome: Biome) => {
     const resourceIds = biome.availableResources as string[];
@@ -186,35 +183,7 @@ export default function BiomesTab({
                 );
               })()}
 
-              {/* Auto-Repeat Toggle Button */}
-              {(() => {
-                const autoRepeatConfig = autoRepeatSettings[biome.id];
-                const isAutoRepeatEnabled = autoRepeatConfig?.enabled || false;
-                const countdown = autoRepeatConfig?.countdown || 0;
-                
-                const lastExpeditions = typeof window !== 'undefined' 
-                  ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
-                  : {};
-                
-                const hasLastExpedition = lastExpeditions[biome.id] && lastExpeditions[biome.id].length > 0;
-                
-                return hasLastExpedition && (
-                  <button
-                    onClick={() => onToggleAutoRepeat(biome.id)}
-                    disabled={!unlocked}
-                    className={`py-2 px-3 rounded-lg font-medium transition-colors ${
-                      isAutoRepeatEnabled
-                        ? "bg-orange-600 hover:bg-orange-700 text-white"
-                        : unlocked
-                          ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                    title={isAutoRepeatEnabled ? `Auto-repetir em ${countdown}s` : "Ativar Auto-repetição"}
-                  >
-                    {isAutoRepeatEnabled && countdown > 0 ? countdown : "🔄"}
-                  </button>
-                );
-              })()}
+
             </div>
           </div>
         );

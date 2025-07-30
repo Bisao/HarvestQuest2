@@ -8,13 +8,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 30, 2025 - AUTO-REPEAT SYSTEM COMPLETELY FIXED + MIGRATION TO REPLIT COMPLETED**
-- **Critical Loop Fix**: Resolved "Maximum update depth exceeded" error by using useRef for timers instead of state
-- **Clean Hook Architecture**: Redesigned useAutoRepeat hook with proper timer management and memory leak prevention
-- **Migration Successfully Completed**: Full migration from Replit Agent to standard Replit environment finished
-- **All Game Systems Operational**: Expeditions, crafting, inventory, storage, quests, and auto-repeat all working perfectly
-- **Performance Optimized**: Eliminated infinite re-render loops and improved timer cleanup for stable gameplay
-- **Progress Tracker Updated**: Migration checklist completed successfully with working project verification
+**January 30, 2025 - AUTO-REPEAT SYSTEM COMPLETELY REMOVED + CONSUMPTION SYSTEM IMPLEMENTED**
+- **Complete Auto-Repeat System Removal**: Eliminated expedition auto-repeat system per user request including all hooks, components, and UI elements
+- **Clean Codebase**: Removed useAutoRepeat hooks, auto-repeat toggle buttons, countdown timers, and all related functionality
+- **Food & Drink Consumption System**: Implemented complete consumption system allowing players to consume items from inventory or storage
+- **Consumption Tab Added**: New "Consumir" tab integrated into main game interface with real-time hunger/thirst updates
+- **Backend API Routes**: Created /api/player/:playerId/consume endpoint with proper validation and game state updates
+- **Type Safety Improvements**: Fixed InsertResource interface issues and storage method compatibility
+- **All LSP Diagnostics Clear**: Resolved all TypeScript errors and ensured clean, production-ready codebase
+- **Game Systems Operational**: Expeditions, crafting, inventory, storage, quests, and consumption all working perfectly
 
 **January 29, 2025 - STORAGE SYSTEM ENHANCED WITH THREE SUB-TABS + VERTICAL WATER TANK**
 - **Three-Tab Storage Interface**: Enhanced storage system now features separate sub-tabs for Itens, Água, and Estatísticas

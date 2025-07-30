@@ -9,7 +9,7 @@ import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 import ConsumptionTab from "@/components/game/consumption-tab";
 import ExpeditionSystem from "@/components/game/expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
-import { useAutoRepeat } from "@/hooks/use-auto-repeat";
+
 import { queryClient } from "@/lib/queryClient";
 import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
 
@@ -64,31 +64,7 @@ export default function Game() {
   // Check if there are any completable quests
   const hasCompletableQuests = quests.some((quest: any) => quest.canComplete === true);
 
-  // Função para iniciar expedição via auto-repeat 
-  const handleAutoStartExpedition = (biomeId: string, resources: string[]) => {
-    const biome = biomes.find(b => b.id === biomeId);
-    if (!biome) return;
 
-    setSelectedBiome(biome);
-    setExpeditionModalOpen(true);
-    setExpeditionMinimized(false);
-    
-    // Disparar evento para auto-iniciar a expedição
-    setTimeout(() => {
-      const event = new CustomEvent('autoStartExpedition', { 
-        detail: { resources } 
-      });
-      window.dispatchEvent(event);
-    }, 500);
-  };
-
-  // Hook de auto-repetição
-  const { autoRepeatSettings, toggleAutoRepeat, restartCountdown } = useAutoRepeat({
-    player,
-    biomes,
-    activeExpedition,
-    onStartExpedition: handleAutoStartExpedition
-  });
 
   const tabs = [
     { id: "biomes", label: "Biomas", emoji: "🌍" },
@@ -168,20 +144,14 @@ export default function Game() {
       return response.json();
     },
     onSuccess: (result: any) => {
-      // Check if auto-repeat is enabled for current biome before clearing expedition
-      const currentBiomeId = activeExpedition?.biomeId;
+
       
       setActiveExpedition(null);
       setExpeditionModalOpen(false);
       setExpeditionMinimized(false);
       setExpeditionMinimizedExpanded(false);
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      
-      // Restart auto-repeat countdown if it was enabled
-      if (currentBiomeId) {
-        console.log('Expedition completed - restarting auto-repeat countdown for biome:', currentBiomeId);
-        restartCountdown(currentBiomeId);
-      }
+
     }
   });
 
@@ -261,14 +231,11 @@ export default function Game() {
                   equipment={equipment}
                   player={player}
                   onExpeditionStart={handleExploreBiome}
-                  autoRepeatSettings={autoRepeatSettings}
-                  onToggleAutoRepeat={toggleAutoRepeat}
                 />
               )}
               {activeTab === "quests" && (
                 <QuestsTab
-                  quests={quests}
-                  playerId={player.id}
+                  player={player}
                 />
               )}
               {activeTab === "inventory" && (
@@ -285,6 +252,7 @@ export default function Game() {
                   playerId={player.id}
                   equipment={equipment}
                   resources={resources}
+                  player={player}
                 />
               )}
               {activeTab === "crafting" && (
@@ -292,7 +260,7 @@ export default function Game() {
                   recipes={recipes}
                   playerId={player.id}
                   resources={resources}
-                  equipment={equipment}
+                  playerLevel={player.level}
                 />
               )}
               {activeTab === "consumption" && (
