@@ -140,7 +140,14 @@ export const ALL_BIOME_IDS = Object.values(BIOME_IDS);
 export const ALL_QUEST_IDS = Object.values(QUEST_IDS);
 export const ALL_RECIPE_IDS = Object.values(RECIPE_IDS);
 
-// Master ID validation
+// Master ID validation  
 export function isValidGameId(id: string): boolean {
-  return [...ALL_RESOURCE_IDS, ...ALL_EQUIPMENT_IDS, ...ALL_BIOME_IDS, ...ALL_QUEST_IDS, ...ALL_RECIPE_IDS].includes(id);
+  const allIds = [
+    ...Object.values(RESOURCE_IDS),
+    ...Object.values(EQUIPMENT_IDS), 
+    ...Object.values(BIOME_IDS),
+    ...Object.values(QUEST_IDS),
+    ...Object.values(RECIPE_IDS)
+  ];
+  return allIds.includes(id as any);
 }

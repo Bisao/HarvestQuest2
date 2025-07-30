@@ -201,6 +201,7 @@ export class MemStorage implements IStorage {
       craftedItemsDestination: insertPlayer.craftedItemsDestination ?? 'storage',
       waterStorage: insertPlayer.waterStorage ?? 0,
       maxWaterStorage: insertPlayer.maxWaterStorage ?? 500,
+      waterTanks: insertPlayer.waterTanks ?? [],
       equippedHelmet: insertPlayer.equippedHelmet || null,
       equippedChestplate: insertPlayer.equippedChestplate || null,
       equippedLeggings: insertPlayer.equippedLeggings || null,
@@ -241,7 +242,7 @@ export class MemStorage implements IStorage {
       experienceValue: insertResource.experienceValue ?? 1,
       
       // Fundamental Attributes
-      attributes: insertResource.attributes ?? { durability: 100, efficiency: 1.0, rarity: 'common' },
+      attributes: insertResource.attributes ?? { durability: 100, efficiency: 1.0, rarity: 'common', baseValue: insertResource.sellPrice ?? 1 },
       
       // Resource Classification  
       category: insertResource.category ?? 'raw_materials',
@@ -264,6 +265,9 @@ export class MemStorage implements IStorage {
       // Effects & Tags
       effects: insertResource.effects ?? [],
       tags: insertResource.tags ?? [],
+      
+      // Derived Properties (calculated from attributes)
+      value: insertResource.sellPrice ?? 1,
     };
     this.resources.set(id, resource);
     return resource;

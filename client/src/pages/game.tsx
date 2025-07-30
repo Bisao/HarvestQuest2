@@ -6,6 +6,7 @@ import QuestsTab from "@/components/game/quests-tab";
 import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
 import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
+import ConsumptionTab from "@/components/game/consumption-tab";
 import ExpeditionSystem from "@/components/game/expedition-system";
 import { useGameState } from "@/hooks/use-game-state";
 import { useAutoRepeat } from "@/hooks/use-auto-repeat";
@@ -95,6 +96,7 @@ export default function Game() {
     { id: "inventory", label: "Inventário", emoji: "🎒" },
     { id: "storage", label: "Armazém", emoji: "🏪" },
     { id: "crafting", label: "Crafting", emoji: "🔨" },
+    { id: "consumption", label: "Consumir", emoji: "🍖" },
   ];
 
   // Handler for exploring biomes
@@ -271,11 +273,11 @@ export default function Game() {
               )}
               {activeTab === "inventory" && (
                 <EnhancedInventoryWithTabs
-                  inventoryItems={inventoryItems}
-                  equipment={equipment}
-                  resources={resources}
                   playerId={player.id}
-                  playerEquipment={player.equipment}
+                  resources={resources}
+                  equipment={equipment}
+                  player={player}
+                  isBlocked={false}
                 />
               )}
               {activeTab === "storage" && (
@@ -289,6 +291,13 @@ export default function Game() {
                 <EnhancedCraftingTab
                   recipes={recipes}
                   playerId={player.id}
+                  resources={resources}
+                  equipment={equipment}
+                />
+              )}
+              {activeTab === "consumption" && (
+                <ConsumptionTab
+                  player={player}
                   resources={resources}
                   equipment={equipment}
                 />
