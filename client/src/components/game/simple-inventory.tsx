@@ -187,11 +187,9 @@ export default function SimpleInventory({
             </div>
           </div>
           
-          {/* Inventory Grid - Scrollable Container */}
-          <div className="h-64 md:h-80 overflow-y-auto mb-4 pr-2">
-            <div className="grid grid-cols-6 md:grid-cols-9 gap-1 md:gap-2">
-              {Array.from({ length: totalSlots }, (_, i) => renderInventorySlot(i))}
-            </div>
+          {/* Inventory Grid */}
+          <div className="grid grid-cols-6 md:grid-cols-9 gap-1 md:gap-2 mb-4">
+            {Array.from({ length: totalSlots }, (_, i) => renderInventorySlot(i))}
           </div>
 
           {/* Item Details Panel */}

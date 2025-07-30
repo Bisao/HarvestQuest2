@@ -13,7 +13,7 @@ export default function GameHeader({ player }: GameHeaderProps) {
 
   return (
     <>
-      <header className="bg-white shadow-md border-b-4 border-forest fixed top-0 left-0 right-0 z-50">
+      <header className="bg-white shadow-md border-b-4 border-forest">
         <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0">
             <div className="flex items-center space-x-2 md:space-x-3">

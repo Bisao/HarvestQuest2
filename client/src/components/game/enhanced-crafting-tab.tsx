@@ -271,7 +271,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     return (
       <div
         key={recipe.id}
-        className={`recipe-card bg-white border-2 rounded-xl p-3 md:p-6 hover:shadow-lg transition-all ${
+        className={`recipe-card bg-white border-2 rounded-xl p-6 hover:shadow-lg transition-all ${
           canCraft 
             ? "border-green-200 hover:border-green-300" 
             : unlocked 
@@ -279,11 +279,11 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
             : "border-gray-300 opacity-60"
         }`}
       >
-        <div className="text-center mb-3 md:mb-4">
-          <div className={`text-3xl md:text-5xl mb-1 md:mb-2 ${!unlocked ? "grayscale" : ""}`}>
+        <div className="text-center mb-4">
+          <div className={`text-5xl mb-2 ${!unlocked ? "grayscale" : ""}`}>
             {recipe.emoji}
           </div>
-          <h4 className={`text-base md:text-lg font-bold ${unlocked ? "text-gray-800" : "text-gray-600"}`}>
+          <h4 className={`text-lg font-bold ${unlocked ? "text-gray-800" : "text-gray-600"}`}>
             {recipe.name}
           </h4>
           <div className="flex items-center justify-center space-x-2 mt-1">
@@ -305,8 +305,8 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
           </div>
         </div>
 
-        <div className="space-y-1 md:space-y-2 mb-3 md:mb-4">
-          <h5 className="text-xs md:text-sm font-semibold text-gray-700">Ingredientes:</h5>
+        <div className="space-y-2 mb-4">
+          <h5 className="text-sm font-semibold text-gray-700">Ingredientes:</h5>
           {ingredients.map(({ resource, quantity, available, hasEnough }) => (
             resource && (
               <div
@@ -316,10 +316,10 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
                 }`}
               >
                 <span className="flex items-center space-x-1">
-                  <span className="flex-shrink-0">{resource.emoji}</span>
-                  <span className="truncate text-xs md:text-sm">{resource.name}</span>
+                  <span>{resource.emoji}</span>
+                  <span>{resource.name}</span>
                 </span>
-                <span className="font-semibold flex-shrink-0 text-xs md:text-sm">
+                <span className="font-semibold">
                   {available}/{quantity * currentQuantity}
                 </span>
               </div>
@@ -353,7 +353,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         <Button
           onClick={() => handleCraft(recipe)}
           disabled={!canCraft || craftMutation.isPending || isBlocked || maxQuantity === 0}
-          className={`w-full text-xs md:text-sm py-2 md:py-3 ${
+          className={`w-full ${
             canCraft 
               ? "bg-green-600 hover:bg-green-700 text-white" 
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -377,8 +377,8 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       </div>
 
       {/* Horizontal Category Tabs */}
-      <div className="mb-4 md:mb-6">
-        <div className="flex overflow-x-auto gap-1 md:gap-2 mb-4 md:mb-6 border-b border-gray-200 scrollbar-hide">
+      <div className="mb-6">
+        <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
           {Object.entries(categorizedRecipes).map(([categoryName, categoryRecipes]) => {
             if (categoryRecipes.length === 0) return null;
             
@@ -388,22 +388,21 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
               <button
                 key={categoryName}
                 onClick={() => toggleCategory(categoryName)}
-                className={`flex items-center space-x-1 md:space-x-2 px-2 md:px-4 py-2 md:py-3 rounded-t-lg font-medium transition-all flex-shrink-0 text-xs md:text-sm ${
+                className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
                   isActive 
                     ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
                     : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
                 }`}
               >
-                <span className="text-sm md:text-lg">
+                <span className="text-lg">
                   {categoryName === "Materiais" && "🧵"}
                   {categoryName === "Ferramentas" && "🔧"}
                   {categoryName === "Armas" && "⚔️"}
                   {categoryName === "Utensílios" && "🍳"}
                   {categoryName === "Comidas" && "🍽️"}
                 </span>
-                <span className="hidden sm:inline">{categoryName}</span>
-                <span className="sm:hidden">{categoryName.slice(0, 4)}</span>
-                <span className="text-xs text-gray-500">({categoryRecipes.length})</span>
+                <span>{categoryName}</span>
+                <span className="text-sm text-gray-500">({categoryRecipes.length})</span>
               </button>
             );
           })}
@@ -414,7 +413,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
           if (categoryRecipes.length === 0 || !expandedCategories[categoryName]) return null;
 
           return (
-            <div key={categoryName} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
+            <div key={categoryName} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {categoryRecipes.map(renderRecipeCard)}
             </div>
           );

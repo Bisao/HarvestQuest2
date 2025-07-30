@@ -212,7 +212,19 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                         </div>
                       ) : (
                         <div className="text-xs text-gray-500">
-                          {isDisabled ? "Em Breve" : "Vazio"}
+                          {isDisabled ? "Em Breve" : (
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-xs h-6 px-2 mt-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEquipSlotClick(slotKey, false);
+                              }}
+                            >
+                              Equipar
+                            </Button>
+                          )}
                         </div>
                       )}
                     </div>
@@ -222,7 +234,16 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
             </div>
           </div>
           
-          
+          {/* Currency/Resource Bars */}
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-amber-700">Gold</span>
+              <div className="flex-1 bg-gray-200 rounded-full h-2">
+                <div className="bg-yellow-500 h-2 rounded-full" style={{ width: "0%" }}></div>
+              </div>
+            </div>
+            
+          </div>
           
         </CardContent>
       </Card>

@@ -73,7 +73,7 @@ export default function ExpeditionModal({
     if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
       return {
         canCollect: true,
-        requirementText: "",
+        requirementText: "Coletável à mão",
         toolIcon: "🤚",
       };
     }
@@ -267,16 +267,7 @@ export default function ExpeditionModal({
             </div>
             <ScrollArea className="h-64 border rounded-lg p-3">
               <div className="space-y-2">
-                {collectableResources
-                  .sort((a, b) => {
-                    // First sort by availability (collectible first)
-                    if (a.canCollect && !b.canCollect) return -1;
-                    if (!a.canCollect && b.canCollect) return 1;
-                    
-                    // Then sort by experience value (higher first)
-                    return b.experienceValue - a.experienceValue;
-                  })
-                  .map((resource) => (
+                {collectableResources.map((resource) => (
                   <div
                     key={resource.id}
                     className={`flex items-center justify-between p-3 rounded-lg border ${
