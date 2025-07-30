@@ -83,10 +83,9 @@ export default function Game() {
       {/* Game Header - Fixed at top */}
       <GameHeader player={player} />
 
-      {/* Main content with top padding to account for fixed header */}
-      <main className="container mx-auto px-4 py-6 pt-24">
-        {/* Tab Navigation */}
-        <div className="bg-white rounded-lg shadow-lg mb-6">
+      {/* Tab Navigation - Fixed below header */}
+      <div className="fixed top-20 left-0 right-0 z-40 bg-white shadow-lg border-b">
+        <div className="container mx-auto px-4">
           <div className="flex border-b">
             {tabs.map((tab) => (
               <button
@@ -103,9 +102,13 @@ export default function Game() {
               </button>
             ))}
           </div>
+        </div>
+      </div>
 
-          {/* Tab Content */}
-          <div className="p-6">
+      {/* Main content with top padding to account for fixed header and tabs */}
+      <main className="container mx-auto px-4 py-6 pt-32">
+        {/* Tab Content */}
+        <div className="bg-white rounded-lg shadow-lg p-6">
             {activeTab === "biomes" && (
               <BiomesTab
                 biomes={biomes}
@@ -146,7 +149,6 @@ export default function Game() {
                 playerLevel={player.level}
               />
             )}
-          </div>
         </div>
 
         {/* Active Expedition Panel */}
