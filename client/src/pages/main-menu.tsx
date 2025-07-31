@@ -142,6 +142,7 @@ export default function MainMenu() {
   };
 
   const handleLoadGame = (username: string) => {
+    console.log("Loading game for player:", username);
     setLocation(`/game?player=${encodeURIComponent(username)}`);
   };
 
@@ -306,19 +307,20 @@ export default function MainMenu() {
                                 <AlertTriangle className="h-5 w-5 text-red-500" />
                                 Confirmar Exclusão
                               </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Tem certeza de que deseja deletar o jogador <strong>"{save.username}"</strong>?
-                                <br />
-                                <br />
-                                Esta ação é permanente e não pode ser desfeita. Todos os dados do jogador, incluindo:
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                  <li>Nível {save.level} e {save.experience} XP</li>
-                                  <li>Inventário e recursos coletados</li>
-                                  <li>Progresso de missões e conquistas</li>
-                                  <li>Equipamentos e itens crafted</li>
-                                </ul>
-                                <br />
-                                serão perdidos permanentemente.
+                              <AlertDialogDescription asChild>
+                                <div>
+                                  <p>Tem certeza de que deseja deletar o jogador <strong>"{save.username}"</strong>?</p>
+                                  <br />
+                                  <p>Esta ação é permanente e não pode ser desfeita. Todos os dados do jogador, incluindo:</p>
+                                  <ul className="list-disc list-inside mt-2 space-y-1">
+                                    <li>Nível {save.level} e {save.experience} XP</li>
+                                    <li>Inventário e recursos coletados</li>
+                                    <li>Progresso de missões e conquistas</li>
+                                    <li>Equipamentos e itens crafted</li>
+                                  </ul>
+                                  <br />
+                                  <p>serão perdidos permanentemente.</p>
+                                </div>
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
