@@ -1,3 +1,4 @@
+
 import { 
   type Player, 
   type InsertPlayer,
@@ -21,6 +22,7 @@ import {
   type InsertPlayerQuest
 } from "@shared/types";
 import { randomUUID } from "crypto";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 import { ALL_RESOURCES } from "./data/resources";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
@@ -31,8 +33,10 @@ export interface IStorage {
   // Player methods
   getPlayer(id: string): Promise<Player | undefined>;
   getPlayerByUsername(username: string): Promise<Player | undefined>;
+  getAllPlayers(): Promise<Player[]>;
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: string, updates: Partial<Player>): Promise<Player>;
+  deletePlayer(id: string): Promise<void>;
 
   // Resource methods
   getAllResources(): Promise<Resource[]>;
@@ -83,6 +87,18 @@ export interface IStorage {
 
   // Game initialization
   initializeGameData(): Promise<void>;
+  
+  // Persistence methods
+  saveData(): Promise<void>;
+  loadData(): Promise<void>;
+}
+
+interface StorageData {
+  players: Array<[string, Player]>;
+  inventoryItems: Array<[string, InventoryItem]>;
+  storageItems: Array<[string, StorageItem]>;
+  expeditions: Array<[string, Expedition]>;
+  playerQuests: Array<[string, PlayerQuest]>;
 }
 
 export class MemStorage implements IStorage {
@@ -96,6 +112,8 @@ export class MemStorage implements IStorage {
   private recipes: Map<string, Recipe>;
   private quests: Map<string, Quest>;
   private playerQuests: Map<string, PlayerQuest>;
+  private saveFile = 'data.json';
+  private isInitialized = false;
 
   constructor() {
     this.players = new Map();
@@ -110,7 +128,80 @@ export class MemStorage implements IStorage {
     this.playerQuests = new Map();
   }
 
+  async saveData(): Promise<void> {
+    if (!this.isInitialized) return;
+    
+    try {
+      const data: StorageData = {
+        players: Array.from(this.players.entries()),
+        inventoryItems: Array.from(this.inventoryItems.entries()),
+        storageItems: Array.from(this.storageItems.entries()),
+        expeditions: Array.from(this.expeditions.entries()),
+        playerQuests: Array.from(this.playerQuests.entries())
+      };
+
+      writeFileSync(this.saveFile, JSON.stringify(data, null, 2));
+      console.log(`💾 Game data saved to ${this.saveFile}`);
+    } catch (error) {
+      console.error('Failed to save game data:', error);
+    }
+  }
+
+  async loadData(): Promise<void> {
+    try {
+      if (existsSync(this.saveFile)) {
+        const fileContent = readFileSync(this.saveFile, 'utf-8');
+        const data: StorageData = JSON.parse(fileContent);
+
+        // Load player data
+        if (data.players) {
+          for (const [id, player] of data.players) {
+            this.players.set(id, player);
+          }
+        }
+
+        // Load inventory items
+        if (data.inventoryItems) {
+          for (const [id, item] of data.inventoryItems) {
+            this.inventoryItems.set(id, item);
+          }
+        }
+
+        // Load storage items
+        if (data.storageItems) {
+          for (const [id, item] of data.storageItems) {
+            this.storageItems.set(id, item);
+          }
+        }
+
+        // Load expeditions
+        if (data.expeditions) {
+          for (const [id, expedition] of data.expeditions) {
+            this.expeditions.set(id, expedition);
+          }
+        }
+
+        // Load player quests
+        if (data.playerQuests) {
+          for (const [id, playerQuest] of data.playerQuests) {
+            this.playerQuests.set(id, playerQuest);
+          }
+        }
+
+        console.log(`📂 Game data loaded from ${this.saveFile}`);
+        console.log(`👥 Players loaded: ${this.players.size}`);
+      } else {
+        console.log(`📂 No save file found, starting fresh`);
+      }
+    } catch (error) {
+      console.error('Failed to load game data:', error);
+    }
+  }
+
   async initializeGameData(): Promise<void> {
+    // Load persisted data first
+    await this.loadData();
+
     // Initialize all resources using modular data
     const resourceIds: string[] = [];
 
@@ -144,33 +235,44 @@ export class MemStorage implements IStorage {
       await this.createQuest({ ...quest, category: quest.category || null });
     }
 
-    // Create default player
-    const defaultPlayer = await this.createPlayer({
-      username: "Player1",
-      level: 1,
-      experience: 0,
-      hunger: 100,
-      thirst: 100,
-      maxHunger: 100,
-      maxThirst: 100,
-      coins: 0,
-      inventoryWeight: 0,
-      maxInventoryWeight: 50000,
-      autoStorage: false,
-      craftedItemsDestination: 'storage',
-      waterStorage: 0,
-      maxWaterStorage: 500,
-      waterTanks: 0, // No tanks unlocked initially
-      equippedHelmet: null,
-      equippedChestplate: null,
-      equippedLeggings: null,
-      equippedBoots: null,
-      equippedWeapon: null,
-      equippedTool: null,
-      autoCompleteQuests: true,
-    });
+    // Create default player only if no players exist
+    if (this.players.size === 0) {
+      const defaultPlayer = await this.createPlayer({
+        username: "Player1",
+        level: 1,
+        experience: 0,
+        hunger: 100,
+        thirst: 100,
+        maxHunger: 100,
+        maxThirst: 100,
+        coins: 0,
+        inventoryWeight: 0,
+        maxInventoryWeight: 50000,
+        autoStorage: false,
+        craftedItemsDestination: 'storage',
+        waterStorage: 0,
+        maxWaterStorage: 500,
+        waterTanks: 0,
+        equippedHelmet: null,
+        equippedChestplate: null,
+        equippedLeggings: null,
+        equippedBoots: null,
+        equippedWeapon: null,
+        equippedTool: null,
+        autoCompleteQuests: true,
+      });
 
+      console.log(`👤 Created default player: ${defaultPlayer.username}`);
+    }
 
+    this.isInitialized = true;
+    
+    // Setup auto-save every 30 seconds
+    setInterval(async () => {
+      await this.saveData();
+    }, 30000);
+
+    console.log("🎮 Game initialized successfully");
   }
 
   // Player methods
@@ -184,11 +286,30 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getAllPlayers(): Promise<Player[]> {
+    return Array.from(this.players.values());
+  }
+
   async createPlayer(insertPlayer: InsertPlayer): Promise<Player> {
+    // Check if username already exists
+    const existingPlayer = await this.getPlayerByUsername(insertPlayer.username);
+    if (existingPlayer) {
+      throw new Error("Nome de usuário já existe");
+    }
+
+    // Validate username
+    if (!insertPlayer.username || insertPlayer.username.trim().length < 2) {
+      throw new Error("Nome de usuário deve ter pelo menos 2 caracteres");
+    }
+
+    if (insertPlayer.username.length > 20) {
+      throw new Error("Nome de usuário não pode ter mais de 20 caracteres");
+    }
+
     const id = randomUUID();
     const player: Player = { 
       id,
-      username: insertPlayer.username,
+      username: insertPlayer.username.trim(),
       level: insertPlayer.level ?? 1,
       experience: insertPlayer.experience ?? 0,
       hunger: insertPlayer.hunger ?? 100,
@@ -202,7 +323,7 @@ export class MemStorage implements IStorage {
       craftedItemsDestination: insertPlayer.craftedItemsDestination ?? 'storage',
       waterStorage: insertPlayer.waterStorage ?? 0,
       maxWaterStorage: insertPlayer.maxWaterStorage ?? 500,
-      waterTanks: insertPlayer.waterTanks ?? [],
+      waterTanks: insertPlayer.waterTanks ?? 0,
       equippedHelmet: insertPlayer.equippedHelmet || null,
       equippedChestplate: insertPlayer.equippedChestplate || null,
       equippedLeggings: insertPlayer.equippedLeggings || null,
@@ -211,7 +332,12 @@ export class MemStorage implements IStorage {
       equippedTool: insertPlayer.equippedTool || null,
       autoCompleteQuests: insertPlayer.autoCompleteQuests ?? true,
     };
+    
     this.players.set(id, player);
+    
+    // Auto-save after creating player
+    await this.saveData();
+    
     return player;
   }
 
@@ -221,7 +347,43 @@ export class MemStorage implements IStorage {
 
     const updated = { ...player, ...updates };
     this.players.set(id, updated);
+    
+    // Auto-save after updating player
+    await this.saveData();
+    
     return updated;
+  }
+
+  async deletePlayer(id: string): Promise<void> {
+    const player = this.players.get(id);
+    if (!player) throw new Error("Player not found");
+
+    // Delete player data
+    this.players.delete(id);
+
+    // Delete related data
+    const playerInventory = await this.getPlayerInventory(id);
+    for (const item of playerInventory) {
+      await this.removeInventoryItem(item.id);
+    }
+
+    const playerStorage = await this.getPlayerStorage(id);
+    for (const item of playerStorage) {
+      await this.removeStorageItem(item.id);
+    }
+
+    const playerExpeditions = await this.getPlayerExpeditions(id);
+    for (const expedition of playerExpeditions) {
+      this.expeditions.delete(expedition.id);
+    }
+
+    const playerQuests = await this.getPlayerQuests(id);
+    for (const quest of playerQuests) {
+      this.playerQuests.delete(quest.id);
+    }
+
+    // Auto-save after deleting player
+    await this.saveData();
   }
 
   // Resource methods
@@ -314,6 +476,7 @@ export class MemStorage implements IStorage {
       quantity: insertItem.quantity ?? 0,
     };
     this.inventoryItems.set(id, item);
+    await this.saveData();
     return item;
   }
 
@@ -323,11 +486,13 @@ export class MemStorage implements IStorage {
 
     const updated = { ...item, ...updates };
     this.inventoryItems.set(id, updated);
+    await this.saveData();
     return updated;
   }
 
   async removeInventoryItem(id: string): Promise<void> {
     this.inventoryItems.delete(id);
+    await this.saveData();
   }
 
   // Storage methods
@@ -347,6 +512,7 @@ export class MemStorage implements IStorage {
       itemType: insertItem.itemType ?? 'resource',
     };
     this.storageItems.set(id, item);
+    await this.saveData();
     return item;
   }
 
@@ -356,11 +522,13 @@ export class MemStorage implements IStorage {
 
     const updated = { ...item, ...updates };
     this.storageItems.set(id, updated);
+    await this.saveData();
     return updated;
   }
 
   async removeStorageItem(id: string): Promise<void> {
     this.storageItems.delete(id);
+    await this.saveData();
   }
 
   // Special method for handling water storage (goes to player's water compartment)
@@ -421,6 +589,7 @@ export class MemStorage implements IStorage {
 
     console.log('Storing expedition with ID:', id);
     this.expeditions.set(id, expedition);
+    await this.saveData();
     return expedition;
   }
 
@@ -430,6 +599,7 @@ export class MemStorage implements IStorage {
 
     const updated = { ...expedition, ...updates };
     this.expeditions.set(id, updated);
+    await this.saveData();
     return updated;
   }
 
@@ -557,6 +727,7 @@ export class MemStorage implements IStorage {
       completedAt: null,
     };
     this.playerQuests.set(id, playerQuest);
+    await this.saveData();
     return playerQuest;
   }
 
@@ -566,10 +737,11 @@ export class MemStorage implements IStorage {
 
     const updated = { ...playerQuest, ...updates };
     this.playerQuests.set(id, updated);
+    await this.saveData();
     return updated;
   }
 }
 
 // Use in-memory storage - no database dependencies
 export const storage = new MemStorage();
-console.log("🚀 Coletor Adventures using In-Memory Storage");
+console.log("🚀 Coletor Adventures using Enhanced In-Memory Storage with Persistence");

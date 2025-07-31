@@ -1,3 +1,4 @@
+
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
@@ -38,39 +39,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register consumption routes
   app.use('/api', createConsumptionRoutes(storage));
 
-  // Get player data - create default player if not found
+  // Create new player
+  app.post("/api/player", async (req, res) => {
+    try {
+      const { username } = req.body;
+
+      if (!username || typeof username !== 'string' || username.trim().length < 2) {
+        return res.status(400).json({ 
+          message: "Nome de usuário deve ter pelo menos 2 caracteres" 
+        });
+      }
+
+      if (username.length > 20) {
+        return res.status(400).json({ 
+          message: "Nome de usuário não pode ter mais de 20 caracteres" 
+        });
+      }
+
+      // Check if player already exists
+      const existingPlayer = await storage.getPlayerByUsername(username.trim());
+      if (existingPlayer) {
+        return res.status(409).json({ 
+          message: "Nome de usuário já existe",
+          playerId: existingPlayer.id 
+        });
+      }
+
+      const newPlayer = await storage.createPlayer({
+        username: username.trim(),
+        level: 1,
+        experience: 0,
+        hunger: 100,
+        maxHunger: 100,
+        thirst: 100,
+        maxThirst: 100,
+        coins: 100, // Starting coins for new players
+        inventoryWeight: 0,
+        maxInventoryWeight: 50000,
+        autoStorage: false,
+        craftedItemsDestination: "storage",
+        waterStorage: 0,
+        maxWaterStorage: 500,
+        waterTanks: 0,
+        equippedHelmet: null,
+        equippedChestplate: null,
+        equippedLeggings: null,
+        equippedBoots: null,
+        equippedWeapon: null,
+        equippedTool: null,
+        autoCompleteQuests: true
+      });
+
+      console.log(`👤 New player created: ${newPlayer.username} (${newPlayer.id})`);
+      res.status(201).json(newPlayer);
+    } catch (error) {
+      console.error("Create player error:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Falha ao criar jogador" 
+      });
+    }
+  });
+
+  // Get player data by username
   app.get("/api/player/:username", async (req, res) => {
     try {
       const { username } = req.params;
-      let player = await storage.getPlayerByUsername(username);
+      const player = await storage.getPlayerByUsername(username);
       
-      // Create default player if not found
       if (!player) {
-        const newPlayer = {
-          username,
-          level: 1,
-          experience: 0,
-          hunger: 100,
-          maxHunger: 100,
-          thirst: 100,
-          maxThirst: 100,
-          coins: 0,
-          inventoryWeight: 0,
-          maxInventoryWeight: 50000, // 50kg = 50,000g
-          autoStorage: false,
-          craftedItemsDestination: "inventory" as const,
-          waterStorage: 0,
-          maxWaterStorage: 100,
-          equippedHelmet: "",
-          equippedChestplate: "",
-          equippedLeggings: "",
-          equippedBoots: "",
-          equippedWeapon: "",
-          equippedTool: ""
-        };
-        
-        player = await storage.createPlayer(newPlayer);
-        // Created new player successfully
+        return res.status(404).json({ message: "Jogador não encontrado" });
       }
       
       // Disable HTTP caching for player data to ensure real-time updates
@@ -83,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(player);
     } catch (error) {
       console.error("Get player error:", error);
-      res.status(500).json({ message: "Failed to get player" });
+      res.status(500).json({ message: "Falha ao buscar jogador" });
     }
   });
 
@@ -445,7 +482,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use dynamic consumption system for effects calculation
-      const { isConsumable, getConsumableEffects, validateConsumption } = await import("../shared/utils/consumable-utils");
+      const { validateConsumption, getConsumableEffects } = await import("../shared/utils/consumable-utils");
       
       // Validate that item is consumable
       const validation = validateConsumption(resource, quantity);
@@ -453,7 +490,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: validation.error });
       }
 
-      // Get consumption effects dynamically from item attributes or fallback patterns
+      // Get consumption effects dynamically from item attributes
       const effects = getConsumableEffects(resource);
       const hungerRestore = effects.hungerRestore;
       const thirstRestore = effects.thirstRestore;
