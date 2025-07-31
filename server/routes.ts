@@ -13,6 +13,7 @@ import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
 import { registerAdminRoutes } from "./routes/admin";
 import { registerStorageRoutes } from "./routes/storage-routes";
 import { createConsumptionRoutes } from "./routes/consumption";
+import savesRouter from "./routes/saves";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -37,6 +38,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register consumption routes
   app.use('/api', createConsumptionRoutes(storage));
+
+  // Register saves routes  
+  app.use('/api/saves', savesRouter);
 
   // Create new player
   app.post("/api/player", async (req, res) => {

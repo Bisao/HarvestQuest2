@@ -135,6 +135,34 @@
         "equippedTool": null,
         "autoCompleteQuests": false
       }
+    ],
+    [
+      "29fbfe98-31b4-4ac8-9039-1a0b38af9c22",
+      {
+        "id": "29fbfe98-31b4-4ac8-9039-1a0b38af9c22",
+        "username": "TestPlayer",
+        "level": 1,
+        "experience": 0,
+        "hunger": 100,
+        "maxHunger": 100,
+        "thirst": 100,
+        "maxThirst": 100,
+        "coins": 100,
+        "inventoryWeight": 0,
+        "maxInventoryWeight": 50000,
+        "autoStorage": false,
+        "craftedItemsDestination": "storage",
+        "waterStorage": 0,
+        "maxWaterStorage": 500,
+        "waterTanks": 0,
+        "equippedHelmet": null,
+        "equippedChestplate": null,
+        "equippedLeggings": null,
+        "equippedBoots": null,
+        "equippedWeapon": null,
+        "equippedTool": null,
+        "autoCompleteQuests": true
+      }
     ]
   ],
   "inventoryItems": [
