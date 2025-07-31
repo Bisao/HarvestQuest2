@@ -135,15 +135,28 @@ export default function ExpeditionSystem({
       biomeId: string;
       selectedResources: string[];
     }) => {
-      const response = await apiRequest('POST', '/api/expeditions', {
-        ...expeditionData,
-        selectedEquipment: [] // Equipment managed through equipped items
+      console.log('Sending expedition data:', expeditionData);
+      
+      const response = await fetch('/api/expeditions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...expeditionData,
+          selectedEquipment: [] // Equipment managed through equipped items
+        }),
       });
+      
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('Expedition error response:', errorText);
         throw new Error(errorText || `Failed to start expedition: ${response.status}`);
       }
-      return response.json();
+      
+      const result = await response.json();
+      console.log('Expedition started successfully:', result);
+      return result;
     },
     onSuccess: (expedition) => {
       const newActiveExpedition: ActiveExpedition = {

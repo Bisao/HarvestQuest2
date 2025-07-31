@@ -372,12 +372,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId, biomeId, selectedResources, selectedEquipment } = req.body;
 
+      console.log('Starting expedition:', { playerId, biomeId, selectedResources, selectedEquipment });
+
+      if (!playerId || !biomeId) {
+        return res.status(400).json({ message: "playerId and biomeId are required" });
+      }
+
+      if (!selectedResources || selectedResources.length === 0) {
+        return res.status(400).json({ message: "At least one resource must be selected" });
+      }
+
       const expedition = await expeditionService.startExpedition(
         playerId, 
         biomeId, 
         selectedResources || [], 
         selectedEquipment || []
       );
+
+      console.log('Expedition created successfully:', expedition);
 
       // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately (hunger/thirst change)
       const { invalidatePlayerCache } = await import("./cache/memory-cache");

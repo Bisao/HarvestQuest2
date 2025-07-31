@@ -22,11 +22,21 @@ export class ExpeditionService {
     selectedResources: string[], 
     selectedEquipment: string[] = []
   ): Promise<Expedition> {
+    console.log('ExpeditionService.startExpedition called with:', { playerId, biomeId, selectedResources, selectedEquipment });
+
     const player = await this.storage.getPlayer(playerId);
-    if (!player) throw new Error("Player not found");
+    if (!player) {
+      console.error('Player not found:', playerId);
+      throw new Error("Player not found");
+    }
+    console.log('Player found:', { id: player.id, hunger: player.hunger, thirst: player.thirst, level: player.level });
 
     const biome = await this.storage.getBiome(biomeId);
-    if (!biome) throw new Error("Biome not found");
+    if (!biome) {
+      console.error('Biome not found:', biomeId);
+      throw new Error("Biome not found");
+    }
+    console.log('Biome found:', { id: biome.id, name: biome.name, requiredLevel: biome.requiredLevel });
 
     // Check if player has enough hunger and thirst for expedition
     if (player.hunger < 5) {
@@ -48,19 +58,37 @@ export class ExpeditionService {
     );
 
     // Additional validation: check if player has required tools for each resource
+    console.log('Validating tools for resources:', biomeValidResources);
     const validResources = [];
     for (const resourceId of biomeValidResources) {
+      const resource = await this.storage.getResource(resourceId);
+      console.log(`Checking tool requirements for resource: ${resource?.name} (${resourceId})`);
+      
       const hasRequiredTool = await this.gameService.hasRequiredTool(playerId, resourceId);
+      console.log(`Player has required tool for ${resource?.name}: ${hasRequiredTool}`);
+      
       if (hasRequiredTool) {
         validResources.push(resourceId);
       } else {
-        console.log(`Player lacks required tool/weapon for resource: ${resourceId}`);
+        console.log(`Player lacks required tool/weapon for resource: ${resource?.name} (${resourceId})`);
       }
     }
+    console.log('Final valid resources:', validResources);
 
     if (validResources.length === 0) {
+      console.log('No valid resources found for player tools');
       throw new Error("Você não possui as ferramentas ou armas necessárias para coletar os recursos selecionados neste bioma.");
     }
+
+    // Check for existing active expeditions
+    const existingExpeditions = await this.storage.getPlayerExpeditions(playerId);
+    const activeExpedition = existingExpeditions.find(exp => exp.status === 'in_progress');
+    if (activeExpedition) {
+      console.log('Player already has active expedition:', activeExpedition.id);
+      throw new Error("Você já possui uma expedição ativa. Finalize-a antes de iniciar uma nova.");
+    }
+
+    console.log('Creating expedition with valid resources:', validResources);
 
     // Create expedition
     const expedition = await this.storage.createExpedition({
@@ -69,6 +97,8 @@ export class ExpeditionService {
       selectedResources: validResources,
       selectedEquipment,
     });
+
+    console.log('Expedition created:', expedition);
 
     // Deduct hunger and thirst for expedition
     await this.storage.updatePlayer(playerId, {
