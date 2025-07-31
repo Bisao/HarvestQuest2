@@ -68,47 +68,59 @@ export default function ExpeditionSystem({
     return resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
   };
 
+  const canCollectResource = (resource: Resource) => {
+    const resourceName = resource.name;
+    
+    // Basic resources (no tools required)
+    if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
+      return true;
+    }
+    
+    // Tool required resources
+    if (['Madeira', 'Bambu'].includes(resourceName)) {
+      return equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
+    }
+    
+    if (['Pedra', 'Ferro Fundido', 'Cristais'].includes(resourceName)) {
+      return equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
+    }
+    
+    if (resourceName === 'Água Fresca') {
+      const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
+      const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
+      return hasBucket || hasBambooBottle;
+    }
+    
+    // Fish resources
+    if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName)) {
+      return equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
+    }
+    
+    // Animals - require weapons and knife
+    if (['Coelho', 'Veado', 'Javali'].includes(resourceName)) {
+      const hasWeapon = player.equippedWeapon !== null;
+      const hasKnife = equipment.some(eq => eq.toolType === "knife" && 
+        (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
+      return hasWeapon && hasKnife;
+    }
+    
+    return true; // Default to collectible
+  };
+
   const getCollectableResources = () => {
     const biomeResources = getBiomeResources();
-    return biomeResources.filter(resource => {
-      // Simplified tool checking based on resource name
-      const resourceName = resource.name;
-      
-      // Basic resources (no tools required)
-      if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
-        return true;
-      }
-      
-      // Tool required resources
-      if (['Madeira', 'Bambu'].includes(resourceName)) {
-        return equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
-      }
-      
-      if (['Pedra', 'Ferro Fundido', 'Cristais'].includes(resourceName)) {
-        return equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
-      }
-      
-      if (resourceName === 'Água Fresca') {
-        const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
-        const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
-        return hasBucket || hasBambooBottle;
-      }
-      
-      // Fish resources
-      if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName)) {
-        return equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
-      }
-      
-      // Animals - require weapons and knife
-      if (['Coelho', 'Veado', 'Javali'].includes(resourceName)) {
-        const hasWeapon = player.equippedWeapon !== null;
-        const hasKnife = equipment.some(eq => eq.toolType === "knife" && 
-          (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
-        return hasWeapon && hasKnife;
-      }
-      
-      return true; // Default to collectible
-    });
+    return biomeResources.filter(resource => canCollectResource(resource));
+  };
+
+  const getAllBiomeResources = () => {
+    const biomeResources = getBiomeResources();
+    
+    // Separate resources into collectible and non-collectible
+    const collectible = biomeResources.filter(resource => canCollectResource(resource));
+    const nonCollectible = biomeResources.filter(resource => !canCollectResource(resource));
+    
+    // Return collectible first, then non-collectible
+    return [...collectible, ...nonCollectible];
   };
 
   // Expedition mutations
@@ -325,6 +337,33 @@ export default function ExpeditionSystem({
     return icons;
   };
 
+  // Function to get required tool text for non-collectable resources
+  const getRequiredToolText = (resource: any) => {
+    const resourceName = resource.name;
+    
+    if (['Madeira', 'Bambu'].includes(resourceName)) {
+      return 'Requer machado';
+    }
+    
+    if (['Pedra', 'Ferro Fundido', 'Cristais'].includes(resourceName)) {
+      return 'Requer picareta';
+    }
+    
+    if (resourceName === 'Água Fresca') {
+      return 'Requer balde';
+    }
+    
+    if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName)) {
+      return 'Requer vara de pesca';
+    }
+    
+    if (['Coelho', 'Veado', 'Javali'].includes(resourceName)) {
+      return 'Requer arma + faca';
+    }
+    
+    return 'Ferramenta necessária';
+  };
+
   if (!biome) return null;
 
   const collectableResources = getCollectableResources();
@@ -399,31 +438,40 @@ export default function ExpeditionSystem({
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
-                  {collectableResources.map((resource) => {
+                  {getAllBiomeResources().map((resource) => {
                     const toolIcons = getToolIcons(resource);
+                    const isCollectable = canCollectResource(resource);
                     return (
-                      <div key={resource.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50">
+                      <div key={resource.id} className={`flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 ${
+                        !isCollectable ? 'opacity-50 bg-gray-50' : ''
+                      }`}>
                         <Checkbox
                           checked={selectedResources.includes(resource.id)}
                           onCheckedChange={() => toggleResourceSelection(resource.id)}
+                          disabled={!isCollectable}
                         />
                         <div className="flex items-center space-x-2 flex-1">
                           <span className="text-lg">{resource.emoji}</span>
                           <div className="flex-1">
                             <div className="flex justify-between items-center">
-                              <div className="font-medium">{resource.name}</div>
+                              <div className={`font-medium ${!isCollectable ? 'text-gray-500' : ''}`}>{resource.name}</div>
                               <div className="flex items-center space-x-1">
                                 {toolIcons.map((icon, index) => (
                                   <span key={index} className="text-xs">{icon}</span>
                                 ))}
+                                {!isCollectable && (
+                                  <span className="text-xs bg-orange-100 text-orange-600 px-1 rounded">
+                                    {getRequiredToolText(resource)}
+                                  </span>
+                                )}
                               </div>
                             </div>
-                            <div className="text-sm text-muted-foreground">
-                              +{resource.experienceValue} XP
+                            <div className={`text-sm ${!isCollectable ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                              {isCollectable ? 'Coletável à mão' : 'XP: +' + resource.experienceValue}
                             </div>
                           </div>
                         </div>
-                        <Badge variant="secondary">{resource.rarity}</Badge>
+                        <Badge variant={isCollectable ? "secondary" : "outline"}>{resource.rarity}</Badge>
                       </div>
                     );
                   })}

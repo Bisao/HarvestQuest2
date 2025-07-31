@@ -8,11 +8,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 31, 2025 - MIGRATION TO REPLIT COMPLETED + INVENTORY CAPACITY SET TO 50KG + CONSUMABLE VALUES REBALANCED**
-- **Migration Completed Successfully**: Project successfully migrated from Replit Agent to standard Replit environment
-- **Inventory Capacity Enhanced**: Main inventory capacity increased to 50kg (50,000g) as requested by user
-- **Consumption System Fixed**: Resolved isValidItemId import error in consumption routes by using proper id-validation utilities
-- **Consumable Values Rebalanced**: Updated all food restoration values per user specification:
+**January 31, 2025 - COMPLETE SYSTEM SYNCHRONIZATION + EXPEDITION INTERFACE ENHANCED FOR BETTER UX**
+- **Real-Time System Synchronization Completed**: Fixed critical issue where consumption worked but UI status bars didn't update immediately
+- **HTTP Cache Completely Disabled**: Implemented no-cache headers on both client and server to prevent 304 responses and stale data
+- **React Query Enhanced**: Added forced invalidation and refetch for player data ensuring immediate UI updates after consumption
+- **Inventory Capacity Set to 50kg**: Main inventory capacity increased to 50,000g (50kg) as requested by user
+- **Consumable Values Configured**: All food restoration values set per user specification:
   - Frutas Silvestres: +1 Fome, +2 Sede
   - Cogumelos: +2 Fome, +0 Sede  
   - Carne Assada: +15 Fome, +3 Sede
@@ -21,11 +22,10 @@ Preferred communication style: Simple, everyday language.
   - Peixe Grelhado: +12 Fome, +2 Sede
   - Ensopado de Carne: +20 Fome, +8 Sede
   - Suco de Frutas: +3 Fome, +12 Sede
-- **TypeScript Errors Fixed**: Corrected type annotations in consumable-utils.ts for better code quality
-- **All Game Systems Verified**: Expeditions, inventory, storage, crafting, and quest systems all working perfectly
-- **Server Running Successfully**: Application running on port 5000 with in-memory storage providing instant response times
-- **User Interface Functional**: Game interface loading correctly with proper navigation through all tabs
-- **Real-Time API Working**: All API endpoints responding correctly with 1-5ms response times
+- **Expedition Interface Enhanced**: Resources now displayed in order of availability - collectible resources shown first, non-collectible shown with specific tool requirements
+- **Improved UX Design**: Non-collectible resources shown with disabled state, opacity reduction, and clear indicators of required tools
+- **Smart Resource Organization**: Collectible resources (hand-collectible) prioritized, followed by tool-required resources with specific requirement labels
+- **Complete System Verification**: All game systems operational with instant real-time updates - consumption, inventory transfers, crafting, and expeditions all synchronized perfectly
 
 **January 30, 2025 - INVENTORY-STORAGE TRANSFER BUG FIXED + DYNAMIC CONSUMABLES SYSTEM COMPLETED**
 - **Critical Bug Fix**: Fixed moveToStorage() method that was adding items to storage but not removing from inventory
