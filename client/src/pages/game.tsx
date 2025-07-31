@@ -9,6 +9,7 @@ import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
 import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
+import { useQuestStatus } from "@/hooks/use-quest-status";
 
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
@@ -39,6 +40,9 @@ export default function Game() {
     queryKey: ["/api/inventory", player?.id],
     enabled: !!player?.id,
   });
+
+  const { hasCompletableQuests } = useQuestStatus(player?.id || "Player1");
+
 
   if (!player) {
     return (
@@ -102,6 +106,11 @@ export default function Game() {
                 <span className="mr-1 sm:mr-2">{tab.emoji}</span>
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">{tab.label.slice(0, 3)}</span>
+                 {tab.id === "quests" && hasCompletableQuests && (
+                    <span className="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center animate-pulse">
+                      !
+                    </span>
+                  )}
               </button>
             ))}
           </div>

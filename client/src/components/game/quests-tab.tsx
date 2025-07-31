@@ -261,13 +261,18 @@ export default function QuestsTab({ player }: QuestsTabProps) {
   }
 
   const renderQuestCard = (quest: Quest, isActive = false) => (
-    <Card key={quest.id} className={isActive ? questCategories.active.color : questCategories[quest.status as keyof typeof questCategories]?.color}>
+    <Card key={quest.id} className={`${isActive ? questCategories.active.color : questCategories[quest.status as keyof typeof questCategories]?.color} ${quest.canComplete ? 'ring-2 ring-yellow-400 ring-opacity-60' : ''}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
             <span className="text-2xl">{quest.emoji}</span>
             <div>
-              <CardTitle className="text-lg">{quest.name}</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                {quest.name}
+                {quest.canComplete && (
+                  <span className="text-yellow-500 animate-pulse text-xl">!</span>
+                )}
+              </CardTitle>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant={getStatusColor(quest.status)}>
                   {getStatusText(quest.status)}
@@ -275,6 +280,11 @@ export default function QuestsTab({ player }: QuestsTabProps) {
                 {quest.status === 'available' && (
                   <Badge variant="outline">
                     Nível {quest.requiredLevel}
+                  </Badge>
+                )}
+                {quest.canComplete && (
+                  <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 animate-pulse">
+                    ✨ Pronta!
                   </Badge>
                 )}
               </div>
@@ -289,17 +299,17 @@ export default function QuestsTab({ player }: QuestsTabProps) {
           <h4 className="font-semibold text-sm">Objetivos:</h4>
           {quest.objectives.map((objective, idx) => {
             if (quest.status === 'active') {
-              const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId);
+              const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId || objective.target);
               const objectiveProgress = quest.progress[progressKey];
 
               return (
                 <div key={idx} className="text-sm">
                   <div className="flex justify-between items-center">
-                    <span className={objectiveProgress?.completed ? "text-green-600" : "text-muted-foreground"}>
-                      • {objective.description}
+                    <span className={objectiveProgress?.completed ? "text-green-600 font-medium" : "text-muted-foreground"}>
+                      {objectiveProgress?.completed ? "✅" : "•"} {objective.description}
                     </span>
                     {objectiveProgress && (
-                      <span className="text-xs font-medium">
+                      <span className={`text-xs font-medium ${objectiveProgress.completed ? 'text-green-600' : 'text-muted-foreground'}`}>
                         {objectiveProgress.current}/{objectiveProgress.required}
                       </span>
                     )}
@@ -307,7 +317,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
                   {objectiveProgress && (
                     <Progress 
                       value={(objectiveProgress.current / objectiveProgress.required) * 100} 
-                      className="h-1 mt-1"
+                      className={`h-2 mt-1 ${objectiveProgress.completed ? 'bg-green-100' : ''}`}
                     />
                   )}
                 </div>
@@ -345,9 +355,9 @@ export default function QuestsTab({ player }: QuestsTabProps) {
           <Button 
             onClick={() => completeQuestMutation.mutate(quest.id)}
             disabled={completeQuestMutation.isPending}
-            className="w-full"
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white animate-pulse"
           >
-            {completeQuestMutation.isPending ? "Completando..." : "Completar Quest"}
+            {completeQuestMutation.isPending ? "Completando..." : "🏆 Resgatar Recompensas"}
           </Button>
         )}
 
@@ -372,11 +382,21 @@ export default function QuestsTab({ player }: QuestsTabProps) {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">📋 Missões</h1>
+      <div className="text-center relative">
+        <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-2">
+          📋 Missões
+          {activeQuests.some(q => q.canComplete) && (
+            <span className="text-yellow-500 animate-bounce text-2xl">!</span>
+          )}
+        </h1>
         <p className="text-muted-foreground">
           Complete missões para ganhar recompensas e experiência
         </p>
+        {activeQuests.some(q => q.canComplete) && (
+          <p className="text-yellow-600 font-medium mt-1 animate-pulse">
+            ✨ Você tem missões prontas para completar!
+          </p>
+        )}
       </div>
 
       {/* Horizontal Category Tabs */}

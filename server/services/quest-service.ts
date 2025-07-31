@@ -19,55 +19,52 @@ export class QuestService {
     let allCompleted = true;
 
     for (const objective of objectives) {
+      const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId || objective.target);
+      
       switch (objective.type) {
         case 'collect': {
-          // Only use stored progress, not current inventory/storage counts
-          // to prevent retroactive quest completion
-          const collectProgress = (playerQuest.progress as any)?.[objective.type + '_' + objective.resourceId] || { current: 0 };
-          const required = objective.quantity || 1;
+          const collectProgress = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
+          const required = objective.quantity || objective.amount || 1;
           
-          progress[objective.type + '_' + objective.resourceId] = {
-            current: collectProgress.current,
+          progress[progressKey] = {
+            current: collectProgress.current || 0,
             required: required,
-            completed: collectProgress.current >= required
+            completed: (collectProgress.current || 0) >= required
           };
           
-          if (collectProgress.current < required) {
+          if ((collectProgress.current || 0) < required) {
             allCompleted = false;
           }
           break;
         }
         
         case 'craft': {
-          // For craft objectives, we need to track when items are crafted
-          // This would require updating the crafting system to track quest progress
-          const craftProgress = (playerQuest.progress as any)?.[objective.type + '_' + objective.itemId] || { current: 0 };
-          const required = objective.quantity || 1;
+          const craftProgress = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
+          const required = objective.quantity || objective.amount || 1;
           
-          progress[objective.type + '_' + objective.itemId] = {
-            current: craftProgress.current,
+          progress[progressKey] = {
+            current: craftProgress.current || 0,
             required: required,
-            completed: craftProgress.current >= required
+            completed: (craftProgress.current || 0) >= required
           };
           
-          if (craftProgress.current < required) {
+          if ((craftProgress.current || 0) < required) {
             allCompleted = false;
           }
           break;
         }
         
         case 'kill': {
-          // For kill objectives, we need to track when creatures are killed during expeditions
-          const killProgress = (playerQuest.progress as any)?.[objective.type + '_' + objective.creatureId] || { current: 0 };
-          const required = objective.quantity || 1;
+          const killProgress = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
+          const required = objective.quantity || objective.amount || 1;
           
-          progress[objective.type + '_' + objective.creatureId] = {
-            current: killProgress.current,
+          progress[progressKey] = {
+            current: killProgress.current || 0,
             required: required,
-            completed: killProgress.current >= required
+            completed: (killProgress.current || 0) >= required
           };
           
-          if (killProgress.current < required) {
+          if ((killProgress.current || 0) < required) {
             allCompleted = false;
           }
           break;
@@ -90,16 +87,16 @@ export class QuestService {
         }
         
         case 'expedition': {
-          const expeditionProgress = (playerQuest.progress as any)?.[objective.type + '_' + objective.biomeId] || { current: 0 };
+          const expeditionProgress = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
           const required = objective.amount || objective.quantity || 1;
           
-          progress[objective.type + '_' + objective.biomeId] = {
-            current: expeditionProgress.current,
+          progress[progressKey] = {
+            current: expeditionProgress.current || 0,
             required: required,
-            completed: expeditionProgress.current >= required
+            completed: (expeditionProgress.current || 0) >= required
           };
           
-          if (expeditionProgress.current < required) {
+          if ((expeditionProgress.current || 0) < required) {
             allCompleted = false;
           }
           break;
@@ -121,52 +118,48 @@ export class QuestService {
       const quest = await this.storage.getQuest(playerQuest.questId);
       if (!quest) continue;
 
-      // Processing quest objectives
-
       const objectives = quest.objectives as any[];
       let progressUpdated = false;
       const currentProgress: any = playerQuest.progress || {};
 
       for (const objective of objectives) {
-        const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId);
+        const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId || objective.target);
         
         switch (action) {
           case 'collect':
-            if (objective.type === 'collect' && objective.resourceId === data.resourceId) {
-              // Found matching collect objective
+            if (objective.type === 'collect' && (objective.resourceId === data.resourceId || objective.target === data.resourceId)) {
               if (!currentProgress[progressKey]) {
-                currentProgress[progressKey] = { current: 0, required: objective.quantity };
+                currentProgress[progressKey] = { current: 0, required: objective.quantity || objective.amount || 1 };
               }
               const previousCurrent = currentProgress[progressKey].current;
               currentProgress[progressKey].current = Math.min(
                 currentProgress[progressKey].current + (data.quantity || 1), 
-                objective.quantity
+                objective.quantity || objective.amount || 1
               );
-              currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
-              // Progress updated successfully
+              currentProgress[progressKey].completed = currentProgress[progressKey].current >= (objective.quantity || objective.amount || 1);
+              console.log(`[QUEST DEBUG] Collect progress updated for quest ${quest.name}: ${previousCurrent} -> ${currentProgress[progressKey].current}/${objective.quantity || objective.amount || 1} (resource: ${data.resourceId})`);
               progressUpdated = true;
             }
             break;
             
           case 'craft':
-            if (objective.type === 'craft' && objective.itemId === data.itemId) {
-              // Found matching craft objective
+            if (objective.type === 'craft' && (objective.itemId === data.itemId || objective.target === data.itemId)) {
               if (!currentProgress[progressKey]) {
-                currentProgress[progressKey] = { current: 0, required: objective.quantity };
+                currentProgress[progressKey] = { current: 0, required: objective.quantity || objective.amount || 1 };
               }
               const previousCurrent = currentProgress[progressKey].current;
               currentProgress[progressKey].current = Math.min(
                 currentProgress[progressKey].current + (data.quantity || 1),
-                objective.quantity
+                objective.quantity || objective.amount || 1
               );
-              currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
-              // Craft progress updated successfully
+              currentProgress[progressKey].completed = currentProgress[progressKey].current >= (objective.quantity || objective.amount || 1);
+              console.log(`[QUEST DEBUG] Craft progress updated for quest ${quest.name}: ${previousCurrent} -> ${currentProgress[progressKey].current}/${objective.quantity || objective.amount || 1} (item: ${data.itemId})`);
               progressUpdated = true;
             }
             break;
             
           case 'expedition':
-            if (objective.type === 'expedition' && objective.biomeId === data.biomeId) {
+            if (objective.type === 'expedition' && (objective.biomeId === data.biomeId || objective.target === data.biomeId)) {
               const required = objective.amount || objective.quantity || 1;
               if (!currentProgress[progressKey]) {
                 currentProgress[progressKey] = { current: 0, required: required };
@@ -183,15 +176,16 @@ export class QuestService {
             break;
             
           case 'kill':
-            if (objective.type === 'kill' && objective.creatureId === data.creatureId) {
+            if (objective.type === 'kill' && (objective.creatureId === data.creatureId || objective.target === data.creatureId)) {
               if (!currentProgress[progressKey]) {
-                currentProgress[progressKey] = { current: 0, required: objective.quantity };
+                currentProgress[progressKey] = { current: 0, required: objective.quantity || objective.amount || 1 };
               }
               currentProgress[progressKey].current = Math.min(
                 currentProgress[progressKey].current + (data.quantity || 1),
-                objective.quantity
+                objective.quantity || objective.amount || 1
               );
-              currentProgress[progressKey].completed = currentProgress[progressKey].current >= objective.quantity;
+              currentProgress[progressKey].completed = currentProgress[progressKey].current >= (objective.quantity || objective.amount || 1);
+              console.log(`[QUEST DEBUG] Kill progress updated for quest ${quest.name}: ${currentProgress[progressKey].current}/${objective.quantity || objective.amount || 1} (creature: ${data.creatureId})`);
               progressUpdated = true;
             }
             break;

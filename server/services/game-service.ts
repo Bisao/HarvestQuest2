@@ -11,16 +11,16 @@ export class GameService {
     const inventory = await this.storage.getPlayerInventory(playerId);
     const resources = await this.storage.getAllResources();
     const equipment = await this.storage.getAllEquipment();
-    
+
     let totalWeightInGrams = 0;
-    
+
     for (const item of inventory) {
       const resource = resources.find(r => r.id === item.resourceId);
       if (resource) {
         totalWeightInGrams += resource.weight * item.quantity;
       }
     }
-    
+
     return totalWeightInGrams;
   }
 
@@ -28,17 +28,17 @@ export class GameService {
   async canCarryMore(playerId: string, additionalWeight: number): Promise<boolean> {
     const player = await this.storage.getPlayer(playerId);
     if (!player) return false;
-    
+
     const currentWeight = await this.calculateInventoryWeight(playerId);
     const maxWeight = this.calculateMaxInventoryWeight(player);
-    
+
     return (currentWeight + additionalWeight) <= maxWeight;
   }
 
   // Calculate max inventory weight considering equipment bonuses
   calculateMaxInventoryWeight(player: Player): number {
     let maxWeight = player.maxInventoryWeight;
-    
+
     // Add equipment bonuses (this would need equipment data)
     // For now, return base weight
     return maxWeight;
@@ -48,58 +48,58 @@ export class GameService {
   async hasRequiredTool(playerId: string, resourceId: string): Promise<boolean> {
     const resource = await this.storage.getResource(resourceId);
     if (!resource || !resource.collectionRequirements || resource.collectionRequirements.length === 0) return true;
-    
+
     const player = await this.storage.getPlayer(playerId);
     if (!player) return false;
-    
+
     const equipment = await this.storage.getAllEquipment();
-    
+
     // Check each collection requirement
     for (const requirement of resource.collectionRequirements) {
       if (requirement.type === 'tool') {
         const requiredTool = requirement.requirement as string;
-        
+
         switch (requiredTool) {
           case "fishing_rod":
             // Check if player has fishing rod equipped
             const equippedFishingRod = equipment.find(eq => 
               eq.id === player.equippedTool && eq.toolType === "fishing_rod"
             );
-            
+
             if (!equippedFishingRod) return false;
-            
+
             // Check if player has bait in inventory
             return await this.hasBaitInInventory(playerId);
-            
+
           case "bucket":
             // For water collection: requires bucket OR bamboo bottle
             const hasBucket = equipment.find(eq => 
               eq.id === player.equippedTool && eq.toolType === "bucket"
             );
-            
+
             const hasBambooBottle = equipment.find(eq => 
               eq.id === player.equippedTool && eq.toolType === "bamboo_bottle"
             );
-            
+
             if (!(hasBucket || hasBambooBottle)) return false;
             break;
-            
+
           case "weapon_and_knife":
             // For hunting large animals: requires weapon AND knife
             const equippedWeapon = equipment.find(eq => 
               eq.id === player.equippedWeapon && eq.slot === "weapon"
             );
             const hasNonKnifeWeapon = !!(equippedWeapon && equippedWeapon.toolType !== "knife");
-            
+
             // Check for knife in both tool and weapon slots
             const hasKnife = equipment.some(eq => 
               (eq.id === player.equippedTool || eq.id === player.equippedWeapon) && 
               eq.toolType === "knife"
             );
-            
+
             if (!(hasNonKnifeWeapon && hasKnife)) return false;
             break;
-            
+
           case "knife":
             // Check for knife in both tool and weapon slots
             const knifeEquipped = equipment.some(eq => 
@@ -108,30 +108,30 @@ export class GameService {
             );
             if (!knifeEquipped) return false;
             break;
-            
+
           default:
             // Regular tool checks - check both tool and weapon slots
             const equippedTool = equipment.find(eq => 
               eq.id === player.equippedTool && eq.toolType === requiredTool
             );
-            
+
             const equippedWeaponTool = equipment.find(eq => 
               eq.id === player.equippedWeapon && eq.toolType === requiredTool
             );
-            
+
             if (!(equippedTool || equippedWeaponTool)) return false;
             break;
         }
       }
     }
-    
+
     return true; // All requirements met
   }
 
   // Check if player has bait in inventory
   private async hasBaitInInventory(playerId: string): Promise<boolean> {
     const inventoryItems = await this.storage.getPlayerInventory(playerId);
-    
+
     // Check if player has bait (now a resource, not equipment) in inventory
     const baitItem = inventoryItems.find(item => item.resourceId === EQUIPMENT_IDS.ISCA_PESCA);
     return !!(baitItem && baitItem.quantity > 0);
@@ -141,16 +141,16 @@ export class GameService {
   async hasFishingRequirements(playerId: string): Promise<boolean> {
     const player = await this.storage.getPlayer(playerId);
     if (!player) return false;
-    
+
     const equipment = await this.storage.getAllEquipment();
-    
+
     // Check if player has fishing rod equipped
     const equippedTool = equipment.find(eq => 
       eq.id === player.equippedTool && eq.toolType === "fishing_rod"
     );
-    
+
     if (!equippedTool) return false;
-    
+
     // Check if player has bait in inventory
     return await this.hasBaitInInventory(playerId);
   }
@@ -159,7 +159,7 @@ export class GameService {
   async moveToStorage(playerId: string, inventoryItemId: string, quantity: number): Promise<void> {
     const inventoryItems = await this.storage.getPlayerInventory(playerId);
     const item = inventoryItems.find(i => i.id === inventoryItemId);
-    
+
     if (!item || item.quantity < quantity) {
       throw new Error("Insufficient quantity in inventory");
     }
@@ -167,7 +167,7 @@ export class GameService {
     // Add to storage
     const storageItems = await this.storage.getPlayerStorage(playerId);
     const existingStorage = storageItems.find(s => s.resourceId === item.resourceId);
-    
+
     if (existingStorage) {
       await this.storage.updateStorageItem(existingStorage.id, {
         quantity: existingStorage.quantity + quantity
@@ -201,7 +201,7 @@ export class GameService {
   async moveToInventory(playerId: string, storageItemId: string, quantity: number): Promise<void> {
     const storageItems = await this.storage.getPlayerStorage(playerId);
     const item = storageItems.find(i => i.id === storageItemId);
-    
+
     if (!item || item.quantity < quantity) {
       throw new Error("Insufficient quantity in storage");
     }
@@ -212,7 +212,7 @@ export class GameService {
     // Check if player can carry the additional weight
     const additionalWeight = resource.weight * quantity;
     const canCarry = await this.canCarryMore(playerId, additionalWeight);
-    
+
     if (!canCarry) {
       throw new Error("Cannot carry more weight");
     }
@@ -220,7 +220,7 @@ export class GameService {
     // Add to inventory
     const inventoryItems = await this.storage.getPlayerInventory(playerId);
     const existingInventory = inventoryItems.find(i => i.resourceId === item.resourceId);
-    
+
     if (existingInventory) {
       await this.storage.updateInventoryItem(existingInventory.id, {
         quantity: existingInventory.quantity + quantity
@@ -253,7 +253,7 @@ export class GameService {
   // Calculate expedition rewards based on equipment and other factors
   calculateExpeditionRewards(baseRewards: Record<string, number>, player: Player, equipment: Equipment[]): Record<string, number> {
     const rewards = { ...baseRewards };
-    
+
     // Apply equipment bonuses
     equipment.forEach(eq => {
       if (eq.bonus && typeof eq.bonus === 'object') {
@@ -263,14 +263,14 @@ export class GameService {
         }
       }
     });
-    
+
     return rewards;
   }
 
   // Experience calculation using experienceValue field
   calculateExperienceGain(resourcesCollected: Record<string, number>, resources: Resource[]): number {
     let totalExp = 0;
-    
+
     for (const [resourceId, quantity] of Object.entries(resourcesCollected)) {
       const resource = resources.find(r => r.id === resourceId);
       if (resource) {
@@ -279,7 +279,7 @@ export class GameService {
         totalExp += expPerItem * quantity;
       }
     }
-    
+
     return totalExp;
   }
 
@@ -288,12 +288,90 @@ export class GameService {
     const totalExp = currentExp + gainedExp;
     let level = 1;
     let requiredExp = 100; // Level 2 requires 100 exp
-    
+
     while (totalExp >= requiredExp) {
       level++;
       requiredExp += level * 50; // Each level requires 50 * level more exp
     }
-    
+
     return { newLevel: level, newExp: totalExp };
+  }
+
+  async collectResource(playerId: string, resourceId: string, amount: number): Promise<void> {
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) throw new Error("Player not found");
+
+    const resource = await this.storage.getResource(resourceId);
+    if (!resource) throw new Error("Resource not found");
+
+    // Check if player can carry the additional weight
+    const additionalWeight = resource.weight * amount;
+    const canCarry = await this.canCarryMore(playerId, additionalWeight);
+    if (!canCarry) throw new Error("Cannot carry more weight");
+
+    // Get player storage
+    const playerStorage = await this.storage.getPlayerStorage(playerId);
+
+    // Add to storage
+    const existingItem = playerStorage.find(item => item.resourceId === resourceId);
+
+    if (existingItem) {
+      await this.storage.updateStorageItem(existingItem.id, {
+        quantity: existingItem.quantity + amount
+      });
+    } else {
+      await this.storage.addStorageItem({
+        playerId,
+        resourceId,
+        quantity: amount,
+        itemType: 'resource'
+      });
+    }
+
+    // Update quest progress for collection
+    const { QuestService } = await import('./quest-service');
+    const questService = new QuestService(this.storage);
+    await questService.updateQuestProgress(playerId, 'collect', {
+      resourceId: resourceId,
+      quantity: amount
+    });
+
+    // Update player weight
+    const newWeight = await this.calculateInventoryWeight(playerId);
+    await this.storage.updatePlayer(playerId, { inventoryWeight: newWeight });
+  }
+
+  async craftItem(playerId: string, craftedResourceId: string, craftQuantity: number): Promise<void> {
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) throw new Error("Player not found");
+
+    const resource = await this.storage.getResource(craftedResourceId);
+    if (!resource) throw new Error("Resource not found");
+
+    // Get player storage
+    const playerStorage = await this.storage.getPlayerStorage(playerId);
+
+    // Add to storage
+    const existingItem = playerStorage.find(item => item.resourceId === craftedResourceId);
+    if (existingItem) {
+      await this.storage.updateStorageItem(existingItem.id, {
+        quantity: existingItem.quantity + craftQuantity
+      });
+    } else {
+      await this.storage.addStorageItem({
+        playerId,
+        resourceId: craftedResourceId,
+        quantity: craftQuantity,
+        itemType: 'resource'
+      });
+    }
+
+    // Update quest progress for crafting
+    const { QuestService } = await import('./quest-service');
+    const questService = new QuestService(this.storage);
+    await questService.updateQuestProgress(playerId, 'craft', {
+      itemId: craftedResourceId,
+      quantity: craftQuantity
+    });
   }
 }
