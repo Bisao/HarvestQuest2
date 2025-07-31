@@ -6,7 +6,18 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Play, User, Plus, Trash2, Wifi, WifiOff } from "lucide-react";
+import { Play, User, Plus, Trash2, Wifi, WifiOff, AlertTriangle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface SaveGame {
   id: string;
@@ -23,6 +34,7 @@ export default function MainMenu() {
   const [location, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const [isOnline, setIsOnline] = useState(() => navigator.onLine);
+  const [playerToDelete, setPlayerToDelete] = useState<{ id: string; username: string } | null>(null);
 
   // Get saved games directly from server
   const { data: savedGames = [], isLoading: isLoadingSaves } = useQuery({
@@ -134,8 +146,13 @@ export default function MainMenu() {
   };
 
   const handleDeleteSave = (playerId: string, username: string) => {
-    if (confirm(`Tem certeza de que deseja deletar o jogador "${username}"?`)) {
-      deleteSaveMutation.mutate(playerId);
+    setPlayerToDelete({ id: playerId, username });
+  };
+
+  const confirmDelete = () => {
+    if (playerToDelete) {
+      deleteSaveMutation.mutate(playerToDelete.id);
+      setPlayerToDelete(null);
     }
   };
 
@@ -273,14 +290,48 @@ export default function MainMenu() {
                           <Play className="h-4 w-4" />
                           Jogar
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteSave(save.id, save.username)}
-                          disabled={deleteSaveMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              disabled={deleteSaveMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="flex items-center gap-2">
+                                <AlertTriangle className="h-5 w-5 text-red-500" />
+                                Confirmar Exclusão
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tem certeza de que deseja deletar o jogador <strong>"{save.username}"</strong>?
+                                <br />
+                                <br />
+                                Esta ação é permanente e não pode ser desfeita. Todos os dados do jogador, incluindo:
+                                <ul className="list-disc list-inside mt-2 space-y-1">
+                                  <li>Nível {save.level} e {save.experience} XP</li>
+                                  <li>Inventário e recursos coletados</li>
+                                  <li>Progresso de missões e conquistas</li>
+                                  <li>Equipamentos e itens crafted</li>
+                                </ul>
+                                <br />
+                                serão perdidos permanentemente.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteSaveMutation.mutate(save.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Sim, Deletar Permanentemente
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   ))
