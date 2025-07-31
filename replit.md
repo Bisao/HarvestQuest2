@@ -8,10 +8,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 31, 2025 - MIGRATION TO REPLIT COMPLETED + INVENTORY CAPACITY SET TO 50KG**
+**January 31, 2025 - MIGRATION TO REPLIT COMPLETED + INVENTORY CAPACITY SET TO 50KG + CONSUMABLE VALUES REBALANCED**
 - **Migration Completed Successfully**: Project successfully migrated from Replit Agent to standard Replit environment
 - **Inventory Capacity Enhanced**: Main inventory capacity increased to 50kg (50,000g) as requested by user
 - **Consumption System Fixed**: Resolved isValidItemId import error in consumption routes by using proper id-validation utilities
+- **Consumable Values Rebalanced**: Updated all food restoration values per user specification:
+  - Frutas Silvestres: +1 Fome, +2 Sede
+  - Cogumelos: +2 Fome, +0 Sede  
+  - Carne Assada: +15 Fome, +3 Sede
+  - Água Fresca: +0 Fome, +10 Sede
+  - Cogumelos Assados: +8 Fome, +1 Sede
+  - Peixe Grelhado: +12 Fome, +2 Sede
+  - Ensopado de Carne: +20 Fome, +8 Sede
+  - Suco de Frutas: +3 Fome, +12 Sede
 - **TypeScript Errors Fixed**: Corrected type annotations in consumable-utils.ts for better code quality
 - **All Game Systems Verified**: Expeditions, inventory, storage, crafting, and quest systems all working perfectly
 - **Server Running Successfully**: Application running on port 5000 with in-memory storage providing instant response times

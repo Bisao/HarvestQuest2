@@ -265,7 +265,7 @@ export function createModernGameItems(): InsertGameItem[] {
       buyPrice: 12,
       attributes: { 
         harvestable: true,
-        hunger_restore: 10,
+        hunger_restore: 2,
         thirst_restore: 0
       },
       effects: ["hunger_restore"],
@@ -292,8 +292,8 @@ export function createModernGameItems(): InsertGameItem[] {
       attributes: { 
         harvestable: true, 
         perishable: true,
-        hunger_restore: 8,
-        thirst_restore: 5
+        hunger_restore: 1,
+        thirst_restore: 2
       },
       effects: ["hunger_restore", "thirst_restore"],
       tags: ["natural", "edible", "sweet", "food"]

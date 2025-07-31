@@ -90,19 +90,19 @@ export function getConsumableEffects(item: any): ConsumableEffects {
 
   // Fallback to hardcoded values for existing items (legacy support)
   const hardcodedEffects: Record<string, ConsumableEffects> = {
-    'Carne Assada': { hungerRestore: 25, thirstRestore: 5 },
-    'cooked_meat': { hungerRestore: 25, thirstRestore: 5 },
-    'Água Fresca': { hungerRestore: 0, thirstRestore: 20 },
-    'fresh_water': { hungerRestore: 0, thirstRestore: 20 },
-    'Cogumelos Assados': { hungerRestore: 15, thirstRestore: 0 },
-    'cooked_mushrooms': { hungerRestore: 15, thirstRestore: 0 },
-    'Peixe Grelhado': { hungerRestore: 20, thirstRestore: 3 },
-    'grilled_fish': { hungerRestore: 20, thirstRestore: 3 },
-    'Ensopado de Carne': { hungerRestore: 35, thirstRestore: 10 },
-    'meat_stew': { hungerRestore: 35, thirstRestore: 10 },
-    'Cogumelos': { hungerRestore: 10, thirstRestore: 0 },
-    'Frutas Silvestres': { hungerRestore: 8, thirstRestore: 5 },
-    'Suco de Frutas': { hungerRestore: 5, thirstRestore: 15 }
+    'Carne Assada': { hungerRestore: 15, thirstRestore: 3 },
+    'cooked_meat': { hungerRestore: 15, thirstRestore: 3 },
+    'Água Fresca': { hungerRestore: 0, thirstRestore: 10 },
+    'fresh_water': { hungerRestore: 0, thirstRestore: 10 },
+    'Cogumelos Assados': { hungerRestore: 8, thirstRestore: 1 },
+    'cooked_mushrooms': { hungerRestore: 8, thirstRestore: 1 },
+    'Peixe Grelhado': { hungerRestore: 12, thirstRestore: 2 },
+    'grilled_fish': { hungerRestore: 12, thirstRestore: 2 },
+    'Ensopado de Carne': { hungerRestore: 20, thirstRestore: 8 },
+    'meat_stew': { hungerRestore: 20, thirstRestore: 8 },
+    'Cogumelos': { hungerRestore: 2, thirstRestore: 0 },
+    'Frutas Silvestres': { hungerRestore: 1, thirstRestore: 2 },
+    'Suco de Frutas': { hungerRestore: 3, thirstRestore: 12 }
   };
 
   return hardcodedEffects[item.name || item.displayName] || { hungerRestore: 0, thirstRestore: 0 };
