@@ -67,6 +67,7 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "expedition",
+        target: BIOME_IDS.FLORESTA,
         biomeId: BIOME_IDS.FLORESTA,
         amount: 15,
         description: "Complete 15 expedições na Floresta"
