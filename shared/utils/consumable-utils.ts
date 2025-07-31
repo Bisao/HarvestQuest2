@@ -34,7 +34,7 @@ export function isConsumable(item: any): boolean {
   // Check by effects array
   if (item.effects && Array.isArray(item.effects)) {
     const consumableEffects = ['hunger_restore', 'thirst_restore', 'minor_health_regen'];
-    if (item.effects.some(effect => consumableEffects.includes(effect))) {
+    if (item.effects.some((effect: string) => consumableEffects.includes(effect))) {
       return true;
     }
   }

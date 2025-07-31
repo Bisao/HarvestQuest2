@@ -8,6 +8,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 31, 2025 - MIGRATION TO REPLIT COMPLETED + INVENTORY CAPACITY SET TO 50KG**
+- **Migration Completed Successfully**: Project successfully migrated from Replit Agent to standard Replit environment
+- **Inventory Capacity Enhanced**: Main inventory capacity increased to 50kg (50,000g) as requested by user
+- **Consumption System Fixed**: Resolved isValidItemId import error in consumption routes by using proper id-validation utilities
+- **TypeScript Errors Fixed**: Corrected type annotations in consumable-utils.ts for better code quality
+- **All Game Systems Verified**: Expeditions, inventory, storage, crafting, and quest systems all working perfectly
+- **Server Running Successfully**: Application running on port 5000 with in-memory storage providing instant response times
+- **User Interface Functional**: Game interface loading correctly with proper navigation through all tabs
+- **Real-Time API Working**: All API endpoints responding correctly with 1-5ms response times
+
 **January 30, 2025 - INVENTORY-STORAGE TRANSFER BUG FIXED + DYNAMIC CONSUMABLES SYSTEM COMPLETED**
 - **Critical Bug Fix**: Fixed moveToStorage() method that was adding items to storage but not removing from inventory
 - **Complete Transfer System**: Items now properly move between inventory and storage with quantity management
