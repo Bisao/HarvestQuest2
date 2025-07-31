@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -134,7 +135,7 @@ export default function Game() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+                className={`flex-shrink-0 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap relative ${
                   activeTab === tab.id
                     ? "bg-blue-50 text-blue-700 border-b-2 border-blue-500"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
