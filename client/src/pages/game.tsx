@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab-new";
 import QuestsTab from "@/components/game/quests-tab";
@@ -14,10 +15,46 @@ import { useQuestStatus } from "@/hooks/use-quest-status";
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
   const [activeExpedition, setActiveExpedition] = useState<ActiveExpedition | null>(null);
+  const [location, setLocation] = useLocation();
+
+  // Get player from URL parameter or localStorage
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  let playerUsername = urlParams.get('player') || '';
+  
+  // Fallback to localStorage if no URL parameter
+  if (!playerUsername) {
+    try {
+      const storedPlayer = localStorage.getItem('currentPlayer');
+      if (storedPlayer) {
+        const parsed = JSON.parse(storedPlayer);
+        playerUsername = parsed.username || '';
+      }
+    } catch (e) {
+      console.error("Error parsing stored player:", e);
+    }
+  }
+
+  // If no player found, redirect to main menu
+  if (!playerUsername) {
+    setLocation('/');
+    return null;
+  }
 
   // Data queries
   const { data: player } = useQuery<Player>({
-    queryKey: ["/api/player/Player1"],
+    queryKey: [`/api/player/${playerUsername}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/player/${encodeURIComponent(playerUsername)}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Player not found, redirect to main menu
+          setLocation('/');
+          throw new Error('Player not found');
+        }
+        throw new Error('Failed to fetch player');
+      }
+      return response.json();
+    }
   });
 
   const { data: biomes = [] } = useQuery<Biome[]>({
@@ -41,7 +78,7 @@ export default function Game() {
     enabled: !!player?.id,
   });
 
-  const { hasCompletableQuests } = useQuestStatus(player?.id || "Player1");
+  const { hasCompletableQuests } = useQuestStatus(player?.id || "");
 
 
   if (!player) {

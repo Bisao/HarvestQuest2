@@ -1,4 +1,3 @@
-
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
@@ -100,27 +99,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get player data by username
-  app.get("/api/player/:username", async (req, res) => {
+  // Get player by ID or username
+  app.get("/api/player/:identifier", async (req, res) => {
     try {
-      const { username } = req.params;
-      const player = await storage.getPlayerByUsername(username);
-      
+      const { identifier } = req.params;
+
+      // Try to get by ID first, then by username
+      let player = await storage.getPlayer(identifier);
       if (!player) {
-        return res.status(404).json({ message: "Jogador não encontrado" });
+        player = await storage.getPlayerByUsername(identifier);
       }
-      
-      // Disable HTTP caching for player data to ensure real-time updates
-      res.set({
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      });
-      
+
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
       res.json(player);
     } catch (error) {
       console.error("Get player error:", error);
-      res.status(500).json({ message: "Falha ao buscar jogador" });
+      res.status(500).json({ message: "Failed to get player" });
     }
   });
 
@@ -409,11 +406,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const expedition = await expeditionService.completeExpedition(id);
-      
+
       // Update quest progress for expedition completion and resources collected
       if (expedition && expedition.playerId) {
         await questService.updateQuestProgress(expedition.playerId, 'expedition', { biomeId: expedition.biomeId });
-        
+
         // Update quest progress for resources collected during expedition
         if (expedition.collectedResources) {
           const collected = expedition.collectedResources as Record<string, any>;
@@ -425,13 +422,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       }
-      
+
       // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
       const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
       invalidateStorageCache(expedition.playerId);
       invalidateInventoryCache(expedition.playerId);
       invalidatePlayerCache(expedition.playerId);
-      
+
       res.json(expedition);
     } catch (error) {
       console.error("Complete expedition error:", error);
@@ -483,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Use dynamic consumption system for effects calculation
       const { validateConsumption, getConsumableEffects } = await import("../shared/utils/consumable-utils");
-      
+
       // Validate that item is consumable
       const validation = validateConsumption(resource, quantity);
       if (!validation.valid) {
@@ -534,7 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       invalidateStorageCache(playerId);
       invalidateInventoryCache(playerId);
       invalidatePlayerCache(playerId);
-      
+
       res.json({ 
         success: true, 
         hungerRestored: hungerRestore * quantity,
@@ -578,7 +575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       invalidateStorageCache(playerId);
       invalidateInventoryCache(playerId);
       invalidatePlayerCache(playerId);
-      
+
       res.json({ 
         success: true, 
         thirstRestored: thirstRestore * quantity,
@@ -599,13 +596,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { playerId, quantity } = req.body;
 
       await gameService.moveToStorage(playerId, inventoryItemId, quantity);
-      
+
       // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
       const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
       invalidateStorageCache(playerId);
       invalidateInventoryCache(playerId);
       invalidatePlayerCache(playerId);
-      
+
       res.json({ message: "Item stored successfully" });
     } catch (error) {
       console.error('Storage error:', error);
@@ -665,7 +662,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get storage item to check resource ID
       const storageItems = await storage.getPlayerStorage(playerId);
       const storageItem = storageItems.find(item => item.id === storageItemId);
-      
+
       if (!storageItem) {
         return res.status(404).json({ message: "Item not found in storage" });
       }
@@ -673,7 +670,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if the item is equipment (tools, weapons, armor)
       const equipment = await storage.getAllEquipment();
       const isEquipment = equipment.some(eq => eq.id === storageItem.resourceId);
-      
+
       if (isEquipment) {
         return res.status(400).json({ 
           message: "Equipamentos, ferramentas e armas só podem ser equipados, não retirados para o inventário." 
@@ -681,13 +678,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       await gameService.moveToInventory(playerId, storageItemId, quantity);
-      
+
       // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
       const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
       invalidateStorageCache(playerId);
       invalidateInventoryCache(playerId);
       invalidatePlayerCache(playerId);
-      
+
       res.json({ message: "Items withdrawn successfully" });
     } catch (error) {
       console.error('Withdraw error:', error);
@@ -804,7 +801,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       let canCollect = false;
-      
+
       // Special check for fishing resources
       if (resource.requiredTool === "fishing_rod") {
         canCollect = await gameService.hasFishingRequirements(playerId);
