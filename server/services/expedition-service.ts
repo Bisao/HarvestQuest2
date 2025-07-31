@@ -3,6 +3,7 @@ import type { IStorage } from "../storage";
 import type { Player, Expedition, Resource, Equipment } from "@shared/types";
 import { GameService } from "./game-service";
 import { QuestService } from "./quest-service";
+import { EQUIPMENT_IDS } from "@shared/constants/game-ids";
 
 export class ExpeditionService {
   private gameService: GameService;
@@ -210,14 +211,9 @@ export class ExpeditionService {
   // Consume bait from player inventory when fishing
   private async consumeBaitForFishing(playerId: string): Promise<boolean> {
     const inventoryItems = await this.storage.getPlayerInventory(playerId);
-    const equipment = await this.storage.getAllEquipment();
     
-    // Find bait equipment ID
-    const baitEquipment = equipment.find(eq => eq.toolType === "bait");
-    if (!baitEquipment) return false;
-    
-    // Find bait in inventory
-    const baitItem = inventoryItems.find(item => item.resourceId === baitEquipment.id);
+    // Find bait in inventory (now it's a resource, not equipment)
+    const baitItem = inventoryItems.find(item => item.resourceId === EQUIPMENT_IDS.ISCA_PESCA);
     if (!baitItem || baitItem.quantity <= 0) return false;
     
     // Consume 1 bait

@@ -21,12 +21,9 @@ export function useFishingRequirements(
     equipment.find(eq => eq.id === player.equippedTool && eq.toolType === "fishing_rod")
   );
 
-  // Find bait equipment
-  const baitEquipment = equipment.find(eq => eq.toolType === "bait");
-  
-  // Check for bait in inventory
-  const baitItem = baitEquipment ? 
-    inventoryItems.find(item => item.resourceId === baitEquipment.id) : null;
+  // Check for bait in inventory (bait is now a resource, not equipment)
+  // Using the same ID but looking in inventory items, not equipment
+  const baitItem = inventoryItems.find(item => item.resourceId === "eq-tool-9a8b7c6d-5e4f-3210-fedc-ba0987654321"); // ISCA_PESCA ID
   
   const hasBait = !!(baitItem && baitItem.quantity > 0);
   const baitCount = baitItem?.quantity || 0;

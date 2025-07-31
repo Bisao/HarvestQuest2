@@ -1,6 +1,7 @@
 // Game service for business logic
 import type { IStorage } from "../storage";
 import type { Player, Resource, Equipment, InventoryItem, StorageItem } from "@shared/types";
+import { EQUIPMENT_IDS } from "@shared/constants/game-ids";
 
 export class GameService {
   constructor(private storage: IStorage) {}
@@ -130,14 +131,9 @@ export class GameService {
   // Check if player has bait in inventory
   private async hasBaitInInventory(playerId: string): Promise<boolean> {
     const inventoryItems = await this.storage.getPlayerInventory(playerId);
-    const equipment = await this.storage.getAllEquipment();
     
-    // Find bait equipment ID
-    const baitEquipment = equipment.find(eq => eq.toolType === "bait");
-    if (!baitEquipment) return false;
-    
-    // Check if player has bait in inventory
-    const baitItem = inventoryItems.find(item => item.resourceId === baitEquipment.id);
+    // Check if player has bait (now a resource, not equipment) in inventory
+    const baitItem = inventoryItems.find(item => item.resourceId === EQUIPMENT_IDS.ISCA_PESCA);
     return !!(baitItem && baitItem.quantity > 0);
   }
 

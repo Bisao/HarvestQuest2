@@ -91,9 +91,11 @@ export default function ExpeditionSystem({
       return hasBucket || hasBambooBottle;
     }
     
-    // Fish resources
+    // Fish resources - need fishing rod equipped AND bait in inventory
     if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName)) {
-      return equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
+      const hasFishingRod = equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
+      // Note: bait check would need inventory data here, but for UI purposes we assume if rod is equipped, bait requirement is handled by backend
+      return hasFishingRod;
     }
     
     // Animals - require weapons and knife

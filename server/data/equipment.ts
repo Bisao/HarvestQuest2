@@ -96,16 +96,6 @@ export function createEquipmentWithIds(): InsertEquipment[] {
       weight: 3,
     },
     {
-      id: EQUIPMENT_IDS.ISCA_PESCA,
-      name: "Isca para Pesca",
-      emoji: "🪱",
-      category: "tools",
-      effects: [{ type: "special_ability", target: "fishing", value: 1, description: "Necessária para pescar peixes" }],
-      slot: "tool",
-      toolType: "bait",
-      weight: 1,
-    },
-    {
       id: EQUIPMENT_IDS.CORDA,
       name: "Corda",
       emoji: "🪢",
@@ -125,7 +115,7 @@ export function createEquipmentWithIds(): InsertEquipment[] {
       toolType: "clay_pot",
       weight: 4,
     },
-    
+
     // Weapons
     {
       id: EQUIPMENT_IDS.ARCO_FLECHA,
@@ -157,7 +147,7 @@ export function createEquipmentWithIds(): InsertEquipment[] {
       toolType: "sword",
       weight: 4,
     },
-    
+
     // Armor
     {
       id: EQUIPMENT_IDS.CAPACETE_FERRO,
@@ -204,7 +194,7 @@ export function createEquipmentWithIds(): InsertEquipment[] {
       slot: "boots",
       weight: 1,
     },
-    
+
     // Storage/Utility
     {
       id: EQUIPMENT_IDS.MOCHILA,
