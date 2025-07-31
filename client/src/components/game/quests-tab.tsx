@@ -37,7 +37,7 @@ interface QuestsTabProps {
 
 export default function QuestsTab({ player }: QuestsTabProps) {
   const { toast } = useToast();
-  const [activeCategory, setActiveCategory] = useState<string>("active");
+  const [activeCategory, setActiveCategory] = useState<string>("available");
 
   const { data: quests = [], isLoading } = useQuery<Quest[]>({
     queryKey: [`/api/player/${player.id}/quests`],
@@ -236,17 +236,17 @@ export default function QuestsTab({ player }: QuestsTabProps) {
   const completedQuests = quests.filter(q => q.status === 'completed');
 
   const questCategories = {
-    active: {
-      label: "Missões Ativas",
-      emoji: "🔥",
-      quests: activeQuests,
-      color: "border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800"
-    },
     available: {
       label: "Missões Disponíveis",
       emoji: "✨",
       quests: availableQuests,
       color: ""
+    },
+    active: {
+      label: "Missões Ativas",
+      emoji: "🔥",
+      quests: activeQuests,
+      color: "border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800"
     },
     completed: {
       label: "Missões Completadas",
@@ -403,8 +403,6 @@ export default function QuestsTab({ player }: QuestsTabProps) {
       <div className="mb-6">
         <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
           {Object.entries(questCategories).map(([categoryKey, category]) => {
-            if (category.quests.length === 0) return null;
-            
             const isActive = activeCategory === categoryKey;
             
             return (
@@ -428,7 +426,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
         {/* Quest Content for Active Category */}
         <div className="bg-white border border-gray-300 border-t-0 rounded-b-lg p-6">
           {Object.entries(questCategories).map(([categoryKey, category]) => {
-            if (activeCategory !== categoryKey || category.quests.length === 0) return null;
+            if (activeCategory !== categoryKey) return null;
 
             return (
               <div key={categoryKey}>
@@ -447,7 +445,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
             );
           })}
 
-          {activeCategory && questCategories[activeCategory as keyof typeof questCategories]?.quests.length === 0 && (
+          {activeCategory && questCategories[activeCategory as keyof typeof questCategories] && questCategories[activeCategory as keyof typeof questCategories].quests.length === 0 && (
             <div className="text-center py-8">
               <div className="text-4xl mb-4">📋</div>
               <h3 className="text-lg font-semibold mb-2">
