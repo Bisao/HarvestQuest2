@@ -8,6 +8,7 @@ import QuestsTab from "@/components/game/quests-tab";
 import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
 import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
+import LoadingScreen from "@/components/game/loading-screen";
 
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
 import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
@@ -80,14 +81,7 @@ export default function Game() {
 
   // Loading state
   if (playerLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando jogador {playerUsername}...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Carregando Jogo..." subMessage={`Preparando aventura para ${playerUsername}`} />;
   }
 
   // Error state

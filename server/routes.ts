@@ -865,6 +865,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const { setupQuestRoutes } = await import("./routes/quest-routes");
   setupQuestRoutes(app, storage, questService, gameService);
 
+  // Player settings routes
+  app.patch("/api/player/:id/settings", async (req, res) => {
+    try {
+      const playerId = req.params.id;
+      const { autoStorage, autoCompleteQuests } = req.body;
+
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
+      const updates: Partial<Player> = {};
+      if (typeof autoStorage === 'boolean') {
+        updates.autoStorage = autoStorage;
+      }
+	  if (typeof autoCompleteQuests === 'boolean') {
+        updates.autoCompleteQuests = autoCompleteQuests;
+      }
+
+      const updatedPlayer = await storage.updatePlayer(playerId, updates);
+
+      res.json({ 
+        message: "Settings updated successfully",
+        player: updatedPlayer
+      });
+    } catch (error) {
+      console.error("Error updating player settings:", error);
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
+  // Save game endpoint
+  app.post("/api/player/:id/save", async (req, res) => {
+    try {
+      const playerId = req.params.id;
+
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
+      res.json({ 
+        message: "Game saved successfully"
+      });
+    } catch (error) {
+      console.error("Error saving game:", error);
+      res.status(500).json({ message: "Failed to save game" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

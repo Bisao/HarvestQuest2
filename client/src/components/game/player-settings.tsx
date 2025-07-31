@@ -4,8 +4,11 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
+import { useSaveGame } from "@/hooks/use-save-game";
 import type { Player } from "@shared/types";
-import { Settings, Archive } from "lucide-react";
+import { Settings, Archive, Home } from "lucide-react";
+import LoadingScreen from "./loading-screen";
 
 interface PlayerSettingsProps {
   player: Player;
@@ -16,8 +19,12 @@ interface PlayerSettingsProps {
 export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettingsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [autoStorage, setAutoStorage] = useState(player.autoStorage);
   const [autoCompleteQuests, setAutoCompleteQuests] = useState(player.autoCompleteQuests ?? true);
+  const [isNavigatingToMenu, setIsNavigatingToMenu] = useState(false);
+  
+  const saveGame = useSaveGame();
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (settings: { autoStorage?: boolean; autoCompleteQuests?: boolean }) => {
@@ -56,7 +63,29 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
     });
   };
 
+  const handleBackToMainMenu = async () => {
+    setIsNavigatingToMenu(true);
+    
+    try {
+      // Save the game first
+      await saveGame.mutateAsync(player.id);
+      
+      // Wait a bit for user to see the save confirmation
+      setTimeout(() => {
+        setLocation('/');
+      }, 1000);
+    } catch (error) {
+      setIsNavigatingToMenu(false);
+      // Error toast is handled by the useSaveGame hook
+    }
+  };
+
   if (!isOpen) return null;
+
+  // Show loading screen when navigating to main menu
+  if (isNavigatingToMenu) {
+    return <LoadingScreen message="Salvando e voltando ao menu..." subMessage="Aguarde um momento" />;
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -103,16 +132,28 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
 
         </div>
 
-        <div className="flex justify-end space-x-3 mt-6">
-          <Button variant="outline" onClick={onClose}>
-            Cancelar
-          </Button>
+        <div className="flex justify-between items-center mt-6">
           <Button 
-            onClick={handleSaveSettings}
-            disabled={updateSettingsMutation.isPending}
+            variant="outline" 
+            onClick={handleBackToMainMenu}
+            disabled={isNavigatingToMenu || saveGame.isPending}
+            className="flex items-center space-x-2"
           >
-            {updateSettingsMutation.isPending ? "Salvando..." : "Salvar"}
+            <Home className="w-4 h-4" />
+            <span>{isNavigatingToMenu ? "Salvando..." : "Menu Principal"}</span>
           </Button>
+          
+          <div className="flex space-x-3">
+            <Button variant="outline" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleSaveSettings}
+              disabled={updateSettingsMutation.isPending}
+            >
+              {updateSettingsMutation.isPending ? "Salvando..." : "Salvar"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
