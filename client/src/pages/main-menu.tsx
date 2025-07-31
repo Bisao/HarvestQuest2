@@ -365,7 +365,7 @@ export default function MainMenu() {
                           size="sm"
                           variant="destructive"
                           onClick={() => handleDeleteSave(save.id, save.username)}
-                          disabled={deleteSaveMutation.isLoading}
+                          disabled={deleteSaveMutation.isPending}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
