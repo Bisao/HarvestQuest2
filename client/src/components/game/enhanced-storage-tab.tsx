@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { StorageItem, Resource, Equipment, Player } from "@shared/types";
-import { isConsumable, getConsumableDescription } from "@shared/utils/consumable-utils";
+import { isConsumable, getConsumableDescription, getConsumableEffects } from "@shared/utils/consumable-utils";
 
 interface EnhancedStorageTabProps {
   playerId: string;
@@ -57,6 +57,17 @@ export default function EnhancedStorageTab({
     queryKey: ["/api/storage", playerId],
     refetchInterval: 1000, // Real-time updates every second
   });
+
+  // Helper function to get item data by ID
+  const getItemById = (id: string): (Resource | Equipment) | null => {
+    const resource = resources.find(r => r.id === id);
+    if (resource) return resource;
+    
+    const equipmentItem = equipment.find(e => e.id === id);
+    if (equipmentItem) return equipmentItem;
+    
+    return null;
+  };
 
   // Enhanced storage data with item information
   const enhancedStorageData = storageItems
@@ -111,7 +122,7 @@ export default function EnhancedStorageTab({
       }
       
       // Rarity filter (only for resources)
-      if (rarityFilter !== "all" && item.type === "resource" && (item.itemData as any).rarity !== rarityFilter) {
+      if (rarityFilter !== "all" && item.itemData.type === "resource" && (item.itemData as any).rarity !== rarityFilter) {
         return false;
       }
       
@@ -157,17 +168,36 @@ export default function EnhancedStorageTab({
   // Consume item mutation (for storage consumables)
   const consumeMutation = useMutation({
     mutationFn: async (resourceId: string) => {
-      return apiRequest("POST", "/api/player/" + playerId + "/consume", {
+      const storageItem = storageItems?.find(item => item.resourceId === resourceId);
+      if (!storageItem) throw new Error("Item não encontrado no armazém");
+      
+      const itemData = getItemById(resourceId);
+      if (!itemData) throw new Error("Dados do item não encontrados");
+      
+      const effects = getConsumableEffects(itemData);
+      
+      const response = await apiRequest("POST", "/api/player/" + playerId + "/consume", {
         itemId: resourceId,
-        quantity: 1
+        quantity: 1,
+        location: 'storage',
+        hungerRestore: effects.hungerRestore,
+        thirstRestore: effects.thirstRestore,
+        inventoryItemId: storageItem.id
       });
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      
+      const hungerGain = data.hungerRestored || 0;
+      const thirstGain = data.thirstRestored || 0;
+      
       toast({
         title: "Item consumido!",
-        description: "Seus status foram restaurados.",
+        description: hungerGain > 0 || thirstGain > 0 ? 
+          `Fome: +${hungerGain} | Sede: +${thirstGain}` :
+          "Item consumido com sucesso.",
       });
     },
     onError: (error: any) => {
@@ -182,9 +212,8 @@ export default function EnhancedStorageTab({
   // Consume water mutation
   const consumeWaterMutation = useMutation({
     mutationFn: async (amount: number) => {
-      return apiRequest(`/api/storage/${playerId}/consume-water`, {
-        method: "POST",
-        body: { amount }
+      return apiRequest("POST", `/api/player/${playerId}/consume-water`, {
+        quantity: amount
       });
     },
     onSuccess: () => {
