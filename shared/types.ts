@@ -13,6 +13,7 @@ export interface Player {
   inventoryWeight: number;
   maxInventoryWeight: number;
   autoStorage: boolean;
+  autoCompleteQuests?: boolean;
   craftedItemsDestination: 'inventory' | 'storage';
   waterStorage: number;
   maxWaterStorage: number;

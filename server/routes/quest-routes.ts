@@ -44,8 +44,8 @@ export function setupQuestRoutes(app: Express, storage: IStorage, questService: 
             if (playerQuest && playerQuest.status === 'active') {
               questProgress = await questService.checkQuestObjectives(playerId, quest.id);
               
-              // Auto-complete quest if all objectives are met
-              if (questProgress.completed && playerQuest.status === 'active') {
+              // Auto-complete quest if all objectives are met and auto-complete is enabled
+              if (questProgress.completed && playerQuest.status === 'active' && player.autoCompleteQuests !== false) {
                 console.log(`[QUEST AUTO-COMPLETE] Quest ${quest.name} completed for player ${playerId}`);
                 await questService.completeQuest(playerId, quest.id);
                 // Update playerQuest status
@@ -62,7 +62,7 @@ export function setupQuestRoutes(app: Express, storage: IStorage, questService: 
               playerQuest: playerQuest || null,
               status: playerQuest?.status || 'available',
               progress: questProgress.progress,
-              canComplete: questProgress.completed && playerQuest?.status === 'active'
+              canComplete: questProgress.completed && playerQuest?.status === 'active' && player.autoCompleteQuests === false
             };
           })
       );

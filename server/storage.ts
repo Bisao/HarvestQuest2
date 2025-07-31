@@ -55,7 +55,7 @@ export interface IStorage {
   addStorageItem(item: InsertStorageItem): Promise<StorageItem>;
   updateStorageItem(id: string, updates: Partial<StorageItem>): Promise<StorageItem>;
   removeStorageItem(id: string): Promise<void>;
-  
+
   // Water storage methods
   addWaterToPlayer(playerId: string, quantity: number): Promise<Player>;
   consumeWaterFromPlayer(playerId: string, quantity: number): Promise<Player>;
@@ -167,9 +167,10 @@ export class MemStorage implements IStorage {
       equippedBoots: null,
       equippedWeapon: null,
       equippedTool: null,
+      autoCompleteQuests: true,
     });
 
-    
+
   }
 
   // Player methods
@@ -208,6 +209,7 @@ export class MemStorage implements IStorage {
       equippedBoots: insertPlayer.equippedBoots || null,
       equippedWeapon: insertPlayer.equippedWeapon || null,
       equippedTool: insertPlayer.equippedTool || null,
+      autoCompleteQuests: insertPlayer.autoCompleteQuests ?? true,
     };
     this.players.set(id, player);
     return player;
@@ -240,32 +242,32 @@ export class MemStorage implements IStorage {
       emoji: insertResource.emoji,
       rarity: insertResource.rarity ?? 'common',
       experienceValue: insertResource.experienceValue ?? 1,
-      
+
       // Fundamental Attributes
       attributes: insertResource.attributes ?? { durability: 100, efficiency: 1.0, rarity: 'common', baseValue: insertResource.sellPrice ?? 1 },
-      
+
       // Resource Classification  
       category: insertResource.category ?? 'raw_materials',
       subcategory: insertResource.subcategory ?? 'basic',
-      
+
       // Spawn Properties
       spawnRate: insertResource.spawnRate ?? 0.5,
       yieldAmount: insertResource.yieldAmount ?? 1,
       requiredTool: insertResource.requiredTool,
-      
+
       // Economy
       sellPrice: insertResource.sellPrice ?? 1,
       buyPrice: insertResource.buyPrice ?? 2,
-      
+
       // Physical Properties
       weight: insertResource.weight ?? 1,
       stackable: insertResource.stackable ?? true,
       maxStackSize: insertResource.maxStackSize ?? 99,
-      
+
       // Effects & Tags
       effects: insertResource.effects ?? [],
       tags: insertResource.tags ?? [],
-      
+
       // Derived Properties (calculated from attributes)
       value: insertResource.sellPrice ?? 1,
     };
@@ -443,21 +445,21 @@ export class MemStorage implements IStorage {
       id,
       name: insertEquipment.name,
       emoji: insertEquipment.emoji,
-      
+
       // Fundamental Attributes
       attributes: insertEquipment.attributes ?? { durability: 100, efficiency: 1.0, rarity: 'common' },
-      
+
       // Equipment Classification
       category: insertEquipment.category,
       slot: insertEquipment.slot ?? 'tool',
       toolType: insertEquipment.toolType,
-      
+
       // Equipment Effects
       effects: insertEquipment.effects ?? [],
-      
+
       // Requirements to use
       requirements: insertEquipment.requirements ?? [],
-      
+
       // Derived Properties
       weight: insertEquipment.weight ?? 1,
       value: insertEquipment.value ?? 1,
@@ -486,15 +488,15 @@ export class MemStorage implements IStorage {
       category: insertRecipe.category ?? 'basic_materials',
       subcategory: insertRecipe.subcategory ?? '',
       difficulty: insertRecipe.difficulty ?? 'trivial',
-      
+
       // Requirements
       requiredSkills: insertRecipe.requiredSkills ?? [],
       requiredTools: insertRecipe.requiredTools ?? [],
-      
+
       // Recipe Data
       ingredients: insertRecipe.ingredients,
       outputs: insertRecipe.outputs,
-      
+
       // Process Information
       craftingTime: insertRecipe.craftingTime ?? 5,
       experienceGained: insertRecipe.experienceGained ?? 10,

@@ -17,9 +17,10 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [autoStorage, setAutoStorage] = useState(player.autoStorage);
+  const [autoCompleteQuests, setAutoCompleteQuests] = useState(player.autoCompleteQuests ?? true);
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async (settings: { autoStorage?: boolean }) => {
+    mutationFn: async (settings: { autoStorage?: boolean; autoCompleteQuests?: boolean }) => {
       const response = await fetch(`/api/player/${player.id}/settings`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -51,6 +52,7 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
   const handleSaveSettings = () => {
     updateSettingsMutation.mutate({
       autoStorage,
+      autoCompleteQuests,
     });
   };
 
@@ -80,6 +82,21 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
             <Switch
               checked={autoStorage}
               onCheckedChange={setAutoStorage}
+            />
+          </div>
+
+          {/* Auto Complete Quests Setting */}
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <span className="text-lg">📋</span>
+              <div>
+                <p className="font-medium text-gray-800">Completar Missões Automaticamente</p>
+                <p className="text-sm text-gray-600">Missões são completadas automaticamente quando objetivos são atingidos</p>
+              </div>
+            </div>
+            <Switch
+              checked={autoCompleteQuests}
+              onCheckedChange={setAutoCompleteQuests}
             />
           </div>
 

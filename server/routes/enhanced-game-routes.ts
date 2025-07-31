@@ -26,7 +26,7 @@ export function registerEnhancedGameRoutes(
   gameService: GameService,
   expeditionService: ExpeditionService
 ) {
-  
+
   // Enhanced player routes with validation and caching
   app.get("/api/v2/player/:username", 
     validateParams(usernameParamSchema),
@@ -34,17 +34,17 @@ export function registerEnhancedGameRoutes(
     async (req, res, next) => {
       try {
         const { username } = req.params;
-        
+
         const player = await cacheGetOrSet(
           `player:username:${username}`,
           () => storage.getPlayerByUsername(username),
           CACHE_TTL.PLAYER_DATA
         );
-        
+
         if (!player) {
           throw new NotFoundError("Player");
         }
-        
+
         successResponse(res, player);
       } catch (error) {
         next(error);
@@ -68,10 +68,10 @@ export function registerEnhancedGameRoutes(
         }
 
         const updatedPlayer = await storage.updatePlayer(playerId, updates);
-        
+
         // Invalidate player cache
         invalidatePlayerCache(playerId);
-        
+
         successResponse(res, updatedPlayer, "Settings updated successfully");
       } catch (error) {
         next(error);
@@ -93,17 +93,17 @@ export function registerEnhancedGameRoutes(
           cacheKey,
           async () => {
             const allResources = await storage.getAllResources();
-            
+
             if (!filters.success) return allResources;
-            
+
             // Apply filters
             return allResources.filter(resource => {
               const { type, rarity, category } = filters.data;
-              
+
               if (type && resource.type !== type) return false;
               if (rarity && resource.rarity !== rarity) return false;
               // Add category filtering logic if needed
-              
+
               return true;
             });
           },
@@ -150,10 +150,10 @@ export function registerEnhancedGameRoutes(
 
         // Check and consume ingredients from storage
         const playerStorage = await storage.getPlayerStorage(playerId);
-        
+
         // Handle recipe ingredients - check if it's array or object format
         let ingredients: Record<string, number> = {};
-        
+
         if (Array.isArray(recipe.ingredients)) {
           // Convert array format to object format
           for (const ingredient of recipe.ingredients) {
@@ -164,11 +164,11 @@ export function registerEnhancedGameRoutes(
         } else {
           throw new InvalidOperationError(`Recipe ${recipe.name} has no valid ingredients defined`);
         }
-        
+
         for (const [ingredientId, requiredAmount] of Object.entries(ingredients)) {
           const totalRequired = requiredAmount * quantity;
           const available = playerStorage.find(item => item.resourceId === ingredientId)?.quantity || 0;
-          
+
           if (available < totalRequired) {
             const resource = await storage.getResource(ingredientId);
             throw new InsufficientResourcesError(
@@ -181,7 +181,7 @@ export function registerEnhancedGameRoutes(
         for (const [ingredientId, requiredAmount] of Object.entries(ingredients)) {
           const totalRequired = requiredAmount * quantity;
           const storageItem = playerStorage.find(item => item.resourceId === ingredientId);
-          
+
           if (storageItem) {
             await storage.updateStorageItem(storageItem.id, {
               quantity: storageItem.quantity - totalRequired
@@ -191,14 +191,14 @@ export function registerEnhancedGameRoutes(
 
         // Handle special crafting: Water Tank Unlock
         const isBarrelCrafting = recipe.id === RECIPE_IDS.BARRIL_IMPROVISADO;
-        
+
         if (isBarrelCrafting) {
           // Instead of adding barrel to inventory/storage, unlock a water tank
           const updatedPlayer = await storage.updatePlayer(playerId, {
             waterTanks: player.waterTanks + quantity, // Each barrel crafted unlocks one tank
             maxWaterStorage: player.maxWaterStorage + (50 * quantity) // Each barrel adds 50 capacity
           });
-          
+
           return res.json({
             message: `${quantity} Barril(s) criado(s) com sucesso! ${quantity} novo(s) tanque(s) de água desbloqueado(s). Capacidade total: ${updatedPlayer.maxWaterStorage} unidades.`,
             player: updatedPlayer,
@@ -206,11 +206,11 @@ export function registerEnhancedGameRoutes(
             barrelsCrafted: quantity
           });
         }
-        
+
         // Add crafted items to storage (always storage as per requirement)
         let outputs: Record<string, number> = {};
         const items = [];
-        
+
         if (!isBarrelCrafting) {
           // Handle recipe outputs - check if it's array or object format
           if (Array.isArray(recipe.outputs)) {
@@ -223,25 +223,25 @@ export function registerEnhancedGameRoutes(
           } else {
             throw new InvalidOperationError(`Recipe ${recipe.name} has no valid outputs defined`);
           }
-          
+
           for (const [itemId, baseAmount] of Object.entries(outputs)) {
             const totalAmount = baseAmount * quantity;
-            
+
             // Always add to storage (items craftados sempre vão para o armazém)
             // Check if this is equipment or resource
             const allResources = await storage.getAllResources();
             const allEquipment = await storage.getAllEquipment();
-            
+
             const isResource = allResources.some(r => r.id === itemId);
             const isEquipment = allEquipment.some(eq => eq.id === itemId);
             const itemType = isEquipment ? 'equipment' : 'resource';
-            
+
             // Refresh player storage to get current state
             const currentStorage = await storage.getPlayerStorage(playerId);
             const existingItem = currentStorage.find(item => 
               item.resourceId === itemId && item.itemType === itemType
             );
-            
+
             if (existingItem) {
               await storage.updateStorageItem(existingItem.id, {
                 quantity: existingItem.quantity + totalAmount
@@ -255,13 +255,13 @@ export function registerEnhancedGameRoutes(
                 itemType
               });
             }
-            
+
             // Log for debugging
             const itemName = isResource 
               ? allResources.find(r => r.id === itemId)?.name 
               : allEquipment.find(e => e.id === itemId)?.name;
             console.log(`DEBUG: Crafted ${totalAmount}x ${itemName} (${itemType}) with ID ${itemId} added to storage for player ${playerId}`);
-            
+
             items.push({ itemId, quantity: totalAmount });
           }
         }
@@ -270,22 +270,22 @@ export function registerEnhancedGameRoutes(
         // CRITICAL FIX: Multiply quest progress by quantity to count all crafted items
         const activeQuests = await storage.getPlayerQuests(playerId);
         const activePlayerQuests = activeQuests.filter(pq => pq.status === 'active');
-        
+
         for (const [craftedItemId, craftedAmount] of Object.entries(outputs || {})) {
           const totalCraftedAmount = (craftedAmount as number) * quantity; // This is the total amount crafted
-          
+
           for (const playerQuest of activePlayerQuests) {
             const quest = await storage.getQuest(playerQuest.questId);
             if (quest && quest.type === 'craft') {
               const objectives = quest.objectives as any[];
-              
+
               for (const objective of objectives) {
                 if (objective.type === 'craft' && objective.itemId === craftedItemId) {
                   const currentProgress = (playerQuest.progress as any)?.[objective.itemId] || 0;
                   const newProgress = Math.min(currentProgress + totalCraftedAmount, objective.quantity);
-                  
+
                   console.log(`Quest progress update: ${objective.itemId} from ${currentProgress} to ${newProgress} (added ${totalCraftedAmount})`);
-                  
+
                   await storage.updatePlayerQuest(playerQuest.id, {
                     progress: {
                       ...playerQuest.progress as any,
@@ -390,12 +390,12 @@ export function registerEnhancedGameRoutes(
         // Check item availability in inventory or storage
         const inventoryItems = await storage.getPlayerInventory(playerId);
         const storageItems = await storage.getPlayerStorage(playerId);
-        
+
         const inventoryItem = inventoryItems.find(item => item.resourceId === itemId);
         const storageItem = storageItems.find(item => item.resourceId === itemId);
-        
+
         const totalAvailable = (inventoryItem?.quantity || 0) + (storageItem?.quantity || 0);
-        
+
         if (totalAvailable < quantity) {
           throw new InsufficientResourcesError("item");
         }
@@ -419,7 +419,7 @@ export function registerEnhancedGameRoutes(
 
         // Consume items (priority: inventory first, then storage)
         let remainingToConsume = quantity;
-        
+
         if (inventoryItem && remainingToConsume > 0) {
           const fromInventory = Math.min(inventoryItem.quantity, remainingToConsume);
           await storage.updateInventoryItem(inventoryItem.id, {
@@ -427,7 +427,7 @@ export function registerEnhancedGameRoutes(
           });
           remainingToConsume -= fromInventory;
         }
-        
+
         if (storageItem && remainingToConsume > 0) {
           await storage.updateStorageItem(storageItem.id, {
             quantity: storageItem.quantity - remainingToConsume
@@ -437,11 +437,11 @@ export function registerEnhancedGameRoutes(
         // Apply consumption effects (simplified)
         const updates: any = {};
         const itemName = resource.name.toLowerCase();
-        
+
         if (itemName.includes('água') || itemName.includes('suco')) {
           updates.thirst = Math.min(player.maxThirst, player.thirst + (10 * quantity));
         }
-        
+
         if (itemName.includes('carne') || itemName.includes('peixe') || itemName.includes('cogumelo')) {
           updates.hunger = Math.min(player.maxHunger, player.hunger + (15 * quantity));
         }
@@ -464,4 +464,22 @@ export function registerEnhancedGameRoutes(
       }
     }
   );
+    // Update player settings
+  app.patch("/api/player/:playerId/settings", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const { autoStorage, autoCompleteQuests } = req.body;
+
+      const updateData: any = {};
+      if (autoStorage !== undefined) updateData.autoStorage = autoStorage;
+      if (autoCompleteQuests !== undefined) updateData.autoCompleteQuests = autoCompleteQuests;
+
+      const updatedPlayer = await storage.updatePlayer(playerId, updateData);
+
+      res.json(updatedPlayer);
+    } catch (error) {
+      console.error("Update player settings error:", error);
+      res.status(500).json({ message: "Failed to update player settings" });
+    }
+  });
 }
