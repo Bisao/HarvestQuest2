@@ -56,7 +56,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           maxThirst: 100,
           coins: 0,
           inventoryWeight: 0,
-          maxInventoryWeight: 50,
+          maxInventoryWeight: 50000, // 50kg = 50,000g
           autoStorage: false,
           craftedItemsDestination: "inventory" as const,
           waterStorage: 0,
@@ -72,6 +72,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         player = await storage.createPlayer(newPlayer);
         // Created new player successfully
       }
+      
+      // Disable HTTP caching for player data to ensure real-time updates
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
       
       res.json(player);
     } catch (error) {
