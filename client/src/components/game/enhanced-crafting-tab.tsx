@@ -271,7 +271,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     return (
       <div
         key={recipe.id}
-        className={`recipe-card bg-white border-2 rounded-xl p-6 hover:shadow-lg transition-all ${
+        className={`recipe-card bg-white border-2 rounded-xl p-3 sm:p-6 hover:shadow-lg transition-all ${
           canCraft 
             ? "border-green-200 hover:border-green-300" 
             : unlocked 
@@ -378,7 +378,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
       {/* Horizontal Category Tabs */}
       <div className="mb-6">
-        <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
+        <div className="flex flex-wrap gap-1 sm:gap-2 mb-6 border-b border-gray-200 overflow-x-auto">
           {Object.entries(categorizedRecipes).map(([categoryName, categoryRecipes]) => {
             if (categoryRecipes.length === 0) return null;
             
@@ -388,21 +388,28 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
               <button
                 key={categoryName}
                 onClick={() => toggleCategory(categoryName)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 sm:py-3 rounded-t-lg font-medium transition-all whitespace-nowrap flex-shrink-0 text-xs sm:text-sm ${
                   isActive 
                     ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
                     : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
                 }`}
               >
-                <span className="text-lg">
+                <span className="text-sm sm:text-lg">
                   {categoryName === "Materiais" && "🧵"}
                   {categoryName === "Ferramentas" && "🔧"}
                   {categoryName === "Armas" && "⚔️"}
                   {categoryName === "Utensílios" && "🍳"}
                   {categoryName === "Comidas" && "🍽️"}
                 </span>
-                <span>{categoryName}</span>
-                <span className="text-sm text-gray-500">({categoryRecipes.length})</span>
+                <span className="hidden sm:inline">{categoryName}</span>
+                <span className="sm:hidden">{
+                  categoryName === "Materiais" ? "Mat." :
+                  categoryName === "Ferramentas" ? "Ferr." :
+                  categoryName === "Armas" ? "Arm." :
+                  categoryName === "Utensílios" ? "Uten." :
+                  "Com."
+                }</span>
+                <span className="text-xs text-gray-500">({categoryRecipes.length})</span>
               </button>
             );
           })}
@@ -413,7 +420,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
           if (categoryRecipes.length === 0 || !expandedCategories[categoryName]) return null;
 
           return (
-            <div key={categoryName} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div key={categoryName} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
               {categoryRecipes.map(renderRecipeCard)}
             </div>
           );

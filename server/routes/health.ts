@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { gameCache } from "../cache/memory-cache";
-import { storage } from "../storage-memory";
+import { storage } from "../storage";
 
 export function registerHealthRoutes(app: Express) {
   // Health check endpoint

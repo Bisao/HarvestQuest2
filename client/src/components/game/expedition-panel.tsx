@@ -230,6 +230,7 @@ export default function ExpeditionPanel({
           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">
             {biome?.name}
           </span>
+          <span className="text-lg">{biome?.emoji}</span>
           <Button
             onClick={() => {
               setIsAutoRepeat(!isAutoRepeat);

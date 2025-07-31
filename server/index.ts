@@ -55,10 +55,6 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize in-memory storage
-  const { storage } = await import("./storage-memory");
-  await storage.initializeGameData();
-  
   const server = await registerRoutes(app);
 
   // Use the centralized error handler

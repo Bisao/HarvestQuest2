@@ -1,6 +1,6 @@
 // Routes for save game management
 import { Router } from "express";
-import { storage } from "../storage-memory";
+import { storage } from "../storage";
 
 const router = Router();
 

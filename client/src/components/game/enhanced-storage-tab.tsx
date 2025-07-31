@@ -6,8 +6,10 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { StorageItem, Resource, Equipment, Player } from "@shared/types";
+import { isConsumable, getConsumableDescription } from "@shared/utils/consumable-utils";
 
 interface EnhancedStorageTabProps {
   playerId: string;
@@ -151,6 +153,31 @@ export default function EnhancedStorageTab({
       });
     }
   };
+
+  // Consume item mutation (for storage consumables)
+  const consumeMutation = useMutation({
+    mutationFn: async (resourceId: string) => {
+      return apiRequest("POST", "/api/player/" + playerId + "/consume", {
+        itemId: resourceId,
+        quantity: 1
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      toast({
+        title: "Item consumido!",
+        description: "Seus status foram restaurados.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao consumir item",
+        description: error.message || "Tente novamente.",
+        variant: "destructive"
+      });
+    }
+  });
 
   // Consume water mutation
   const consumeWaterMutation = useMutation({
@@ -353,45 +380,45 @@ export default function EnhancedStorageTab({
           )}
 
           {/* Storage Items Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {filteredStorageData.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all duration-200"
+                  className="bg-white border border-gray-200 rounded-xl p-3 sm:p-5 hover:shadow-lg transition-all duration-200"
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-4xl">{item.itemData.emoji}</span>
-                      <div>
-                        <h4 className="font-bold text-gray-800">{item.itemData.name}</h4>
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                      <span className="text-2xl sm:text-4xl flex-shrink-0">{item.itemData.emoji}</span>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-bold text-gray-800 text-sm sm:text-base truncate">{item.itemData.name}</h4>
                         <div className="flex items-center space-x-2">
-                          <span className={`text-sm font-medium ${getTypeColor(item.itemData.type)}`}>
-                            {item.itemData.type === 'equipment' ? 'Equipamento' : 'Recurso'}
+                          <span className={`text-xs sm:text-sm font-medium ${getTypeColor(item.itemData.type)}`}>
+                            {item.itemData.type === 'equipment' ? 'Equip.' : 'Recurso'}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className={`text-3xl font-bold ${getTypeColor(item.itemData.type)}`}>
+                    <div className="text-right flex-shrink-0">
+                      <div className={`text-xl sm:text-3xl font-bold ${getTypeColor(item.itemData.type)}`}>
                         {item.quantity}
                       </div>
-                      <div className="text-xs text-gray-500">unidades</div>
+                      <div className="text-xs text-gray-500">unid.</div>
                     </div>
                   </div>
 
                   {/* Item Details */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Peso unitário:</span>
+                  <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-gray-600">Peso unit.:</span>
                       <span className="font-semibold">
                         {item.itemData.weight >= 1000 ? `${(item.itemData.weight / 1000).toFixed(1)}kg` : `${item.itemData.weight}g`}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Valor unitário:</span>
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-gray-600">Valor unit.:</span>
                       <span className="font-semibold text-green-600">{item.itemData.value} 💰</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-gray-600">Peso total:</span>
                       <span className="font-semibold">
                         {(() => {
@@ -403,24 +430,45 @@ export default function EnhancedStorageTab({
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setWithdrawDialog({ 
-                        open: true, 
-                        item, 
-                        amount: Math.min(1, item.quantity) 
-                      })}
-                      disabled={isBlocked}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
-                    >
-                      {item.itemData.type === 'equipment' ? '⚔️ Equipar' : '📦 Retirar'}
-                    </button>
-                    <button
-                      disabled={isBlocked}
-                      className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
-                    >
-                      💰 Vender
-                    </button>
+                  <div className="space-y-2">
+                    {/* First Row - Main Actions */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setWithdrawDialog({ 
+                          open: true, 
+                          item, 
+                          amount: Math.min(1, item.quantity) 
+                        })}
+                        disabled={isBlocked}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-2 sm:px-3 rounded-lg transition-colors text-xs sm:text-sm"
+                      >
+                        {item.itemData.type === 'equipment' ? '⚔️ Equipar' : '📦 Retirar'}
+                      </button>
+                      <button
+                        disabled={isBlocked}
+                        className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-2 sm:px-3 rounded-lg transition-colors text-xs sm:text-sm"
+                      >
+                        💰 Vender
+                      </button>
+                    </div>
+
+                    {/* Second Row - Consume Button (if consumable) */}
+                    {isConsumable(item.itemData) && (
+                      <div className="space-y-1">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => consumeMutation.mutate(item.resourceId)}
+                          disabled={consumeMutation.isPending || isBlocked}
+                          className="bg-orange-600 hover:bg-orange-700 w-full"
+                        >
+                          {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
+                        </Button>
+                        <p className="text-xs text-gray-600 text-center">
+                          {getConsumableDescription(item.itemData)}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Item Value Display */}

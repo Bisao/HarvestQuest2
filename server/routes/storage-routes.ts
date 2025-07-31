@@ -2,7 +2,7 @@
 // Unified storage management with proper error handling and validation
 
 import type { Express } from "express";
-import type { IStorage } from "../storage-memory";
+import type { IStorage } from "../storage";
 import { StorageService } from "../services/storage-service";
 
 export function registerStorageRoutes(app: Express, storage: IStorage) {

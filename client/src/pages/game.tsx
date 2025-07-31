@@ -8,7 +8,7 @@ import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
-import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/schema";
+import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
 
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
@@ -85,28 +85,29 @@ export default function Game() {
       {/* Game Header */}
       <GameHeader player={player} />
 
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 max-w-7xl">
         {/* Tab Navigation */}
-        <div className="bg-white rounded-lg shadow-lg mb-6">
-          <div className="flex border-b">
+        <div className="bg-white rounded-lg shadow-lg mb-4 sm:mb-6">
+          <div className="flex border-b overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                className={`flex-shrink-0 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? "bg-blue-50 text-blue-700 border-b-2 border-blue-500"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
-                <span className="mr-2">{tab.emoji}</span>
-                {tab.label}
+                <span className="mr-1 sm:mr-2">{tab.emoji}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.slice(0, 3)}</span>
               </button>
             ))}
           </div>
 
           {/* Tab Content */}
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
             {activeTab === "biomes" && (
               <BiomesTab
                 biomes={biomes}
