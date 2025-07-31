@@ -8,7 +8,7 @@ import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
-import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
+import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/schema";
 
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");

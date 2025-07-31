@@ -55,6 +55,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize database
+  const { storage } = await import("./storage");
+  await storage.initializeGameData();
+  
   const server = await registerRoutes(app);
 
   // Use the centralized error handler
