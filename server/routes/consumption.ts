@@ -14,16 +14,9 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       // Get quantity from request, default to 1
       const quantity = parseInt(req.body.quantity) || 1;
 
-      // Import validation from shared utils
-      const { isValidGameId } = await import('../../shared/utils/id-validation');
-
-      // Validate input with centralized ID system
+      // Validate input
       if (!itemId || !location || typeof hungerRestore !== 'number' || typeof thirstRestore !== 'number') {
         return res.status(400).json({ error: 'Missing required fields or invalid types' });
-      }
-
-      if (!isValidGameId(itemId)) {
-        return res.status(400).json({ error: 'Invalid item ID format' });
       }
 
       if (quantity <= 0) {
