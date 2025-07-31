@@ -34,7 +34,8 @@ export default function StatusTab({ player }: StatusTabProps) {
       max: null,
       emoji: "⭐",
       description: `XP: ${player.experience}`,
-      color: "bg-purple-500"
+      color: "bg-purple-500",
+      showProgress: false
     },
     {
       title: "Fome",
@@ -42,7 +43,8 @@ export default function StatusTab({ player }: StatusTabProps) {
       max: 100,
       emoji: "🍖",
       description: `${player.hunger}/100`,
-      color: getProgressColor(player.hunger, 100, 'warning')
+      color: getProgressColor(player.hunger, 100, 'warning'),
+      showProgress: true
     },
     {
       title: "Sede",
@@ -50,9 +52,21 @@ export default function StatusTab({ player }: StatusTabProps) {
       max: 100,
       emoji: "💧",
       description: `${player.thirst}/100`,
-      color: getProgressColor(player.thirst, 100, 'warning')
+      color: getProgressColor(player.thirst, 100, 'warning'),
+      showProgress: true
     },
   ];
+
+  // XP progress calculation (assuming level progression)
+  const getXPProgress = () => {
+    const baseXP = 100; // XP needed for level 1
+    const xpForCurrentLevel = baseXP * player.level;
+    const xpForNextLevel = baseXP * (player.level + 1);
+    const currentLevelXP = player.experience - (baseXP * (player.level - 1));
+    const neededXP = xpForNextLevel - (baseXP * player.level);
+    
+    return Math.min((currentLevelXP / neededXP) * 100, 100);
+  };
 
   const inventoryStats = [
     {
@@ -81,7 +95,25 @@ export default function StatusTab({ player }: StatusTabProps) {
               <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg">{stat.emoji}</span>
+                    <div className="flex flex-col items-center">
+                      <span className="text-lg">{stat.emoji}</span>
+                      {stat.showProgress && (
+                        <div className="w-6 mt-1">
+                          <Progress 
+                            value={(stat.value / stat.max) * 100} 
+                            className="h-1"
+                          />
+                        </div>
+                      )}
+                      {stat.title === "Nível" && (
+                        <div className="w-6 mt-1">
+                          <Progress 
+                            value={getXPProgress()} 
+                            className="h-1"
+                          />
+                        </div>
+                      )}
+                    </div>
                     <span className="font-medium">{stat.title}</span>
                   </div>
                   <Badge variant="secondary">
