@@ -107,6 +107,34 @@
         "equippedTool": null,
         "autoCompleteQuests": true
       }
+    ],
+    [
+      "c66641cb-afd9-4de4-850f-cad0ca56d473",
+      {
+        "id": "c66641cb-afd9-4de4-850f-cad0ca56d473",
+        "username": "Bisao",
+        "level": 1,
+        "experience": 16,
+        "hunger": 85,
+        "maxHunger": 100,
+        "thirst": 90,
+        "maxThirst": 100,
+        "coins": 100,
+        "inventoryWeight": 0,
+        "maxInventoryWeight": 50000,
+        "autoStorage": true,
+        "craftedItemsDestination": "storage",
+        "waterStorage": 0,
+        "maxWaterStorage": 500,
+        "waterTanks": 0,
+        "equippedHelmet": null,
+        "equippedChestplate": null,
+        "equippedLeggings": null,
+        "equippedBoots": null,
+        "equippedWeapon": null,
+        "equippedTool": null,
+        "autoCompleteQuests": false
+      }
     ]
   ],
   "inventoryItems": [
@@ -156,7 +184,58 @@
       }
     ]
   ],
-  "storageItems": [],
+  "storageItems": [
+    [
+      "c3f53bf0-0f85-4bdb-a236-a10a6fc2e1de",
+      {
+        "id": "c3f53bf0-0f85-4bdb-a236-a10a6fc2e1de",
+        "playerId": "c66641cb-afd9-4de4-850f-cad0ca56d473",
+        "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+        "quantity": 2,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "6440babe-a69c-447d-aa3b-32b57461f6c3",
+      {
+        "id": "6440babe-a69c-447d-aa3b-32b57461f6c3",
+        "playerId": "c66641cb-afd9-4de4-850f-cad0ca56d473",
+        "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+        "quantity": 4,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "46d99679-7f81-4291-bccb-7b4ad4af538f",
+      {
+        "id": "46d99679-7f81-4291-bccb-7b4ad4af538f",
+        "playerId": "c66641cb-afd9-4de4-850f-cad0ca56d473",
+        "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+        "quantity": 5,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "17ee1940-6cd0-4b3a-bafd-170da782e791",
+      {
+        "id": "17ee1940-6cd0-4b3a-bafd-170da782e791",
+        "playerId": "c66641cb-afd9-4de4-850f-cad0ca56d473",
+        "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+        "quantity": 2,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "6496057c-4314-41ca-8f8f-71fedf097449",
+      {
+        "id": "6496057c-4314-41ca-8f8f-71fedf097449",
+        "playerId": "c66641cb-afd9-4de4-850f-cad0ca56d473",
+        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+        "quantity": 1,
+        "itemType": "resource"
+      }
+    ]
+  ],
   "expeditions": [
     [
       "8ce8841f-80c8-4ac8-b792-7ca6ec5f7dc8",
@@ -182,6 +261,33 @@
         },
         "startTime": 1753998428441,
         "endTime": 1753998494,
+        "progress": 100
+      }
+    ],
+    [
+      "5472b6c4-0b8f-4084-8802-da2e81d7da08",
+      {
+        "id": "5472b6c4-0b8f-4084-8802-da2e81d7da08",
+        "playerId": "c66641cb-afd9-4de4-850f-cad0ca56d473",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "completed",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 2,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 4,
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 5,
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 2,
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 1
+        },
+        "startTime": 1753998750426,
+        "endTime": 1753998815,
         "progress": 100
       }
     ]
