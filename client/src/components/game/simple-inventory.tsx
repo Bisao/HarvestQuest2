@@ -128,10 +128,15 @@ export default function SimpleInventory({
       });
       return response.json();
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+    onSuccess: async (data) => {
+      // Force immediate cache invalidation
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Force immediate refetch of player data
+      await queryClient.refetchQueries({ queryKey: ["/api/player/Player1"] });
+      
       setSelectedItem(null);
       toast({
         title: "Item consumido!",

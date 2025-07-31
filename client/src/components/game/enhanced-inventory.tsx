@@ -213,16 +213,21 @@ export default function EnhancedInventory({
       });
       return response.json();
     },
-    onSuccess: (data) => {
-      // Real-time updates for all player data after consuming
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId, "weight"] });
+    onSuccess: async (data) => {
+      // Force immediate cache invalidation and refetch
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      
+      // Force immediate refetch of player data
+      await queryClient.refetchQueries({ queryKey: ["/api/player/Player1"] });
+      
       setSelectedItem(null);
       toast({
         title: "Item consumido!",
-        description: `Fome: +${data.hungerRestored} | Sede: +${data.thirstRestored}`,
+        description: data.hungerRestored || data.thirstRestored ? 
+          `Fome: +${data.hungerRestored || 0} | Sede: +${data.thirstRestored || 0}` :
+          "Item foi consumido com sucesso.",
       });
     },
     onError: (error: any) => {

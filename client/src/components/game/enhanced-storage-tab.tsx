@@ -108,8 +108,8 @@ export default function EnhancedStorageTab({
         return false;
       }
       
-      // Rarity filter
-      if (rarityFilter !== "all" && item.itemData.rarity !== rarityFilter) {
+      // Rarity filter (only for resources)
+      if (rarityFilter !== "all" && item.type === "resource" && (item.itemData as any).rarity !== rarityFilter) {
         return false;
       }
       
