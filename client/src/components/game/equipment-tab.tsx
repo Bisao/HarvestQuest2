@@ -196,7 +196,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                       <div className="font-medium text-xs">{name}</div>
                       
                       {equippedItem ? (
-                        <div className="text-xs text-green-700">Equipado</div>
+                        <div className="text-lg">{equippedItem.emoji}</div>
                       ) : (
                         <div className="text-xs text-gray-500">
                           {isDisabled ? "Em Breve" : "Clique para equipar"}
