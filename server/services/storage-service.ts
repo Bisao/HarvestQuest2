@@ -1,7 +1,7 @@
 // Enhanced Storage Service - Clean, unified storage management
 // Handles all storage operations with real-time synchronization
 
-import type { IStorage } from "../storage";
+import type { IStorage } from "../storage-memory";
 import type { StorageItem, Resource, Equipment, Player } from "@shared/types";
 
 export class StorageService {

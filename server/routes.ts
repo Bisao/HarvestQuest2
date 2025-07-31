@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage-memory";
 import { insertExpeditionSchema, updatePlayerSchema } from "@shared/types";
 import { z } from "zod";
 import type { Player } from "@shared/types";
@@ -35,8 +35,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register enhanced storage routes
   registerStorageRoutes(app, storage);
 
-  // Register consumption routes
-  app.use('/api', createConsumptionRoutes(storage));
+  // Register consumption routes (disabled - using main routes consumption endpoint)
+  // app.use('/api', createConsumptionRoutes(storage));
 
   // Get player data - create default player if not found
   app.get("/api/player/:username", async (req, res) => {

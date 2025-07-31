@@ -1,5 +1,5 @@
 // Refactored Expedition Service - Clean, modular and optimized
-import type { IStorage } from "../storage";
+import type { IStorage } from "../storage-memory";
 import type { Player, Expedition, Resource, Equipment } from "@shared/types";
 import { GameService } from "./game-service";
 import { QuestService } from "./quest-service";

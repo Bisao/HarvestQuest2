@@ -1,4 +1,4 @@
-import type { IStorage } from "../storage";
+import type { IStorage } from "../storage-memory";
 
 export class QuestService {
   constructor(private storage: IStorage) {}

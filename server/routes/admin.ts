@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import { storage } from "../storage";
+import { storage } from "../storage-memory";
 import { gameCache } from "../cache/memory-cache";
 import { successResponse, errorResponse } from "../utils/response-helpers";
 

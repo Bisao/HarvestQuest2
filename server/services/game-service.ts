@@ -1,5 +1,5 @@
 // Game service for business logic
-import type { IStorage } from "../storage";
+import type { IStorage } from "../storage-memory";
 import type { Player, Resource, Equipment, InventoryItem, StorageItem } from "@shared/types";
 
 export class GameService {

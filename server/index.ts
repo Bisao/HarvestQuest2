@@ -55,8 +55,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database
-  const { storage } = await import("./storage");
+  // Initialize in-memory storage
+  const { storage } = await import("./storage-memory");
   await storage.initializeGameData();
   
   const server = await registerRoutes(app);

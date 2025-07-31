@@ -9,7 +9,7 @@ export function createResourcesWithIds(): InsertResource[] {
     { id: RESOURCE_IDS.PEDRA, name: "Pedra", emoji: "🪨", weight: 3, sellPrice: 3, buyPrice: 6, type: "basic", rarity: "common", requiredTool: "pickaxe", experienceValue: 2 },
     { id: RESOURCE_IDS.PEDRAS_SOLTAS, name: "Pedras Soltas", emoji: "🗿", weight: 1, sellPrice: 1, buyPrice: 2, type: "basic", rarity: "common", experienceValue: 1 },
     { id: RESOURCE_IDS.GRAVETOS, name: "Gravetos", emoji: "🪵", weight: 2, sellPrice: 2, buyPrice: 4, type: "basic", rarity: "common", experienceValue: 1 },
-    { id: RESOURCE_IDS.AGUA_FRESCA, name: "Água Fresca", emoji: "💧", weight: 1, sellPrice: 1, buyPrice: 2, type: "basic", rarity: "common", requiredTool: "bucket", experienceValue: 1 },
+    { id: RESOURCE_IDS.AGUA_FRESCA, name: "Água Fresca", emoji: "💧", weight: 1, sellPrice: 1, buyPrice: 2, type: "basic", rarity: "common", requiredTool: "bucket", experienceValue: 1, hunger_restore: 0, thirst_restore: 10 },
     { id: RESOURCE_IDS.BAMBU, name: "Bambu", emoji: "🎋", weight: 2, sellPrice: 4, buyPrice: 8, type: "basic", rarity: "common", requiredTool: "axe", experienceValue: 2 },
     { id: RESOURCE_IDS.MADEIRA, name: "Madeira", emoji: "🪵", weight: 3, sellPrice: 5, buyPrice: 10, type: "basic", rarity: "common", requiredTool: "axe", experienceValue: 6 },
     { id: RESOURCE_IDS.ARGILA, name: "Argila", emoji: "🧱", weight: 2, sellPrice: 3, buyPrice: 6, type: "basic", rarity: "common", experienceValue: 2 },
@@ -27,8 +27,8 @@ export function createResourcesWithIds(): InsertResource[] {
     { id: RESOURCE_IDS.PEIXE_PEQUENO, name: "Peixe Pequeno", emoji: "🐟", weight: 1, sellPrice: 8, buyPrice: 16, type: "unique", rarity: "common", requiredTool: "fishing_rod", experienceValue: 2 },
     { id: RESOURCE_IDS.PEIXE_GRANDE, name: "Peixe Grande", emoji: "🐠", weight: 3, sellPrice: 18, buyPrice: 36, type: "unique", rarity: "uncommon", requiredTool: "fishing_rod", experienceValue: 4 },
     { id: RESOURCE_IDS.SALMAO, name: "Salmão", emoji: "🍣", weight: 4, sellPrice: 25, buyPrice: 50, type: "unique", rarity: "rare", requiredTool: "fishing_rod", experienceValue: 6 },
-    { id: RESOURCE_IDS.COGUMELOS, name: "Cogumelos", emoji: "🍄", weight: 1, sellPrice: 6, buyPrice: 12, type: "unique", rarity: "common", experienceValue: 2 },
-    { id: RESOURCE_IDS.FRUTAS_SILVESTRES, name: "Frutas Silvestres", emoji: "🫐", weight: 1, sellPrice: 4, buyPrice: 8, type: "unique", rarity: "common", experienceValue: 1 },
+    { id: RESOURCE_IDS.COGUMELOS, name: "Cogumelos", emoji: "🍄", weight: 1, sellPrice: 6, buyPrice: 12, type: "unique", rarity: "common", experienceValue: 2, hunger_restore: 2, thirst_restore: 0 },
+    { id: RESOURCE_IDS.FRUTAS_SILVESTRES, name: "Frutas Silvestres", emoji: "🫐", weight: 1, sellPrice: 4, buyPrice: 8, type: "unique", rarity: "common", experienceValue: 1, hunger_restore: 1, thirst_restore: 2 },
     
     // Unique resources
     { id: RESOURCE_IDS.MADEIRA_FLORESTA, name: "Madeira", emoji: "🌳", weight: 5, sellPrice: 8, buyPrice: 16, type: "unique", rarity: "common", requiredTool: "axe", experienceValue: 3 },
@@ -36,12 +36,12 @@ export function createResourcesWithIds(): InsertResource[] {
     { id: RESOURCE_IDS.CRISTAIS, name: "Cristais", emoji: "💎", weight: 1, sellPrice: 20, buyPrice: 40, type: "unique", rarity: "rare", requiredTool: "pickaxe", experienceValue: 10 },
     { id: RESOURCE_IDS.CONCHAS, name: "Conchas", emoji: "🐚", weight: 1, sellPrice: 12, buyPrice: 24, type: "unique", rarity: "uncommon", experienceValue: 4 },
     
-    // Food resources
-    { id: RESOURCE_IDS.SUCO_FRUTAS, name: "Suco de Frutas", emoji: "🧃", weight: 1, sellPrice: 5, buyPrice: 10, type: "food", rarity: "common", experienceValue: 2 },
-    { id: RESOURCE_IDS.COGUMELOS_ASSADOS, name: "Cogumelos Assados", emoji: "🍄‍🟫", weight: 1, sellPrice: 6, buyPrice: 12, type: "food", rarity: "common", experienceValue: 3 },
-    { id: RESOURCE_IDS.PEIXE_GRELHADO, name: "Peixe Grelhado", emoji: "🐟", weight: 2, sellPrice: 12, buyPrice: 24, type: "food", rarity: "common", experienceValue: 4 },
-    { id: RESOURCE_IDS.CARNE_ASSADA, name: "Carne Assada", emoji: "🍖", weight: 2, sellPrice: 15, buyPrice: 30, type: "food", rarity: "common", experienceValue: 5 },
-    { id: RESOURCE_IDS.ENSOPADO_CARNE, name: "Ensopado de Carne", emoji: "🍲", weight: 3, sellPrice: 25, buyPrice: 50, type: "food", rarity: "uncommon", experienceValue: 8 },
+    // Food resources with hunger and thirst restoration values
+    { id: RESOURCE_IDS.SUCO_FRUTAS, name: "Suco de Frutas", emoji: "🧃", weight: 1, sellPrice: 5, buyPrice: 10, type: "food", rarity: "common", experienceValue: 2, hunger_restore: 3, thirst_restore: 12 },
+    { id: RESOURCE_IDS.COGUMELOS_ASSADOS, name: "Cogumelos Assados", emoji: "🍄‍🟫", weight: 1, sellPrice: 6, buyPrice: 12, type: "food", rarity: "common", experienceValue: 3, hunger_restore: 8, thirst_restore: 1 },
+    { id: RESOURCE_IDS.PEIXE_GRELHADO, name: "Peixe Grelhado", emoji: "🐟", weight: 2, sellPrice: 12, buyPrice: 24, type: "food", rarity: "common", experienceValue: 4, hunger_restore: 12, thirst_restore: 2 },
+    { id: RESOURCE_IDS.CARNE_ASSADA, name: "Carne Assada", emoji: "🍖", weight: 2, sellPrice: 15, buyPrice: 30, type: "food", rarity: "common", experienceValue: 5, hunger_restore: 15, thirst_restore: 3 },
+    { id: RESOURCE_IDS.ENSOPADO_CARNE, name: "Ensopado de Carne", emoji: "🍲", weight: 3, sellPrice: 25, buyPrice: 50, type: "food", rarity: "uncommon", experienceValue: 8, hunger_restore: 20, thirst_restore: 8 },
   ];
 }
 

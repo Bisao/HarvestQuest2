@@ -1,7 +1,7 @@
 // Async Performance Optimizations
 // Utilities for parallelizing operations and improving async performance
 
-import type { IStorage } from "../storage";
+import type { IStorage } from "../storage-memory";
 
 /**
  * Batches multiple database operations for better performance

@@ -15,7 +15,7 @@ import {
   resourceFilterSchema
 } from "../schemas/game-schemas";
 import { usernameParamSchema, playerIdParamSchema, idParamSchema } from "../middleware/validation";
-import type { IStorage } from "../storage";
+import type { IStorage } from "../storage-memory";
 import { GameService } from "../services/game-service";
 import { ExpeditionService } from "../services/expedition-service";
 import { RESOURCE_IDS, EQUIPMENT_IDS, BIOME_IDS, RECIPE_IDS } from "@shared/constants/game-ids";
