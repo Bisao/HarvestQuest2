@@ -48,10 +48,13 @@ export function createConsumptionRoutes(storage: IStorage): Router {
 
       if (location === 'inventory') {
         const inventoryItems = await storage.getPlayerInventory(playerId);
-        // Prioritize specific inventory item ID, fallback to item ID lookup
-        targetItem = inventoryItemId ? 
-          inventoryItems.find((item: any) => item.id === inventoryItemId) :
-          inventoryItems.find((item: any) => item.resourceId === itemId);
+        // First try to find by inventory item ID (frontend sends inventory item ID)
+        targetItem = inventoryItems.find((item: any) => item.id === itemId);
+        
+        // If not found, try by resource ID (fallback)
+        if (!targetItem) {
+          targetItem = inventoryItems.find((item: any) => item.resourceId === itemId);
+        }
         
         if (targetItem && targetItem.quantity > 0) {
           hasItem = true;
