@@ -1,36 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Play, Trash2, Gamepad2, Compass, Hammer, Trophy, Wifi, WifiOff, RefreshCw, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { LocalStorageManager, type LocalSave } from "@/lib/local-storage";
+import { useLocation } from "wouter";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Play, User, Plus, Trash2, Wifi, WifiOff } from "lucide-react";
 
-interface SaveSlot {
+interface SaveGame {
   id: string;
   username: string;
   level: number;
   experience: number;
   lastPlayed: number;
-}
-
-async function apiRequest(method: string, path: string, body?: any) {
-  const options: RequestInit = {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
-
-  return fetch(path, options);
 }
 
 export default function MainMenu() {
@@ -39,11 +22,10 @@ export default function MainMenu() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const queryClient = useQueryClient();
-  const [localSaves, setLocalSaves] = useState<LocalSave[]>([]);
   const [isOnline, setIsOnline] = useState(() => navigator.onLine);
 
-  // Get saved games with local storage integration
-  const { data: serverSaves = [], isLoading: isLoadingSaves } = useQuery({
+  // Get saved games directly from server
+  const { data: savedGames = [], isLoading: isLoadingSaves } = useQuery({
     queryKey: ["/api/saves"],
     queryFn: async () => {
       const response = await fetch("/api/saves");
@@ -55,7 +37,7 @@ export default function MainMenu() {
     retry: 1,
   });
 
-  // Monitor online status only
+  // Monitor online status
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -69,68 +51,31 @@ export default function MainMenu() {
     };
   }, []);
 
-  // Load local saves on initial mount only
-  useEffect(() => {
-    const saves = LocalStorageManager.getSaves();
-    setLocalSaves(saves);
-  }, []);
-
-  // Create new player with local storage backup
+  // Create new player
   const createPlayerMutation = useMutation({
     mutationFn: async (username: string) => {
-      // First, try to create on server if online
-      if (isOnline) {
-        const response = await fetch("/api/player", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to create player");
-        }
-
-        return response.json();
-      } else {
-        // Create offline player
-        const localSave: LocalSave = {
-          id: `local_${Date.now()}`,
-          username,
-          level: 1,
-          experience: 0,
-          lastPlayed: Date.now(),
-          syncedWithServer: false
-        };
-
-        LocalStorageManager.addSave(localSave);
-        return localSave;
-      }
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Sucesso!",
-        description: `Jogador ${data.username} criado ${isOnline ? 'com sucesso!' : 'offline!'}`,
+      const response = await fetch("/api/player", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
       });
 
-      // Store player data in localStorage
-      LocalStorageManager.setCurrentPlayer(data.username, data.id);
-
-      // Add to local saves if created online
-      if (isOnline) {
-        LocalStorageManager.addSave({
-          id: data.id,
-          username: data.username,
-          level: data.level || 1,
-          experience: data.experience || 0,
-          lastPlayed: Date.now(),
-          syncedWithServer: true
-        });
-        queryClient.invalidateQueries({ queryKey: ["/api/saves"] });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create player");
       }
 
-      // Update local state
-      setLocalSaves(LocalStorageManager.getSaves());
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setNewPlayerName("");
+      toast({
+        title: "Jogador criado!",
+        description: `${data.username} está pronto para aventura!`,
+      });
+      
+      // Refresh saves list
+      queryClient.invalidateQueries({ queryKey: ["/api/saves"] });
       setLocation(`/game?player=${encodeURIComponent(data.username)}`);
     },
     onError: (error) => {
@@ -142,8 +87,7 @@ export default function MainMenu() {
     },
   });
 
-
-  // Delete save with local storage support
+  // Delete save
   const deleteSaveMutation = useMutation({
     mutationFn: async (playerId: string) => {
       const response = await fetch(`/api/saves/${playerId}`, {
@@ -156,18 +100,11 @@ export default function MainMenu() {
 
       return response.json();
     },
-    onSuccess: (_, playerId) => {
+    onSuccess: () => {
       toast({
         title: "Sucesso!",
         description: "Jogo deletado com sucesso!",
       });
-
-      // Remove from local storage
-      const save = localSaves.find(s => s.id === playerId);
-      if (save) {
-        LocalStorageManager.removeSave(save.username);
-        setLocalSaves(LocalStorageManager.getSaves());
-      }
 
       queryClient.invalidateQueries({ queryKey: ["/api/saves"] });
     },
@@ -182,36 +119,14 @@ export default function MainMenu() {
 
   const handleCreatePlayer = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!newPlayerName.trim()) {
-      toast({
-        title: "Nome inválido",
-        description: "Por favor, insira um nome válido.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (newPlayerName.trim().length < 2) {
-      toast({
-        title: "Nome muito curto",
-        description: "O nome deve ter pelo menos 2 caracteres.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (newPlayerName.length > 20) {
-      toast({
-        title: "Nome muito longo",
-        description: "O nome não pode ter mais de 20 caracteres.",
-        variant: "destructive"
-      });
-      return;
-    }
-
+    if (!newPlayerName.trim()) return;
+    
     setIsCreating(true);
-    createPlayerMutation.mutate(newPlayerName.trim());
+    try {
+      await createPlayerMutation.mutateAsync(newPlayerName.trim());
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleLoadGame = (username: string) => {
@@ -219,37 +134,40 @@ export default function MainMenu() {
   };
 
   const handleDeleteSave = (playerId: string, username: string) => {
-    if (window.confirm(`Tem certeza que deseja deletar o jogo de ${username}? Esta ação não pode ser desfeita.`)) {
+    if (confirm(`Tem certeza de que deseja deletar o jogador "${username}"?`)) {
       deleteSaveMutation.mutate(playerId);
     }
   };
 
   const formatLastPlayed = (timestamp: number) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return "Agora mesmo";
+    if (diffInHours < 24) return `${diffInHours}h atrás`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d atrás`;
+    
+    return date.toLocaleDateString('pt-BR');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Gamepad2 className="h-8 w-8 text-green-600" />
-            <h1 className="text-4xl font-bold text-gray-800">Coletor Adventures</h1>
-          </div>
-          <p className="text-gray-600 text-lg">
+        <div className="text-center">
+          <h1 className="text-5xl font-bold text-gray-800 mb-2 flex items-center justify-center gap-3">
+            🎮 Coletor Adventures
+          </h1>
+          <p className="text-lg text-gray-600">
             Explore biomas, colete recursos e construa seu império!
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* Main Content */}
+        <div className="grid md:grid-cols-2 gap-8">
           {/* Create New Game */}
           <Card>
             <CardHeader>
@@ -263,14 +181,16 @@ export default function MainMenu() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleCreatePlayer} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="playerName">Nome do Jogador</Label>
+                <div>
+                  <label htmlFor="playerName" className="block text-sm font-medium text-gray-700 mb-2">
+                    Nome do Jogador
+                  </label>
                   <Input
                     id="playerName"
                     type="text"
-                    placeholder="Digite seu nome..."
                     value={newPlayerName}
                     onChange={(e) => setNewPlayerName(e.target.value)}
+                    placeholder="Digite seu nome..."
                     maxLength={20}
                     disabled={isCreating}
                     className="w-full"
@@ -316,14 +236,14 @@ export default function MainMenu() {
                   <div className="text-center py-8 text-gray-500">
                     Carregando jogos salvos...
                   </div>
-                ) : localSaves.length === 0 ? (
+                ) : savedGames.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     Nenhum jogo salvo encontrado.
                     <br />
                     Crie um novo jogo para começar!
                   </div>
                 ) : (
-                  localSaves.map((save) => (
+                  savedGames.map((save: SaveGame) => (
                     <div
                       key={save.id}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border hover:bg-gray-100 transition-colors"
@@ -376,18 +296,27 @@ export default function MainMenu() {
             <CardTitle>Como Jogar</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-600">
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2">🗺️ Explore</h4>
-                <p>Descubra diferentes biomas e colete recursos únicos de cada região.</p>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="text-2xl mb-2">🌍</div>
+                <h3 className="font-semibold text-green-700 mb-2">Explore</h3>
+                <p className="text-sm text-gray-600">
+                  Descubra diferentes biomas e colete recursos únicos de cada região.
+                </p>
               </div>
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2">🔧 Construa</h4>
-                <p>Use recursos coletados para criar ferramentas, armas e equipamentos.</p>
+              <div className="text-center">
+                <div className="text-2xl mb-2">🔨</div>
+                <h3 className="font-semibold text-blue-700 mb-2">Construa</h3>
+                <p className="text-sm text-gray-600">
+                  Use recursos coletados para criar ferramentas, armas e equipamentos.
+                </p>
               </div>
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2">📈 Evolua</h4>
-                <p>Ganhe experiência, suba de nível e desbloqueie novas habilidades.</p>
+              <div className="text-center">
+                <div className="text-2xl mb-2">📈</div>
+                <h3 className="font-semibold text-purple-700 mb-2">Evolua</h3>
+                <p className="text-sm text-gray-600">
+                  Ganhe experiência, suba de nível e desbloqueie novas habilidades.
+                </p>
               </div>
             </div>
           </CardContent>
