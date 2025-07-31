@@ -143,7 +143,9 @@ export default function MainMenu() {
 
   const handleLoadGame = (username: string) => {
     console.log("Loading game for player:", username);
-    setLocation(`/game?player=${encodeURIComponent(username)}`);
+    const gameUrl = `/game?player=${encodeURIComponent(username)}`;
+    console.log("Navigating to:", gameUrl);
+    setLocation(gameUrl);
   };
 
   const handleDeleteSave = (playerId: string, username: string) => {

@@ -18,25 +18,16 @@ export default function Game() {
   const [activeExpedition, setActiveExpedition] = useState<ActiveExpedition | null>(null);
   const [location, setLocation] = useLocation();
 
-  // Get player from URL parameter or localStorage
+  // Get player from URL parameter
   const urlParams = new URLSearchParams(location.split('?')[1] || '');
-  let playerUsername = urlParams.get('player') || '';
+  const playerUsername = urlParams.get('player') || '';
   
-  // Fallback to localStorage if no URL parameter
-  if (!playerUsername) {
-    try {
-      const storedPlayer = localStorage.getItem('currentPlayer');
-      if (storedPlayer) {
-        const parsed = JSON.parse(storedPlayer);
-        playerUsername = parsed.username || '';
-      }
-    } catch (e) {
-      console.error("Error parsing stored player:", e);
-    }
-  }
+  console.log("Game component - location:", location);
+  console.log("Game component - playerUsername:", playerUsername);
 
   // If no player found, redirect to main menu
   if (!playerUsername) {
+    console.log("No player username found, redirecting to main menu");
     setLocation('/');
     return null;
   }
