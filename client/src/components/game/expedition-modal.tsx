@@ -48,7 +48,7 @@ export default function ExpeditionModal({
   // Get resources available in this biome with collectability check
   const getCollectableResources = (): CollectableResource[] => {
     if (!biome) return [];
-    
+
     const resourceIds = biome.availableResources as string[];
     const biomeResources = resourceIds
       .map(id => resources.find(r => r.id === id))
@@ -68,7 +68,7 @@ export default function ExpeditionModal({
   // Check if player can collect a specific resource
   const checkResourceCollectability = (resource: Resource) => {
     const resourceName = resource.name;
-    
+
     // Basic resources (no tools required)
     if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
       return {
@@ -77,7 +77,7 @@ export default function ExpeditionModal({
         toolIcon: "🤚",
       };
     }
-    
+
     // Tool required resources
     if (['Madeira', 'Bambu'].includes(resourceName)) {
       const hasAxe = equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
@@ -87,7 +87,7 @@ export default function ExpeditionModal({
         toolIcon: "🪓",
       };
     }
-    
+
     if (['Pedra', 'Ferro Fundido', 'Cristais'].includes(resourceName)) {
       const hasPickaxe = equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
       return {
@@ -96,7 +96,7 @@ export default function ExpeditionModal({
         toolIcon: "⛏️",
       };
     }
-    
+
     if (resourceName === 'Água Fresca') {
       const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
       const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
@@ -107,7 +107,7 @@ export default function ExpeditionModal({
         toolIcon: "🪣",
       };
     }
-    
+
     // Fish resources
     if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName)) {
       const hasFishingRod = equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
@@ -117,26 +117,26 @@ export default function ExpeditionModal({
         toolIcon: "🎣",
       };
     }
-    
+
     // Animals - require weapons and knife
     if (['Coelho', 'Veado', 'Javali'].includes(resourceName)) {
       const hasWeapon = player.equippedWeapon !== null;
       const hasKnife = equipment.some(eq => eq.toolType === "knife" && 
         (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
       const canCollect = hasWeapon && hasKnife;
-      
+
       let requirementText = "Requer arma + faca";
       if (hasWeapon && hasKnife) requirementText = "Arma e faca equipadas";
       else if (hasWeapon && !hasKnife) requirementText = "Requer faca";
       else if (!hasWeapon && hasKnife) requirementText = "Requer arma";
-      
+
       return {
         canCollect,
         requirementText,
         toolIcon: resourceName === 'Coelho' ? "🐰" : resourceName === 'Veado' ? "🦌" : "🐗",
       };
     }
-    
+
     return {
       canCollect: true,
       requirementText: "Coletável",
@@ -144,7 +144,21 @@ export default function ExpeditionModal({
     };
   };
 
-  const collectableResources = getCollectableResources();
+  const collectableResources = (() => {
+    const biomeResources = getCollectableResources();
+    const resourcesWithCollectability = biomeResources.map(resource => {
+      return {
+        ...resource,
+      };
+    });
+
+    // Sort resources: collectible first, then non-collectible
+    return resourcesWithCollectability.sort((a, b) => {
+      if (a.canCollect && !b.canCollect) return -1;
+      if (!a.canCollect && b.canCollect) return 1;
+      return 0;
+    });
+  })();
   const availableResources = collectableResources.filter(r => r.canCollect);
 
   // Handle resource selection
@@ -229,7 +243,7 @@ export default function ExpeditionModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          
+
 
           {/* Resource selection */}
           <div>
@@ -241,7 +255,7 @@ export default function ExpeditionModal({
                 onClick={() => {
                   const availableResources = collectableResources.filter(r => r.canCollect);
                   const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
-                  
+
                   if (allAvailableSelected) {
                     // Desmarcar todos os disponíveis
                     setSelectedResources(prev => prev.filter(id => !availableResources.some(r => r.id === id)));
@@ -304,7 +318,7 @@ export default function ExpeditionModal({
             </ScrollArea>
           </div>
 
-          
+
 
           {/* Action buttons */}
           <div className="flex justify-between">

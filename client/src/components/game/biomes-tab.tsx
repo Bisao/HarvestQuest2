@@ -24,10 +24,48 @@ export default function BiomesTab({
 
   const isUnlocked = (biome: Biome) => player.level >= biome.requiredLevel;
 
-  // Function to get tool icons required for each resource
+  const canCollectResource = (resource: Resource) => {
+    const resourceName = resource.name;
+
+    // Basic resources (no tools required)
+    if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
+      return true;
+    }
+
+    // Tool required resources
+    if (['Madeira', 'Bambu'].includes(resourceName)) {
+      return equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
+    }
+
+    if (['Pedra', 'Ferro Fundido', 'Cristais'].includes(resourceName)) {
+      return equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
+    }
+
+    if (resourceName === 'Água Fresca') {
+      const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
+      const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
+      return hasBucket || hasBambooBottle;
+    }
+
+    // Fish resources
+    if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName)) {
+      return equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
+    }
+
+    // Animals - require weapons and knife
+    if (['Coelho', 'Veado', 'Javali'].includes(resourceName)) {
+      const hasWeapon = player.equippedWeapon !== null;
+      const hasKnife = equipment.some(eq => eq.toolType === "knife" && 
+        (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
+      return hasWeapon && hasKnife;
+    }
+
+    return true; // Default to collectible
+  };
+
   const getToolIcons = (resource: Resource) => {
     const icons: string[] = [];
-    
+
     switch (resource.name) {
       case "Fibra":
         icons.push("🤚");
@@ -71,15 +109,21 @@ export default function BiomesTab({
         icons.push("🤚");
         break;
     }
-    
+
     return icons;
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {biomes.map((biome) => {
-        const biomeResources = getResourcesForBiome(biome);
-        const unlocked = isUnlocked(biome);
+        const biomeResources = getResourcesForBiome(biome).sort((a, b) => {
+          const aCanCollect = canCollectResource(a);
+          const bCanCollect = canCollectResource(b);
+
+          if (aCanCollect && !bCanCollect) return -1;
+          if (!aCanCollect && bCanCollect) return 1;
+          return 0;
+        });
 
         return (
           <div
@@ -154,14 +198,14 @@ export default function BiomesTab({
                 const lastExpeditions = typeof window !== 'undefined' 
                   ? JSON.parse(localStorage.getItem('lastExpeditionResources') || '{}')
                   : {};
-                
+
                 const hasLastExpedition = lastExpeditions[biome.id] && lastExpeditions[biome.id].length > 0;
-                
+
                 return hasLastExpedition && (
                   <button
                     onClick={() => {
                       onExpeditionStart(biome);
-                      
+
                       // Auto-select the last expedition resources
                       setTimeout(() => {
                         const event = new CustomEvent('repeatLastExpedition', {

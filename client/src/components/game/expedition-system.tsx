@@ -117,12 +117,15 @@ export default function ExpeditionSystem({
   const getAllBiomeResources = () => {
     const biomeResources = getBiomeResources();
     
-    // Separate resources into collectible and non-collectible
-    const collectible = biomeResources.filter(resource => canCollectResource(resource));
-    const nonCollectible = biomeResources.filter(resource => !canCollectResource(resource));
-    
-    // Return collectible first, then non-collectible
-    return [...collectible, ...nonCollectible];
+    // Sort resources: collectible first, then non-collectible
+    return biomeResources.sort((a, b) => {
+      const aCanCollect = canCollectResource(a);
+      const bCanCollect = canCollectResource(b);
+      
+      if (aCanCollect && !bCanCollect) return -1;
+      if (!aCanCollect && bCanCollect) return 1;
+      return 0;
+    });
   };
 
   // Expedition mutations
