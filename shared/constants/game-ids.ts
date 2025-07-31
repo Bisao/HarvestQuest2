@@ -18,6 +18,9 @@ export const RESOURCE_IDS = {
   PELO: "res-1f7b5a3e-8c9d-4e17-9a28-6c2e8f5b1dc0",
   BARBANTE: "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
   
+  // Consumables
+  ISCA_PESCA: "eq-tool-bait-fishing-001", // Isca movida para recursos
+  
   // Animals 
   COELHO: "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
   VEADO: "res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3",
@@ -52,7 +55,6 @@ export const EQUIPMENT_IDS = {
   FACA: "eq-tool-6f789012-3456-7890-f123-456789012345",
   BALDE_MADEIRA: "eq-tool-7890123a-4567-8901-1234-567890123456",
   GARRAFA_BAMBU: "eq-tool-890123ab-5678-9012-2345-678901234567",
-  ISCA_PESCA: "eq-tool-bait-fishing-001",
   CORDA: "eq-tool-0123abcd-789a-1234-4567-89012345678a",
   PANELA_BARRO: "eq-tool-clay-pot-001",
   PANELA: "eq-tool-metal-pot-001",

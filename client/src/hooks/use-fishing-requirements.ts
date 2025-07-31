@@ -22,8 +22,8 @@ export function useFishingRequirements(
   );
 
   // Check for bait in inventory (bait is now a resource, not equipment)
-  // Using the same ID but looking in inventory items, not equipment
-  const baitItem = inventoryItems.find(item => item.resourceId === "eq-tool-9a8b7c6d-5e4f-3210-fedc-ba0987654321"); // ISCA_PESCA ID
+  // Using RESOURCE_IDS.ISCA_PESCA for correct reference
+  const baitItem = inventoryItems.find(item => item.resourceId === "eq-tool-bait-fishing-001"); // ISCA_PESCA ID from RESOURCE_IDS
   
   const hasBait = !!(baitItem && baitItem.quantity > 0);
   const baitCount = baitItem?.quantity || 0;

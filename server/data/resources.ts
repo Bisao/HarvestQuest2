@@ -19,7 +19,7 @@ export function createResourcesWithIds(): InsertResource[] {
 
     // CONSUMABLES & FISHING
     {
-      id: EQUIPMENT_IDS.ISCA_PESCA,
+      id: RESOURCE_IDS.ISCA_PESCA,
       name: "Isca para Pesca",
       emoji: "🪱",
       description: "Isca artesanal feita com fibras e frutas para atrair peixes",
