@@ -85,7 +85,8 @@ export default function ExpeditionPanel({
               if (prev <= 1) {
                 clearInterval(countdownRef.current!);
                 countdownRef.current = null;
-                handleCompleteExpedition();
+                // Complete expedition and automatically restart
+                completeExpeditionMutation.mutate();
                 return 0;
               }
               return prev - 1;
@@ -120,25 +121,29 @@ export default function ExpeditionPanel({
       return response.json();
     },
     onSuccess: () => {
-      if (!isAutoRepeat) {
-        toast({
-          title: "Expedição Concluída",
-          description: "Recursos coletados com sucesso!",
-        });
-      }
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       
-      if (isAutoRepeat) {
-        // Reset progress and start new expedition after a brief delay
+      if (isAutoRepeat && autoRepeatCountdown === 0) {
+        // Auto-repeat mode: restart expedition immediately
         setTimeout(() => {
           setCurrentProgress(0);
           setCollectedResources({});
-          setAutoRepeatCountdown(0);
-          // Restart the progress simulation
-          const newExpedition = { ...expedition, startTime: Date.now() };
-          Object.assign(expedition, newExpedition);
+          // Update expedition start time for new cycle
+          expedition.startTime = Date.now();
         }, 500);
+        
+        toast({
+          title: "Auto-Repetição",
+          description: "Nova expedição iniciada automaticamente!",
+        });
       } else {
+        // Normal completion
+        if (!isAutoRepeat) {
+          toast({
+            title: "Expedição Concluída",
+            description: "Recursos coletados com sucesso!",
+          });
+        }
         onExpeditionComplete();
       }
     },
@@ -174,7 +179,17 @@ export default function ExpeditionPanel({
           </span>
           <span className="text-lg">{biome?.emoji}</span>
           <Button
-            onClick={() => setIsAutoRepeat(!isAutoRepeat)}
+            onClick={() => {
+              setIsAutoRepeat(!isAutoRepeat);
+              if (isAutoRepeat) {
+                // If turning off auto-repeat, clear any active countdown
+                setAutoRepeatCountdown(0);
+                if (countdownRef.current) {
+                  clearInterval(countdownRef.current);
+                  countdownRef.current = null;
+                }
+              }
+            }}
             className={`h-6 px-2 text-xs ${
               isAutoRepeat 
                 ? 'bg-green-600 hover:bg-green-700 text-white' 
