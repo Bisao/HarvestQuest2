@@ -1,5 +1,7 @@
-// Dynamic consumable system utilities
+
+// Dynamic consumable system utilities - MODERNIZED
 import type { Resource, Equipment } from "@shared/types";
+import { RESOURCE_IDS } from "@shared/constants/game-ids";
 
 export interface ConsumableEffects {
   hungerRestore: number;
@@ -8,30 +10,25 @@ export interface ConsumableEffects {
 }
 
 /**
- * Check if an item is consumable
+ * Check if an item is consumable using modern system
  */
 export function isConsumable(item: any): boolean {
   if (!item) return false;
 
-  // Check by category and subcategory
+  // Primary: Check by category (modern system)
   if (item.category === 'consumable') {
     return true;
   }
 
-  // Check by type for legacy items
-  if (item.type === 'food') {
-    return true;
-  }
-
-  // Check by attributes (backup method)
+  // Secondary: Check by attributes (modern system priority)
   if (item.attributes && (
-    item.attributes.hunger_restore > 0 || 
-    item.attributes.thirst_restore > 0
+    (item.attributes.hunger_restore && item.attributes.hunger_restore > 0) || 
+    (item.attributes.thirst_restore && item.attributes.thirst_restore > 0)
   )) {
     return true;
   }
 
-  // Check by effects array
+  // Tertiary: Check by effects array
   if (item.effects && Array.isArray(item.effects)) {
     const consumableEffects = ['hunger_restore', 'thirst_restore', 'minor_health_regen'];
     if (item.effects.some((effect: string) => consumableEffects.includes(effect))) {
@@ -39,40 +36,36 @@ export function isConsumable(item: any): boolean {
     }
   }
 
-  // Check by ID - usando os IDs corretos do sistema
-  const consumableIds = [
-    'res-carne-assada-001',
-    'res-agua-fresca-001', 
-    'res-cogumelos-assados-001',
-    'res-peixe-grelhado-001',
-    'res-ensopado-carne-001',
-    'res-cogumelos-001',
-    'res-frutas-silvestres-001',
-    'res-suco-frutas-001'
+  // Modern consumable IDs from items-modern.ts
+  const modernConsumableIds = [
+    RESOURCE_IDS.CARNE_ASSADA,      // res-carne-assada-001
+    RESOURCE_IDS.AGUA_FRESCA,       // res-agua-fresca-001
+    RESOURCE_IDS.COGUMELOS,         // res-cogumelos-001
+    RESOURCE_IDS.FRUTAS_SILVESTRES  // res-frutas-silvestres-001
   ];
 
-  if (consumableIds.includes(item.id)) {
+  if (modernConsumableIds.includes(item.id)) {
     return true;
   }
 
-  // Fallback: check by name for existing items (legacy support)
-  const consumableNames = [
+  // Legacy support: Check by type for old items
+  if (item.type === 'food') {
+    return true;
+  }
+
+  // Legacy support: Check by name for existing items (only as last resort)
+  const legacyConsumableNames = [
     'Carne Assada',
     'Água Fresca', 
-    'Cogumelos Assados',
-    'Peixe Grelhado',
-    'Ensopado de Carne',
     'Cogumelos',
     'Frutas Silvestres',
-    'Suco de Frutas',
     'cooked_meat',
     'fresh_water',
-    'cooked_mushrooms',
-    'grilled_fish',
-    'meat_stew'
+    'mushrooms',
+    'wild_berries'
   ];
 
-  return consumableNames.includes(item.name || item.displayName);
+  return legacyConsumableNames.includes(item.name || item.displayName);
 }
 
 export function getConsumableEffects(item: any): ConsumableEffects {
@@ -80,32 +73,45 @@ export function getConsumableEffects(item: any): ConsumableEffects {
     return { hungerRestore: 0, thirstRestore: 0 };
   }
 
-  // Try to get from attributes first (modern system)
+  // PRIORITY 1: Modern system - get from attributes
   if (item.attributes) {
-    return {
-      hungerRestore: item.attributes.hunger_restore || 0,
-      thirstRestore: item.attributes.thirst_restore || 0
-    };
+    const hungerRestore = item.attributes.hunger_restore || 0;
+    const thirstRestore = item.attributes.thirst_restore || 0;
+    
+    // Only return if we have actual values
+    if (hungerRestore > 0 || thirstRestore > 0) {
+      return {
+        hungerRestore,
+        thirstRestore
+      };
+    }
   }
 
-  // Fallback to hardcoded values for existing items (legacy support)
-  const hardcodedEffects: Record<string, ConsumableEffects> = {
+  // PRIORITY 2: Modern ID-based effects (from items-modern.ts data)
+  const modernIdEffects: Record<string, ConsumableEffects> = {
+    [RESOURCE_IDS.CARNE_ASSADA]: { hungerRestore: 25, thirstRestore: 5 },
+    [RESOURCE_IDS.AGUA_FRESCA]: { hungerRestore: 0, thirstRestore: 20 },
+    [RESOURCE_IDS.COGUMELOS]: { hungerRestore: 2, thirstRestore: 0 },
+    [RESOURCE_IDS.FRUTAS_SILVESTRES]: { hungerRestore: 1, thirstRestore: 2 }
+  };
+
+  if (modernIdEffects[item.id]) {
+    return modernIdEffects[item.id];
+  }
+
+  // PRIORITY 3: Legacy support for old items (reduced values to encourage modernization)
+  const legacyEffects: Record<string, ConsumableEffects> = {
     'Carne Assada': { hungerRestore: 15, thirstRestore: 3 },
     'cooked_meat': { hungerRestore: 15, thirstRestore: 3 },
     'Água Fresca': { hungerRestore: 0, thirstRestore: 10 },
     'fresh_water': { hungerRestore: 0, thirstRestore: 10 },
-    'Cogumelos Assados': { hungerRestore: 8, thirstRestore: 1 },
-    'cooked_mushrooms': { hungerRestore: 8, thirstRestore: 1 },
-    'Peixe Grelhado': { hungerRestore: 12, thirstRestore: 2 },
-    'grilled_fish': { hungerRestore: 12, thirstRestore: 2 },
-    'Ensopado de Carne': { hungerRestore: 20, thirstRestore: 8 },
-    'meat_stew': { hungerRestore: 20, thirstRestore: 8 },
     'Cogumelos': { hungerRestore: 2, thirstRestore: 0 },
+    'mushrooms': { hungerRestore: 2, thirstRestore: 0 },
     'Frutas Silvestres': { hungerRestore: 1, thirstRestore: 2 },
-    'Suco de Frutas': { hungerRestore: 3, thirstRestore: 12 }
+    'wild_berries': { hungerRestore: 1, thirstRestore: 2 }
   };
 
-  return hardcodedEffects[item.name || item.displayName] || { hungerRestore: 0, thirstRestore: 0 };
+  return legacyEffects[item.name || item.displayName] || { hungerRestore: 0, thirstRestore: 0 };
 }
 
 /**
@@ -151,7 +157,7 @@ export function canConsumeItem(item: any, requestedQuantity: number = 1): boolea
 }
 
 /**
- * Validate consumption parameters
+ * Validate consumption parameters with modern system support
  */
 export function validateConsumption(item: any, quantity: number = 1): {
   valid: boolean;
@@ -175,5 +181,52 @@ export function validateConsumption(item: any, quantity: number = 1): {
   }
 
   const effects = getConsumableEffects(item);
+  
+  // Validate that the item actually provides some benefit
+  if (effects.hungerRestore === 0 && effects.thirstRestore === 0) {
+    return { valid: false, error: "Item não fornece benefícios de consumo" };
+  }
+
   return { valid: true, effects };
+}
+
+/**
+ * Get modern item data by ID
+ */
+export function getModernConsumableData(itemId: string): ConsumableEffects | null {
+  const modernConsumables: Record<string, ConsumableEffects> = {
+    [RESOURCE_IDS.CARNE_ASSADA]: { 
+      hungerRestore: 25, 
+      thirstRestore: 5,
+      effects: ['hunger_restore', 'minor_health_regen']
+    },
+    [RESOURCE_IDS.AGUA_FRESCA]: { 
+      hungerRestore: 0, 
+      thirstRestore: 20,
+      effects: ['thirst_restore', 'cooling']
+    },
+    [RESOURCE_IDS.COGUMELOS]: { 
+      hungerRestore: 2, 
+      thirstRestore: 0,
+      effects: ['hunger_restore']
+    },
+    [RESOURCE_IDS.FRUTAS_SILVESTRES]: { 
+      hungerRestore: 1, 
+      thirstRestore: 2,
+      effects: ['hunger_restore', 'thirst_restore']
+    }
+  };
+
+  return modernConsumables[itemId] || null;
+}
+
+/**
+ * Check if item is using modern system
+ */
+export function isModernConsumable(item: any): boolean {
+  if (!item) return false;
+  
+  return item.category === 'consumable' && 
+         item.attributes && 
+         (item.attributes.hunger_restore > 0 || item.attributes.thirst_restore > 0);
 }

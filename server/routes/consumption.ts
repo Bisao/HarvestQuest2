@@ -14,9 +14,21 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       // Get quantity from request, default to 1
       const quantity = parseInt(req.body.quantity) || 1;
 
-      // Validate input
-      if (!itemId || !location || typeof hungerRestore !== 'number' || typeof thirstRestore !== 'number') {
-        return res.status(400).json({ error: 'Missing required fields or invalid types' });
+      // Enhanced validation with modern system support
+      if (!itemId || !location) {
+        return res.status(400).json({ error: 'Missing required fields: itemId and location' });
+      }
+
+      if (typeof hungerRestore !== 'number' || typeof thirstRestore !== 'number') {
+        return res.status(400).json({ error: 'hungerRestore and thirstRestore must be numbers' });
+      }
+
+      if (hungerRestore < 0 || thirstRestore < 0) {
+        return res.status(400).json({ error: 'Restoration values cannot be negative' });
+      }
+
+      if (hungerRestore === 0 && thirstRestore === 0) {
+        return res.status(400).json({ error: 'Item must provide at least some hunger or thirst restoration' });
       }
 
       if (quantity <= 0) {
@@ -33,7 +45,7 @@ export function createConsumptionRoutes(storage: IStorage): Router {
         return res.status(404).json({ error: 'Player not found' });
       }
 
-      // Check if item exists in specified location
+      // Check if item exists in specified location with improved ID handling
       let hasItem = false;
       let itemQuantity = 0;
       let inventoryItemId = req.body.inventoryItemId;
@@ -41,12 +53,22 @@ export function createConsumptionRoutes(storage: IStorage): Router {
 
       if (location === 'inventory') {
         const inventoryItems = await storage.getPlayerInventory(playerId);
-        // First try to find by inventory item ID (frontend sends inventory item ID)
+        
+        // Priority 1: Try to find by inventory item ID (direct record ID)
         targetItem = inventoryItems.find((item: any) => item.id === itemId);
         
-        // If not found, try by resource ID (fallback)
+        // Priority 2: Try by resource ID (modern system)
         if (!targetItem) {
           targetItem = inventoryItems.find((item: any) => item.resourceId === itemId);
+        }
+        
+        // Priority 3: Try by item data matching (legacy support)
+        if (!targetItem) {
+          const resources = await storage.getAllResources();
+          const matchingResource = resources.find((r: any) => r.id === itemId);
+          if (matchingResource) {
+            targetItem = inventoryItems.find((item: any) => item.resourceId === matchingResource.id);
+          }
         }
         
         if (targetItem && targetItem.quantity > 0) {
@@ -56,11 +78,18 @@ export function createConsumptionRoutes(storage: IStorage): Router {
         }
       } else if (location === 'storage') {
         const storageItems = await storage.getPlayerStorage(playerId);
-        // Use standardized item ID for storage lookup
-        targetItem = storageItems.find((item: any) => 
-          item.resourceId === itemId && 
-          (item.itemType === 'resource' || !item.itemType) // Handle legacy records
-        );
+        
+        // Priority 1: Direct resource ID match
+        targetItem = storageItems.find((item: any) => item.resourceId === itemId);
+        
+        // Priority 2: Handle legacy records and ensure consumable type
+        if (!targetItem) {
+          targetItem = storageItems.find((item: any) => 
+            item.resourceId === itemId && 
+            (item.itemType === 'resource' || item.itemType === 'consumable' || !item.itemType)
+          );
+        }
+        
         if (targetItem && targetItem.quantity > 0) {
           hasItem = true;
           itemQuantity = targetItem.quantity;

@@ -17,10 +17,10 @@ export const RESOURCE_IDS = {
   OSSOS: "res-5a3f7b1e-9d8c-4e18-9a39-2c6e8f3b7dbf",
   PELO: "res-1f7b5a3e-8c9d-4e17-9a28-6c2e8f5b1dc0",
   BARBANTE: "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
-  
+
   // Consumables
   ISCA_PESCA: "eq-tool-bait-fishing-001", // Isca movida para recursos
-  
+
   // Animals 
   COELHO: "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
   VEADO: "res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3",
@@ -30,13 +30,13 @@ export const RESOURCE_IDS = {
   SALMAO: "res-e5a1c9f7-8b3d-4e10-9a21-8c6e2f7b9df7",
   COGUMELOS: "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
   FRUTAS_SILVESTRES: "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-  
+
   // Unique resources
   MADEIRA_FLORESTA: "res-c9a1f7e5-3d8b-4e07-9a18-8c6e2f9b7dea",
   AREIA: "res-a1e5f7c9-8b3d-4e06-9a17-2c8e6f7b5deb",
   CRISTAIS: "res-e5f7a1c9-3d8b-4e05-9a16-6c2e8f9b7dec",
   CONCHAS: "res-f7a1e5c9-8b3d-4e04-9a15-8c6e2f5b9ded",
-  
+
   // Food resources
   SUCO_FRUTAS: "res-a1c9e5f7-3b8d-4e03-9a14-2c8e6f9b7dee",
   COGUMELOS_ASSADOS: "res-c9e5a1f7-8d3b-4e02-9a13-6c2e8f7b5def",
@@ -58,19 +58,19 @@ export const EQUIPMENT_IDS = {
   CORDA: "eq-tool-0123abcd-789a-1234-4567-89012345678a",
   PANELA_BARRO: "eq-tool-clay-pot-001",
   PANELA: "eq-tool-metal-pot-001",
-  
+
   // Weapons
   ARCO_FLECHA: "eq-weap-a1b2c3d4-5e6f-7890-abcd-ef1234567890",
   LANCA: "eq-weap-b2c3d4e5-6f78-9012-bcde-f12345678901",
   ESPADA_PEDRA: "eq-weap-stone-sword-001",
-  
+
   // Armor
   CAPACETE_COURO: "eq-armor-c3d4e5f6-7890-1234-cdef-123456789012",
   PEITORAL_COURO: "eq-armor-d4e5f678-9012-3456-def1-234567890123",
   CALCAS_COURO: "eq-armor-e5f67890-1234-5678-ef12-345678901234",
   BOTAS_COURO: "eq-armor-f6789012-3456-7890-f123-456789012345",
   CAPACETE_FERRO: "eq-armor-iron-helmet-001",
-  
+
   // Storage/Utility
   MOCHILA: "eq-util-78901234-5678-9012-1234-567890123456",
   BARRIL_IMPROVISADO: "eq-container-makeshift-barrel-001",

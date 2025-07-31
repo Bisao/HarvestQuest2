@@ -266,7 +266,9 @@ export function createModernGameItems(): InsertGameItem[] {
       attributes: { 
         harvestable: true,
         hunger_restore: 2,
-        thirst_restore: 0
+        thirst_restore: 0,
+        consumable: true,
+        food_type: "raw"
       },
       effects: ["hunger_restore"],
       tags: ["natural", "edible", "craftable", "food"]
@@ -300,6 +302,34 @@ export function createModernGameItems(): InsertGameItem[] {
     },
 
     // CONSUMABLES - Food and potions
+    {
+      id: "res-cogumelos-assados-001",
+      name: "cooked_mushrooms",
+      displayName: "Cogumelos Assados",
+      description: "Cogumelos preparados no fogo, mais nutritivos que crus",
+      iconPath: "🍄‍🟫",
+      category: "consumable",
+      subcategory: "food",
+      weight: 180, // 180 gramas por porção
+      stackable: true,
+      maxStackSize: 30,
+      rarity: "common",
+      xpReward: 3,
+      yieldAmount: 1,
+      requiredTool: null,
+      spawnRate: 0.0, // Crafted only
+      sellPrice: 10,
+      buyPrice: 20,
+      attributes: {
+        hunger_restore: 8,
+        thirst_restore: 1,
+        consumable: true,
+        food_type: "cooked",
+        cook_time: 20 // seconds
+      },
+      effects: ["hunger_restore"],
+      tags: ["food", "cooked", "nutritious"]
+    },
     {
       id: RESOURCE_IDS.CARNE_ASSADA,
       name: "cooked_meat",
