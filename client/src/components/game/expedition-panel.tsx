@@ -35,7 +35,10 @@ export default function ExpeditionPanel({
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(expedition.progress);
   const [collectedResources, setCollectedResources] = useState<Record<string, number>>({});
+  const [isAutoRepeat, setIsAutoRepeat] = useState(false);
+  const [autoRepeatCountdown, setAutoRepeatCountdown] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   const biome = biomes.find(b => b.id === expedition.biomeId);
@@ -73,6 +76,22 @@ export default function ExpeditionPanel({
       if (progressPercent >= 100) {
         clearInterval(intervalRef.current!);
         intervalRef.current = null;
+        
+        // Handle auto-repeat
+        if (isAutoRepeat) {
+          setAutoRepeatCountdown(5);
+          countdownRef.current = setInterval(() => {
+            setAutoRepeatCountdown(prev => {
+              if (prev <= 1) {
+                clearInterval(countdownRef.current!);
+                countdownRef.current = null;
+                handleCompleteExpedition();
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        }
       }
     }, 1000);
 
@@ -80,10 +99,13 @@ export default function ExpeditionPanel({
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
     };
   }, [expedition, currentProgress]);
 
-  // Complete expedition mutation
+  // Complete expedition mutation  
   const completeExpeditionMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`/api/expeditions/${expedition.id}/complete`, {
@@ -98,12 +120,27 @@ export default function ExpeditionPanel({
       return response.json();
     },
     onSuccess: () => {
-      toast({
-        title: "Expedição Concluída",
-        description: "Recursos coletados com sucesso!",
-      });
+      if (!isAutoRepeat) {
+        toast({
+          title: "Expedição Concluída",
+          description: "Recursos coletados com sucesso!",
+        });
+      }
       queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      onExpeditionComplete();
+      
+      if (isAutoRepeat) {
+        // Reset progress and start new expedition after a brief delay
+        setTimeout(() => {
+          setCurrentProgress(0);
+          setCollectedResources({});
+          setAutoRepeatCountdown(0);
+          // Restart the progress simulation
+          const newExpedition = { ...expedition, startTime: Date.now() };
+          Object.assign(expedition, newExpedition);
+        }, 500);
+      } else {
+        onExpeditionComplete();
+      }
     },
     onError: (error: any) => {
       toast({
@@ -136,6 +173,17 @@ export default function ExpeditionPanel({
             {biome?.name}
           </span>
           <span className="text-lg">{biome?.emoji}</span>
+          <Button
+            onClick={() => setIsAutoRepeat(!isAutoRepeat)}
+            className={`h-6 px-2 text-xs ${
+              isAutoRepeat 
+                ? 'bg-green-600 hover:bg-green-700 text-white' 
+                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+            }`}
+            size="sm"
+          >
+            🔄 {isAutoRepeat ? 'ON' : 'OFF'}
+          </Button>
         </div>
         <Button
           variant="ghost"
@@ -162,8 +210,34 @@ export default function ExpeditionPanel({
         </div>
       )}
       
+      {/* Auto-repeat countdown when completed and auto-repeat is on */}
+      {!isExpanded && isCompleted && autoRepeatCountdown > 0 && (
+        <div className="px-3 pb-2">
+          <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-center">
+            <div className="text-xs text-yellow-700 font-medium">
+              Repetindo em {autoRepeatCountdown}s...
+            </div>
+            <Button
+              onClick={() => {
+                setIsAutoRepeat(false);
+                setAutoRepeatCountdown(0);
+                if (countdownRef.current) {
+                  clearInterval(countdownRef.current);
+                  countdownRef.current = null;
+                }
+              }}
+              variant="outline"
+              size="sm"
+              className="mt-1 h-6 px-2 text-xs"
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      )}
+      
       {/* Finalize button when completed and minimized */}
-      {!isExpanded && isCompleted && (
+      {!isExpanded && isCompleted && !autoRepeatCountdown && (
         <div className="px-3 pb-2">
           <Button
             onClick={handleCompleteExpedition}
@@ -237,14 +311,37 @@ export default function ExpeditionPanel({
                   </div>
                 </div>
 
-                <Button
-                  onClick={handleCompleteExpedition}
-                  disabled={completeExpeditionMutation.isPending}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
-                  size="sm"
-                >
-                  {completeExpeditionMutation.isPending ? "Finalizando..." : "Finalizar Expedição"}
-                </Button>
+                {autoRepeatCountdown > 0 ? (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-center mb-2">
+                    <div className="text-sm text-yellow-700 font-medium mb-2">
+                      Repetindo em {autoRepeatCountdown}s...
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setIsAutoRepeat(false);
+                        setAutoRepeatCountdown(0);
+                        if (countdownRef.current) {
+                          clearInterval(countdownRef.current);
+                          countdownRef.current = null;
+                        }
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      Cancelar Auto-Repetição
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleCompleteExpedition}
+                    disabled={completeExpeditionMutation.isPending}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    size="sm"
+                  >
+                    {completeExpeditionMutation.isPending ? "Finalizando..." : "Finalizar Expedição"}
+                  </Button>
+                )}
               </div>
             </>
           )}

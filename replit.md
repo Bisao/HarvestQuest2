@@ -8,6 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 31, 2025 - AUTO-REPEAT EXPEDITION FEATURE ADDED + MIGRATION COMPLETED**
+- **Auto-Repeat Expedition System**: Added toggle button for automatic expedition repetition with 5-second countdown
+- **Loop Functionality**: When auto-repeat is enabled, expeditions automatically restart after completion with visual countdown
+- **Visual Feedback**: Auto-repeat status shown with ON/OFF toggle button and countdown timer in both minimized and expanded views
+- **Cancel Option**: Users can cancel auto-repeat during countdown with clear cancel buttons
+- **Migration Successfully Completed**: Project fully migrated from Replit Agent to standard Replit environment
+- **All Systems Operational**: All game mechanics verified working with enhanced auto-repeat functionality
+
 **January 31, 2025 - COMPLETE SYSTEM SYNCHRONIZATION + EXPEDITION INTERFACE ENHANCED FOR BETTER UX**
 - **Real-Time System Synchronization Completed**: Fixed critical issue where consumption worked but UI status bars didn't update immediately
 - **HTTP Cache Completely Disabled**: Implemented no-cache headers on both client and server to prevent 304 responses and stale data
