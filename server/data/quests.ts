@@ -128,9 +128,9 @@ export const ALL_QUESTS: InsertQuest[] = [
       },
       {
         type: "collect",
-        resourceId: RESOURCE_IDS.PEDRAS_SOLTAS,
+        resourceId: RESOURCE_IDS.PEDRA,
         quantity: 15,
-        description: "Colete 15 pedras soltas"
+        description: "Colete 15 pedras (requer picareta equipada)"
       }
     ],
     rewards: {
@@ -394,9 +394,9 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: EQUIPMENT_IDS.FACA,
+        itemId: EQUIPMENT_IDS.PICARETA,
         quantity: 1,
-        description: "Crie 1 faca"
+        description: "Crie 1 picareta"
       },
       {
         type: "craft",
