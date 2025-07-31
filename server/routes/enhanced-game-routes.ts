@@ -276,20 +276,28 @@ export function registerEnhancedGameRoutes(
 
           for (const playerQuest of activePlayerQuests) {
             const quest = await storage.getQuest(playerQuest.questId);
-            if (quest && quest.type === 'craft') {
+            if (quest) {
               const objectives = quest.objectives as any[];
 
               for (const objective of objectives) {
-                if (objective.type === 'craft' && objective.itemId === craftedItemId) {
-                  const currentProgress = (playerQuest.progress as any)?.[objective.itemId] || 0;
-                  const newProgress = Math.min(currentProgress + totalCraftedAmount, objective.quantity);
+                if (objective.type === 'craft' && (objective.itemId === craftedItemId || objective.resourceId === craftedItemId)) {
+                  // Use the same progress key format as quest-service.ts
+                  const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.target);
+                  const currentProgressObj = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
+                  const currentProgress = currentProgressObj.current || 0;
+                  const required = objective.quantity || objective.amount || 1;
+                  const newProgress = Math.min(currentProgress + totalCraftedAmount, required);
 
-                  console.log(`Quest progress update: ${objective.itemId} from ${currentProgress} to ${newProgress} (added ${totalCraftedAmount})`);
+                  console.log(`[CRAFT QUEST] Quest ${quest.name} progress update: ${progressKey} from ${currentProgress} to ${newProgress} (added ${totalCraftedAmount})`);
 
                   await storage.updatePlayerQuest(playerQuest.id, {
                     progress: {
-                      ...playerQuest.progress as any,
-                      [objective.itemId]: newProgress
+                      ...(playerQuest.progress as any || {}),
+                      [progressKey]: {
+                        current: newProgress,
+                        required: required,
+                        completed: newProgress >= required
+                      }
                     }
                   });
                 }

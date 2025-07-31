@@ -143,7 +143,7 @@ export class QuestService {
             break;
             
           case 'craft':
-            if (objective.type === 'craft' && (objective.itemId === data.itemId || objective.target === data.itemId)) {
+            if (objective.type === 'craft' && (objective.itemId === data.itemId || objective.resourceId === data.resourceId || objective.target === data.itemId || objective.target === data.resourceId)) {
               if (!currentProgress[progressKey]) {
                 currentProgress[progressKey] = { current: 0, required: objective.quantity || objective.amount || 1 };
               }
@@ -153,7 +153,7 @@ export class QuestService {
                 objective.quantity || objective.amount || 1
               );
               currentProgress[progressKey].completed = currentProgress[progressKey].current >= (objective.quantity || objective.amount || 1);
-              console.log(`[QUEST DEBUG] Craft progress updated for quest ${quest.name}: ${previousCurrent} -> ${currentProgress[progressKey].current}/${objective.quantity || objective.amount || 1} (item: ${data.itemId})`);
+              console.log(`[QUEST DEBUG] Craft progress updated for quest ${quest.name}: ${previousCurrent} -> ${currentProgress[progressKey].current}/${objective.quantity || objective.amount || 1} (item: ${data.itemId || data.resourceId})`);
               progressUpdated = true;
             }
             break;

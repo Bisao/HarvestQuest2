@@ -370,7 +370,7 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: RESOURCE_IDS.BARBANTE,
+        resourceId: RESOURCE_IDS.BARBANTE,
         quantity: 3,
         description: "Crie 3 barbantes"
       }
@@ -454,13 +454,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: RESOURCE_IDS.COGUMELOS_ASSADOS,
+        resourceId: RESOURCE_IDS.COGUMELOS_ASSADOS,
         quantity: 5,
         description: "Cozinhe 5 cogumelos assados"
       },
       {
         type: "craft",
-        itemId: RESOURCE_IDS.CARNE_ASSADA,
+        resourceId: RESOURCE_IDS.CARNE_ASSADA,
         quantity: 3,
         description: "Cozinhe 3 carnes assadas"
       }
@@ -484,13 +484,13 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
-        itemId: RESOURCE_IDS.ENSOPADO_CARNE,
+        resourceId: RESOURCE_IDS.ENSOPADO_CARNE,
         quantity: 2,
         description: "Cozinhe 2 ensopados de carne"
       },
       {
         type: "craft",
-        itemId: RESOURCE_IDS.SUCO_FRUTAS,
+        resourceId: RESOURCE_IDS.SUCO_FRUTAS,
         quantity: 5,
         description: "Prepare 5 sucos de frutas"
       }
