@@ -40,7 +40,7 @@ export default function MainMenu() {
   const [location, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const [localSaves, setLocalSaves] = useState<LocalSave[]>([]);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(() => navigator.onLine);
 
   // Get saved games with local storage integration
   const { data: serverSaves = [], isLoading: isLoadingSaves } = useQuery({
@@ -55,15 +55,7 @@ export default function MainMenu() {
     retry: 1,
   });
 
-  // Sync saves on component mount and when server data changes
-  useEffect(() => {
-    if (serverSaves.length >= 0) {
-      const synced = LocalStorageManager.syncSaves(serverSaves);
-      setLocalSaves(synced);
-    }
-  }, [serverSaves]);
-
-  // Monitor online status
+  // Monitor online status only
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -77,7 +69,7 @@ export default function MainMenu() {
     };
   }, []);
 
-  // Load local saves on mount
+  // Load local saves on initial mount only
   useEffect(() => {
     const saves = LocalStorageManager.getSaves();
     setLocalSaves(saves);

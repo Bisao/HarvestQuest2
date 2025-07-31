@@ -235,35 +235,7 @@ export class MemStorage implements IStorage {
       await this.createQuest({ ...quest, category: quest.category || null });
     }
 
-    // Create default player only if no players exist
-    if (this.players.size === 0) {
-      const defaultPlayer = await this.createPlayer({
-        username: "Player1",
-        level: 1,
-        experience: 0,
-        hunger: 100,
-        thirst: 100,
-        maxHunger: 100,
-        maxThirst: 100,
-        coins: 0,
-        inventoryWeight: 0,
-        maxInventoryWeight: 50000,
-        autoStorage: false,
-        craftedItemsDestination: 'storage',
-        waterStorage: 0,
-        maxWaterStorage: 500,
-        waterTanks: 0,
-        equippedHelmet: null,
-        equippedChestplate: null,
-        equippedLeggings: null,
-        equippedBoots: null,
-        equippedWeapon: null,
-        equippedTool: null,
-        autoCompleteQuests: true,
-      });
-
-      console.log(`👤 Created default player: ${defaultPlayer.username}`);
-    }
+    // No default player creation - players must be created via the main menu
 
     this.isInitialized = true;
     
