@@ -1,14 +1,13 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad2, Plus, User, Trash2, Play } from "lucide-react";
+import { User, Play, Trash2, Gamepad2, Compass, Hammer, Trophy, Wifi, WifiOff, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { LocalStorageManager, type LocalSave } from "@/lib/local-storage";
 
 interface SaveSlot {
   id: string;
@@ -37,91 +36,160 @@ export default function MainMenu() {
   const [newPlayerName, setNewPlayerName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const queryClient = useQueryClient();
+  const [localSaves, setLocalSaves] = useState<LocalSave[]>([]);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  // Query for save slots
-  const { data: saveSlots = [], isLoading: isLoadingSaves } = useQuery<SaveSlot[]>({
-    queryKey: ['/api/saves'],
+  // Get saved games with local storage integration
+  const { data: serverSaves = [], isLoading: isLoadingSaves } = useQuery({
+    queryKey: ["/api/saves"],
     queryFn: async () => {
-      const response = await fetch('/api/saves');
+      const response = await fetch("/api/saves");
       if (!response.ok) {
-        throw new Error('Failed to fetch saves');
+        throw new Error("Failed to fetch saves");
       }
       return response.json();
-    }
+    },
+    retry: 1,
   });
 
-  // Create player mutation
+  // Sync saves on component mount and when server data changes
+  useEffect(() => {
+    if (serverSaves.length >= 0) {
+      const synced = LocalStorageManager.syncSaves(serverSaves);
+      setLocalSaves(synced);
+    }
+  }, [serverSaves]);
+
+  // Monitor online status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Load local saves on mount
+  useEffect(() => {
+    const saves = LocalStorageManager.getSaves();
+    setLocalSaves(saves);
+  }, []);
+
+  // Create new player with local storage backup
   const createPlayerMutation = useMutation({
     mutationFn: async (username: string) => {
-      const response = await apiRequest('POST', '/api/player', { username });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create player');
-      }
-      return response.json();
-    },
-    onSuccess: (player) => {
-      toast({
-        title: "Jogador Criado!",
-        description: `Bem-vindo, ${player.username}! Sua aventura começou.`,
-      });
-      
-      // Store current player in localStorage
-      localStorage.setItem('currentPlayer', JSON.stringify(player));
-      
-      // Navigate to game
-      setLocation(`/game?player=${encodeURIComponent(player.username)}`);
-    },
-    onError: (error: Error) => {
-      if (error.message.includes('já existe')) {
-        toast({
-          title: "Jogador já existe!",
-          description: "Esse nome já está em uso. Tente outro nome ou carregue o jogo existente.",
-          variant: "destructive"
+      // First, try to create on server if online
+      if (isOnline) {
+        const response = await fetch("/api/player", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
         });
-      } else {
-        toast({
-          title: "Erro",
-          description: error.message || "Falha ao criar jogador.",
-          variant: "destructive"
-        });
-      }
-    },
-    onSettled: () => {
-      setIsCreating(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/saves'] });
-    }
-  });
 
-  // Delete save mutation
-  const deleteSaveMutation = useMutation({
-    mutationFn: async (playerId: string) => {
-      const response = await apiRequest('DELETE', `/api/saves/${playerId}`);
-      if (!response.ok) {
-        throw new Error('Failed to delete save');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to create player");
+        }
+
+        return response.json();
+      } else {
+        // Create offline player
+        const localSave: LocalSave = {
+          id: `local_${Date.now()}`,
+          username,
+          level: 1,
+          experience: 0,
+          lastPlayed: Date.now(),
+          syncedWithServer: false
+        };
+
+        LocalStorageManager.addSave(localSave);
+        return localSave;
       }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
-        title: "Jogo Deletado",
-        description: "O jogo foi deletado com sucesso.",
+        title: "Sucesso!",
+        description: `Jogador ${data.username} criado ${isOnline ? 'com sucesso!' : 'offline!'}`,
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/saves'] });
+
+      // Store player data in localStorage
+      LocalStorageManager.setCurrentPlayer(data.username, data.id);
+
+      // Add to local saves if created online
+      if (isOnline) {
+        LocalStorageManager.addSave({
+          id: data.id,
+          username: data.username,
+          level: data.level || 1,
+          experience: data.experience || 0,
+          lastPlayed: Date.now(),
+          syncedWithServer: true
+        });
+        queryClient.invalidateQueries({ queryKey: ["/api/saves"] });
+      }
+
+      // Update local state
+      setLocalSaves(LocalStorageManager.getSaves());
+      setLocation(`/game?player=${encodeURIComponent(data.username)}`);
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
         title: "Erro",
-        description: error.message || "Falha ao deletar o jogo.",
-        variant: "destructive"
+        description: error.message,
+        variant: "destructive",
       });
-    }
+    },
+  });
+
+
+  // Delete save with local storage support
+  const deleteSaveMutation = useMutation({
+    mutationFn: async (playerId: string) => {
+      const response = await fetch(`/api/saves/${playerId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete save");
+      }
+
+      return response.json();
+    },
+    onSuccess: (_, playerId) => {
+      toast({
+        title: "Sucesso!",
+        description: "Jogo deletado com sucesso!",
+      });
+
+      // Remove from local storage
+      const save = localSaves.find(s => s.id === playerId);
+      if (save) {
+        LocalStorageManager.removeSave(save.username);
+        setLocalSaves(LocalStorageManager.getSaves());
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["/api/saves"] });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Falha ao deletar o jogo.",
+        variant: "destructive",
+      });
+    },
   });
 
   const handleCreatePlayer = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newPlayerName.trim()) {
       toast({
         title: "Nome inválido",
@@ -241,19 +309,28 @@ export default function MainMenu() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+             {isOnline ? (
+                <Badge className="mb-2 w-full rounded-md" variant="outline">
+                  <Wifi className="mr-2 h-4 w-4" /> Online
+                </Badge>
+              ) : (
+                <Badge className="mb-2 w-full rounded-md" variant="destructive">
+                  <WifiOff className="mr-2 h-4 w-4" /> Offline
+                </Badge>
+              )}
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {isLoadingSaves ? (
                   <div className="text-center py-8 text-gray-500">
                     Carregando jogos salvos...
                   </div>
-                ) : saveSlots.length === 0 ? (
+                ) : localSaves.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     Nenhum jogo salvo encontrado.
                     <br />
                     Crie um novo jogo para começar!
                   </div>
                 ) : (
-                  saveSlots.map((save) => (
+                  localSaves.map((save) => (
                     <div
                       key={save.id}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border hover:bg-gray-100 transition-colors"
