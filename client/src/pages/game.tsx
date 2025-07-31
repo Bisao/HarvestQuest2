@@ -19,7 +19,7 @@ export default function Game() {
   const [location, setLocation] = useLocation();
 
   // Get player from URL parameter
-  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const urlParams = new URLSearchParams(window.location.search);
   const playerUsername = urlParams.get('player') || '';
   
   console.log("Game component - location:", location);
