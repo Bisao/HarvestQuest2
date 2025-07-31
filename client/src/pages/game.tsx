@@ -42,11 +42,13 @@ export default function Game() {
   }
 
   // Data queries
-  const { data: player } = useQuery<Player>({
+  const { data: player, isLoading: playerLoading, error: playerError } = useQuery<Player>({
     queryKey: [`/api/player/${playerUsername}`],
     queryFn: async () => {
+      console.log("Fetching player data for:", playerUsername);
       const response = await fetch(`/api/player/${encodeURIComponent(playerUsername)}`);
       if (!response.ok) {
+        console.error("Player fetch failed:", response.status, response.statusText);
         if (response.status === 404) {
           // Player not found, redirect to main menu
           setLocation('/');
@@ -54,8 +56,12 @@ export default function Game() {
         }
         throw new Error('Failed to fetch player');
       }
-      return response.json();
-    }
+      const playerData = await response.json();
+      console.log("Player data loaded:", playerData);
+      return playerData;
+    },
+    retry: 1,
+    enabled: !!playerUsername,
   });
 
   const { data: biomes = [] } = useQuery<Biome[]>({
@@ -81,13 +87,56 @@ export default function Game() {
 
   const { hasCompletableQuests } = useQuestStatus(player?.id || "");
 
-
-  if (!player) {
+  // Loading state
+  if (playerLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando jogo...</p>
+          <p className="mt-4 text-gray-600">Carregando jogador {playerUsername}...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (playerError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Erro ao carregar jogador</h2>
+          <p className="text-gray-600 mb-4">
+            Não foi possível carregar os dados do jogador "{playerUsername}".
+          </p>
+          <p className="text-sm text-gray-500 mb-6">
+            Erro: {playerError.message}
+          </p>
+          <button 
+            onClick={() => setLocation('/')}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+          >
+            Voltar ao Menu Principal
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // No player found
+  if (!player) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-yellow-600 mb-4">Jogador não encontrado</h2>
+          <p className="text-gray-600 mb-6">
+            O jogador "{playerUsername}" não foi encontrado.
+          </p>
+          <button 
+            onClick={() => setLocation('/')}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+          >
+            Voltar ao Menu Principal
+          </button>
         </div>
       </div>
     );
