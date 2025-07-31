@@ -21,17 +21,53 @@ export default function GameHeader({ player }: GameHeaderProps) {
               <h1 className="text-lg md:text-2xl font-bold text-gray-800">Coletor Adventures</h1>
             </div>
             <div className="flex items-center space-x-3 md:space-x-6 text-xs md:text-sm">
-              <div className="flex items-center space-x-1 md:space-x-2">
-                <span className="text-sm md:text-lg">⭐</span>
-                <span className="font-semibold">Nível {player.level}</span>
+              <div className="flex flex-col items-center space-y-1">
+                <div className="flex items-center space-x-1 md:space-x-2">
+                  <span className="text-sm md:text-lg">⭐</span>
+                  <span className="font-semibold">Nível {player.level}</span>
+                </div>
+                <div className="w-12 md:w-16">
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div 
+                      className="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${Math.min(((player.experience % 100) / 100) * 100, 100)}%` 
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-1 md:space-x-2">
-                <span className="text-sm md:text-lg">🍖</span>
-                <span className="font-semibold">{player.hunger}/{player.maxHunger}</span>
+              <div className="flex flex-col items-center space-y-1">
+                <div className="flex items-center space-x-1 md:space-x-2">
+                  <span className="text-sm md:text-lg">🍖</span>
+                  <span className="font-semibold">{player.hunger}/{player.maxHunger}</span>
+                </div>
+                <div className="w-12 md:w-16">
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div 
+                      className="bg-orange-500 h-1.5 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${Math.min((player.hunger / player.maxHunger) * 100, 100)}%` 
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-1 md:space-x-2">
-                <span className="text-sm md:text-lg">💧</span>
-                <span className="font-semibold">{player.thirst}/{player.maxThirst}</span>
+              <div className="flex flex-col items-center space-y-1">
+                <div className="flex items-center space-x-1 md:space-x-2">
+                  <span className="text-sm md:text-lg">💧</span>
+                  <span className="font-semibold">{player.thirst}/{player.maxThirst}</span>
+                </div>
+                <div className="w-12 md:w-16">
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div 
+                      className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${Math.min((player.thirst / player.maxThirst) * 100, 100)}%` 
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
               <div className="flex items-center space-x-1 md:space-x-2">
                 <span className="text-sm md:text-lg">💰</span>
