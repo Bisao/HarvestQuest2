@@ -15,7 +15,7 @@ export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
   const [activeExpedition, setActiveExpedition] = useState<ActiveExpedition | null>(null);
 
-  // Data queries
+  // Data queries - get player by username to be more robust
   const { data: player } = useQuery<Player>({
     queryKey: ["/api/player/Player1"],
   });
@@ -41,7 +41,7 @@ export default function Game() {
     enabled: !!player?.id,
   });
 
-  const { hasCompletableQuests } = useQuestStatus(player?.id || "Player1");
+  const { hasCompletableQuests } = useQuestStatus(player?.id || "");
 
 
   if (!player) {
