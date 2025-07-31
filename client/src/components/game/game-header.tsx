@@ -22,11 +22,11 @@ export default function GameHeader({ player }: GameHeaderProps) {
             </div>
             <div className="flex items-center space-x-3 md:space-x-6 text-xs md:text-sm">
               <div className="flex flex-col items-center space-y-1">
-                <div className="flex items-center space-x-1 md:space-x-2">
+                <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">⭐</span>
-                  <span className="font-semibold">Nível {player.level}</span>
+                  <span className="font-semibold whitespace-nowrap">Nível {player.level}</span>
                 </div>
-                <div className="w-12 md:w-16">
+                <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
                       className="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
@@ -38,11 +38,11 @@ export default function GameHeader({ player }: GameHeaderProps) {
                 </div>
               </div>
               <div className="flex flex-col items-center space-y-1">
-                <div className="flex items-center space-x-1 md:space-x-2">
+                <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">🍖</span>
-                  <span className="font-semibold">{player.hunger}/{player.maxHunger}</span>
+                  <span className="font-semibold whitespace-nowrap">{player.hunger}/{player.maxHunger}</span>
                 </div>
-                <div className="w-12 md:w-16">
+                <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
                       className="bg-orange-500 h-1.5 rounded-full transition-all duration-300"
@@ -54,11 +54,11 @@ export default function GameHeader({ player }: GameHeaderProps) {
                 </div>
               </div>
               <div className="flex flex-col items-center space-y-1">
-                <div className="flex items-center space-x-1 md:space-x-2">
+                <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">💧</span>
-                  <span className="font-semibold">{player.thirst}/{player.maxThirst}</span>
+                  <span className="font-semibold whitespace-nowrap">{player.thirst}/{player.maxThirst}</span>
                 </div>
-                <div className="w-12 md:w-16">
+                <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
                       className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
