@@ -44,6 +44,59 @@ export default function ExpeditionPanel({
   const biome = biomes.find(b => b.id === expedition.biomeId);
   const isCompleted = currentProgress >= 100;
 
+  // Complete expedition mutation  
+  const completeExpeditionMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/expeditions/${expedition.id}/complete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to complete expedition');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      
+      if (isAutoRepeat) {
+        // Auto-repeat mode: restart expedition immediately
+        setTimeout(() => {
+          setCurrentProgress(0);
+          setCollectedResources({});
+          setAutoRepeatCountdown(0);
+          // Update expedition start time for new cycle
+          expedition.startTime = Date.now();
+        }, 500);
+        
+        toast({
+          title: "Auto-Repetição",
+          description: "Nova expedição iniciada automaticamente!",
+        });
+      } else {
+        // Normal completion
+        toast({
+          title: "Expedição Concluída",
+          description: "Recursos coletados com sucesso!",
+        });
+        onExpeditionComplete();
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao finalizar expedição",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCompleteExpedition = () => {
+    completeExpeditionMutation.mutate();
+  };
+
   // Progress simulation
   useEffect(() => {
     if (currentProgress >= 100) {
@@ -80,18 +133,6 @@ export default function ExpeditionPanel({
         // Handle auto-repeat
         if (isAutoRepeat) {
           setAutoRepeatCountdown(5);
-          countdownRef.current = setInterval(() => {
-            setAutoRepeatCountdown(prev => {
-              if (prev <= 1) {
-                clearInterval(countdownRef.current!);
-                countdownRef.current = null;
-                // Complete expedition and automatically restart
-                completeExpeditionMutation.mutate();
-                return 0;
-              }
-              return prev - 1;
-            });
-          }, 1000);
         }
       }
     }, 1000);
@@ -104,61 +145,31 @@ export default function ExpeditionPanel({
         clearInterval(countdownRef.current);
       }
     };
-  }, [expedition, currentProgress]);
+  }, [expedition, currentProgress, isAutoRepeat]);
 
-  // Complete expedition mutation  
-  const completeExpeditionMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/expeditions/${expedition.id}/complete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to complete expedition');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
-      
-      if (isAutoRepeat && autoRepeatCountdown === 0) {
-        // Auto-repeat mode: restart expedition immediately
-        setTimeout(() => {
-          setCurrentProgress(0);
-          setCollectedResources({});
-          // Update expedition start time for new cycle
-          expedition.startTime = Date.now();
-        }, 500);
-        
-        toast({
-          title: "Auto-Repetição",
-          description: "Nova expedição iniciada automaticamente!",
+  // Auto-repeat countdown effect
+  useEffect(() => {
+    if (autoRepeatCountdown > 0 && isAutoRepeat) {
+      countdownRef.current = setInterval(() => {
+        setAutoRepeatCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownRef.current!);
+            countdownRef.current = null;
+            // Trigger completion
+            handleCompleteExpedition();
+            return 0;
+          }
+          return prev - 1;
         });
-      } else {
-        // Normal completion
-        if (!isAutoRepeat) {
-          toast({
-            title: "Expedição Concluída",
-            description: "Recursos coletados com sucesso!",
-          });
-        }
-        onExpeditionComplete();
-      }
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Erro",
-        description: error.message || "Erro ao finalizar expedição",
-        variant: "destructive",
-      });
-    },
-  });
+      }, 1000);
 
-  const handleCompleteExpedition = () => {
-    completeExpeditionMutation.mutate();
-  };
+      return () => {
+        if (countdownRef.current) {
+          clearInterval(countdownRef.current);
+        }
+      };
+    }
+  }, [autoRepeatCountdown, isAutoRepeat]);
 
   // Get resource info for display
   const getResourceInfo = (resourceId: string) => {
