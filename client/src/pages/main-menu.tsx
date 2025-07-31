@@ -4,8 +4,9 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { User, Play, Trash2, Gamepad2, Compass, Hammer, Trophy, Wifi, WifiOff, RefreshCw } from "lucide-react";
+import { User, Play, Trash2, Gamepad2, Compass, Hammer, Trophy, Wifi, WifiOff, RefreshCw, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LocalStorageManager, type LocalSave } from "@/lib/local-storage";
 
