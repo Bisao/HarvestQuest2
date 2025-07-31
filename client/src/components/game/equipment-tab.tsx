@@ -106,7 +106,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
   };
 
   const handleEquipSlotClick = (slotKey: string, hasEquippedItem: boolean) => {
-    if (!hasEquippedItem && ["helmet", "chestplate", "leggings", "boots", "weapon", "tool"].includes(slotKey)) {
+    if (["helmet", "chestplate", "leggings", "boots", "weapon", "tool"].includes(slotKey)) {
       setSelectedSlot(slotKey);
       setEquipModalOpen(true);
     }
@@ -184,47 +184,22 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                   return (
                     <div 
                       key={slotKey} 
-                      onClick={() => handleEquipSlotClick(slotKey, !!equippedItem)}
-                      className={`aspect-square border-2 rounded-lg flex flex-col items-center justify-center p-2 text-center transition-all cursor-pointer ${
+                      onClick={() => !isDisabled && handleEquipSlotClick(slotKey, !!equippedItem)}
+                      className={`aspect-square border-2 rounded-lg flex flex-col items-center justify-center p-2 text-center transition-all ${
                         isDisabled 
                           ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed" 
-                          : equippedItem 
+                          : "cursor-pointer " + (equippedItem 
                           ? "border-green-300 bg-green-50 hover:bg-green-100" 
-                          : "border-amber-300 bg-amber-100 hover:bg-amber-200"
+                          : "border-amber-300 bg-amber-100 hover:bg-amber-200")
                       }`}>
                       <div className="text-lg">{emoji}</div>
                       <div className="font-medium text-xs">{name}</div>
                       
                       {equippedItem ? (
-                        <div className="space-y-1">
-                          <div className="text-xs text-green-700">Equipado</div>
-                          {!isDisabled && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleUnequip(slotKey)}
-                              disabled={unequipMutation.isPending}
-                              className="text-xs h-6 px-2"
-                            >
-                              Remover
-                            </Button>
-                          )}
-                        </div>
+                        <div className="text-xs text-green-700">Equipado</div>
                       ) : (
                         <div className="text-xs text-gray-500">
-                          {isDisabled ? "Em Breve" : (
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="text-xs h-6 px-2 mt-1"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEquipSlotClick(slotKey, false);
-                              }}
-                            >
-                              Equipar
-                            </Button>
-                          )}
+                          {isDisabled ? "Em Breve" : "Clique para equipar"}
                         </div>
                       )}
                     </div>
@@ -266,6 +241,36 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
           
           <ScrollArea className="max-h-80">
             <div className="space-y-2">
+              {/* Current equipped item with unequip option */}
+              {selectedSlot && (() => {
+                const slotData = equipmentSlots.find(s => s.slot === selectedSlot);
+                const currentEquippedId = slotData?.equippedId;
+                const currentEquippedItem = currentEquippedId ? getEquippedItem(currentEquippedId) : null;
+                
+                return currentEquippedItem ? (
+                  <div className="p-3 border-2 border-blue-300 rounded-lg bg-blue-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{currentEquippedItem.emoji}</span>
+                        <div>
+                          <p className="font-medium">{currentEquippedItem.name}</p>
+                          <p className="text-sm text-blue-600">Equipado atualmente</p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleUnequip(selectedSlot)}
+                        disabled={unequipMutation.isPending}
+                      >
+                        Desequipar
+                      </Button>
+                    </div>
+                  </div>
+                ) : null;
+              })()}
+              
+              {/* Available equipment */}
               {selectedSlot && getAvailableEquipmentForSlot(selectedSlot).length > 0 ? (
                 getAvailableEquipmentForSlot(selectedSlot).map((eq) => (
                   <div
@@ -291,14 +296,19 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                   </div>
                 ))
               ) : (
-                <div className="text-center p-6 text-gray-500">
-                  <p>Nenhum item disponível para este slot.</p>
-                  <p className="text-sm mt-2">
-                    {selectedSlot === 'weapon' ? 'Crie armas no sistema de crafting.' :
-                     selectedSlot === 'tool' ? 'Crie ferramentas no sistema de crafting.' :
-                     'Crie equipamentos no sistema de crafting.'}
-                  </p>
-                </div>
+                selectedSlot && !(() => {
+                  const slotData = equipmentSlots.find(s => s.slot === selectedSlot);
+                  return slotData?.equippedId;
+                })() && (
+                  <div className="text-center p-6 text-gray-500">
+                    <p>Nenhum item disponível para este slot.</p>
+                    <p className="text-sm mt-2">
+                      {selectedSlot === 'weapon' ? 'Crie armas no sistema de crafting.' :
+                       selectedSlot === 'tool' ? 'Crie ferramentas no sistema de crafting.' :
+                       'Crie equipamentos no sistema de crafting.'}
+                    </p>
+                  </div>
+                )
               )}
             </div>
           </ScrollArea>
