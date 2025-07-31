@@ -23,7 +23,7 @@ interface ExpeditionPanelProps {
   expedition: ActiveExpedition;
   biomes: Biome[];
   resources: Resource[];
-  onExpeditionComplete: () => void;
+  onExpeditionComplete: (shouldKeepActive?: boolean) => void;
 }
 
 export default function ExpeditionPanel({
@@ -81,7 +81,7 @@ export default function ExpeditionPanel({
           title: "Expedição Concluída",
           description: "Recursos coletados com sucesso!",
         });
-        onExpeditionComplete();
+        onExpeditionComplete(false);
       }
     },
     onError: (error: any) => {

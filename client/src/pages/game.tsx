@@ -66,8 +66,10 @@ export default function Game() {
   };
 
   // Handle expedition completion
-  const handleExpeditionComplete = () => {
-    setActiveExpedition(null);
+  const handleExpeditionComplete = (shouldKeepActive = false) => {
+    if (!shouldKeepActive) {
+      setActiveExpedition(null);
+    }
   };
 
   const tabs = [

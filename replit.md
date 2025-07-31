@@ -8,11 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**January 31, 2025 - AUTO-REPEAT EXPEDITION FEATURE ADDED + MIGRATION COMPLETED**
+**January 31, 2025 - AUTO-REPEAT EXPEDITION FEATURE FIXED + MIGRATION COMPLETED**
 - **Auto-Repeat Expedition System**: Added toggle button for automatic expedition repetition with 5-second countdown
+- **Persistent Auto-Repeat State**: Fixed critical bug where auto-repeat button would deactivate after a few repetitions
+- **Component State Management**: Modified expedition completion logic to prevent component unmounting when auto-repeat is active
 - **Loop Functionality**: When auto-repeat is enabled, expeditions automatically restart after completion with visual countdown
 - **Visual Feedback**: Auto-repeat status shown with ON/OFF toggle button and countdown timer in both minimized and expanded views
 - **Cancel Option**: Users can cancel auto-repeat during countdown with clear cancel buttons
+- **Manual Control Only**: Auto-repeat now only deactivates when user manually clicks the toggle button
 - **Migration Successfully Completed**: Project fully migrated from Replit Agent to standard Replit environment
 - **All Systems Operational**: All game mechanics verified working with enhanced auto-repeat functionality
 
