@@ -1,13 +1,13 @@
 // Painel minimizado de expedição no canto inferior esquerdo
 import { useState, useEffect, useRef } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronUp, ChevronDown } from "lucide-react";
-import type { Biome, Resource } from "@shared/types";
+import type { Biome, Resource, Player } from "@shared/types";
 
 export interface ActiveExpedition {
   id: string;
@@ -43,6 +43,12 @@ export default function ExpeditionPanel({
 
   const biome = biomes.find(b => b.id === expedition.biomeId);
   const isCompleted = currentProgress >= 100;
+
+  // Query player data for real-time hunger/thirst monitoring
+  const { data: player } = useQuery<Player>({
+    queryKey: ["/api/player/Player1"],
+    refetchInterval: 2000, // Refetch every 2 seconds for real-time monitoring
+  });
 
   // Complete expedition mutation  
   const completeExpeditionMutation = useMutation({
@@ -130,9 +136,21 @@ export default function ExpeditionPanel({
         clearInterval(intervalRef.current!);
         intervalRef.current = null;
         
-        // Handle auto-repeat
+        // Handle auto-repeat - but check if player has sufficient hunger/thirst
         if (isAutoRepeat) {
-          setAutoRepeatCountdown(5);
+          if (player && (player.hunger <= 0 || player.thirst <= 0)) {
+            // Auto-disable if player status is too low
+            setIsAutoRepeat(false);
+            toast({
+              title: "Auto-Repetição Desativada",
+              description: player.hunger <= 0 
+                ? "Fome muito baixa! Consuma alimentos antes de continuar." 
+                : "Sede muito baixa! Beba água antes de continuar.",
+              variant: "destructive",
+            });
+          } else {
+            setAutoRepeatCountdown(5);
+          }
         }
       }
     }, 1000);
@@ -170,6 +188,30 @@ export default function ExpeditionPanel({
       };
     }
   }, [autoRepeatCountdown, isAutoRepeat]);
+
+  // Monitor player hunger/thirst and disable auto-repeat if they reach 0
+  useEffect(() => {
+    if (player && isAutoRepeat) {
+      if (player.hunger <= 0 || player.thirst <= 0) {
+        setIsAutoRepeat(false);
+        setAutoRepeatCountdown(0);
+        
+        // Clear any active countdown
+        if (countdownRef.current) {
+          clearInterval(countdownRef.current);
+          countdownRef.current = null;
+        }
+        
+        toast({
+          title: "Auto-Repetição Desativada",
+          description: player.hunger <= 0 
+            ? "Fome muito baixa! Consuma alimentos antes de continuar." 
+            : "Sede muito baixa! Beba água antes de continuar.",
+          variant: "destructive",
+        });
+      }
+    }
+  }, [player?.hunger, player?.thirst, isAutoRepeat, toast]);
 
   // Get resource info for display
   const getResourceInfo = (resourceId: string) => {
