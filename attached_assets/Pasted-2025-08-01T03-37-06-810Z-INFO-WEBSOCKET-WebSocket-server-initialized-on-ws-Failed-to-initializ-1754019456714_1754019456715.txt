@@ -1,0 +1,31 @@
+2025-08-01T03:37:06.810Z [INFO] [WEBSOCKET] WebSocket server initialized on /ws
+Failed to initialize hunger/thirst system: Error [TransformError]: Transform failed with 1 error:
+/home/runner/workspace/server/services/hunger-thirst-service.ts:279:10: ERROR: Expected ";" but found "calculateStatusPenalties"
+    at failureErrorWithLog (/home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:1476:15)
+    at /home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:755:50
+    at responseCallbacks.<computed> (/home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:622:9)
+    at handleIncomingPacket (/home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:677:12)
+    at Socket.readFromStdout (/home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:600:7)
+    at Socket.emit (node:events:524:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:191:23)
+
+node:internal/process/promises:391
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+Error [TransformError]: Transform failed with 1 error:
+/home/runner/workspace/server/services/hunger-thirst-service.ts:279:10: ERROR: Expected ";" but found "calculateStatusPenalties"
+    at failureErrorWithLog (/home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:1476:15)
+    at /home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:755:50
+    at responseCallbacks.<computed> (/home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:622:9)
+    at handleIncomingPacket (/home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:677:12)
+    at Socket.readFromStdout (/home/runner/workspace/node_modules/tsx/node_modules/esbuild/lib/main.js:600:7)
+    at Socket.emit (node:events:524:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:191:23)
+
+Node.js v20.19.3
