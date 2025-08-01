@@ -7,9 +7,9 @@
         "username": "oChaps",
         "level": 2,
         "experience": 189,
-        "hunger": 74,
+        "hunger": 42,
         "maxHunger": 100,
-        "thirst": 72,
+        "thirst": 40,
         "maxThirst": 100,
         "coins": 180,
         "inventoryWeight": 0,
@@ -29,7 +29,7 @@
         "equippedFood": null,
         "equippedDrink": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754070726893
+        "lastOnlineTime": 1754072198970
       }
     ]
   ],
@@ -101,7 +101,17 @@
         "id": "5f305c8b-4c68-4727-ae31-edc91ea1fbf2",
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
-        "quantity": 5,
+        "quantity": 2,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "53051578-36b8-471f-839b-ce0e34a00a6f",
+      {
+        "id": "53051578-36b8-471f-839b-ce0e34a00a6f",
+        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
+        "resourceId": "eq-tool-0123abcd-789a-1234-4567-89012345678a",
+        "quantity": 1,
         "itemType": "resource"
       }
     ]

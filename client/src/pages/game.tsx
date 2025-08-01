@@ -6,7 +6,7 @@ import BiomesTab from "@/components/game/biomes-tab-new";
 import QuestsTab from "@/components/game/quests-tab";
 import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
 import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
-import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
+import RecreatedCraftingTab from "@/components/game/recreated-crafting-tab";
 import LoadingScreen from "@/components/game/loading-screen";
 import { OfflineActivityReportDialog } from "@/components/game/offline-activity-report";
 import { OfflineConfigModal } from "@/components/game/offline-config-modal";
@@ -316,7 +316,7 @@ export default function Game() {
               />
             )}
             {activeTab === "crafting" && (
-              <EnhancedCraftingTab
+              <RecreatedCraftingTab
                 recipes={recipes}
                 playerId={player.id}
                 resources={resources}
