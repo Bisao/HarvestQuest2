@@ -90,7 +90,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}/quests`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}`] });
 
       let message = "Quest completada!";
       if (data.newLevel) {
@@ -321,94 +321,95 @@ export default function QuestsTab({ player }: QuestsTabProps) {
             </div>
           </div>
         </CardHeader>
-      <CardContent className="space-y-4">
-        <CardDescription>{quest.description}</CardDescription>
+        <CardContent className="space-y-4">
+          <CardDescription>{quest.description}</CardDescription>
 
-        <div className="space-y-2">
-          <h4 className="font-semibold text-sm">Objetivos:</h4>
-          {quest.objectives.map((objective, idx) => {
-            if (quest.status === 'active') {
-              const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId || objective.target);
-              const objectiveProgress = quest.progress[progressKey];
+          <div className="space-y-2">
+            <h4 className="font-semibold text-sm">Objetivos:</h4>
+            {quest.objectives.map((objective, idx) => {
+              if (quest.status === 'active') {
+                const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId || objective.target);
+                const objectiveProgress = quest.progress[progressKey];
 
-              return (
-                <div key={idx} className="text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className={objectiveProgress?.completed ? "text-green-600 font-medium" : "text-muted-foreground"}>
-                      {objectiveProgress?.completed ? "✅" : "•"} {objective.description}
-                    </span>
-                    {objectiveProgress && (
-                      <span className={`text-xs font-medium ${objectiveProgress.completed ? 'text-green-600' : 'text-muted-foreground'}`}>
-                        {objectiveProgress.current}/{objectiveProgress.required}
+                return (
+                  <div key={idx} className="text-sm">
+                    <div className="flex justify-between items-center">
+                      <span className={objectiveProgress?.completed ? "text-green-600 font-medium" : "text-muted-foreground"}>
+                        {objectiveProgress?.completed ? "✅" : "•"} {objective.description}
                       </span>
+                      {objectiveProgress && (
+                        <span className={`text-xs font-medium ${objectiveProgress.completed ? 'text-green-600' : 'text-muted-foreground'}`}>
+                          {objectiveProgress.current}/{objectiveProgress.required}
+                        </span>
+                      )}
+                    </div>
+                    {objectiveProgress && (
+                      <Progress 
+                        value={(objectiveProgress.current / objectiveProgress.required) * 100} 
+                        className={`h-2 mt-1 ${objectiveProgress.completed ? 'bg-green-100' : ''}`}
+                      />
                     )}
                   </div>
-                  {objectiveProgress && (
-                    <Progress 
-                      value={(objectiveProgress.current / objectiveProgress.required) * 100} 
-                      className={`h-2 mt-1 ${objectiveProgress.completed ? 'bg-green-100' : ''}`}
-                    />
-                  )}
-                </div>
-              );
-            } else {
-              return (
-                <div key={idx} className="text-sm text-muted-foreground">
-                  • {objective.description}
-                </div>
-              );
-            }
-          })}
-        </div>
-
-        <div className="space-y-2">
-          <h4 className="font-semibold text-sm">Recompensas:</h4>
-          <p className="text-sm text-muted-foreground">
-            {formatRewards(quest.rewards)}
-          </p>
-        </div>
-
-        {quest.status === 'available' && (
-          <Button 
-            onClick={() => startQuestMutation.mutate(quest.id)}
-            disabled={startQuestMutation.isPending || player.level < quest.requiredLevel}
-            className="w-full"
-            variant={player.level < quest.requiredLevel ? "secondary" : "default"}
-          >
-            {startQuestMutation.isPending ? "Iniciando..." : 
-             player.level < quest.requiredLevel ? `🔒 Requer Nível ${quest.requiredLevel}` :
-             "🚀 Iniciar Quest"}
-          </Button>
-        )}
-
-        {quest.status === 'active' && canCompleteQuest(quest) && (
-          <Button 
-            onClick={() => completeQuestMutation.mutate(quest.id)}
-            disabled={completeQuestMutation.isPending}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white animate-pulse"
-          >
-            {completeQuestMutation.isPending ? "Completando..." : "🏆 Resgatar Recompensas"}
-          </Button>
-        )}
-
-        {quest.status === 'completed' && (
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="flex-1 justify-center">
-              ✅ Completa
-            </Badge>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => repeatQuestMutation.mutate(quest.id)}
-              disabled={repeatQuestMutation.isPending}
-            >
-              {repeatQuestMutation.isPending ? "Reiniciando..." : "🔄 Repetir"}
-            </Button>
+                );
+              } else {
+                return (
+                  <div key={idx} className="text-sm text-muted-foreground">
+                    • {objective.description}
+                  </div>
+                );
+              }
+            })}
           </div>
-        )}
-      </CardContent>
-    </Card>
-  );
+
+          <div className="space-y-2">
+            <h4 className="font-semibold text-sm">Recompensas:</h4>
+            <p className="text-sm text-muted-foreground">
+              {formatRewards(quest.rewards)}
+            </p>
+          </div>
+
+          {quest.status === 'available' && (
+            <Button 
+              onClick={() => startQuestMutation.mutate(quest.id)}
+              disabled={startQuestMutation.isPending || player.level < quest.requiredLevel}
+              className="w-full"
+              variant={player.level < quest.requiredLevel ? "secondary" : "default"}
+            >
+              {startQuestMutation.isPending ? "Iniciando..." : 
+               player.level < quest.requiredLevel ? `🔒 Requer Nível ${quest.requiredLevel}` :
+               "🚀 Iniciar Quest"}
+            </Button>
+          )}
+
+          {quest.status === 'active' && canCompleteQuest(quest) && (
+            <Button 
+              onClick={() => completeQuestMutation.mutate(quest.id)}
+              disabled={completeQuestMutation.isPending}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white animate-pulse"
+            >
+              {completeQuestMutation.isPending ? "Completando..." : "🏆 Resgatar Recompensas"}
+            </Button>
+          )}
+
+          {quest.status === 'completed' && (
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="flex-1 justify-center">
+                ✅ Completa
+              </Badge>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => repeatQuestMutation.mutate(quest.id)}
+                disabled={repeatQuestMutation.isPending}
+              >
+                {repeatQuestMutation.isPending ? "Reiniciando..." : "🔄 Repetir"}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
