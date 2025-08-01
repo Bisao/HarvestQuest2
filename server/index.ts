@@ -62,6 +62,9 @@ let wsService: WebSocketService; // Declare wsService outside the scope of the a
 
   // Initialize WebSocket service
   wsService = new WebSocketService(server);
+  
+  // Store reference in app for use in other routes  
+  app.locals.wsService = wsService;
 
   // Use the centralized error handler
   app.use(errorHandler);

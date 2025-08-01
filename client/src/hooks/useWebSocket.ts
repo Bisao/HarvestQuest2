@@ -121,16 +121,6 @@ export function useWebSocket(playerId: string | null) {
       case 'pong':
         // Server responded to our ping
         break;
-      case 'player_update':
-      case 'player_updated':
-        console.log('📡 Real-time player update received:', message.data);
-        // Update player data directly in cache and force refetch
-        if (playerId && message.data) {
-          queryClient.setQueryData([`/api/player/${playerId}`], message.data);
-          queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
-          queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
-        }
-        break;
 
       case 'item_consumed':
         console.log('📡 Item consumption update received:', message.data);

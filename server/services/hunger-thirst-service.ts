@@ -74,10 +74,8 @@ export class HungerThirstService {
           try {
             const updatedPlayer = await this.storage.getPlayer(player.id);
             if (updatedPlayer) {
-              const webSocketModule = await import("../websocket-service");
-              if (webSocketModule.default) {
-                webSocketModule.default.broadcastPlayerUpdate(player.id, updatedPlayer);
-              }
+              const { broadcastPlayerUpdate } = await import("../websocket-service");
+              broadcastPlayerUpdate(player.id, updatedPlayer);
               console.log(`📡 Real-time hunger/thirst update sent to player ${player.username}`);
             }
           } catch (error) {

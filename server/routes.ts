@@ -918,16 +918,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   
-  // Initialize WebSocket service for real-time updates
-  const wsService = new WebSocketService(httpServer);
-  
   // Store reference in app for use in other routes  
-  app.locals.wsService = wsService;
+  // WebSocket service will be initialized in index.ts
   
   // Also store in storage for access by services
   if (storage.setApp) {
     storage.setApp(app);
   }
   
-  return httpServer;
+  return httpServer; httpServer;
 }
