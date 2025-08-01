@@ -235,12 +235,22 @@ export default function QuestsTab({ player }: QuestsTabProps) {
   const activeQuests = quests.filter(q => q.status === 'active');
   const completedQuests = quests.filter(q => q.status === 'completed');
 
+  // Group available quests by category
+  const availableByCategory = availableQuests.reduce((acc, quest) => {
+    if (!acc[quest.category || 'geral']) {
+      acc[quest.category || 'geral'] = [];
+    }
+    acc[quest.category || 'geral'].push(quest);
+    return acc;
+  }, {} as Record<string, Quest[]>);
+
   const questCategories = {
     available: {
       label: "Missões Disponíveis",
       emoji: "✨",
       quests: availableQuests,
-      color: ""
+      color: "",
+      subcategories: availableByCategory
     },
     active: {
       label: "Missões Ativas",
@@ -256,42 +266,61 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     }
   };
 
+  const categoryLabels = {
+    iniciante: { label: "🌱 Iniciante", color: "bg-green-100 text-green-800" },
+    aventureiro: { label: "⚔️ Aventureiro", color: "bg-blue-100 text-blue-800" },
+    especialista: { label: "🏆 Especialista", color: "bg-purple-100 text-purple-800" },
+    lendario: { label: "👑 Lendário", color: "bg-yellow-100 text-yellow-800" }
+  };
+
   if (isLoading) {
     return <div className="flex justify-center p-8">Carregando quests...</div>;
   }
 
-  const renderQuestCard = (quest: Quest, isActive = false) => (
-    <Card key={quest.id} className={`${isActive ? questCategories.active.color : questCategories[quest.status as keyof typeof questCategories]?.color} ${quest.canComplete ? 'ring-2 ring-yellow-400 ring-opacity-60' : ''}`}>
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{quest.emoji}</span>
-            <div>
-              <CardTitle className="text-lg flex items-center gap-2">
-                {quest.name}
-                {quest.canComplete && (
-                  <span className="text-yellow-500 animate-pulse text-xl">!</span>
-                )}
-              </CardTitle>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge variant={getStatusColor(quest.status)}>
-                  {getStatusText(quest.status)}
-                </Badge>
-                {quest.status === 'available' && (
+  const renderQuestCard = (quest: Quest, isActive = false) => {
+    const canActivate = quest.status === 'available' && player.level >= quest.requiredLevel;
+    const categoryInfo = categoryLabels[quest.category as keyof typeof categoryLabels];
+    
+    return (
+      <Card key={quest.id} className={`${isActive ? questCategories.active.color : questCategories[quest.status as keyof typeof questCategories]?.color} ${quest.canComplete ? 'ring-2 ring-yellow-400 ring-opacity-60' : ''} ${!canActivate && quest.status === 'available' ? 'opacity-60' : ''}`}>
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{quest.emoji}</span>
+              <div>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  {quest.name}
+                  {quest.canComplete && (
+                    <span className="text-yellow-500 animate-pulse text-xl">!</span>
+                  )}
+                </CardTitle>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <Badge variant={getStatusColor(quest.status)}>
+                    {getStatusText(quest.status)}
+                  </Badge>
+                  {categoryInfo && (
+                    <Badge variant="outline" className={categoryInfo.color}>
+                      {categoryInfo.label}
+                    </Badge>
+                  )}
                   <Badge variant="outline">
                     Nível {quest.requiredLevel}
                   </Badge>
-                )}
-                {quest.canComplete && (
-                  <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 animate-pulse">
-                    ✨ Pronta!
-                  </Badge>
-                )}
+                  {quest.status === 'available' && !canActivate && (
+                    <Badge variant="destructive" className="bg-red-100 text-red-800">
+                      🔒 Bloqueada
+                    </Badge>
+                  )}
+                  {quest.canComplete && (
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 animate-pulse">
+                      ✨ Pronta!
+                    </Badge>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </CardHeader>
+        </CardHeader>
       <CardContent className="space-y-4">
         <CardDescription>{quest.description}</CardDescription>
 
@@ -344,10 +373,11 @@ export default function QuestsTab({ player }: QuestsTabProps) {
             onClick={() => startQuestMutation.mutate(quest.id)}
             disabled={startQuestMutation.isPending || player.level < quest.requiredLevel}
             className="w-full"
+            variant={player.level < quest.requiredLevel ? "secondary" : "default"}
           >
             {startQuestMutation.isPending ? "Iniciando..." : 
-             player.level < quest.requiredLevel ? `Requer Nível ${quest.requiredLevel}` :
-             "Iniciar Quest"}
+             player.level < quest.requiredLevel ? `🔒 Requer Nível ${quest.requiredLevel}` :
+             "🚀 Iniciar Quest"}
           </Button>
         )}
 
@@ -430,7 +460,34 @@ export default function QuestsTab({ player }: QuestsTabProps) {
 
             return (
               <div key={categoryKey}>
-                {categoryKey === 'completed' ? (
+                {categoryKey === 'available' ? (
+                  // Group available quests by difficulty category
+                  <div className="space-y-8">
+                    {Object.entries(category.subcategories || {}).map(([subCat, subQuests]) => {
+                      const categoryInfo = categoryLabels[subCat as keyof typeof categoryLabels];
+                      const availableCount = subQuests.filter(q => player.level >= q.requiredLevel).length;
+                      const totalCount = subQuests.length;
+                      
+                      return (
+                        <div key={subCat} className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-xl font-bold flex items-center gap-2">
+                              {categoryInfo ? categoryInfo.label : `📋 ${subCat}`}
+                              <Badge variant="outline" className="ml-2">
+                                {availableCount}/{totalCount} disponíveis
+                              </Badge>
+                            </h3>
+                          </div>
+                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {subQuests
+                              .sort((a, b) => a.requiredLevel - b.requiredLevel)
+                              .map((quest) => renderQuestCard(quest))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : categoryKey === 'completed' ? (
                   <ScrollArea className="h-96">
                     <div className="space-y-4">
                       {category.quests.map((quest) => renderQuestCard(quest))}
