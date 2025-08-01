@@ -1,3 +1,4 @@
+
 // Modern recipe system with fundamental attributes
 import type { InsertRecipe } from "@shared/types";
 import { RESOURCE_IDS, EQUIPMENT_IDS } from "@shared/constants/game-ids";

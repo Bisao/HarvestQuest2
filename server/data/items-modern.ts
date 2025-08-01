@@ -164,32 +164,6 @@ export function createModernGameItems(): InsertGameItem[] {
       effects: [],
       tags: ["wood", "flexible", "renewable"]
     },
-    {
-      id: RESOURCE_IDS.COURO,
-      name: "leather",
-      displayName: "Couro",
-      description: "Couro resistente processado de animais, usado para equipamentos e itens duráveis",
-      iconPath: "🦫",
-      category: "material",
-      subcategory: "processed_animal",
-      weight: 500, // 500 gramas por peça de couro
-      stackable: true,
-      maxStackSize: 64,
-      rarity: "common",
-      xpReward: 3,
-      yieldAmount: 1,
-      requiredTool: "knife",
-      spawnRate: 0.0, // Processed from animals
-      sellPrice: 8,
-      buyPrice: 16,
-      attributes: {
-        durability: "high",
-        flexibility: "medium",
-        water_resistance: "low"
-      },
-      effects: [],
-      tags: ["material", "leather", "processed", "crafting"]
-    },
     
     // Animals for hunting
     {
