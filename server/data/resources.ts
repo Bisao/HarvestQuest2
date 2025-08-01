@@ -29,7 +29,7 @@ export function createResourcesWithIds(): InsertResource[] {
       sellPrice: 3,
       buyPrice: 6,
       experienceValue: 2,
-      category: "consumable",
+      category: "consumables",
       stackable: true,
       maxStackSize: 50,
       tags: ["consumable", "fishing", "craftable"],
@@ -74,7 +74,7 @@ export function createResourcesWithIds(): InsertResource[] {
       category: "drink",
       rarity: "common", 
       experienceValue: 2,
-      attributes: { hunger_restore: 3, thirst_restore: 12, consumable: true }
+      attributes: { consumable: true }
     },
     { 
       id: RESOURCE_IDS.COGUMELOS_ASSADOS, 
@@ -87,7 +87,7 @@ export function createResourcesWithIds(): InsertResource[] {
       category: "food",
       rarity: "common", 
       experienceValue: 3,
-      attributes: { hunger_restore: 8, thirst_restore: 1, consumable: true }
+      attributes: { consumable: true }
     },
     { 
       id: RESOURCE_IDS.PEIXE_GRELHADO, 
@@ -100,7 +100,7 @@ export function createResourcesWithIds(): InsertResource[] {
       category: "food",
       rarity: "common", 
       experienceValue: 4,
-      attributes: { hunger_restore: 12, thirst_restore: 2, consumable: true }
+      attributes: { consumable: true }
     },
     { 
       id: RESOURCE_IDS.CARNE_ASSADA, 
@@ -113,7 +113,7 @@ export function createResourcesWithIds(): InsertResource[] {
       category: "food",
       rarity: "common", 
       experienceValue: 5,
-      attributes: { hunger_restore: 25, thirst_restore: 5, consumable: true }
+      attributes: { consumable: true }
     },
     { 
       id: RESOURCE_IDS.ENSOPADO_CARNE, 
@@ -126,7 +126,7 @@ export function createResourcesWithIds(): InsertResource[] {
       category: "food",
       rarity: "uncommon", 
       experienceValue: 8,
-      attributes: { hunger_restore: 20, thirst_restore: 8, consumable: true }
+      attributes: { consumable: true }
     },
   ];
 }
