@@ -536,4 +536,94 @@ export function registerEnhancedGameRoutes(
       res.status(500).json({ message: "Failed to update player settings" });
     }
   });
+
+  // Get offline activity config
+  app.get('/api/player/:playerId/offline-config', (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const player = gameStorage.getPlayer(playerId);
+
+      if (!player) {
+        return res.status(404).json({ error: 'Player not found' });
+      }
+
+      res.json(player.offlineActivityConfig || {
+        enabled: false,
+        maxDuration: 12,
+        stopOnLowResources: true,
+        minHunger: 20,
+        minThirst: 20,
+        preferredResources: []
+      });
+    } catch (error) {
+      console.error('Error fetching offline config:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Get available resources for offline activities
+  app.get('/api/player/:playerId/offline-resources', (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const player = gameStorage.getPlayer(playerId);
+
+      if (!player) {
+        return res.status(404).json({ error: 'Player not found' });
+      }
+
+      const allResources = gameData.resources;
+      const allBiomes = gameData.biomes;
+      const playerInventory = gameStorage.getInventory(playerId);
+
+      // Biomas acessíveis pelo jogador
+      const accessibleBiomes = allBiomes.filter(biome => 
+        biome.requiredLevel <= player.level
+      );
+
+      // Função para verificar se o jogador pode coletar um recurso
+      const canCollectResource = (resource: any) => {
+        if (!resource.requirements) return true;
+
+        // Verifica requisito de nível
+        if (resource.requirements.level && player.level < resource.requirements.level) {
+          return false;
+        }
+
+        // Verifica requisito de ferramenta
+        if (resource.requirements.tool) {
+          const hasTool = playerInventory.some((item: any) => 
+            item.itemId === resource.requirements.tool && item.quantity > 0
+          ) || player.equippedTool === resource.requirements.tool;
+
+          if (!hasTool) return false;
+        }
+
+        // Verifica requisito de bioma - pelo menos um bioma acessível deve estar disponível
+        if (resource.requirements.biomes && resource.requirements.biomes.length > 0) {
+          const hasAccessibleBiome = resource.requirements.biomes.some((biomeId: string) => 
+            accessibleBiomes.some((biome: any) => biome.id === biomeId)
+          );
+          if (!hasAccessibleBiome) return false;
+        }
+
+        return true;
+      };
+
+      // Filtra recursos disponíveis
+      const availableResources = allResources
+        .filter((resource: any) => {
+          // Filtra apenas recursos (não equipamentos)
+          if (resource.type !== 'resource') return false;
+
+          // Verifica se pode coletar baseado nos requisitos
+          return canCollectResource(resource);
+        })
+        .sort((a: any, b: any) => (a.requirements?.level || 0) - (b.requirements?.level || 0));
+
+      res.json(availableResources);
+    } catch (error) {
+      console.error('Error fetching offline resources:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 }
