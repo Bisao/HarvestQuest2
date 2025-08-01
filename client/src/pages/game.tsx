@@ -7,6 +7,7 @@ import QuestsTab from "@/components/game/quests-tab";
 import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
 import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import RecreatedCraftingTab from "@/components/game/recreated-crafting-tab";
+import WorkshopsTab from "@/components/game/workshops-tab";
 import LoadingScreen from "@/components/game/loading-screen";
 import { OfflineActivityReportDialog } from "@/components/game/offline-activity-report";
 import { OfflineConfigModal } from "@/components/game/offline-config-modal";
@@ -247,6 +248,7 @@ export default function Game() {
     { id: "inventory", label: "Inventário", emoji: "🎒" },
     { id: "storage", label: "Armazém", emoji: "🏠" },
     { id: "crafting", label: "Crafting", emoji: "🔨" },
+    { id: "workshops", label: "Oficinas", emoji: "🏭" },
     { id: "quests", label: "Missões", emoji: "📜" },
   ];
 
@@ -321,6 +323,13 @@ export default function Game() {
                 playerId={player.id}
                 resources={resources}
                 playerLevel={player.level}
+              />
+            )}
+            {activeTab === "workshops" && (
+              <WorkshopsTab
+                playerId={player.id}
+                playerLevel={player.level}
+                resources={resources}
               />
             )}
           </div>
