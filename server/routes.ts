@@ -365,7 +365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Equip item endpoint
+  // Equipment routes
   app.post("/api/player/equip", async (req, res) => {
     try {
       const { playerId, slot, equipmentId } = req.body;
@@ -379,124 +379,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Player not found" });
       }
 
-      const validSlots = ['helmet', 'chestplate', 'leggings', 'boots', 'weapon', 'tool', 'food', 'drink'];
-      if (!validSlots.includes(slot)) {
-        return res.status(400).json({ error: "Invalid slot" });
+      // If equipmentId is null, we're unequipping
+      if (equipmentId === null) {
+        const updateData: any = {};
+        updateData[`equipped${slot.charAt(0).toUpperCase() + slot.slice(1)}`] = null;
+
+        await storage.updatePlayer(playerId, updateData);
+
+        // Invalidate cache for real-time update
+        const { invalidatePlayerCache } = await import("./cache/memory-cache");
+        invalidatePlayerCache(playerId);
+
+        res.json({ success: true, message: "Item unequipped" });
+        return;
       }
 
-      // Get current equipped item for this slot
-      let currentEquippedId: string | null = null;
-      let slotKey: keyof Player | null = null;
+      // For food and drink slots, check if it's a consumable in storage
+      if (slot === 'food' || slot === 'drink') {
+        const storage_items = await storage.getPlayerStorage(playerId);
+        const storageItem = storage_items.find(item => 
+          item.resourceId === equipmentId && 
+          item.quantity > 0 && 
+          item.itemType === 'resource'
+        );
 
-      switch (slot) {
-        case "helmet": slotKey = 'equippedHelmet'; break;
-        case "chestplate": slotKey = 'equippedChestplate'; break;
-        case "leggings": slotKey = 'equippedLeggings'; break;
-        case "boots": slotKey = 'equippedBoots'; break;
-        case "weapon": slotKey = 'equippedWeapon'; break;
-        case "tool": slotKey = 'equippedTool'; break;
-        case "food": slotKey = 'equippedFood'; break;
-        case "drink": slotKey = 'equippedDrink'; break;
-        default:
-          return res.status(400).json({ error: "Invalid slot" });
-      }
-
-      if (slotKey) {
-        currentEquippedId = player[slotKey] as string | null;
-      }
-
-      // If unequipping (equipmentId is null)
-      if (!equipmentId) {
-        // Return currently equipped item to storage
-        if (currentEquippedId) {
-          const storageItems = await storage.getPlayerStorage(playerId);
-          const existingStorageItem = storageItems.find(item => item.resourceId === currentEquippedId);
-
-          if (existingStorageItem) {
-            await storage.updateStorageItem(existingStorageItem.id, {
-              quantity: existingStorageItem.quantity + 1
-            });
-          } else {
-            await storage.addStorageItem({
-              playerId,
-              resourceId: currentEquippedId,
-              quantity: 1,
-              itemType: 'equipment'
-            });
-          }
-        }
-      } else {
-        // If equipping a new item
-        // Check if item is available in storage
-        const storageItems = await storage.getPlayerStorage(playerId);
-        const storageItem = storageItems.find(item => item.resourceId === equipmentId);
-
-        if (!storageItem || storageItem.quantity < 1) {
-          return res.status(400).json({ error: "Item not available in storage" });
+        if (!storageItem) {
+          return res.status(400).json({ error: "Consumable not found in storage" });
         }
 
-        // Return currently equipped item to storage (if any)
-        if (currentEquippedId) {
-          const existingCurrentItem = storageItems.find(item => item.resourceId === currentEquippedId);
-          if (existingCurrentItem) {
-            await storage.updateStorageItem(existingCurrentItem.id, {
-              quantity: existingCurrentItem.quantity + 1
-            });
-          } else {
-            await storage.addStorageItem({
-              playerId,
-              resourceId: currentEquippedId,
-              quantity: 1,
-              itemType: 'equipment'
-            });
-          }
+        // Check if it's actually a consumable
+        const resources = await storage.getAllResources();
+        const resourceData = resources.find(r => r.id === equipmentId);
+
+        if (!resourceData || resourceData.category !== 'consumable') {
+          return res.status(400).json({ error: "Item is not a consumable" });
         }
 
-        // Consume 1 item from storage
-        if (storageItem.quantity === 1) {
-          await storage.removeStorageItem(storageItem.id);
-        } else {
-          await storage.updateStorageItem(storageItem.id, {
-            quantity: storageItem.quantity - 1
-          });
+        // Verify subcategory matches slot
+        if (resourceData.subcategory !== slot) {
+          return res.status(400).json({ error: `Item is not a ${slot} consumable` });
         }
+
+        // Update player equipment
+        const updateData: any = {};
+        updateData[`equipped${slot.charAt(0).toUpperCase() + slot.slice(1)}`] = equipmentId;
+
+        await storage.updatePlayer(playerId, updateData);
+
+        // Invalidate cache for real-time update
+        const { invalidatePlayerCache } = await import("./cache/memory-cache");
+        invalidatePlayerCache(playerId);
+
+        res.json({ success: true, message: "Consumable equipped successfully" });
+        return;
       }
 
-      // Update the player's equipped item for the specific slot
-      const updates: Partial<Player> = {};
+      // For regular equipment slots
+      const equipment = await storage.getAllEquipment();
+      const equipmentItem = equipment.find(eq => eq.id === equipmentId);
 
-      switch (slot) {
-        case "helmet":
-          updates.equippedHelmet = equipmentId;
-          break;
-        case "chestplate":
-          updates.equippedChestplate = equipmentId;
-          break;
-        case "leggings":
-          updates.equippedLeggings = equipmentId;
-          break;
-        case "boots":
-          updates.equippedBoots = equipmentId;
-          break;
-        case "weapon":
-          updates.equippedWeapon = equipmentId;
-          break;
-        case "tool":
-          updates.equippedTool = equipmentId;
-          break;
-        case "food":
-            updates.equippedFood = equipmentId;
-            break;
-        case "drink":
-            updates.equippedDrink = equipmentId;
-            break;
+      if (!equipmentItem) {
+        return res.status(404).json({ error: "Equipment not found" });
       }
 
-      const updatedPlayer = await storage.updatePlayer(playerId, updates);
-      res.json(updatedPlayer);
+      // Check if player has the equipment in storage or inventory
+      const inventory = await storage.getPlayerInventory(playerId);
+      const storage_items = await storage.getPlayerStorage(playerId);
+
+      const hasInInventory = inventory.some(item => item.resourceId === equipmentId);
+      const hasInStorage = storage_items.some(item => 
+        item.resourceId === equipmentId && 
+        item.quantity > 0 && 
+        item.itemType === 'equipment'
+      );
+
+      if (!hasInInventory && !hasInStorage) {
+        return res.status(400).json({ error: "You don't have this equipment" });
+      }
+
+      // Update player equipment
+      const updateData: any = {};
+      updateData[`equipped${slot.charAt(0).toUpperCase() + slot.slice(1)}`] = equipmentId;
+
+      await storage.updatePlayer(playerId, updateData);
+
+      // Invalidate cache for real-time update
+      const { invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidatePlayerCache(playerId);
+
+      res.json({ success: true, message: "Equipment equipped successfully" });
     } catch (error) {
-      console.error("Error equipping item:", error);
-      res.status(500).json({ error: "Failed to equip item" });
+      console.error("Equip equipment error:", error);
+      res.status(500).json({ error: "Failed to equip equipment" });
     }
   });
 

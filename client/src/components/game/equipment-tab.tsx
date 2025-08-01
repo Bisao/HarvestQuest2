@@ -59,22 +59,31 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
         slot, 
         equipmentId 
       });
-      if (!response.ok) throw new Error("Failed to equip item");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to equip item");
+      }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Force refetch of player data to update equipped items
       queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", player.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory", player.id] });
+      
+      // Force immediate refetch
+      queryClient.refetchQueries({ queryKey: [`/api/player/${player.id}`] });
+      
       setEquipModalOpen(false);
       toast({
         title: "Item equipado",
-        description: "Item equipado com sucesso.",
+        description: data.message || "Item equipado com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Erro",
-        description: "Falha ao equipar item.",
+        description: error.message || "Falha ao equipar item.",
         variant: "destructive",
       });
     },
@@ -82,22 +91,35 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
 
   const unequipMutation = useMutation({
     mutationFn: async (slot: string) => {
-      const response = await apiRequest("POST", `/api/player/${player.id}/unequip`, { slot });
-      if (!response.ok) throw new Error("Failed to unequip item");
+      const response = await apiRequest("POST", `/api/player/equip`, { 
+        playerId: player.id, 
+        slot, 
+        equipmentId: null 
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to unequip item");
+      }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Force refetch of player data to update equipped items
       queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", player.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory", player.id] });
+      
+      // Force immediate refetch
+      queryClient.refetchQueries({ queryKey: [`/api/player/${player.id}`] });
+      
       toast({
         title: "Item desequipado",
-        description: "Item removido com sucesso.",
+        description: data.message || "Item removido com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Erro",
-        description: "Falha ao desequipar item.",
+        description: error.message || "Falha ao desequipar item.",
         variant: "destructive",
       });
     },
