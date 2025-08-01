@@ -319,6 +319,13 @@ export function registerEnhancedGameRoutes(
         invalidateStorageCache(playerId);
         invalidateInventoryCache(playerId);
 
+        // Clear cache keys manually to ensure immediate update
+        const { gameCache } = await import("../cache/memory-cache");
+        gameCache.del(`player:${playerId}`);
+        gameCache.del(`storage:${playerId}`);
+        gameCache.del(`inventory:${playerId}`);
+        gameCache.del(`player:username:${player.username}`);
+
         successResponse(res, {
           recipe: {
             id: recipe.id,

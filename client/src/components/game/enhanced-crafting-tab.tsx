@@ -40,7 +40,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
   const craftMutation = useMutation({
     mutationFn: async ({ recipeId, quantity = 1 }: { recipeId: string; quantity?: number }) => {
       try {
-        const response = await fetch("/api/craft", {
+        const response = await fetch("/api/v2/craft", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ playerId, recipeId, quantity: quantity || 1 }),
