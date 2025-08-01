@@ -12,7 +12,7 @@
         "thirst": 2,
         "maxThirst": 100,
         "coins": 100,
-        "inventoryWeight": 5,
+        "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -29,17 +29,7 @@
       }
     ]
   ],
-  "inventoryItems": [
-    [
-      "da1a4e7a-701d-4d87-80c5-f28523798a03",
-      {
-        "id": "da1a4e7a-701d-4d87-80c5-f28523798a03",
-        "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
-        "resourceId": "res-c9e5a1f7-8d3b-4e02-9a13-6c2e8f7b5def",
-        "quantity": 5
-      }
-    ]
-  ],
+  "inventoryItems": [],
   "storageItems": [
     [
       "9647de49-e2e6-48dc-b6cd-03d4de7d2627",
@@ -97,7 +87,7 @@
         "id": "21576543-dda3-49e6-91c7-8a3125c6b8a5",
         "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
         "resourceId": "res-c9e5a1f7-8d3b-4e02-9a13-6c2e8f7b5def",
-        "quantity": 3,
+        "quantity": 8,
         "itemType": "resource"
       }
     ]
