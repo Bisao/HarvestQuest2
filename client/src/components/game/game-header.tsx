@@ -1,24 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Player } from "@shared/types";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import PlayerSettings from "./player-settings";
+import { useGamePolling } from "@/hooks/useGamePolling";
 
 interface GameHeaderProps {
   player: Player;
 }
 
-const GameHeader = ({ player }: GameHeaderProps) => {
+const GameHeader = ({ player: initialPlayer }: GameHeaderProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   
+  // Use polling to get real-time updates
+  const { player: polledPlayer } = useGamePolling({
+    playerId: initialPlayer?.id || null,
+    enabled: !!initialPlayer?.id,
+    pollInterval: 1500 // 1.5 seconds for header updates
+  });
+  
+  // Use polled data if available, fallback to initial player data
+  const currentPlayer = polledPlayer || initialPlayer;
+  
   // Ensure we have valid values for calculations
-  const currentHunger = Math.max(0, player.hunger || 0);
-  const currentThirst = Math.max(0, player.thirst || 0);
-  const maxHunger = player.maxHunger || 100;
-  const maxThirst = player.maxThirst || 100;
+  const currentHunger = Math.max(0, currentPlayer.hunger || 0);
+  const currentThirst = Math.max(0, currentPlayer.thirst || 0);
+  const maxHunger = currentPlayer.maxHunger || 100;
+  const maxThirst = currentPlayer.maxThirst || 100;
   
   // Calculate values directly to ensure real-time updates
-  const experiencePercentage = Math.min(((player.experience % 100) / 100) * 100, 100);
+  const experiencePercentage = Math.min(((currentPlayer.experience % 100) / 100) * 100, 100);
   const hungerPercentage = Math.min((currentHunger / maxHunger) * 100, 100);
   const thirstPercentage = Math.min((currentThirst / maxThirst) * 100, 100);
 
@@ -35,7 +46,7 @@ const GameHeader = ({ player }: GameHeaderProps) => {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">⭐</span>
-                  <span className="font-semibold whitespace-nowrap">Nível {player.level}</span>
+                  <span className="font-semibold whitespace-nowrap">Nível {currentPlayer.level}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
@@ -92,7 +103,7 @@ const GameHeader = ({ player }: GameHeaderProps) => {
               </div>
               <div className="flex items-center space-x-1 md:space-x-2">
                 <span className="text-sm md:text-lg">💰</span>
-                <span className="font-semibold">{(player.coins || 0).toLocaleString()}</span>
+                <span className="font-semibold">{(currentPlayer.coins || 0).toLocaleString()}</span>
               </div>
               <Button
                 variant="ghost"
@@ -108,7 +119,7 @@ const GameHeader = ({ player }: GameHeaderProps) => {
       </header>
       
       <PlayerSettings 
-        player={player}
+        player={currentPlayer}
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
       />

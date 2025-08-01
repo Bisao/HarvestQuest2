@@ -40,7 +40,7 @@ export function useGamePolling({
     enabled: enabled && !!playerId,
     refetchInterval: pollInterval,
     refetchIntervalInBackground: true,
-    staleTime: 1000,
+    staleTime: 500,
   });
 
   // Poll storage data
@@ -55,7 +55,7 @@ export function useGamePolling({
     enabled: enabled && !!playerId,
     refetchInterval: pollInterval,
     refetchIntervalInBackground: true,
-    staleTime: 1000,
+    staleTime: 500,
   });
 
   return {
