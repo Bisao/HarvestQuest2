@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { StorageItem, Resource, Equipment, Player } from "@shared/types";
 import { isConsumable, getConsumableDescription, getConsumableEffects } from "@shared/utils/consumable-utils";
 
@@ -408,9 +409,10 @@ export default function EnhancedStorageTab({
             </div>
           )}
 
-          {/* Storage Items Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {filteredStorageData.map((item) => (
+          {/* Storage Items Grid with ScrollArea */}
+          <ScrollArea className="h-[600px] w-full rounded-md border">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 p-4">
+              {filteredStorageData.map((item) => (
                 <div
                   key={item.id}
                   className="bg-white border border-gray-200 rounded-xl p-3 sm:p-5 hover:shadow-lg transition-all duration-200"
@@ -509,40 +511,41 @@ export default function EnhancedStorageTab({
                     </span>
                   </div>
                 </div>
-              ))}
+                ))}
 
-            {/* Empty State */}
-            {filteredStorageData.length === 0 && enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length === 0 && (
-              <div className="col-span-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-12 text-center">
-                <div className="text-6xl text-gray-400 mb-4">📦</div>
-                <h3 className="text-lg font-semibold text-gray-600 mb-2">Armazém Vazio</h3>
-                <p className="text-gray-500">
-                  Colete recursos em expedições para começar a encher seu armazém!
-                </p>
-              </div>
-            )}
+              {/* Empty State */}
+              {filteredStorageData.length === 0 && enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length === 0 && (
+                <div className="col-span-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-12 text-center">
+                  <div className="text-6xl text-gray-400 mb-4">📦</div>
+                  <h3 className="text-lg font-semibold text-gray-600 mb-2">Armazém Vazio</h3>
+                  <p className="text-gray-500">
+                    Colete recursos em expedições para começar a encher seu armazém!
+                  </p>
+                </div>
+              )}
 
-            {/* No Results State */}
-            {filteredStorageData.length === 0 && enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length > 0 && (
-              <div className="col-span-full bg-yellow-50 border-2 border-dashed border-yellow-300 rounded-xl p-12 text-center">
-                <div className="text-6xl text-yellow-400 mb-4">🔍</div>
-                <h3 className="text-lg font-semibold text-yellow-600 mb-2">Nenhum Item Encontrado</h3>
-                <p className="text-yellow-600 mb-4">
-                  Nenhum item corresponde aos filtros selecionados.
-                </p>
-                <button
-                  onClick={() => {
-                    setSearchFilter("");
-                    setTypeFilter("all");
-                    setRarityFilter("all");
-                  }}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-                >
-                  Limpar Filtros
-                </button>
-              </div>
-            )}
-          </div>
+              {/* No Results State */}
+              {filteredStorageData.length === 0 && enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length > 0 && (
+                <div className="col-span-full bg-yellow-50 border-2 border-dashed border-yellow-300 rounded-xl p-12 text-center">
+                  <div className="text-6xl text-yellow-400 mb-4">🔍</div>
+                  <h3 className="text-lg font-semibold text-yellow-600 mb-2">Nenhum Item Encontrado</h3>
+                  <p className="text-yellow-600 mb-4">
+                    Nenhum item corresponde aos filtros selecionados.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSearchFilter("");
+                      setTypeFilter("all");
+                      setRarityFilter("all");
+                    }}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  >
+                    Limpar Filtros
+                  </button>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
         </div>
       )}
 
