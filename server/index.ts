@@ -57,24 +57,22 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Initialize and start hunger/thirst degradation system
-  const { HungerThirstService } from './services/hunger-thirst-service';
-  import { AutoConsumeService } from './services/auto-consume-service';
-
-// Create services
-const gameService = new GameService(storage);
-const hungerThirstService = new HungerThirstService(storage);
-const autoConsumeService = new AutoConsumeService(storage);
+  // Initialize services
   const { storage } = await import("./storage");
+  const { HungerThirstService } = await import('./services/hunger-thirst-service');
+  const { AutoConsumeService } = await import('./services/auto-consume-service');
+  const { GameService } = await import('./services/game-service');
+
+  // Create services
+  const gameService = new GameService(storage);
   const hungerThirstService = new HungerThirstService(storage);
   const autoConsumeService = new AutoConsumeService(storage);
+
+  // Start degradation system
   hungerThirstService.startPassiveDegradation();
 
-// Start degradation system
-hungerThirstService.startPassiveDegradation();
-
-// Start auto consume system
-autoConsumeService.startAutoConsume();
+  // Start auto consume system
+  autoConsumeService.startAutoConsume();
 
   // Use the centralized error handler
   app.use(errorHandler);
