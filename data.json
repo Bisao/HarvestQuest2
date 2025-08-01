@@ -7,9 +7,9 @@
         "username": "Bison",
         "level": 3,
         "experience": 222,
-        "hunger": 82,
+        "hunger": 78,
         "maxHunger": 100,
-        "thirst": 82,
+        "thirst": 78,
         "maxThirst": 100,
         "coins": 150,
         "inventoryWeight": 0,
@@ -29,7 +29,7 @@
         "equippedFood": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
         "equippedDrink": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754034919841
+        "lastOnlineTime": 1754035212590
       }
     ]
   ],
@@ -41,7 +41,7 @@
         "id": "cd61de8e-ea98-49f1-93ed-6aa0d2a9019e",
         "playerId": "6723aecf-ca0d-47eb-9582-de719ca3027f",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 7,
+        "quantity": 2,
         "itemType": "resource"
       }
     ],
