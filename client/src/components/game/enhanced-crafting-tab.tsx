@@ -94,19 +94,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     const resource = resources.find(r => r.id === resourceId);
     if (resource) return resource;
 
-    // ID mapping for known inconsistencies
-    const idMappings: Record<string, string> = {
-      "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1": "Barbante",
-      "res-8bd33b18-a241-4859-ae9f-870fab5673d0": "Fibra",
-      "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": "Pedras Soltas",
-      "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": "Gravetos"
-    };
-
-    // Fallback usando mapping
-    const mappedName = idMappings[resourceId];
-    if (mappedName) {
-      const mappedResource = resources.find(r => r.name === mappedName);
-      if (mappedResource) return mappedResource;
+    // Simple fallback for unknown resources
 
       return {
         id: resourceId,
@@ -213,19 +201,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       const fallbackResource = getResourceData(ingredient.itemId);
       const available = getStorageQuantity(ingredient.itemId);
 
-      // Special handling for known problematic IDs
-      if (ingredient.itemId === "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1") {
-        const barbante = resources.find(r => r.name === "Barbante");
-        if (barbante) {
-          const barbanteDispo = storageItems.find(item => item.resourceId === barbante.id)?.quantity || 0;
-          return {
-            resource: barbante,
-            quantity: ingredient.quantity,
-            available: barbanteDispo,
-            hasEnough: barbanteDispo >= ingredient.quantity
-          };
-        }
-      }
+      // Direct lookup without special handling
 
       return {
         resource: fallbackResource,
