@@ -79,23 +79,30 @@ export function useWebSocket(playerId: string | null) {
   const handleMessage = (message: WebSocketMessage) => {
     switch (message.type) {
       case 'player_update':
-        // Update player data in cache
+        console.log('📡 Real-time player update received:', message.data);
+        // Update player data in cache with correct query key format
         if (playerId && message.data) {
-          queryClient.setQueryData(["/api/player", playerId], message.data);
+          queryClient.setQueryData([`/api/player/${playerId}`], message.data);
+          // Also invalidate to force UI refresh
+          queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
         }
         break;
 
       case 'inventory_update':
+        console.log('📡 Real-time inventory update received:', message.data);
         // Update inventory data in cache
         if (playerId && message.data) {
           queryClient.setQueryData(["/api/inventory", playerId], message.data);
+          queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
         }
         break;
 
       case 'storage_update':
+        console.log('📡 Real-time storage update received:', message.data);
         // Update storage data in cache
         if (playerId && message.data) {
           queryClient.setQueryData(["/api/storage", playerId], message.data);
+          queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
         }
         break;
 

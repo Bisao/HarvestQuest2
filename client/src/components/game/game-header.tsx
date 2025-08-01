@@ -40,12 +40,12 @@ export default function GameHeader({ player }: GameHeaderProps) {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">🍖</span>
-                  <span className="font-semibold whitespace-nowrap">{player.hunger}/{player.maxHunger}</span>
+                  <span className="font-semibold whitespace-nowrap" key={`hunger-${player.hunger}`}>{player.hunger}/{player.maxHunger}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
-                      className="bg-orange-500 h-1.5 rounded-full transition-all duration-300"
+                      className="bg-orange-500 h-1.5 rounded-full transition-all duration-500"
                       style={{ 
                         width: `${Math.min((player.hunger / player.maxHunger) * 100, 100)}%` 
                       }}
@@ -56,12 +56,12 @@ export default function GameHeader({ player }: GameHeaderProps) {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">💧</span>
-                  <span className="font-semibold whitespace-nowrap">{player.thirst}/{player.maxThirst}</span>
+                  <span className="font-semibold whitespace-nowrap" key={`thirst-${player.thirst}`}>{player.thirst}/{player.maxThirst}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
-                      className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                      className="bg-blue-500 h-1.5 rounded-full transition-all duration-500"
                       style={{ 
                         width: `${Math.min((player.thirst / player.maxThirst) * 100, 100)}%` 
                       }}

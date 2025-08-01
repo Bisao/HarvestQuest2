@@ -145,8 +145,9 @@ export class WebSocketService {
     const client = this.clients.get(playerId);
     if (client && client.ws.readyState === WebSocket.OPEN) {
       this.sendToClient(client.ws, {
-        type: 'player_updated',
+        type: 'player_update',
         data: playerData,
+        playerId: playerId,
         timestamp: Date.now()
       });
       console.log(`📡 Player update sent to ${playerId}`);
