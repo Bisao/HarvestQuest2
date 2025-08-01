@@ -187,9 +187,15 @@ export default function EnhancedStorageTab({
       });
       return response.json();
     },
-    onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+    onSuccess: async (data: any) => {
+      // Force immediate cache invalidation with correct query keys
+      await queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      
+      // Force immediate refetch
+      await queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+      await queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
       
       const hungerGain = data.hungerRestored || 0;
       const thirstGain = data.thirstRestored || 0;

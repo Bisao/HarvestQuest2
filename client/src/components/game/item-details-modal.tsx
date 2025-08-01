@@ -94,11 +94,15 @@ export function ItemDetailsModal({
 
       return response.json();
     },
-    onSuccess: (data) => {
-      // Force refresh all related queries
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
+    onSuccess: async (data) => {
+      // Force refresh all related queries with correct keys
+      await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      await queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
+      
+      // Force immediate refetch
+      await queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+      await queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
 
       // Reset consume quantity and close modal
       setConsumeQuantity(1);

@@ -129,13 +129,14 @@ export default function SimpleInventory({
       return response.json();
     },
     onSuccess: async (data) => {
-      // Force immediate cache invalidation
+      // Force immediate cache invalidation with correct query keys
       await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      await queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
+      await queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
       
       // Force immediate refetch of player data
-      await queryClient.refetchQueries({ queryKey: ["/api/player", playerId] });
+      await queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+      await queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
       
       setSelectedItem(null);
       toast({

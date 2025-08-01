@@ -70,12 +70,16 @@ export class HungerThirstService {
             console.log(`🍖💧 Player ${player.username}: H:${player.hunger}→${newHunger}, T:${player.thirst}→${newThirst}`);
           }
 
-          // Broadcast real-time update via WebSocket if available
+          // Broadcast real-time update via WebSocket
           try {
             const updatedPlayer = await this.storage.getPlayer(player.id);
             if (updatedPlayer) {
-              // Note: WebSocket service will be available through app locals after server restart
-              console.log(`📡 Real-time update ready for player ${player.username}`);
+              const { broadcastToPlayer } = await import("../websocket-service");
+              broadcastToPlayer(player.id, {
+                type: 'player_updated',
+                data: updatedPlayer
+              });
+              console.log(`📡 Real-time hunger/thirst update sent to player ${player.username}`);
             }
           } catch (error) {
             console.warn('WebSocket broadcast failed:', error);

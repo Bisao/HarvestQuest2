@@ -136,6 +136,27 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       } catch (error) {
         console.warn('Cache invalidation failed:', error);
       }
+
+      // Broadcast real-time update via WebSocket
+      try {
+        const { broadcastToPlayer } = await import("../websocket-service");
+        broadcastToPlayer(playerId, {
+          type: 'player_updated',
+          data: updatedPlayer
+        });
+        broadcastToPlayer(playerId, {
+          type: 'item_consumed',
+          data: {
+            itemId,
+            location,
+            quantity,
+            hungerRestored: newHunger - player.hunger,
+            thirstRestored: newThirst - player.thirst
+          }
+        });
+      } catch (error) {
+        console.warn('WebSocket broadcast failed:', error);
+      }
       
       res.json({
         success: true,

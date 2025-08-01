@@ -22,7 +22,7 @@ export function useWebSocket(playerId: string | null) {
       // Determine WebSocket protocol based on current location
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const wsUrl = `${protocol}//${window.location.host}/ws`;
-      
+
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
@@ -30,7 +30,7 @@ export function useWebSocket(playerId: string | null) {
         console.log('🔌 WebSocket connected');
         setIsConnected(true);
         setConnectionError(null);
-        
+
         // Register with server
         ws.send(JSON.stringify({
           type: 'register',
@@ -58,7 +58,7 @@ export function useWebSocket(playerId: string | null) {
         console.log('🔌 WebSocket disconnected:', event.code, event.reason);
         setIsConnected(false);
         cleanup();
-        
+
         // Reconnect after delay unless it was a clean close
         if (event.code !== 1000) {
           reconnectTimeoutRef.current = setTimeout(connect, 5000);
@@ -121,6 +121,20 @@ export function useWebSocket(playerId: string | null) {
       case 'pong':
         // Server responded to our ping
         break;
+      case 'player_update':
+      case 'player_updated':
+        console.log('📡 Real-time player update received:', message.data);
+        // Force refresh player data when receiving real-time updates
+        queryClient.invalidateQueries({ queryKey: [`/api/player/${message.data.id}`] });
+        queryClient.refetchQueries({ queryKey: [`/api/player/${message.data.id}`] });
+        break;
+
+      case 'item_consumed':
+        console.log('📡 Item consumption update received:', message.data);
+        // Force refresh inventory and storage when item is consumed
+        queryClient.invalidateQueries({ queryKey: ["/api/inventory", message.data.playerId] });
+        queryClient.invalidateQueries({ queryKey: ["/api/storage", message.data.playerId] });
+        break;
 
       default:
         console.log('Unknown WebSocket message type:', message.type);
@@ -132,7 +146,7 @@ export function useWebSocket(playerId: string | null) {
       clearInterval(heartbeatIntervalRef.current);
       heartbeatIntervalRef.current = null;
     }
-    
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;

@@ -214,13 +214,14 @@ export default function EnhancedInventory({
       return response.json();
     },
     onSuccess: async (data) => {
-      // Force immediate cache invalidation and refetch
+      // Force immediate cache invalidation and refetch with correct keys
       await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      await queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      await queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
       
-      // Force immediate refetch of player data
-      await queryClient.refetchQueries({ queryKey: ["/api/player/Player1"] });
+      // Force immediate refetch of all player-related data
+      await queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+      await queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
       
       setSelectedItem(null);
       toast({
