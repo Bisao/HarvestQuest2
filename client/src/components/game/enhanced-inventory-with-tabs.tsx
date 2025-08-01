@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import EquipmentTab from "@/components/game/equipment-tab";
 import StatusTab from "@/components/game/status-tab";
-import SimpleInventory from "@/components/game/simple-inventory";
+import InventoryTab from "@/components/game/inventory-tab";
 import type { Player, Resource, Equipment } from "@shared/types";
 
 interface EnhancedInventoryWithTabsProps {
@@ -72,12 +72,11 @@ export default function EnhancedInventoryWithTabs({
         )}
 
         {activeSubTab === "inventory" && (
-          <SimpleInventory
+          <InventoryTab
             playerId={playerId}
             resources={resources}
-            equipment={equipment}
-            player={player}
-            isBlocked={isBlocked}
+            currentWeight={player.inventoryWeight}
+            maxWeight={player.maxInventoryWeight}
           />
         )}
       </div>
