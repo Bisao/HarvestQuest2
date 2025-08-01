@@ -226,29 +226,29 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
 
   // Função para determinar o tipo de item - CORRIGIDA
   const getItemType = (process: WorkshopProcess): string => {
-    const outputId = process.output?.resourceId;
+    const outputId = process?.output?.resourceId;
 
     if (!outputId || typeof outputId !== 'string') {
       return "materials"; // Default seguro
     }
 
     // Materiais básicos
-    if (outputId.includes("barbante") || outputId.includes("corda") || outputId.includes("couro")) {
+    if (outputId.toLowerCase().includes("barbante") || outputId.toLowerCase().includes("corda") || outputId.toLowerCase().includes("couro")) {
       return "materials";
     }
 
     // Recursos processados
-    if (outputId.includes("madeira") || outputId.includes("pedra") || outputId.includes("argila")) {
+    if (outputId.toLowerCase().includes("madeira") || outputId.toLowerCase().includes("pedra") || outputId.toLowerCase().includes("argila")) {
       return "resources";
     }
 
     // Metais
-    if (outputId.includes("ferro") || outputId.includes("metal") || outputId.includes("barra")) {
+    if (outputId.toLowerCase().includes("ferro") || outputId.toLowerCase().includes("metal") || outputId.toLowerCase().includes("barra")) {
       return "metals";
     }
 
     // Alimentos
-    if (outputId.includes("carne") || outputId.includes("peixe") || outputId.includes("cogumelo")) {
+    if (outputId.toLowerCase().includes("carne") || outputId.toLowerCase().includes("peixe") || outputId.toLowerCase().includes("cogumelo")) {
       return "food";
     }
 

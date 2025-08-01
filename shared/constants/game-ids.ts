@@ -28,7 +28,7 @@ export const RESOURCE_IDS = {
   ISCA_PESCA: "eq-tool-bait-fishing-001", // Isca movida para recursos
 
   // Equipment Parts - Sistema completo de partes para oficinas robustas
-  
+
   // === CABOS E HASTES ===
   CABO_MACHADO: "res-cabo-machado-001",
   CABO_PICARETA: "res-cabo-picareta-001", 
@@ -55,7 +55,7 @@ export const RESOURCE_IDS = {
   LINGOTE_FERRO: "res-lingote-ferro-001",
   CHAPA_FERRO: "res-chapa-ferro-001",
   FERRO_FUNDIDO_REFINADO: "res-ferro-fundido-refinado-001",
-  
+
   // === CORDAS E AMARRAÇÕES ===
   CORDA_RESISTENTE: "res-corda-resistente-001",
   FIO_SINEW: "res-fio-sinew-001",

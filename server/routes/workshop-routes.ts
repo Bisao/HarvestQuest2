@@ -37,7 +37,7 @@ interface WorkshopProcess {
 
 // SISTEMA ROBUSTO DE OFICINAS - Sincronizado com frontend
 const WORKSHOP_PROCESSES: WorkshopProcess[] = [
-  // ===== BANCADA - MATERIAIS BÁSICOS =====
+  // ===== BANCADA - MATERIAIS E PARTES =====
   {
     id: "proc-barbante-001",
     name: "Barbante",
@@ -59,13 +59,41 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     category: "bancada",
     requiredLevel: 2,
     input: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 6 },
-    output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 }, // Placeholder - precisa criar RESOURCE_IDS.CORDA
+    output: { resourceId: RESOURCE_IDS.CORDA, quantity: 2 },
     processingTime: 25,
     efficiency: 80,
     experienceGained: 12
   },
+  {
+    id: "proc-corda-resistente-001",
+    name: "Corda Resistente",
+    emoji: "🪢",
+    description: "Reforce corda simples com fibras adicionais",
+    category: "bancada",
+    requiredLevel: 4,
+    input: { resourceId: RESOURCE_IDS.CORDA, quantity: 2 },
+    secondary: { resourceId: RESOURCE_IDS.FIBRA, quantity: 3 },
+    output: { resourceId: RESOURCE_IDS.CORDA_RESIS, quantity: 1 },
+    processingTime: 35,
+    efficiency: 85,
+    experienceGained: 20
+  },
+  {
+    id: "proc-empunhadura-001",
+    name: "Empunhadura",
+    emoji: "✊",
+    description: "Envolva barbante em couro para criar empunhadura",
+    category: "bancada",
+    requiredLevel: 3,
+    input: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 3 },
+    secondary: { resourceId: RESOURCE_IDS.COURO, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.EMPUNHADURA, quantity: 2 },
+    processingTime: 30,
+    efficiency: 90,
+    experienceGained: 18
+  },
 
-  // ===== MADEIRA - PROCESSAMENTO DE MADEIRA =====
+  // ===== MADEIRA - PROCESSAMENTO E PARTES =====
   {
     id: "proc-madeira-refinada-001",
     name: "Madeira Refinada",
@@ -92,8 +120,48 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     efficiency: 90,
     experienceGained: 12
   },
+  {
+    id: "proc-cabo-madeira-001",
+    name: "Cabo de Madeira",
+    emoji: "🪓",
+    description: "Talhe madeira em cabo ergonômico",
+    category: "madeira",
+    requiredLevel: 3,
+    input: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.CABO_MADEIRA, quantity: 2 },
+    processingTime: 35,
+    efficiency: 85,
+    experienceGained: 18
+  },
+  {
+    id: "proc-cabo-bambu-001",
+    name: "Cabo de Bambu",
+    emoji: "🎋",
+    description: "Processe bambu em cabo flexível",
+    category: "madeira",
+    requiredLevel: 4,
+    input: { resourceId: RESOURCE_IDS.BAMBU, quantity: 2 },
+    output: { resourceId: RESOURCE_IDS.CABO_BAMBU, quantity: 1 },
+    processingTime: 30,
+    efficiency: 90,
+    experienceGained: 20
+  },
+  {
+    id: "proc-cabo-longo-001",
+    name: "Cabo Longo",
+    emoji: "🗡️",
+    description: "Una madeiras para criar cabo de arma longa",
+    category: "madeira",
+    requiredLevel: 5,
+    input: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 2 },
+    secondary: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 3 },
+    output: { resourceId: RESOURCE_IDS.CABO_LONGO, quantity: 1 },
+    processingTime: 45,
+    efficiency: 80,
+    experienceGained: 25
+  },
 
-  // ===== PEDRAS - PROCESSAMENTO DE MINERAIS =====
+  // ===== PEDRAS - PROCESSAMENTO E PARTES =====
   {
     id: "proc-pedras-lapidadas-001",
     name: "Pedras Lapidadas", 
@@ -120,8 +188,34 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     efficiency: 120,
     experienceGained: 25
   },
+  {
+    id: "proc-lamina-pedra-001",
+    name: "Lâmina de Pedra",
+    emoji: "🗡️",
+    description: "Talhe pedra em lâmina afiada",
+    category: "pedras",
+    requiredLevel: 2,
+    input: { resourceId: RESOURCE_IDS.PEDRA, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.LAMINA_PEDRA, quantity: 2 },
+    processingTime: 35,
+    efficiency: 80,
+    experienceGained: 15
+  },
+  {
+    id: "proc-ponta-pedra-001",
+    name: "Ponta de Pedra",
+    emoji: "⚡",
+    description: "Molde pedras pequenas em pontas perfurantes",
+    category: "pedras",
+    requiredLevel: 1,
+    input: { resourceId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 3 },
+    output: { resourceId: RESOURCE_IDS.PONTA_PEDRA, quantity: 4 },
+    processingTime: 25,
+    efficiency: 90,
+    experienceGained: 10
+  },
 
-  // ===== FORJA - METAIS =====
+  // ===== FORJA - METAIS E PARTES =====
   {
     id: "proc-ferro-fundido-001",
     name: "Fundição de Ferro",
@@ -135,6 +229,48 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     processingTime: 90,
     efficiency: 70,
     experienceGained: 40
+  },
+  {
+    id: "proc-lamina-ferro-001",
+    name: "Lâmina de Ferro",
+    emoji: "🗡️",
+    description: "Forje ferro fundido em lâmina afiada",
+    category: "forja",
+    requiredLevel: 7,
+    input: { resourceId: RESOURCE_IDS.FERRO_FUNDIDO, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.LAMINA_FERRO, quantity: 1 },
+    processingTime: 60,
+    efficiency: 85,
+    experienceGained: 35
+  },
+  {
+    id: "proc-ponta-ferro-001", 
+    name: "Ponta de Ferro",
+    emoji: "⚡",
+    description: "Forje ferro fundido em ponta perfurante",
+    category: "forja",
+    requiredLevel: 7,
+    input: { resourceId: RESOURCE_IDS.FERRO_FUNDIDO, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.PONTA_FERRO, quantity: 2 },
+    processingTime: 50,
+    efficiency: 90,
+    experienceGained: 30
+  },
+  {
+    id: "proc-haste-ferro-001",
+    name: "Haste de Ferro",
+    emoji: "🔩",
+    description: "Forje ferro fundido em haste resistente",
+    category: "forja",
+    requiredLevel: 8,
+    input: { resourceId: RESOURCE_IDS.FERRO_FUNDIDO, quantity: 2 },
+    fuel: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 2 },
+    output: { resourceId: RESOURCE_IDS.HASTE_FERRO, quantity: 1 },
+    processingTime: 75,
+    efficiency: 80,
+    experienceGained: 45
   },
 
   // ===== FOGUEIRA - ALIMENTOS =====
