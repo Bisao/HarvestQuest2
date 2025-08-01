@@ -47,6 +47,83 @@ export function getItemType(itemId: string): 'resource' | 'equipment' | 'unknown
 }
 
 /**
+
+
+/**
+ * Validate that all recipe ingredients use valid game IDs
+ * This ensures consistency with shared/constants/game-ids.ts
+ */
+export function validateRecipeIngredients(recipes: any[]): { 
+  isValid: boolean; 
+  errors: string[]; 
+  invalidIds: string[] 
+} {
+  const errors: string[] = [];
+  const invalidIds: string[] = [];
+  
+  for (const recipe of recipes) {
+    // Validate recipe ID
+    if (!isValidRecipeId(recipe.id)) {
+      errors.push(`Invalid recipe ID: ${recipe.id}`);
+      invalidIds.push(recipe.id);
+    }
+    
+    // Validate output ID
+    if (recipe.output?.itemId && !isValidGameId(recipe.output.itemId)) {
+      errors.push(`Invalid output ID in recipe ${recipe.id}: ${recipe.output.itemId}`);
+      invalidIds.push(recipe.output.itemId);
+    }
+    
+    // Validate ingredient IDs
+    if (recipe.ingredients) {
+      for (const ingredient of recipe.ingredients) {
+        if (!isValidGameId(ingredient.itemId)) {
+          errors.push(`Invalid ingredient ID in recipe ${recipe.id}: ${ingredient.itemId}`);
+          invalidIds.push(ingredient.itemId);
+        }
+      }
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+    invalidIds: [...new Set(invalidIds)] // Remove duplicates
+  };
+}
+
+/**
+ * Validate all game data consistency
+ */
+export function validateGameDataConsistency(): {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+} {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  
+  // Check for duplicate IDs across categories
+  const allIds = [
+    ...Object.values(RESOURCE_IDS),
+    ...Object.values(EQUIPMENT_IDS),
+    ...Object.values(RECIPE_IDS),
+    ...Object.values(BIOME_IDS),
+    ...Object.values(QUEST_IDS)
+  ];
+  
+  const duplicates = allIds.filter((id, index) => allIds.indexOf(id) !== index);
+  if (duplicates.length > 0) {
+    errors.push(`Duplicate IDs found: ${duplicates.join(', ')}`);
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
  * Standardizes item references across all systems
  */
 export function standardizeItemReference(

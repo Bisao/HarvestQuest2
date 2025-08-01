@@ -1,5 +1,11 @@
-// Centralized ID management system for all game items and resources
-// This ensures consistent IDs across backend and frontend systems
+// ⭐ ARQUIVO CENTRAL DE IDs - NEVER HARDCODE IDs ⭐
+// Este é o ÚNICO local onde IDs devem ser definidos no projeto
+// TODOS os outros arquivos DEVEM importar IDs deste arquivo
+// 
+// 🚫 NUNCA faça: const id = "res-abc123..."
+// ✅ SEMPRE faça: import { RESOURCE_IDS } from '@shared/constants/game-ids'
+//
+// Este sistema garante consistência total entre backend e frontend
 
 export const RESOURCE_IDS = {
   // Basic resources

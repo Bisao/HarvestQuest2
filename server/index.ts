@@ -5,7 +5,34 @@ import { corsMiddleware, securityHeaders } from "./middleware/cors";
 import { errorHandler, requestLogger } from "./middleware/error-handler";
 import { rateLimit } from "./middleware/auth";
 
+// Import consumption routes
+import { createConsumptionRoutes } from "./routes/consumption";
+import { createModernRecipeData } from "./data/recipes-modern";
+import { GameService } from "./services/game-service";
+import { validateRecipeIngredients, validateGameDataConsistency } from "@shared/utils/id-validation";
+
 const app = express();
+const port = Number(process.env.PORT) || 5000;
+
+// Validate game data consistency on startup
+console.log("🔍 Validating game data consistency...");
+const consistencyCheck = validateGameDataConsistency();
+if (!consistencyCheck.isValid) {
+  console.error("❌ Game data consistency errors:", consistencyCheck.errors);
+  process.exit(1);
+}
+
+// Validate recipe ingredients
+const recipes = createModernRecipeData();
+const recipeValidation = validateRecipeIngredients(recipes);
+if (!recipeValidation.isValid) {
+  console.error("❌ Recipe validation errors:");
+  recipeValidation.errors.forEach(error => console.error(`  - ${error}`));
+  console.error("❌ Invalid IDs found:", recipeValidation.invalidIds);
+  process.exit(1);
+}
+
+console.log("✅ All game data validation passed!");
 
 // Trust proxy for rate limiting and IP detection
 app.set('trust proxy', 1);
@@ -61,8 +88,6 @@ app.use((req, res, next) => {
   const { storage } = await import("./storage");
   const { HungerThirstService } = await import('./services/hunger-thirst-service');
   const { AutoConsumeService } = await import('./services/auto-consume-service');
-  const { GameService } = await import('./services/game-service');
-
   // Create services
   const gameService = new GameService(storage);
   const hungerThirstService = new HungerThirstService(storage);
@@ -99,5 +124,3 @@ app.use((req, res, next) => {
     log(`serving on port ${port}`);
   });
 })();
-// Import consumption routes
-import { createConsumptionRoutes } from "./routes/consumption";

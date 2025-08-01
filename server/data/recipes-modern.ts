@@ -1,3 +1,7 @@
+// Central recipe system - ALL IDs must reference shared/constants/game-ids.ts
+import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from "@shared/constants/game-ids";
+import { GameIdResolver } from "@shared/utils/id-resolver";
+import type { Recipe } from "@shared/types";
 
 // Modern recipe system with fundamental attributes
 import type { InsertRecipe } from "@shared/types";
