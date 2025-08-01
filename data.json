@@ -7,9 +7,9 @@
         "username": "Bison",
         "level": 2,
         "experience": 168,
-        "hunger": 18,
+        "hunger": 10,
         "maxHunger": 100,
-        "thirst": 20,
+        "thirst": 12,
         "maxThirst": 100,
         "coins": 100,
         "inventoryWeight": 157,
@@ -25,7 +25,8 @@
         "equippedBoots": null,
         "equippedWeapon": null,
         "equippedTool": null,
-        "autoCompleteQuests": true
+        "autoCompleteQuests": true,
+        "health": null
       }
     ]
   ],
