@@ -1189,15 +1189,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Add crafted items to storage
       if (recipe.outputs && Array.isArray(recipe.outputs)) {
+        console.log(`🔧 CRAFT: Adding ${recipe.outputs.length} outputs to storage for recipe ${recipe.name}`);
+        
         for (const output of recipe.outputs) {
           const totalAmount = output.quantity * quantity;
-          const existingItem = storageItems.find(item => item.resourceId === output.itemId);
+          console.log(`🔧 CRAFT: Processing output - itemId: ${output.itemId}, amount: ${totalAmount}`);
+          
+          // Refresh storage items to get current state
+          const currentStorageItems = await storage.getPlayerStorage(playerId);
+          const existingItem = currentStorageItems.find(item => item.resourceId === output.itemId);
 
           if (existingItem) {
+            console.log(`🔧 CRAFT: Updating existing item ${output.itemId} from ${existingItem.quantity} to ${existingItem.quantity + totalAmount}`);
             await storage.updateStorageItem(existingItem.id, {
               quantity: existingItem.quantity + totalAmount
             });
           } else {
+            console.log(`🔧 CRAFT: Adding new item ${output.itemId} with quantity ${totalAmount}`);
             await storage.addStorageItem({
               playerId,
               resourceId: output.itemId,
@@ -1207,6 +1215,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       }
+
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+      const { invalidateStorageCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateStorageCache(playerId);
+      invalidatePlayerCache(playerId);
 
       res.json({
         success: true,

@@ -31,6 +31,28 @@ export function createModernGameItems(): (Resource | Equipment)[] {
       tags: ["natural", "renewable", "craftable"]
     },
     {
+      id: RESOURCE_IDS.BARBANTE,
+      name: "barbante",
+      displayName: "Barbante",
+      description: "Fios processados de fibra, material essencial para artesanato e ferramentas",
+      iconPath: "🧵",
+      category: "resource",
+      subcategory: "processed_fiber",
+      weight: 10, // 10 gramas por barbante
+      stackable: true,
+      maxStackSize: 99,
+      rarity: "common",
+      xpReward: 2,
+      yieldAmount: 1,
+      requiredTool: null,
+      spawnRate: 0, // Não spawn natural, apenas craftado
+      sellPrice: 5,
+      buyPrice: 10,
+      attributes: { crafted: true, flexible: true },
+      effects: [],
+      tags: ["crafted", "cordage", "essential"]
+    },
+    {
       id: RESOURCE_IDS.PEDRA,
       name: "stone",
       displayName: "Pedra",

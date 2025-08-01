@@ -7,9 +7,9 @@
         "username": "oChaps",
         "level": 2,
         "experience": 189,
-        "hunger": 86,
+        "hunger": 74,
         "maxHunger": 100,
-        "thirst": 84,
+        "thirst": 72,
         "maxThirst": 100,
         "coins": 180,
         "inventoryWeight": 0,
@@ -51,7 +51,7 @@
         "id": "dd97e126-8f09-41e5-81f7-e427cc7e0b7c",
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 19,
+        "quantity": 0,
         "itemType": "resource"
       }
     ],
@@ -92,6 +92,16 @@
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
         "quantity": 20,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "5f305c8b-4c68-4727-ae31-edc91ea1fbf2",
+      {
+        "id": "5f305c8b-4c68-4727-ae31-edc91ea1fbf2",
+        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
+        "resourceId": "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
+        "quantity": 5,
         "itemType": "resource"
       }
     ]
