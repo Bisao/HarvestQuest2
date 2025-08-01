@@ -7,7 +7,7 @@ export function createRecipeData(): InsertRecipe[] {
   return [
     // MATERIAIS BÁSICOS
     {
-      id: RECIPE_IDS.BARBANTE,
+      id: "recipe-barbante-001",
       name: "Barbante",
       emoji: "🧵",
       category: "basic_materials",
@@ -27,7 +27,7 @@ export function createRecipeData(): InsertRecipe[] {
     
     // FERRAMENTAS
     {
-      id: RECIPE_IDS.MACHADO,
+      id: "recipe-machado-001",
       name: "Machado",
       emoji: "🪓",
       category: "tools",
@@ -47,7 +47,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 95
     },
     {
-      id: RECIPE_IDS.PICARETA,
+      id: "recipe-picareta-001",
       name: "Picareta",
       emoji: "⛏️",
       category: "tools",
@@ -67,7 +67,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 95
     },
     {
-      id: RECIPE_IDS.FOICE,
+      id: "recipe-foice-001",
       name: "Foice",
       emoji: "🔪",
       category: "tools",
@@ -87,7 +87,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 90
     },
     {
-      id: RECIPE_IDS.BALDE_MADEIRA,
+      id: "recipe-balde-001",
       name: "Balde de Madeira",
       emoji: "🪣",
       category: "containers",
@@ -106,7 +106,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 90
     },
     {
-      id: RECIPE_IDS.FACA,
+      id: "recipe-faca-001",
       name: "Faca",
       emoji: "🗡️",
       category: "tools",
@@ -126,7 +126,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 95
     },
     {
-      id: RECIPE_IDS.VARA_PESCA,
+      id: "recipe-vara-001",
       name: "Vara de Pesca",
       emoji: "🎣",
       category: "tools",
@@ -147,7 +147,7 @@ export function createRecipeData(): InsertRecipe[] {
     
     // ARMAS
     {
-      id: RECIPE_IDS.ARCO_FLECHA,
+      id: "recipe-arco-001",
       name: "Arco e Flecha",
       emoji: "🏹",
       category: "weapons",
@@ -167,7 +167,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 80
     },
     {
-      id: RECIPE_IDS.LANCA,
+      id: "recipe-lanca-001",
       name: "Lança",
       emoji: "🔱",
       category: "weapons",
@@ -189,7 +189,7 @@ export function createRecipeData(): InsertRecipe[] {
     
     // EQUIPAMENTOS
     {
-      id: RECIPE_IDS.MOCHILA,
+      id: "recipe-mochila-001",
       name: "Mochila",
       emoji: "🎒",
       category: "accessories",
@@ -210,7 +210,7 @@ export function createRecipeData(): InsertRecipe[] {
     
     // MATERIAIS AVANÇADOS
     {
-      id: RECIPE_IDS.CORDA,
+      id: "recipe-corda-001",
       name: "Corda",
       emoji: "🪢",
       category: "basic_materials",
@@ -228,7 +228,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 90
     },
     {
-      id: RECIPE_IDS.ISCA_PESCA,
+      id: "recipe-isca-001",
       name: "Isca para Pesca",
       emoji: "🪱",
       category: "consumables",
@@ -249,7 +249,7 @@ export function createRecipeData(): InsertRecipe[] {
     
     // UTENSÍLIOS DE COZINHA
     {
-      id: RECIPE_IDS.PANELA_BARRO,
+      id: "recipe-panela-barro-001",
       name: "Panela de Barro",
       emoji: "🏺",
       category: "containers",
@@ -267,7 +267,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 85
     },
     {
-      id: RECIPE_IDS.PANELA,
+      id: "recipe-panela-001",
       name: "Panela",
       emoji: "🫕",
       category: "containers",
@@ -285,7 +285,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 80
     },
     {
-      id: RECIPE_IDS.GARRAFA_BAMBU,
+      id: "recipe-garrafa-001",
       name: "Garrafa de Bambu",
       emoji: "🎍",
       category: "containers",
@@ -305,7 +305,7 @@ export function createRecipeData(): InsertRecipe[] {
     
     // COMIDAS
     {
-      id: RECIPE_IDS.SUCO_FRUTAS,
+      id: "recipe-suco-001",
       name: "Suco de Frutas",
       emoji: "🧃",
       category: "consumables",
@@ -324,7 +324,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 100
     },
     {
-      id: RECIPE_IDS.COGUMELOS_ASSADOS,
+      id: "recipe-cogumelos-001",
       name: "Cogumelos Assados",
       emoji: "🍄‍🟫",
       category: "consumables",
@@ -343,7 +343,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 100
     },
     {
-      id: RECIPE_IDS.PEIXE_GRELHADO,
+      id: "recipe-peixe-001",
       name: "Peixe Grelhado",
       emoji: "🐟",
       category: "consumables",
@@ -362,7 +362,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 100
     },
     {
-      id: RECIPE_IDS.CARNE_ASSADA,
+      id: "recipe-carne-001",
       name: "Carne Assada",
       emoji: "🍖",
       category: "consumables",
@@ -381,7 +381,7 @@ export function createRecipeData(): InsertRecipe[] {
       successRate: 100
     },
     {
-      id: RECIPE_IDS.ENSOPADO_CARNE,
+      id: "recipe-ensopado-001",
       name: "Ensopado de Carne",
       emoji: "🍲",
       category: "consumables",
@@ -402,7 +402,7 @@ export function createRecipeData(): InsertRecipe[] {
     
     // WATER TANK UNLOCKING
     {
-      id: RECIPE_IDS.BARRIL_IMPROVISADO,
+      id: "recipe-barril-001",
       name: "Barril Improvisado",
       emoji: "🛢️",
       category: "advanced",
