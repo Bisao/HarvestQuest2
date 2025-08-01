@@ -208,32 +208,36 @@ export function registerEnhancedGameRoutes(
         }
 
         // Add crafted items to storage (always storage as per requirement)
-        let outputs: Record<string, number> = {};
         const items = [];
 
         if (!isBarrelCrafting) {
-          // Handle recipe outputs - check if it's array or object format
-          if (Array.isArray(recipe.outputs)) {
-            // Convert array format to object format
-            for (const output of recipe.outputs) {
-              outputs[output.itemId] = output.quantity;
-            }
-          } else if (typeof recipe.outputs === 'object' && recipe.outputs !== null) {
-            outputs = recipe.outputs as Record<string, number>;
-          } else {
-            throw new InvalidOperationError(`Recipe ${recipe.name} has no valid outputs defined`);
+          // Handle recipe outputs - ALWAYS expect array format
+          if (!Array.isArray(recipe.outputs)) {
+            throw new InvalidOperationError(`Recipe ${recipe.name} outputs must be an array format`);
           }
 
-          for (const [itemId, baseAmount] of Object.entries(outputs)) {
-            const totalAmount = baseAmount * quantity;
+          // Get all resources and equipment for type checking
+          const allResources = await storage.getAllResources();
+          const allEquipment = await storage.getAllEquipment();
+
+          console.log(`DEBUG: Processing outputs for recipe ${recipe.name}:`, recipe.outputs);
+
+          for (const output of recipe.outputs) {
+            const totalAmount = output.quantity * quantity;
+            const itemId = output.itemId;
+
+            console.log(`DEBUG: Processing output ${itemId} with total amount ${totalAmount}`);
 
             // Always add to storage (items craftados sempre vão para o armazém)
             // Check if this is equipment or resource
-            const allResources = await storage.getAllResources();
-            const allEquipment = await storage.getAllEquipment();
-
             const isResource = allResources.some(r => r.id === itemId);
             const isEquipment = allEquipment.some(eq => eq.id === itemId);
+            
+            if (!isResource && !isEquipment) {
+              console.error(`ERROR: Item ${itemId} not found in resources or equipment`);
+              throw new InvalidOperationError(`Item ${itemId} not found in game data`);
+            }
+
             const itemType = isEquipment ? 'equipment' : 'resource';
 
             // Refresh player storage to get current state
@@ -246,14 +250,16 @@ export function registerEnhancedGameRoutes(
               await storage.updateStorageItem(existingItem.id, {
                 quantity: existingItem.quantity + totalAmount
               });
+              console.log(`DEBUG: Updated existing storage item ${existingItem.id} for ${itemId}, new quantity: ${existingItem.quantity + totalAmount}`);
             } else {
-              // Create new storage item to avoid foreign key issues
-              await storage.addStorageItem({
+              // Create new storage item
+              const newStorageItem = await storage.addStorageItem({
                 playerId,
                 resourceId: itemId,
                 quantity: totalAmount,
                 itemType
               });
+              console.log(`DEBUG: Created new storage item ${newStorageItem.id} for ${itemId} with quantity: ${totalAmount}`);
             }
 
             // Log for debugging
@@ -267,26 +273,27 @@ export function registerEnhancedGameRoutes(
         }
 
         // Update quest progress for crafting (only for active quests)
-        // CRITICAL FIX: Multiply quest progress by quantity to count all crafted items
         const activeQuests = await storage.getPlayerQuests(playerId);
         const activePlayerQuests = activeQuests.filter(pq => pq.status === 'active');
 
-        for (const [craftedItemId, craftedAmount] of Object.entries(outputs || {})) {
-          const totalCraftedAmount = (craftedAmount as number) * quantity; // This is the total amount crafted
+        if (!isBarrelCrafting) {
+          for (const output of recipe.outputs) {
+            const craftedItemId = output.itemId;
+            const totalCraftedAmount = output.quantity * quantity;
 
-          for (const playerQuest of activePlayerQuests) {
-            const quest = await storage.getQuest(playerQuest.questId);
-            if (quest) {
-              const objectives = quest.objectives as any[];
+            for (const playerQuest of activePlayerQuests) {
+              const quest = await storage.getQuest(playerQuest.questId);
+              if (quest) {
+                const objectives = quest.objectives as any[];
 
-              for (const objective of objectives) {
-                if (objective.type === 'craft' && (objective.itemId === craftedItemId || objective.resourceId === craftedItemId)) {
-                  // Use the same progress key format as quest-service.ts
-                  const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.target);
-                  const currentProgressObj = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
-                  const currentProgress = currentProgressObj.current || 0;
-                  const required = objective.quantity || objective.amount || 1;
-                  const newProgress = Math.min(currentProgress + totalCraftedAmount, required);
+                for (const objective of objectives) {
+                  if (objective.type === 'craft' && (objective.itemId === craftedItemId || objective.resourceId === craftedItemId)) {
+                    // Use the same progress key format as quest-service.ts
+                    const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.target);
+                    const currentProgressObj = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
+                    const currentProgress = currentProgressObj.current || 0;
+                    const required = objective.quantity || objective.amount || 1;
+                    const newProgress = Math.min(currentProgress + totalCraftedAmount, required);d);
 
                   console.log(`[CRAFT QUEST] Quest ${quest.name} progress update: ${progressKey} from ${currentProgress} to ${newProgress} (added ${totalCraftedAmount})`);
 

@@ -156,10 +156,12 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       if (resource) {
         const available = storageItems.find(item => item.resourceId === ingredient.itemId)?.quantity || 0;
         return {
+          resource,
           name: resource.name,
           emoji: resource.emoji,
           quantity: ingredient.quantity,
-          available
+          available,
+          hasEnough: available >= ingredient.quantity
         };
       }
 
@@ -168,20 +170,24 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       if (equipmentItem) {
         const available = storageItems.find(item => item.resourceId === ingredient.itemId)?.quantity || 0;
         return {
+          resource: equipmentItem,
           name: equipmentItem.name,
           emoji: equipmentItem.emoji,
           quantity: ingredient.quantity,
-          available
+          available,
+          hasEnough: available >= ingredient.quantity
         };
       }
 
       // Fallback if not found
       console.warn(`Ingredient not found: ${ingredient.itemId}`);
       return {
-        name: `Item Desconhecido`,
+        resource: null,
+        name: `Item Desconhecido (${ingredient.itemId})`,
         emoji: "❓",
         quantity: ingredient.quantity,
-        available: 0
+        available: 0,
+        hasEnough: false
       };
     });
   };
