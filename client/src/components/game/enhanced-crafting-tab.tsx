@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Recipe, Resource, StorageItem } from "@shared/types";
+import type { Recipe, Resource, StorageItem, Equipment } from "@shared/types";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -55,23 +55,23 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       const data = response.data || response;
       const quantity = data?.quantity || 1;
       const recipeName = data?.recipe?.name || data?.recipe || "Item";
-      
+
       toast({
         title: "Item Craftado!",
         description: `${quantity}x ${recipeName} foi criado com sucesso!`,
       });
-      
+
       // Reset craft quantity for this recipe
       if (data?.recipe?.id) {
         setCraftQuantities(prev => ({ ...prev, [data.recipe.id]: 1 }));
       }
-      
+
       // CRITICAL: Force complete cache invalidation for real-time sync
       queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
       queryClient.removeQueries({ queryKey: ["/api/player", playerId, "quests"] });
-      
+
       // Force immediate refetch
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
@@ -141,30 +141,49 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     return 0;
   };
 
+  // Get equipment data for ingredient resolution
+  const { data: equipment = [] } = useQuery<Equipment[]>({
+    queryKey: ["/api/equipment"],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
   const getRecipeIngredients = (recipe: Recipe) => {
-    // Handle both old Record format and new RecipeIngredient[] format
-    let ingredients: Array<{resourceId: string, quantity: number}>;
-    
-    if (Array.isArray(recipe.ingredients)) {
-      // New format: RecipeIngredient[]
-      ingredients = recipe.ingredients.map(ing => ({
-        resourceId: ing.itemId,
-        quantity: ing.quantity
-      }));
-    } else {
-      // Old format: Record<string, number>
-      ingredients = Object.entries(recipe.ingredients as Record<string, number>).map(([resourceId, quantity]) => ({
-        resourceId,
-        quantity
-      }));
-    }
-    
-    return ingredients.map(({resourceId, quantity}) => ({
-      resource: getResourceData(resourceId),
-      quantity,
-      available: getStorageQuantity(resourceId),
-      hasEnough: getStorageQuantity(resourceId) >= quantity,
-    }));
+    if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) return [];
+
+    return recipe.ingredients.map(ingredient => {
+      // First try resources
+      const resource = resources.find(r => r.id === ingredient.itemId);
+      if (resource) {
+        const available = storageItems.find(item => item.resourceId === ingredient.itemId)?.quantity || 0;
+        return {
+          name: resource.name,
+          emoji: resource.emoji,
+          quantity: ingredient.quantity,
+          available
+        };
+      }
+
+      // Then try equipment
+      const equipmentItem = equipment.find(eq => eq.id === ingredient.itemId);
+      if (equipmentItem) {
+        const available = storageItems.find(item => item.resourceId === ingredient.itemId)?.quantity || 0;
+        return {
+          name: equipmentItem.name,
+          emoji: equipmentItem.emoji,
+          quantity: ingredient.quantity,
+          available
+        };
+      }
+
+      // Fallback if not found
+      console.warn(`Ingredient not found: ${ingredient.itemId}`);
+      return {
+        name: `Item Desconhecido`,
+        emoji: "❓",
+        quantity: ingredient.quantity,
+        available: 0
+      };
+    });
   };
 
   const canCraftRecipe = (recipe: Recipe, quantity = 1) => {
@@ -381,9 +400,9 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         <div className="flex flex-wrap gap-1 sm:gap-2 mb-6 border-b border-gray-200 overflow-x-auto">
           {Object.entries(categorizedRecipes).map(([categoryName, categoryRecipes]) => {
             if (categoryRecipes.length === 0) return null;
-            
+
             const isActive = expandedCategories[categoryName];
-            
+
             return (
               <button
                 key={categoryName}
