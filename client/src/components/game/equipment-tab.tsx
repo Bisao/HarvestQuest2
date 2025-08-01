@@ -305,15 +305,18 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                           ? "border-green-300 bg-green-50 hover:bg-green-100" 
                           : "border-amber-300 bg-amber-100 hover:bg-amber-200")
                       }`}>
-                      <div className="text-lg">{emoji}</div>
-                      <div className="font-medium text-xs">{name}</div>
-
                       {equippedItem ? (
-                        <div className="text-lg">{equippedItem.emoji}</div>
+                        // When equipped, show only the item icon
+                        <div className="text-3xl">{equippedItem.emoji}</div>
                       ) : (
-                        <div className="text-xs text-gray-500">
-                          {isDisabled ? "Em Breve" : "Clique para equipar"}
-                        </div>
+                        // When empty, show slot info
+                        <>
+                          <div className="text-lg">{emoji}</div>
+                          <div className="font-medium text-xs">{name}</div>
+                          <div className="text-xs text-gray-500">
+                            {isDisabled ? "Em Breve" : "Clique para equipar"}
+                          </div>
+                        </>
                       )}
                     </div>
                   );
