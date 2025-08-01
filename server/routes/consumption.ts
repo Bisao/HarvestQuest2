@@ -41,7 +41,7 @@ export function createConsumptionRoutes(storage: IStorage): Router {
 
       // Import modern system utilities
       const { isConsumable, validateConsumption, getAllModernConsumableIds } = await import("../../shared/utils/consumable-utils");
-      
+
       // Validate that itemId is a modern consumable
       const modernIds = getAllModernConsumableIds();
       if (!modernIds.includes(itemId)) {
@@ -62,10 +62,10 @@ export function createConsumptionRoutes(storage: IStorage): Router {
 
       if (location === 'inventory') {
         const inventoryItems = await storage.getPlayerInventory(playerId);
-        
+
         // Modern system: Find by resource ID only
         targetItem = inventoryItems.find((item: any) => item.resourceId === itemId);
-        
+
         if (targetItem && targetItem.quantity > 0) {
           hasItem = true;
           itemQuantity = targetItem.quantity;
@@ -73,13 +73,13 @@ export function createConsumptionRoutes(storage: IStorage): Router {
         }
       } else if (location === 'storage') {
         const storageItems = await storage.getPlayerStorage(playerId);
-        
+
         // Modern system: Direct resource ID match for consumables
         targetItem = storageItems.find((item: any) => 
           item.resourceId === itemId && 
           (item.itemType === 'resource' || item.itemType === 'consumable')
         );
-        
+
         if (targetItem && targetItem.quantity > 0) {
           hasItem = true;
           itemQuantity = targetItem.quantity;
@@ -126,7 +126,7 @@ export function createConsumptionRoutes(storage: IStorage): Router {
 
       // Return updated player data
       const updatedPlayer = await storage.getPlayer(playerId);
-      
+
       // Invalidate cache to ensure frontend sees updated data
       try {
         const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("../cache/memory-cache");
@@ -140,10 +140,10 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       // Broadcast real-time update via WebSocket
       try {
         const { broadcastPlayerUpdate, broadcastInventoryUpdate, broadcastStorageUpdate } = await import("../websocket-service");
-        
+
         // Always broadcast player update with latest data
         broadcastPlayerUpdate(playerId, updatedPlayer);
-        
+
         // Broadcast inventory/storage updates based on location
         if (location === 'inventory') {
           const updatedInventory = await storage.getPlayerInventory(playerId);
@@ -152,12 +152,12 @@ export function createConsumptionRoutes(storage: IStorage): Router {
           const updatedStorage = await storage.getPlayerStorage(playerId);
           broadcastStorageUpdate(playerId, updatedStorage);
         }
-        
+
         console.log(`📡 Real-time consumption updates broadcast sent for ${playerId}`);
       } catch (error) {
         console.warn('WebSocket broadcast failed:', error);
       }
-      
+
       res.json({
         success: true,
         player: updatedPlayer,

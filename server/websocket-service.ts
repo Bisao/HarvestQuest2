@@ -73,6 +73,16 @@ export class WebSocketService {
       case 'ping':
         this.sendToClient(ws, { type: 'pong', timestamp: Date.now() });
         break;
+      case 'pong':
+        // Update last ping time for this client
+        const clientsArray = Array.from(this.clients.entries());
+        for (const [playerId, client] of clientsArray) {
+          if (client.ws === ws) {
+            client.lastPing = Date.now();
+            break;
+          }
+        }
+        break;
       default:
         console.log('Unknown WebSocket message type:', message.type);
     }

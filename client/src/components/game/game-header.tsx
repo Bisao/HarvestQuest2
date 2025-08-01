@@ -40,7 +40,7 @@ export default function GameHeader({ player }: GameHeaderProps) {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">🍖</span>
-                  <span className="font-semibold whitespace-nowrap" key={`hunger-${player.hunger}`}>{player.hunger}/{player.maxHunger}</span>
+                  <span className="font-semibold whitespace-nowrap" key={`hunger-${player.hunger}-${Date.now()}`}>{player.hunger}/{player.maxHunger}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
@@ -56,7 +56,7 @@ export default function GameHeader({ player }: GameHeaderProps) {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">💧</span>
-                  <span className="font-semibold whitespace-nowrap" key={`thirst-${player.thirst}`}>{player.thirst}/{player.maxThirst}</span>
+                  <span className="font-semibold whitespace-nowrap" key={`thirst-${player.thirst}-${Date.now()}`}>{player.thirst}/{player.maxThirst}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">

@@ -82,9 +82,15 @@ export function useWebSocket(playerId: string | null) {
         console.log('📡 Real-time player update received:', message.data);
         // Update player data in cache with correct query key format
         if (playerId && message.data) {
+          // Force immediate update
           queryClient.setQueryData([`/api/player/${playerId}`], message.data);
-          // Also invalidate to force UI refresh
+          // Invalidate all related queries to force refresh
           queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
+          queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+          
+          // Also invalidate inventory and storage in case they were affected
+          queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+          queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
         }
         break;
 

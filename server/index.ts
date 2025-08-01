@@ -66,6 +66,12 @@ let wsService: WebSocketService; // Declare wsService outside the scope of the a
   // Store reference in app for use in other routes  
   app.locals.wsService = wsService;
 
+  // Initialize and start hunger/thirst degradation system
+  const { HungerThirstService } = await import("./services/hunger-thirst-service");
+  const { storage } = await import("./storage");
+  const hungerThirstService = new HungerThirstService(storage);
+  hungerThirstService.startPassiveDegradation();
+
   // Use the centralized error handler
   app.use(errorHandler);
 

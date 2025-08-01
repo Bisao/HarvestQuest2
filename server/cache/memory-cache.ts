@@ -19,7 +19,7 @@ class MemoryCache {
 
   get<T>(key: string): T | null {
     const item = this.cache.get(key);
-    
+
     if (!item) {
       return null;
     }
@@ -114,13 +114,11 @@ export const CACHE_KEYS = {
   QUEST_PROGRESS: (playerId: string) => `quest:progress:${playerId}`
 };
 
-// Cache TTL constants (in milliseconds)
 export const CACHE_TTL = {
-  STATIC_DATA: 15 * 60 * 1000,    // 15 minutes for resources, biomes, etc.
-  PLAYER_DATA: 2 * 60 * 1000,     // 2 minutes for player data
-  INVENTORY: 1 * 60 * 1000,       // 1 minute for inventory/storage
-  EXPEDITION: 30 * 1000,          // 30 seconds for active expeditions
-  QUEST_PROGRESS: 5 * 60 * 1000   // 5 minutes for quest progress
+  STATIC_DATA: 15 * 60 * 1000,    // 15 minutes
+  PLAYER_DATA: 30 * 1000,         // 30 seconds (reduced for real-time updates)
+  INVENTORY: 30 * 1000,           // 30 seconds (reduced for real-time updates)
+  EXPEDITIONS: 30 * 1000          // 30 seconds
 };
 
 // Global cache instance
@@ -148,10 +146,10 @@ export function cacheGetOrSet<T>(
 
       // Fetch fresh data
       const data = await fetchFn();
-      
+
       // Store in cache
       gameCache.set(key, data, ttl);
-      
+
       resolve(data);
     } catch (error) {
       reject(error);
