@@ -1,3 +1,4 @@
+
 // Modern recipe system with fundamental attributes
 import type { InsertRecipe } from "@shared/types";
 import { RESOURCE_IDS, EQUIPMENT_IDS } from "@shared/constants/game-ids";
@@ -14,10 +15,10 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "trivial",
       requiredLevel: 1,
       ingredients: [
-        { itemId: "res-f2b8e7d6-9a5c-4e31-8b7f-3c9e1d5a8b42", quantity: 5, consumed: true } // Fibra
+        { itemId: RESOURCE_IDS.FIBRA, quantity: 5, consumed: true } // Fibra
       ],
       outputs: [
-        { itemId: "res-b1a4d264-7d91-4560-88c0-99706231b8d1", quantity: 1, chance: 100 } // Barbante
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, chance: 100 } // Barbante
       ],
       craftingTime: 5,
       experienceGained: 10,
@@ -34,12 +35,12 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "easy",
       requiredLevel: 1,
       ingredients: [
-        { itemId: "res-e4c8f7a2-6b9d-4e31-8f5a-2c9e7d3b1a65", quantity: 1, consumed: true }, // Pedras Soltas
-        { itemId: "res-b1a4d264-7d91-4560-88c0-99706231b8d1", quantity: 2, consumed: true }, // Barbante
-        { itemId: "res-a7f9e3c5-8b2d-4e61-9a8f-1c5e9b7d3a42", quantity: 1, consumed: true }  // Gravetos
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
       ],
       outputs: [
-        { itemId: "eq-machado-basico-001", quantity: 1, chance: 100 }
+        { itemId: EQUIPMENT_IDS.MACHADO, quantity: 1, chance: 100 }
       ],
       craftingTime: 30,
       experienceGained: 25,
@@ -55,12 +56,12 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "easy",
       requiredLevel: 1,
       ingredients: [
-        { itemId: "res-e4c8f7a2-6b9d-4e31-8f5a-2c9e7d3b1a65", quantity: 2, consumed: true }, // Pedras Soltas
-        { itemId: "res-b1a4d264-7d91-4560-88c0-99706231b8d1", quantity: 2, consumed: true }, // Barbante
-        { itemId: "res-a7f9e3c5-8b2d-4e61-9a8f-1c5e9b7d3a42", quantity: 1, consumed: true }  // Gravetos
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
       ],
       outputs: [
-        { itemId: "eq-picareta-basica-001", quantity: 1, chance: 100 }
+        { itemId: EQUIPMENT_IDS.PICARETA, quantity: 1, chance: 100 }
       ],
       craftingTime: 35,
       experienceGained: 30,
@@ -76,12 +77,12 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "easy",
       requiredLevel: 1,
       ingredients: [
-        { itemId: "res-e4c8f7a2-6b9d-4e31-8f5a-2c9e7d3b1a65", quantity: 1, consumed: true }, // Pedras Soltas
-        { itemId: "res-b1a4d264-7d91-4560-88c0-99706231b8d1", quantity: 1, consumed: true }, // Barbante
-        { itemId: "res-a7f9e3c5-8b2d-4e61-9a8f-1c5e9b7d3a42", quantity: 1, consumed: true }  // Gravetos
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
       ],
       outputs: [
-        { itemId: "eq-faca-basica-001", quantity: 1, chance: 100 }
+        { itemId: EQUIPMENT_IDS.FACA, quantity: 1, chance: 100 }
       ],
       craftingTime: 25,
       experienceGained: 20,
@@ -97,11 +98,11 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "medium",
       requiredLevel: 3,
       ingredients: [
-        { itemId: "res-a7f9e3c5-8b2d-4e61-9a8f-1c5e9b7d3a42", quantity: 3, consumed: true }, // Gravetos
-        { itemId: "res-f2b8e7d6-9a5c-4e31-8b7f-3c9e1d5a8b42", quantity: 2, consumed: true }  // Fibra
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 3, consumed: true },
+        { itemId: RESOURCE_IDS.FIBRA, quantity: 2, consumed: true }
       ],
       outputs: [
-        { itemId: "eq-vara-pesca-001", quantity: 1, chance: 100 }
+        { itemId: EQUIPMENT_IDS.VARA_PESCA, quantity: 1, chance: 100 }
       ],
       craftingTime: 45,
       experienceGained: 40,
@@ -117,12 +118,12 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "medium", 
       requiredLevel: 2,
       ingredients: [
-        { itemId: "res-c9f7e5a3-8b1d-4e62-9a7f-2c8e6b9d4a53", quantity: 1, consumed: true }, // Pedra
-        { itemId: "res-b1a4d264-7d91-4560-88c0-99706231b8d1", quantity: 2, consumed: true }, // Barbante
-        { itemId: "res-a7f9e3c5-8b2d-4e61-9a8f-1c5e9b7d3a42", quantity: 1, consumed: true }  // Gravetos
+        { itemId: RESOURCE_IDS.PEDRA, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
       ],
       outputs: [
-        { itemId: "eq-foice-basica-001", quantity: 1, chance: 100 }
+        { itemId: EQUIPMENT_IDS.FOICE, quantity: 1, chance: 100 }
       ],
       craftingTime: 40,
       experienceGained: 35,
@@ -139,12 +140,12 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "hard",
       requiredLevel: 5,
       ingredients: [
-        { itemId: "res-a7f9e3c5-8b2d-4e61-9a8f-1c5e9b7d3a42", quantity: 2, consumed: true }, // Gravetos
-        { itemId: "res-b1a4d264-7d91-4560-88c0-99706231b8d1", quantity: 2, consumed: true }, // Barbante
-        { itemId: "res-e4c8f7a2-6b9d-4e31-8f5a-2c9e7d3b1a65", quantity: 1, consumed: true }  // Pedras Soltas
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1, consumed: true }
       ],
       outputs: [
-        { itemId: "eq-arco-flecha-001", quantity: 1, chance: 100 }
+        { itemId: EQUIPMENT_IDS.ARCO_FLECHA, quantity: 1, chance: 100 }
       ],
       craftingTime: 60,
       experienceGained: 60,
@@ -160,12 +161,12 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "medium",
       requiredLevel: 4,
       ingredients: [
-        { itemId: "res-a7f9e3c5-8b2d-4e61-9a8f-1c5e9b7d3a42", quantity: 2, consumed: true }, // Gravetos
-        { itemId: "res-b1a4d264-7d91-4560-88c0-99706231b8d1", quantity: 4, consumed: true }, // Barbante
-        { itemId: "res-e4c8f7a2-6b9d-4e31-8f5a-2c9e7d3b1a65", quantity: 1, consumed: true }  // Pedras Soltas
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 4, consumed: true },
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1, consumed: true }
       ],
       outputs: [
-        { itemId: "eq-lanca-basica-001", quantity: 1, chance: 100 }
+        { itemId: EQUIPMENT_IDS.LANCA, quantity: 1, chance: 100 }
       ],
       craftingTime: 50,
       experienceGained: 50,
@@ -182,15 +183,74 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "medium",
       requiredLevel: 2,
       ingredients: [
-        { itemId: "res-d8e6f4b2-9c7a-4e53-8b9f-1d7e5c3a9b64", quantity: 1, consumed: true }, // Madeira
-        { itemId: "res-b1a4d264-7d91-4560-88c0-99706231b8d1", quantity: 2, consumed: true }  // Barbante
+        { itemId: RESOURCE_IDS.MADEIRA, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true }
       ],
       outputs: [
-        { itemId: "eq-balde-madeira-001", quantity: 1, chance: 100 }
+        { itemId: EQUIPMENT_IDS.BALDE_MADEIRA, quantity: 1, chance: 100 }
       ],
       craftingTime: 40,
       experienceGained: 35,
       successRate: 90
+    },
+
+    {
+      id: "rec-garrafa-bambu-001",
+      name: "Garrafa de Bambu",
+      emoji: "🧴",
+      category: "containers",
+      subcategory: "liquid_containers",
+      difficulty: "medium",
+      requiredLevel: 3,
+      ingredients: [
+        { itemId: RESOURCE_IDS.BAMBU, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.GARRAFA_BAMBU, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 35,
+      experienceGained: 30,
+      successRate: 90
+    },
+
+    {
+      id: "rec-mochila-001",
+      name: "Mochila",
+      emoji: "🎒",
+      category: "equipment",
+      subcategory: "storage_equipment",
+      difficulty: "hard",
+      requiredLevel: 5,
+      ingredients: [
+        { itemId: RESOURCE_IDS.COURO, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 5, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.MOCHILA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 60,
+      experienceGained: 50,
+      successRate: 80
+    },
+
+    {
+      id: "rec-corda-001",
+      name: "Corda",
+      emoji: "🪢",
+      category: "basic_materials",
+      subcategory: "cordage",
+      difficulty: "easy",
+      requiredLevel: 2,
+      ingredients: [
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 3, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.CORDA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 20,
+      experienceGained: 15,
+      successRate: 100
     },
 
     // CONSUMABLES
@@ -203,11 +263,11 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "trivial",
       requiredLevel: 1,
       ingredients: [
-        { itemId: "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37", quantity: 3, consumed: true }, // Cogumelos
-        { itemId: "res-a7f9e3c5-8b2d-4e61-9a8f-1c5e9b7d3a42", quantity: 1, consumed: true }  // Gravetos
+        { itemId: RESOURCE_IDS.COGUMELOS, quantity: 3, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
       ],
       outputs: [
-        { itemId: "res-8f1f5c93-ebb4-4808-b8fe-a6a912552aec", quantity: 1, chance: 100 } // Cogumelos Assados
+        { itemId: RESOURCE_IDS.COGUMELOS_ASSADOS, quantity: 1, chance: 100 }
       ],
       craftingTime: 15,
       experienceGained: 15,
@@ -223,15 +283,57 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "trivial",
       requiredLevel: 1,
       ingredients: [
-        { itemId: "res-d7a5f9c3-8e2b-4d61-9a8f-3c7e5b9d1a42", quantity: 1, consumed: true }, // Carne
-        { itemId: "res-a7f9e3c5-8b2d-4e61-9a8f-1c5e9b7d3a42", quantity: 1, consumed: true }  // Gravetos
+        { itemId: RESOURCE_IDS.CARNE, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
       ],
       outputs: [
-        { itemId: "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23", quantity: 1, chance: 100 } // Carne Assada
+        { itemId: RESOURCE_IDS.CARNE_ASSADA, quantity: 1, chance: 100 }
       ],
       craftingTime: 20,
       experienceGained: 20,
       successRate: 100
+    },
+
+    {
+      id: "rec-peixe-grelhado-001",
+      name: "Peixe Grelhado",
+      emoji: "🐟",
+      category: "consumables",
+      subcategory: "cooked_food",
+      difficulty: "trivial",
+      requiredLevel: 2,
+      ingredients: [
+        { itemId: RESOURCE_IDS.PEIXE_PEQUENO, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.PEIXE_GRELHADO, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 15,
+      experienceGained: 15,
+      successRate: 100
+    },
+
+    {
+      id: "rec-ensopado-carne-001",
+      name: "Ensopado de Carne",
+      emoji: "🍲",
+      category: "consumables",
+      subcategory: "cooked_food",
+      difficulty: "medium",
+      requiredLevel: 4,
+      ingredients: [
+        { itemId: RESOURCE_IDS.CARNE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.COGUMELOS, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.AGUA_FRESCA, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 2, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.ENSOPADO_CARNE, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 45,
+      experienceGained: 40,
+      successRate: 90
     },
 
     // SUCO DE FRUTAS
@@ -244,13 +346,75 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "trivial",
       requiredLevel: 1,
       ingredients: [
-        { itemId: "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8", quantity: 3, consumed: true } // Frutas Silvestres
+        { itemId: RESOURCE_IDS.FRUTAS_SILVESTRES, quantity: 3, consumed: true }
       ],
       outputs: [
-        { itemId: "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9", quantity: 1, chance: 100 } // Suco de Frutas
+        { itemId: RESOURCE_IDS.SUCO_FRUTAS, quantity: 1, chance: 100 }
       ],
       craftingTime: 10,
       experienceGained: 10,
+      successRate: 100
+    },
+
+    // PANELAS E UTENSÍLIOS DE COZINHA
+    {
+      id: "rec-panela-barro-001",
+      name: "Panela de Barro",
+      emoji: "🏺",
+      category: "tools",
+      subcategory: "cooking_tools",
+      difficulty: "medium",
+      requiredLevel: 3,
+      ingredients: [
+        { itemId: RESOURCE_IDS.ARGILA, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.AGUA_FRESCA, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.PANELA_BARRO, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 50,
+      experienceGained: 35,
+      successRate: 85
+    },
+
+    {
+      id: "rec-panela-001",
+      name: "Panela",
+      emoji: "🍲",
+      category: "tools",
+      subcategory: "cooking_tools",
+      difficulty: "hard",
+      requiredLevel: 6,
+      ingredients: [
+        { itemId: RESOURCE_IDS.FERRO_FUNDIDO, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.MADEIRA, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.PANELA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 80,
+      experienceGained: 60,
+      successRate: 80
+    },
+
+    // ISCA PARA PESCA
+    {
+      id: "rec-isca-pesca-001",
+      name: "Isca para Pesca",
+      emoji: "🪱",
+      category: "consumables",
+      subcategory: "bait",
+      difficulty: "trivial",
+      requiredLevel: 2,
+      ingredients: [
+        { itemId: RESOURCE_IDS.COGUMELOS, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.FRUTAS_SILVESTRES, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.ISCA_PESCA, quantity: 3, chance: 100 }
+      ],
+      craftingTime: 10,
+      experienceGained: 8,
       successRate: 100
     }
   ];
