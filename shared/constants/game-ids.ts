@@ -42,12 +42,7 @@ export const RESOURCE_IDS = {
   COGUMELOS_ASSADOS: "res-cogumelos-assados-001", 
   PEIXE_GRELHADO: "res-peixe-grelhado-001",
   CARNE_ASSADA: "res-carne-assada-001",
-  ENSOPADO_CARNE: "res-ensopado-carne-001",
-  
-  // All consumable items with standardized IDs
-  AGUA_FRESCA: "res-agua-fresca-001",
-  COGUMELOS: "res-cogumelos-001",
-  FRUTAS_SILVESTRES: "res-frutas-silvestres-001"
+  ENSOPADO_CARNE: "res-ensopado-carne-001"
 } as const;
 
 export const EQUIPMENT_IDS = {
