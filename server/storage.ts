@@ -23,7 +23,7 @@ import {
 } from "@shared/types";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync } from "fs";
-import { ALL_RESOURCES } from "./data/resources";
+import { getAllGameItems } from "./data/items-modern";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
 import { createRecipeData } from "./data/recipes";
@@ -203,11 +203,40 @@ export class MemStorage implements IStorage {
     // Load persisted data first
     await this.loadData();
 
-    // Initialize all resources using modular data
+    // Initialize all resources using modern game items system
     const resourceIds: string[] = [];
+    const allItems = getAllGameItems();
+    const resourceItems = allItems.filter(item => item.category === 'resource');
 
-    for (const resource of ALL_RESOURCES) {
-      const created = await this.createResource(resource);
+    for (const resource of resourceItems) {
+      // Convert modern item to legacy resource format for storage compatibility
+      const legacyResource = {
+        id: resource.id,
+        name: resource.displayName,
+        emoji: resource.iconPath,
+        rarity: resource.rarity,
+        experienceValue: resource.xpReward,
+        category: 'raw_materials' as const,
+        subcategory: resource.subcategory,
+        spawnRate: resource.spawnRate,
+        yieldAmount: resource.yieldAmount,
+        requiredTool: resource.requiredTool,
+        sellPrice: resource.sellPrice,
+        buyPrice: resource.buyPrice,
+        weight: resource.weight,
+        stackable: resource.stackable,
+        maxStackSize: resource.maxStackSize,
+        effects: resource.effects,
+        tags: resource.tags,
+        attributes: { 
+          durability: 100, 
+          efficiency: 100, 
+          rarity: resource.rarity,
+          baseValue: resource.sellPrice 
+        },
+        value: resource.sellPrice
+      };
+      const created = await this.createResource(legacyResource);
       resourceIds.push(created.id);
     }
 

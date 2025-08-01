@@ -1,6 +1,6 @@
 
 import type { IStorage } from "../storage";
-import { resources } from "../data/resources";
+import { getAllGameItems } from "../data/items-modern";
 
 export class AutoConsumeService {
   private checkTimer: NodeJS.Timeout | null = null;
@@ -74,9 +74,10 @@ export class AutoConsumeService {
       const player = await this.storage.getPlayer(playerId);
       if (!player) return;
 
-      // Get item data
-      const itemData = resources.find(r => r.id === itemId);
-      if (!itemData || itemData.type !== 'consumable') return;
+      // Get item data from modern items system
+      const allItems = getAllGameItems();
+      const itemData = allItems.find(item => item.id === itemId);
+      if (!itemData || itemData.category !== 'consumable') return;
 
       // Check if we have the item in storage
       const storageItems = await this.storage.getPlayerStorage(playerId);
@@ -90,9 +91,9 @@ export class AutoConsumeService {
         return;
       }
 
-      // Consume the item
-      const hungerRestore = itemData.hungerRestore || 0;
-      const thirstRestore = itemData.thirstRestore || 0;
+      // Consume the item - get restoration values from attributes
+      const hungerRestore = itemData.attributes?.hunger_restore || 0;
+      const thirstRestore = itemData.attributes?.thirst_restore || 0;
 
       // Don't over-consume - check if we really need it
       const currentHungerPercentage = (player.hunger / player.maxHunger) * 100;
@@ -122,7 +123,7 @@ export class AutoConsumeService {
         await this.storage.updateStorageItem(storageItem.id, { quantity: newQuantity });
       }
 
-      console.log(`🍽️ Auto-consumed ${itemData.name} for player ${playerId}: H:${player.hunger}→${newHunger}, T:${player.thirst}→${newThirst}`);
+      console.log(`🍽️ Auto-consumed ${itemData.displayName} for player ${playerId}: H:${player.hunger}→${newHunger}, T:${player.thirst}→${newThirst}`);
 
       // Invalidate cache
       try {

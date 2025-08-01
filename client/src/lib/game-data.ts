@@ -6,6 +6,9 @@ export const BASIC_RESOURCES = [
   { id: "gravetos", name: "Gravetos", emoji: "🪵", weight: 2, value: 2 },
 ];
 
+// Add the missing resources export for equipment-tab.tsx
+export const resources = BASIC_RESOURCES;
+
 export const UNIQUE_RESOURCES = {
   forest: { id: "madeira", name: "Madeira", emoji: "🌳", weight: 5, value: 8 },
   desert: { id: "areia", name: "Areia", emoji: "⏳", weight: 2, value: 5 },
