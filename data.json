@@ -7,9 +7,9 @@
         "username": "Bison",
         "level": 1,
         "experience": 81,
-        "hunger": 92,
+        "hunger": 97,
         "maxHunger": 100,
-        "thirst": 86,
+        "thirst": 87,
         "maxThirst": 100,
         "coins": 100,
         "inventoryWeight": 6930,
@@ -27,7 +27,7 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": true,
-        "lastOnlineTime": 1754031252303
+        "lastOnlineTime": 1754031338107
       }
     ]
   ],
@@ -74,7 +74,7 @@
         "id": "bbf67c89-28f5-42f2-bf9d-3fe419032b66",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 15
+        "quantity": 14
       }
     ]
   ],
