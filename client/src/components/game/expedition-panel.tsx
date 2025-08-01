@@ -213,9 +213,54 @@ export default function ExpeditionPanel({
     }
   }, [player?.hunger, player?.thirst, isAutoRepeat, toast]);
 
-  // Get resource info for display
+  // Get resource info for display using enhanced mapping
   const getResourceInfo = (resourceId: string) => {
-    return resources.find(r => r.id === resourceId);
+    // First try to find in provided resources array
+    const found = resources.find(r => r.id === resourceId);
+    if (found) return found;
+
+    // Enhanced fallback mapping using exact IDs from game-ids.ts
+    const resourceMap: Record<string, { name: string; emoji: string }> = {
+      // Basic resources (matching exact game-ids.ts)
+      "res-a1b2c3d4-e5f6-4789-abc1-234567890123": { name: "Fibra", emoji: "🌾" },
+      "res-b2c3d4e5-f6a7-4890-bcd2-345678901234": { name: "Pedra", emoji: "🪨" },
+      "res-c3d4e5f6-a7b8-4901-cde3-456789012345": { name: "Pedras Soltas", emoji: "🪨" },
+      "res-d4e5f6a7-b8c9-4012-def4-567890123456": { name: "Gravetos", emoji: "🪵" },
+      "res-e5f6a7b8-c9d0-4123-efa5-678901234567": { name: "Água Fresca", emoji: "💧" },
+      "res-f6a7b8c9-d0e1-4234-fab6-789012345678": { name: "Bambu", emoji: "🎋" },
+      "res-a7b8c9d0-e1f2-4345-abc7-890123456789": { name: "Madeira", emoji: "🌳" },
+      "res-b8c9d0e1-f2a3-4456-bcd8-901234567890": { name: "Argila", emoji: "🧱" },
+      "res-c9d0e1f2-a3b4-4567-cde9-012345678901": { name: "Ferro Fundido", emoji: "⚙️" },
+      "res-d0e1f2a3-b4c5-4678-def0-123456789012": { name: "Couro", emoji: "🦫" },
+      "res-e1f2a3b4-c5d6-4789-efa1-234567890123": { name: "Carne", emoji: "🥩" },
+      "res-f2a3b4c5-d6e7-4890-fab2-345678901234": { name: "Ossos", emoji: "🦴" },
+      "res-a3b4c5d6-e7f8-4901-abc3-456789012345": { name: "Pelo", emoji: "🧶" },
+      "res-b4c5d6e7-f8a9-4012-bcd4-567890123456": { name: "Barbante", emoji: "🧵" },
+      
+      // More resources
+      "res-c5d6e7f8-a9b0-4123-cde5-678901234567": { name: "Linho", emoji: "🌾" },
+      "res-d6e7f8a9-b0c1-4234-def6-789012345678": { name: "Algodão", emoji: "☁️" },
+      "res-e7f8a9b0-c1d2-4345-efa7-890123456789": { name: "Juta", emoji: "🌾" },
+      "res-f8a9b0c1-d2e3-4456-fab8-901234567890": { name: "Sisal", emoji: "🌾" },
+      "res-a9b0c1d2-e3f4-4567-abc9-012345678901": { name: "Cânhamo", emoji: "🌾" },
+    };
+
+    // Check direct mapping
+    if (resourceMap[resourceId]) {
+      return {
+        id: resourceId,
+        name: resourceMap[resourceId].name,
+        emoji: resourceMap[resourceId].emoji
+      };
+    }
+
+    // Pattern-based fallback for unrecognized IDs
+    console.warn(`🔍 Resource not found for ID: ${resourceId}`);
+    return {
+      id: resourceId,
+      name: "Recurso Desconhecido",
+      emoji: "📦"
+    };
   };
 
   const timeRemaining = Math.max(0, expedition.estimatedDuration - (Date.now() - expedition.startTime));
