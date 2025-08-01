@@ -9,7 +9,7 @@
         "experience": 149,
         "hunger": 0,
         "maxHunger": 100,
-        "thirst": 8,
+        "thirst": 2,
         "maxThirst": 100,
         "coins": 100,
         "inventoryWeight": 8,
