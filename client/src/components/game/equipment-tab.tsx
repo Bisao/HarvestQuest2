@@ -128,10 +128,20 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
           const resourceData = getItemById(item.resourceId);
           if (!resourceData) return false;
 
-          // Check if it's a consumable with the right category
-          return resourceData.type === 'consumable' && 
-                 resourceData.category === slotType &&
-                 item.quantity > 0;
+          // Check if it's a consumable using the utility function
+          if (!isConsumable(resourceData)) return false;
+
+          // For modern consumables, check category and subcategory
+          if (resourceData.category === 'consumable') {
+            return resourceData.subcategory === slotType && item.quantity > 0;
+          }
+
+          // For legacy consumables, check by type
+          if (resourceData.type === 'consumable') {
+            return resourceData.category === slotType && item.quantity > 0;
+          }
+
+          return false;
         })
         .map(item => {
           const resourceData = getItemById(item.resourceId);
