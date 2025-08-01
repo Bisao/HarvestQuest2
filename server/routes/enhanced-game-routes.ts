@@ -414,12 +414,9 @@ export function registerEnhancedGameRoutes(
           throw new NotFoundError("Item");
         }
 
-        // For now, assume all items with certain names are consumable
-        // This should be a property in the resource schema
-        const consumablePatterns = ['água', 'carne', 'peixe', 'cogumelo', 'fruta', 'suco'];
-        const isConsumable = consumablePatterns.some(pattern => 
-          resource.name.toLowerCase().includes(pattern)
-        );
+        // Use modern consumable validation system
+        const { isConsumable: checkConsumable } = await import("../../shared/utils/consumable-utils");
+        const isConsumable = checkConsumable(resource);
 
         if (!isConsumable) {
           throw new InvalidOperationError(`${resource.name} is not consumable`);

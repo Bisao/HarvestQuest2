@@ -45,7 +45,13 @@ export function isConsumable(item: any): boolean {
     "res-cogumelos-assados-001",    // Cogumelos Assados
     RESOURCE_IDS.PEIXE_GRELHADO,    // Peixe Grelhado
     RESOURCE_IDS.ENSOPADO_CARNE,    // Ensopado de Carne
-    RESOURCE_IDS.SUCO_FRUTAS        // Suco de Frutas
+    RESOURCE_IDS.SUCO_FRUTAS,       // Suco de Frutas
+    // Legacy IDs for compatibility
+    "res-8bd33b18-a241-4859-ae9f-870fab5673d0", // Água
+    "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23", // Carne
+    "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37", // Cogumelos
+    "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8", // Frutas
+    "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"  // Outros consumíveis
   ];
 
   return modernConsumableIds.includes(item.id);
@@ -79,7 +85,13 @@ export function getConsumableEffects(item: any): ConsumableEffects {
     "res-cogumelos-assados-001": { hungerRestore: 8, thirstRestore: 1 },
     [RESOURCE_IDS.PEIXE_GRELHADO]: { hungerRestore: 12, thirstRestore: 2 },
     [RESOURCE_IDS.ENSOPADO_CARNE]: { hungerRestore: 20, thirstRestore: 8 },
-    [RESOURCE_IDS.SUCO_FRUTAS]: { hungerRestore: 3, thirstRestore: 12 }
+    [RESOURCE_IDS.SUCO_FRUTAS]: { hungerRestore: 3, thirstRestore: 12 },
+    // Legacy IDs for backward compatibility
+    "res-8bd33b18-a241-4859-ae9f-870fab5673d0": { hungerRestore: 0, thirstRestore: 10 }, // Água
+    "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": { hungerRestore: 15, thirstRestore: 3 }, // Carne
+    "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": { hungerRestore: 2, thirstRestore: 0 }, // Cogumelos
+    "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": { hungerRestore: 1, thirstRestore: 2 }, // Frutas
+    "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": { hungerRestore: 5, thirstRestore: 1 }  // Outros
   };
 
   return modernIdEffects[item.id] || { hungerRestore: 0, thirstRestore: 0 };
@@ -205,6 +217,32 @@ export function getModernConsumableData(itemId: string): ConsumableEffects | nul
       hungerRestore: 3, 
       thirstRestore: 12,
       effects: ['thirst_restore', 'vitamin_boost']
+    },
+    // Legacy IDs for backward compatibility
+    "res-8bd33b18-a241-4859-ae9f-870fab5673d0": { 
+      hungerRestore: 0, 
+      thirstRestore: 10,
+      effects: ['thirst_restore']
+    },
+    "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": { 
+      hungerRestore: 15, 
+      thirstRestore: 3,
+      effects: ['hunger_restore']
+    },
+    "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": { 
+      hungerRestore: 2, 
+      thirstRestore: 0,
+      effects: ['hunger_restore']
+    },
+    "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": { 
+      hungerRestore: 1, 
+      thirstRestore: 2,
+      effects: ['hunger_restore', 'thirst_restore']
+    },
+    "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": { 
+      hungerRestore: 5, 
+      thirstRestore: 1,
+      effects: ['hunger_restore']
     }
   };
 
@@ -234,6 +272,12 @@ export function getAllModernConsumableIds(): string[] {
     "res-cogumelos-assados-001",
     RESOURCE_IDS.PEIXE_GRELHADO,
     RESOURCE_IDS.ENSOPADO_CARNE,
-    RESOURCE_IDS.SUCO_FRUTAS
+    RESOURCE_IDS.SUCO_FRUTAS,
+    // Legacy IDs
+    "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+    "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+    "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+    "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+    "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
   ];
 }

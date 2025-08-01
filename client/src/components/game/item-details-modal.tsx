@@ -99,7 +99,7 @@ export function ItemDetailsModal({
       await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       await queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
-      
+
       // Force immediate refetch
       await queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
       await queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });

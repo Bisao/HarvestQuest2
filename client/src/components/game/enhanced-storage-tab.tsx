@@ -490,7 +490,7 @@ export default function EnhancedStorageTab({
                     </div>
 
                     {/* Second Row - Consume Button (if consumable) */}
-                    {isConsumable(item.itemData) && (
+                    {(isConsumable(item.itemData) || isConsumable({ id: item.resourceId, name: item.itemData?.name || '' })) && (
                       <div className="space-y-1">
                         <Button
                           variant="default"
