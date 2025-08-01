@@ -435,12 +435,14 @@ export default function QuestsTab({ player }: QuestsTabProps) {
         <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
           {Object.entries(questCategories).map(([categoryKey, category]) => {
             const isActive = activeCategory === categoryKey;
+            const completableCount = categoryKey === 'active' ? 
+              category.quests.filter(q => q.canComplete).length : 0;
             
             return (
               <button
                 key={categoryKey}
                 onClick={() => setActiveCategory(categoryKey)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
+                className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all relative ${
                   isActive 
                     ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
                     : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
@@ -449,6 +451,11 @@ export default function QuestsTab({ player }: QuestsTabProps) {
                 <span className="text-lg">{category.emoji}</span>
                 <span>{category.label}</span>
                 <span className="text-sm text-gray-500">({category.quests.length})</span>
+                {completableCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse font-bold">
+                    {completableCount}
+                  </span>
+                )}
               </button>
             );
           })}
