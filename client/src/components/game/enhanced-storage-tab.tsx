@@ -556,7 +556,7 @@ export default function EnhancedStorageTab({
                             const totalWeight = item.itemData.weight * item.quantity;
                             return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(2)}kg` : `${totalWeight.toFixed(2)}g`;
                           })()}
-                        </div>iv>
+                        </div>
                       </div>
                     </div>
 
