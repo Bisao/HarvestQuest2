@@ -18,30 +18,10 @@ export function createResourcesWithIds(): InsertResource[] {
     { id: RESOURCE_IDS.COURO, name: "Couro", emoji: "🦫", weight: 2, sellPrice: 8, buyPrice: 16, type: "basic", rarity: "common", requiredTool: "knife", experienceValue: 3 },
 
     // CONSUMABLES & FISHING
-    {
-      id: RESOURCE_IDS.ISCA_PESCA,
-      name: "Isca para Pesca",
-      emoji: "🪱",
-      description: "Isca artesanal feita com fibras e frutas para atrair peixes",
-      type: "resource",
-      rarity: "common",
-      weight: 10, // 10 gramas por unidade
-      sellPrice: 3,
-      buyPrice: 6,
-      experienceValue: 2,
-      category: "consumables",
-      stackable: true,
-      maxStackSize: 50,
-      tags: ["consumable", "fishing", "craftable"],
-      collectionRequirements: []
-    },
+    { id: RESOURCE_IDS.ISCA_PESCA, name: "Isca para Pesca", emoji: "🪱", weight: 1, sellPrice: 3, buyPrice: 6, type: "basic", rarity: "common", experienceValue: 2 },
 
     // ANIMAL PRODUCTS
-    {
-      id: RESOURCE_IDS.CARNE,
-      name: "Carne",
-      emoji: "🥩",
-       weight: 2, sellPrice: 12, buyPrice: 24, type: "basic", rarity: "common", experienceValue: 4 },
+    { id: RESOURCE_IDS.CARNE, name: "Carne", emoji: "🥩", weight: 2, sellPrice: 12, buyPrice: 24, type: "basic", rarity: "common", experienceValue: 4 },
     { id: RESOURCE_IDS.OSSOS, name: "Ossos", emoji: "🦴", weight: 1, sellPrice: 5, buyPrice: 10, type: "basic", rarity: "common", experienceValue: 2 },
     { id: RESOURCE_IDS.PELO, name: "Pelo", emoji: "🧶", weight: 1, sellPrice: 3, buyPrice: 6, type: "basic", rarity: "common", experienceValue: 1 },
     { id: RESOURCE_IDS.BARBANTE, name: "Barbante", emoji: "🧵", weight: 1, sellPrice: 1, buyPrice: 2, type: "basic", rarity: "common", experienceValue: 1 },
@@ -63,71 +43,11 @@ export function createResourcesWithIds(): InsertResource[] {
     { id: RESOURCE_IDS.CONCHAS, name: "Conchas", emoji: "🐚", weight: 1, sellPrice: 12, buyPrice: 24, type: "unique", rarity: "uncommon", experienceValue: 4 },
 
     // Food resources (consumables)
-    { 
-      id: RESOURCE_IDS.SUCO_FRUTAS, 
-      name: "Suco de Frutas", 
-      emoji: "🧃", 
-      weight: 1, 
-      sellPrice: 5, 
-      buyPrice: 10, 
-      type: "consumable", 
-      category: "drink",
-      rarity: "common", 
-      experienceValue: 2,
-      attributes: { consumable: true }
-    },
-    { 
-      id: RESOURCE_IDS.COGUMELOS_ASSADOS, 
-      name: "Cogumelos Assados", 
-      emoji: "🍄‍🟫", 
-      weight: 1, 
-      sellPrice: 6, 
-      buyPrice: 12, 
-      type: "consumable", 
-      category: "food",
-      rarity: "common", 
-      experienceValue: 3,
-      attributes: { consumable: true }
-    },
-    { 
-      id: RESOURCE_IDS.PEIXE_GRELHADO, 
-      name: "Peixe Grelhado", 
-      emoji: "🐟", 
-      weight: 2, 
-      sellPrice: 12, 
-      buyPrice: 24, 
-      type: "consumable", 
-      category: "food",
-      rarity: "common", 
-      experienceValue: 4,
-      attributes: { consumable: true }
-    },
-    { 
-      id: RESOURCE_IDS.CARNE_ASSADA, 
-      name: "Carne Assada", 
-      emoji: "🍖", 
-      weight: 2, 
-      sellPrice: 15, 
-      buyPrice: 30, 
-      type: "consumable", 
-      category: "food",
-      rarity: "common", 
-      experienceValue: 5,
-      attributes: { consumable: true }
-    },
-    { 
-      id: RESOURCE_IDS.ENSOPADO_CARNE, 
-      name: "Ensopado de Carne", 
-      emoji: "🍲", 
-      weight: 3, 
-      sellPrice: 25, 
-      buyPrice: 50, 
-      type: "consumable", 
-      category: "food",
-      rarity: "uncommon", 
-      experienceValue: 8,
-      attributes: { consumable: true }
-    },
+    { id: RESOURCE_IDS.SUCO_FRUTAS, name: "Suco de Frutas", emoji: "🧃", weight: 1, sellPrice: 5, buyPrice: 10, type: "basic", rarity: "common", experienceValue: 2 },
+    { id: RESOURCE_IDS.COGUMELOS_ASSADOS, name: "Cogumelos Assados", emoji: "🍄‍🟫", weight: 1, sellPrice: 6, buyPrice: 12, type: "basic", rarity: "common", experienceValue: 3 },
+    { id: RESOURCE_IDS.PEIXE_GRELHADO, name: "Peixe Grelhado", emoji: "🐟", weight: 2, sellPrice: 12, buyPrice: 24, type: "basic", rarity: "common", experienceValue: 4 },
+    { id: RESOURCE_IDS.CARNE_ASSADA, name: "Carne Assada", emoji: "🍖", weight: 2, sellPrice: 15, buyPrice: 30, type: "basic", rarity: "common", experienceValue: 5 },
+    { id: RESOURCE_IDS.ENSOPADO_CARNE, name: "Ensopado de Carne", emoji: "🍲", weight: 3, sellPrice: 25, buyPrice: 50, type: "basic", rarity: "uncommon", experienceValue: 8 },
   ];
 }
 
