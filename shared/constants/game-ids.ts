@@ -12,7 +12,7 @@ export const RESOURCE_IDS = {
   MADEIRA: "res-8e5c2a9f-7b1d-4e63-9a84-6f1c8e5a2b6a",
   ARGILA: "res-1c9e5a7b-3f8d-4e52-9a73-8e2c6f9b1d7b",
   FERRO_FUNDIDO: "res-9f7b3e1a-5d8c-4e41-9a62-2c6e8f1b5d8c",
-  COURO: "res-3e1a9f7b-8d5c-4e30-9a51-6c8e2f9b3d9d",
+  COURO: "res-c8f5e3b1-9a7d-4e62-8f51-2c6e8b9d4a73",
   CARNE: "res-7b5e3a1f-1d9c-4e29-9a40-8c2e6f7b5dae",
   OSSOS: "res-5a3f7b1e-9d8c-4e18-9a39-2c6e8f3b7dbf",
   PELO: "res-1f7b5a3e-8c9d-4e17-9a28-6c2e8f5b1dc0",
