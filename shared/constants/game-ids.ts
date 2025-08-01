@@ -27,21 +27,60 @@ export const RESOURCE_IDS = {
   // Consumables
   ISCA_PESCA: "eq-tool-bait-fishing-001", // Isca movida para recursos
 
-  // Equipment Parts - Sistema de partes para oficinas robustas
-  CABO_MACHADO: "cabo-machado",
-  CABO_PICARETA: "cabo-picareta", 
-  CABO_ESPADA: "cabo-espada",
-  HASTE_FLECHA: "haste-flecha",
-  CABECA_MACHADO: "cabeca-machado",
-  CABECA_PICARETA: "cabeca-picareta",
-  LAMINA_ESPADA: "lamina-espada",
-  PONTA_FLECHA: "ponta-flecha",
-  BARRA_FERRO: "barra-ferro",
+  // Equipment Parts - Sistema completo de partes para oficinas robustas
+  
+  // === CABOS E HASTES ===
+  CABO_MACHADO: "res-cabo-machado-001",
+  CABO_PICARETA: "res-cabo-picareta-001", 
+  CABO_ESPADA: "res-cabo-espada-001",
+  CABO_FACA: "res-cabo-faca-001",
+  CABO_LANCA: "res-cabo-lanca-001",
+  HASTE_FLECHA: "res-haste-flecha-001",
+  CABO_FOICE: "res-cabo-foice-001",
+  CABO_PA: "res-cabo-pa-001",
+  VARA_BAMBU: "res-vara-bambu-001",
+
+  // === CABEÇAS E LÂMINAS ===
+  CABECA_MACHADO: "res-cabeca-machado-001",
+  CABECA_PICARETA: "res-cabeca-picareta-001",
+  LAMINA_ESPADA: "res-lamina-espada-001",
+  LAMINA_FACA: "res-lamina-faca-001",
+  PONTA_LANCA: "res-ponta-lanca-001",
+  PONTA_FLECHA: "res-ponta-flecha-001",
+  LAMINA_FOICE: "res-lamina-foice-001",
+  CABECA_PA: "res-cabeca-pa-001",
+
+  // === MATERIAIS PROCESSADOS ===
+  BARRA_FERRO: "res-barra-ferro-001",
+  LINGOTE_FERRO: "res-lingote-ferro-001",
+  CHAPA_FERRO: "res-chapa-ferro-001",
+  FERRO_FUNDIDO_REFINADO: "res-ferro-fundido-refinado-001",
+  
+  // === CORDAS E AMARRAÇÕES ===
+  CORDA_RESISTENTE: "res-corda-resistente-001",
+  FIO_SINEW: "res-fio-sinew-001",
+  BARBANTE_REFORÇADO: "res-barbante-reforcado-001",
+
+  // === TECIDOS E COUROS ===
+  COURO_CURTIDO: "res-couro-curtido-001",
+  COURO_REFINADO: "res-couro-refinado-001",
+  TECIDO_FIBRA: "res-tecido-fibra-001",
+  PELE_TRATADA: "res-pele-tratada-001",
+
+  // === COMPONENTES ESPECIAIS ===
+  GANCHO_FERRO: "res-gancho-ferro-001",
+  ARGOLA_FERRO: "res-argola-ferro-001",
+  PREGO_FERRO: "res-prego-ferro-001",
+  DOBRADIÇA_FERRO: "res-dobradica-ferro-001",
+  CORDA_ARCO: "res-corda-arco-001",
+  EMPUNHADURA: "res-empunhadura-001",
 
   // Raw materials for processing
-  MINERAL_FERRO: "mineral-ferro",
-  CARVAO: "carvao",
-  FIBRA_ALGODAO: "fibra-algodao",
+  MINERAL_FERRO: "res-mineral-ferro-001",
+  CARVAO: "res-carvao-001",
+  FIBRA_ALGODAO: "res-fibra-algodao-001",
+  PEDRA_AMOLAR: "res-pedra-amolar-001",
+  RESINA_ARVORE: "res-resina-arvore-001",
 
   // Animals 
   COELHO: "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
@@ -81,10 +120,20 @@ export const EQUIPMENT_IDS = {
   PANELA_BARRO: "eq-tool-clay-pot-001",
   PANELA: "eq-tool-metal-pot-001",
 
+  // Advanced Tools
+  PICARETA_FERRO: "eq-tool-iron-pickaxe-001",
+  MACHADO_FERRO: "eq-tool-iron-axe-001",
+  PA_FERRO: "eq-tool-iron-shovel-001",
+  FACA_FERRO: "eq-tool-iron-knife-001",
+  FOICE_FERRO: "eq-tool-iron-sickle-001",
+
   // Weapons
   ARCO_FLECHA: "eq-weap-a1b2c3d4-5e6f-7890-abcd-ef1234567890",
   LANCA: "eq-weap-b2c3d4e5-6f78-9012-bcde-f12345678901",
   ESPADA_PEDRA: "eq-weap-stone-sword-001",
+  ESPADA_FERRO: "eq-weap-iron-sword-001",
+  LANCA_FERRO: "eq-weap-iron-spear-001",
+  ARCO_COMPOSTO: "eq-weap-composite-bow-001",
 
   // Armor
   CAPACETE_COURO: "eq-armor-c3d4e5f6-7890-1234-cdef-123456789012",
@@ -92,10 +141,15 @@ export const EQUIPMENT_IDS = {
   CALCAS_COURO: "eq-armor-e5f67890-1234-5678-ef12-345678901234",
   BOTAS_COURO: "eq-armor-f6789012-3456-7890-f123-456789012345",
   CAPACETE_FERRO: "eq-armor-iron-helmet-001",
+  PEITORAL_FERRO: "eq-armor-iron-chestplate-001",
+  CALCAS_FERRO: "eq-armor-iron-leggings-001",
+  BOTAS_FERRO: "eq-armor-iron-boots-001",
 
   // Storage/Utility
   MOCHILA: "eq-util-78901234-5678-9012-1234-567890123456",
   BARRIL_IMPROVISADO: "eq-container-makeshift-barrel-001",
+  MOCHILA_GRANDE: "eq-container-large-backpack-001",
+  BOLSA_FERRAMENTAS: "eq-container-tool-bag-001",
 } as const;
 
 // Update BIOME_IDS with correct actual database IDs
@@ -113,27 +167,78 @@ export const QUEST_IDS = {
 } as const;
 
 export const RECIPE_IDS = {
+  // === RECEITAS BÁSICAS ===
   BARBANTE: "rec-barbante-001",
+  CORDA: "rec-corda-001",
+  BARBANTE_REFORÇADO: "rec-barbante-reforcado-001",
+  CORDA_RESISTENTE: "rec-corda-resistente-001",
+
+  // === RECEITAS DE EQUIPAMENTOS COMPLETOS ===
   MACHADO: "rec-machado-001", 
   PICARETA: "rec-picareta-001",
   FOICE: "rec-foice-001",
-  BALDE_MADEIRA: "rec-balde-madeira-001",
   FACA: "rec-faca-001",
   VARA_PESCA: "rec-vara-pesca-001",
   ARCO_FLECHA: "rec-arco-flecha-001",
   LANCA: "rec-lanca-001",
-  MOCHILA: "rec-mochila-001",
-  CORDA: "rec-corda-001",
-  ISCA_PESCA: "rec-isca-pesca-001",
+  PA: "rec-pa-001",
+  ESPADA_PEDRA: "rec-espada-pedra-001",
+
+  // === RECEITAS DE PARTES - CABOS E HASTES ===
+  CABO_MACHADO: "rec-cabo-machado-001",
+  CABO_PICARETA: "rec-cabo-picareta-001",
+  CABO_ESPADA: "rec-cabo-espada-001",
+  CABO_FACA: "rec-cabo-faca-001",
+  CABO_LANCA: "rec-cabo-lanca-001",
+  CABO_FOICE: "rec-cabo-foice-001",
+  CABO_PA: "rec-cabo-pa-001",
+  HASTE_FLECHA: "rec-haste-flecha-001",
+  VARA_BAMBU: "rec-vara-bambu-001",
+
+  // === RECEITAS DE PARTES - CABEÇAS E LÂMINAS ===
+  CABECA_MACHADO: "rec-cabeca-machado-001",
+  CABECA_PICARETA: "rec-cabeca-picareta-001",
+  LAMINA_ESPADA: "rec-lamina-espada-001",
+  LAMINA_FACA: "rec-lamina-faca-001",
+  PONTA_LANCA: "rec-ponta-lanca-001",
+  PONTA_FLECHA: "rec-ponta-flecha-001",
+  LAMINA_FOICE: "rec-lamina-foice-001",
+  CABECA_PA: "rec-cabeca-pa-001",
+
+  // === RECEITAS DE MATERIAIS PROCESSADOS ===
+  BARRA_FERRO: "rec-barra-ferro-001",
+  LINGOTE_FERRO: "rec-lingote-ferro-001",
+  CHAPA_FERRO: "rec-chapa-ferro-001",
+  FERRO_FUNDIDO_REFINADO: "rec-ferro-fundido-refinado-001",
+  COURO_CURTIDO: "rec-couro-curtido-001",
+  COURO_REFINADO: "rec-couro-refinado-001",
+  TECIDO_FIBRA: "rec-tecido-fibra-001",
+  PELE_TRATADA: "rec-pele-tratada-001",
+
+  // === RECEITAS DE COMPONENTES ESPECIAIS ===
+  GANCHO_FERRO: "rec-gancho-ferro-001",
+  ARGOLA_FERRO: "rec-argola-ferro-001",
+  PREGO_FERRO: "rec-prego-ferro-001",
+  DOBRADICA_FERRO: "rec-dobradica-ferro-001",
+  CORDA_ARCO: "rec-corda-arco-001",
+  EMPUNHADURA: "rec-empunhadura-001",
+  FIO_SINEW: "rec-fio-sinew-001",
+
+  // === RECEITAS DE CONTAINERS E UTENSÍLIOS ===
+  BALDE_MADEIRA: "rec-balde-madeira-001",
   PANELA_BARRO: "rec-panela-barro-001",
   PANELA: "rec-panela-001",
   GARRAFA_BAMBU: "rec-garrafa-bambu-001",
+  MOCHILA: "rec-mochila-001",
+  BARRIL_IMPROVISADO: "rec-barril-improvisado-001",
+
+  // === RECEITAS DE CONSUMÍVEIS ===
+  ISCA_PESCA: "rec-isca-pesca-001",
   SUCO_FRUTAS: "rec-suco-frutas-001",
   COGUMELOS_ASSADOS: "rec-cogumelos-assados-001",
   PEIXE_GRELHADO: "rec-peixe-grelhado-001",
   CARNE_ASSADA: "rec-carne-assada-001",
-  ENSOPADO_CARNE: "rec-ensopado-carne-001",
-  BARRIL_IMPROVISADO: "rec-barril-improvisado-001"
+  ENSOPADO_CARNE: "rec-ensopado-carne-001"
 } as const;
 
 // Helper functions for type safety
