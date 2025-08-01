@@ -159,7 +159,7 @@ export function registerEnhancedGameRoutes(
           for (const ingredient of recipe.ingredients) {
             ingredients[ingredient.itemId] = ingredient.quantity;
           }
-        } else if (typeof recipe.ingredients === 'object' && recipe.ingredients.ingredients !== null) {
+        } else if (typeof recipe.ingredients === 'object' && recipe.ingredients !== null) {
           ingredients = recipe.ingredients as Record<string, number>;
         } else {
           throw new InvalidOperationError(`Recipe ${recipe.name} has no valid ingredients defined`);
@@ -347,26 +347,17 @@ export function registerEnhancedGameRoutes(
         const availableResources = [];
 
         for (const resource of allResources) {
-          // Check level requirement
-          if (resource.requiredLevel && resource.requiredLevel > playerLevel) {
-            continue;
-          }
-
           // Check if player has required tools
           const hasTools = await gameService.hasRequiredTool(playerId, resource.id);
           if (!hasTools) {
             continue;
           }
 
-          // Check if resource can be collected (has collection requirements or is basic)
-          if (resource.collectionRequirements && resource.collectionRequirements.length > 0) {
-            availableResources.push({
-              id: resource.id,
-              name: resource.name,
-              requiredLevel: resource.requiredLevel || 1,
-              collectionRequirements: resource.collectionRequirements
-            });
-          }
+          // Add resource to available list
+          availableResources.push({
+            id: resource.id,
+            name: resource.name
+          });
         }
 
         successResponse(res, availableResources);
@@ -538,16 +529,16 @@ export function registerEnhancedGameRoutes(
   });
 
   // Get offline activity config
-  app.get('/api/player/:playerId/offline-config', (req, res) => {
+  app.get('/api/player/:playerId/offline-config', async (req, res) => {
     try {
       const { playerId } = req.params;
-      const player = gameStorage.getPlayer(playerId);
+      const player = await storage.getPlayer(playerId);
 
       if (!player) {
         return res.status(404).json({ error: 'Player not found' });
       }
 
-      res.json(player.offlineActivityConfig || {
+      res.json({
         enabled: false,
         maxDuration: 12,
         stopOnLowResources: true,
@@ -561,22 +552,21 @@ export function registerEnhancedGameRoutes(
     }
   });
 
-  // Get available resources for offline activities
-  app.get('/api/player/:playerId/offline-resources', (req, res) => {
+  // Get available resources for offline activities (duplicate endpoint - remove this one)
+  app.get('/api/player/:playerId/offline-resources-old', async (req, res) => {
     try {
       const { playerId } = req.params;
-      const player = gameStorage.getPlayer(playerId);
+      const player = await storage.getPlayer(playerId);
 
       if (!player) {
         return res.status(404).json({ error: 'Player not found' });
       }
 
-      const allResources = gameData.resources;
-      const allBiomes = gameData.biomes;
-      const playerInventory = gameStorage.getInventory(playerId);
+      const allResources = await storage.getAllResources();
+      const allBiomes = await storage.getAllBiomes();
 
       // Biomas acessíveis pelo jogador
-      const accessibleBiomes = allBiomes.filter(biome => 
+      const accessibleBiomes = allBiomes.filter((biome: any) => 
         biome.requiredLevel <= player.level
       );
 
@@ -591,6 +581,7 @@ export function registerEnhancedGameRoutes(
 
         // Verifica requisito de ferramenta
         if (resource.requirements.tool) {
+          const playerInventory = await storage.getPlayerInventory(playerId);
           const hasTool = playerInventory.some((item: any) => 
             item.itemId === resource.requirements.tool && item.quantity > 0
           ) || player.equippedTool === resource.requirements.tool;
