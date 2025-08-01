@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import { useQueryClient } from "@tanstack/react-query";
 import { isConsumable, getConsumableEffects } from "@shared/utils/consumable-utils";
 import type { Resource, Equipment, Player } from "@shared/types";
 
@@ -35,6 +36,7 @@ export function ItemDetailsModal({
   player 
 }: ItemDetailsModalProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [moveQuantity, setMoveQuantity] = useState(1);
   const [consumeQuantity, setConsumeQuantity] = useState(1);
 
@@ -170,58 +172,60 @@ export function ItemDetailsModal({
           )}
           
           {/* Item Information */}
-          <div className="bg-gray-50 rounded-lg p-4 space-y-2"></div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Quantidade:</span>
-              <span className="font-semibold">{item.quantity}</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span className="text-gray-600">Peso unitário:</span>
-              <span className="font-semibold">
-                {itemData.weight >= 1000 ? `${(itemData.weight / 1000).toFixed(1)}kg` : `${itemData.weight}g`}
-              </span>
-            </div>
-
-            <div className="flex justify-between">
-              <span className="text-gray-600">Peso total:</span>
-              <span className="font-semibold">
-                {(() => {
-                  const totalWeight = itemData.weight * item.quantity;
-                  return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
-                })()}
-              </span>
-            </div>
-
-            <div className="flex justify-between">
-              <span className="text-gray-600">Valor unitário:</span>
-              <span className="font-semibold">{itemData.value} moedas</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span className="text-gray-600">Valor total:</span>
-              <span className="font-semibold">{itemData.value * item.quantity} moedas</span>
-            </div>
-
-            {/* Consumable Effects */}
-            {itemIsConsumable && consumableEffects && (
-              <div className="border-t pt-2 mt-2">
-                <div className="text-sm font-medium text-green-700 mb-1">Efeitos de Consumo:</div>
-                {consumableEffects.hungerRestore > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Restaura Fome:</span>
-                    <span className="text-green-600">+{consumableEffects.hungerRestore}</span>
-                  </div>
-                )}
-                {consumableEffects.thirstRestore > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Restaura Sede:</span>
-                    <span className="text-blue-600">+{consumableEffects.thirstRestore}</span>
-                  </div>
-                )}
+          {itemData && (
+            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Quantidade:</span>
+                <span className="font-semibold">{item.quantity}</span>
               </div>
-            )}
-          </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-600">Peso unitário:</span>
+                <span className="font-semibold">
+                  {itemData.weight >= 1000 ? `${(itemData.weight / 1000).toFixed(1)}kg` : `${itemData.weight}g`}
+                </span>
+              </div>
+
+            <div className="flex justify-between">
+                <span className="text-gray-600">Peso total:</span>
+                <span className="font-semibold">
+                  {(() => {
+                    const totalWeight = itemData.weight * item.quantity;
+                    return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
+                  })()}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-600">Valor unitário:</span>
+                <span className="font-semibold">{itemData.sellPrice || itemData.value || 0} moedas</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-600">Valor total:</span>
+                <span className="font-semibold">{(itemData.sellPrice || itemData.value || 0) * item.quantity} moedas</span>
+              </div>
+
+              {/* Consumable Effects */}
+              {itemIsConsumable && consumableEffects && (
+                <div className="border-t pt-2 mt-2">
+                  <div className="text-sm font-medium text-green-700 mb-1">Efeitos de Consumo:</div>
+                  {consumableEffects.hungerRestore > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Restaura Fome:</span>
+                      <span className="text-green-600">+{consumableEffects.hungerRestore}</span>
+                    </div>
+                  )}
+                  {consumableEffects.thirstRestore > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Restaura Sede:</span>
+                      <span className="text-blue-600">+{consumableEffects.thirstRestore}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Actions */}
           <div className="space-y-3">

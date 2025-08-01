@@ -203,7 +203,8 @@ export default function EnhancedInventory({
       const effects = getConsumableEffects(itemData);
       
       const response = await apiRequest('POST', `/api/player/${playerId}/consume`, {
-        itemId,
+        itemId: item.resourceId,
+        inventoryItemId: item.id,
         quantity: 1,
         location: 'inventory',
         hungerRestore: effects.hungerRestore,
@@ -225,7 +226,7 @@ export default function EnhancedInventory({
       toast({
         title: "Erro",
         description: error.message || "Não foi possível consumir o item.",
-        variant: "destructive"
+        variant: "destructive"structive"
       });
     }
   });
