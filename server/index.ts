@@ -133,7 +133,7 @@ app.use((req, res, next) => {
   import storageRoutes from './routes/storage';
   import consumptionRoutes from './routes/consumption';
   import questRoutes from './routes/quest';
-  
+
   const limiter = rateLimit(100, 60000);
 
   // Apply the rate limiting middleware to all requests
