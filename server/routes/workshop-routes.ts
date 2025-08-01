@@ -12,7 +12,7 @@ interface WorkshopProcess {
   name: string;
   emoji: string;
   description: string;
-  category: "madeira" | "pedras" | "fibras" | "forja" | "fogueira" | "equipamentos";
+  category: "bancada" | "madeira" | "pedras" | "forja" | "fogueira";
   requiredLevel: number;
   input: {
     resourceId: string;
@@ -39,7 +39,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     name: "Barbante",
     emoji: "🧵",
     description: "Processe fibras em barbante útil",
-    category: "fibras",
+    category: "bancada",
     requiredLevel: 1,
     input: { resourceId: RESOURCE_IDS.FIBRA, quantity: 5 },
     output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 1 },
@@ -184,7 +184,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     name: "Mochila",
     emoji: "🎒",
     description: "Costure uma mochila para mais capacidade",
-    category: "fibras",
+    category: "bancada",
     requiredLevel: 5,
     input: { resourceId: RESOURCE_IDS.COURO, quantity: 2 },
     fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 5 },
@@ -198,7 +198,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     name: "Corda",
     emoji: "🪢",
     description: "Trança barbante em corda resistente",
-    category: "fibras",
+    category: "bancada",
     requiredLevel: 2,
     input: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 3 },
     output: { resourceId: EQUIPMENT_IDS.CORDA, quantity: 1 },
@@ -263,13 +263,13 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     experienceGained: 25
   },
 
-  // FIBRAS
+  // BANCADA (CRIAÇÃO DE ITENS)
   {
     id: "proc-fibra-processada-001",
     name: "Fibra Processada",
     emoji: "🌾",
     description: "Processe fibras brutas em material têxtil",
-    category: "fibras",
+    category: "bancada",
     requiredLevel: 1,
     input: { resourceId: RESOURCE_IDS.FIBRA, quantity: 10 },
     output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 4 },
@@ -282,7 +282,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     name: "Couro Tratado",
     emoji: "🦫",
     description: "Trate couro bruto para melhor qualidade",
-    category: "fibras", 
+    category: "bancada", 
     requiredLevel: 5,
     input: { resourceId: RESOURCE_IDS.COURO, quantity: 2 },
     output: { resourceId: RESOURCE_IDS.COURO, quantity: 3 },

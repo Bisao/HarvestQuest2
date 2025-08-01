@@ -28,6 +28,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
+- **August 1, 2025**: WORKSHOP SYSTEM REORGANIZATION COMPLETED
+  - **BANCADA SYSTEM**: Renamed "Fibras" category to "Bancada" for item creation
+  - **SPECIALIZED CATEGORIES**: Organized workshops into specialized functions:
+    - Bancada: Creation of items, equipment, and crafted materials
+    - Madeira: Processing of wood materials  
+    - Pedras: Processing of stone and mineral materials
+    - Forja: Metal work and smelting operations
+    - Fogueira: Food preparation and preservation
+  - **COMPLETE CRAFTING MIGRATION**: All traditional crafting moved to workshop system
+  - **SECURE APIs**: Full validation and security implementation
 - **August 1, 2025**: ID VALIDATION SYSTEM COMPLETED
   - **MASTER RULE IMPLEMENTED**: game-ids.ts is now the ONLY source of truth for ALL game IDs
   - Created comprehensive validation system with 5 validator files as requested:

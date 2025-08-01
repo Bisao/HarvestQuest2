@@ -21,7 +21,7 @@ interface WorkshopProcess {
   name: string;
   emoji: string;
   description: string;
-  category: "madeira" | "pedras" | "fibras" | "forja" | "fogueira" | "equipamentos";
+  category: "bancada" | "madeira" | "pedras" | "forja" | "fogueira";
   requiredLevel: number;
   input: {
     resourceId: string;
@@ -47,7 +47,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     name: "Barbante",
     emoji: "🧵",
     description: "Processe fibras em barbante útil",
-    category: "fibras",
+    category: "bancada",
     requiredLevel: 1,
     input: { resourceId: RESOURCE_IDS.FIBRA, quantity: 5 },
     output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 1 },
@@ -192,7 +192,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     name: "Mochila",
     emoji: "🎒",
     description: "Costure uma mochila para mais capacidade",
-    category: "fibras",
+    category: "bancada",
     requiredLevel: 5,
     input: { resourceId: RESOURCE_IDS.COURO, quantity: 2 },
     fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 5 },
@@ -206,7 +206,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     name: "Corda",
     emoji: "🪢",
     description: "Trança barbante em corda resistente",
-    category: "fibras",
+    category: "bancada",
     requiredLevel: 2,
     input: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 3 },
     output: { resourceId: "eq-tool-0123abcd-789a-1234-4567-89012345678a", quantity: 1 }, // EQUIPMENT_IDS.CORDA
@@ -271,13 +271,13 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     experienceGained: 25
   },
 
-  // FIBRAS
+  // BANCADA (CRIAÇÃO DE ITENS)
   {
     id: "proc-fibra-processada-001",
     name: "Fibra Processada",
     emoji: "🌾",
     description: "Processe fibras brutas em material têxtil",
-    category: "fibras",
+    category: "bancada",
     requiredLevel: 1,
     input: { resourceId: RESOURCE_IDS.FIBRA, quantity: 10 },
     output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 4 },
@@ -290,7 +290,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     name: "Couro Tratado",
     emoji: "🦫",
     description: "Trate couro bruto para melhor qualidade",
-    category: "fibras", 
+    category: "bancada", 
     requiredLevel: 5,
     input: { resourceId: RESOURCE_IDS.COURO, quantity: 2 },
     output: { resourceId: RESOURCE_IDS.COURO, quantity: 3 },
@@ -377,7 +377,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
 export default function WorkshopsTab({ resources, playerLevel, playerId, isBlocked = false }: WorkshopTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeCategory, setActiveCategory] = useState<string>("madeira");
+  const [activeCategory, setActiveCategory] = useState<string>("bancada");
   const [selectedProcess, setSelectedProcess] = useState<WorkshopProcess | null>(null);
   const [processQuantity, setProcessQuantity] = useState<number>(1);
   const [processingInProgress, setProcessingInProgress] = useState<boolean>(false);
@@ -602,12 +602,11 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
   }, {} as Record<string, WorkshopProcess[]>);
 
   const categoryInfo = {
-    madeira: { name: "Madeira", emoji: "🪵", color: "bg-amber-50 border-amber-200" },
-    pedras: { name: "Pedras", emoji: "🪨", color: "bg-gray-50 border-gray-200" },
-    fibras: { name: "Fibras", emoji: "🌾", color: "bg-green-50 border-green-200" },
-    forja: { name: "Forja", emoji: "🔥", color: "bg-red-50 border-red-200" },
-    fogueira: { name: "Fogueira", emoji: "🏕️", color: "bg-orange-50 border-orange-200" },
-    equipamentos: { name: "Equipamentos", emoji: "⚔️", color: "bg-purple-50 border-purple-200" }
+    bancada: { name: "Bancada", emoji: "🔨", color: "bg-blue-50 border-blue-200", description: "Criação de itens e equipamentos" },
+    madeira: { name: "Madeira", emoji: "🪵", color: "bg-amber-50 border-amber-200", description: "Processamento de materiais de madeira" },
+    pedras: { name: "Pedras", emoji: "🪨", color: "bg-gray-50 border-gray-200", description: "Processamento de minerais e pedras" },
+    forja: { name: "Forja", emoji: "🔥", color: "bg-red-50 border-red-200", description: "Fundição e trabalho com metais" },
+    fogueira: { name: "Fogueira", emoji: "🏕️", color: "bg-orange-50 border-orange-200", description: "Cozimento e preservação de alimentos" }
   };
 
   const maxProcessable = selectedProcess ? getMaxProcessable(selectedProcess) : 0;
