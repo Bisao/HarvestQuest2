@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertExpeditionSchema, updatePlayerSchema } from "@shared/types";
 import { z } from "zod";
 import type { Player, HungerDegradationMode } from "@shared/types";
+import { validateParams, playerIdParamSchema } from "./middleware/validation";
 import { GameService } from "./services/game-service";
 import { ExpeditionService } from "./services/expedition-service";
 import { QuestService } from "./services/quest-service";
