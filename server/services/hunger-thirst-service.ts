@@ -20,10 +20,10 @@ export class HungerThirstService {
     this.isRunning = true;
     console.log('🍖💧 Starting passive hunger/thirst degradation system');
 
-    // Degrade every 4 seconds (4,000ms)
+    // Degrade every 40 seconds (40,000ms)
     this.degradationTimer = setInterval(async () => {
       await this.degradeAllPlayers();
-    }, 4000); // 4 seconds
+    }, 40000); // 40 seconds
   }
 
   /**
@@ -52,8 +52,8 @@ export class HungerThirstService {
         }
 
         // Base degradation rates (can be adjusted based on difficulty)
-        const hungerDecrease = Math.min(1, player.hunger); // Lose 1 hunger every 4 seconds, but don't go below 0
-        const thirstDecrease = Math.min(1, player.thirst); // Lose 1 thirst every 4 seconds, but don't go below 0
+        const hungerDecrease = Math.min(1, player.hunger); // Lose 1 hunger every 40 seconds, but don't go below 0
+        const thirstDecrease = Math.min(1, player.thirst); // Lose 1 thirst every 40 seconds, but don't go below 0
 
         const newHunger = Math.max(0, player.hunger - hungerDecrease);
         const newThirst = Math.max(0, player.thirst - thirstDecrease);
@@ -116,7 +116,7 @@ export class HungerThirstService {
   getStatus(): { isRunning: boolean; intervalMs: number } {
     return {
       isRunning: this.isRunning,
-      intervalMs: 4000 // 4 seconds
+      intervalMs: 40000 // 40 seconds
     };
   }
 }
