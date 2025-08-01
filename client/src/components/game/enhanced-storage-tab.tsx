@@ -2,7 +2,7 @@
 // Unified item management with proper type handling and inventory integration
 
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useGameData } from "@/hooks/useGamePolling";
@@ -43,6 +43,7 @@ export default function EnhancedStorageTab({
   isBlocked = false 
 }: EnhancedStorageTabProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [activeSubTab, setActiveSubTab] = useState("items");
   const [withdrawDialog, setWithdrawDialog] = useState<{
     open: boolean;
