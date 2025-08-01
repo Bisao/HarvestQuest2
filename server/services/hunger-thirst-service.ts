@@ -141,7 +141,7 @@ export class HungerThirstService {
           }
 
           // Data will be updated automatically via polling - no WebSocket needed
-          console.log(`✅ Hunger/thirst updated for player ${player.id}: hunger=${updatedPlayer.hunger}, thirst=${updatedPlayer.thirst}`);
+          console.log(`✅ Hunger/thirst updated for player ${player.id}: hunger=${newHunger}, thirst=${newThirst}`);
 
           // Invalidate cache to ensure frontend gets updated data
           try {
@@ -169,8 +169,7 @@ export class HungerThirstService {
     hungerRate *= levelMultiplier;
     thirstRate *= levelMultiplier;
 
-    return { hunger: Math.ceil(hungerRate), thirst: Math.ceil(thirstRate) };
-  }= levelMultiplier;
+    hungerRate *= levelMultiplier;
     thirstRate *= levelMultiplier;
 
     // Equipment can reduce degradation
@@ -275,6 +274,31 @@ export class HungerThirstService {
 
 
   /**
+   * Calculate penalties for low hunger/thirst status
+   */
+  private calculateStatusPenalties(hunger: number, thirst: number): {
+    healthPenalty: number;
+    experiencePenalty: number;
+  } {
+    let healthPenalty = 0;
+    let experiencePenalty = 0;
+
+    // Severe penalties for critical status
+    if (hunger <= 0 || thirst <= 0) {
+      healthPenalty = 5; // Lose 5 health when completely starved/dehydrated
+      experiencePenalty = 0.5; // 50% XP penalty
+    } else if (hunger <= 5 || thirst <= 5) {
+      healthPenalty = 2; // Lose 2 health when very low
+      experiencePenalty = 0.25; // 25% XP penalty
+    } else if (hunger <= 10 || thirst <= 10) {
+      healthPenalty = 1; // Lose 1 health when low
+      experiencePenalty = 0.1; // 10% XP penalty
+    }
+
+    return { healthPenalty, experiencePenalty };
+  }
+
+  /**
    * Calculate hunger/thirst degradation for offline players
    */
   async calculateOfflineDegradation(playerId: string, lastOnlineTime: number): Promise<void> {
@@ -297,9 +321,6 @@ export class HungerThirstService {
 
       console.log(`⏰ Offline degradation applied to ${player.username}: -${hungerLoss}H, -${thirstLoss}T`);
     }
-  }
-
-    return { healthPenalty, experiencePenalty };
   }
 
   /**
