@@ -6,13 +6,13 @@
         "id": "45681017-ff0b-4efc-829e-de0932057f0b",
         "username": "Bison",
         "level": 1,
-        "experience": 16,
-        "hunger": 96,
+        "experience": 29,
+        "hunger": 88,
         "maxHunger": 100,
-        "thirst": 96,
+        "thirst": 88,
         "maxThirst": 100,
         "coins": 100,
-        "inventoryWeight": 18,
+        "inventoryWeight": 32,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -27,7 +27,14 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754027227946
+        "lastOnlineTime": 1754027553851,
+        "offlineActivityConfig": {
+          "enabled": true,
+          "maxDuration": 12,
+          "stopOnLowResources": true,
+          "minHunger": 5,
+          "minThirst": 5
+        }
       }
     ]
   ],
@@ -38,7 +45,7 @@
         "id": "a2a0b578-3423-47aa-afc0-14a611805880",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 2
+        "quantity": 6
       }
     ],
     [
@@ -47,7 +54,7 @@
         "id": "4b25e13d-a610-4e13-ae44-e82c0ef88d70",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 4
+        "quantity": 8
       }
     ],
     [
@@ -56,7 +63,7 @@
         "id": "ad512b57-e8f5-4517-bd7b-f384382316ff",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 3
+        "quantity": 5
       }
     ],
     [
@@ -65,7 +72,7 @@
         "id": "8c61b8ae-f210-48f1-967e-26298b281a99",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 1
+        "quantity": 2
       }
     ],
     [
@@ -74,7 +81,7 @@
         "id": "005beba3-db0d-4891-a86b-5f549ae61b1a",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 5
+        "quantity": 6
       }
     ]
   ],
@@ -96,14 +103,14 @@
         ],
         "selectedEquipment": [],
         "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 2,
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 4,
           "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 4,
-          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 3,
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 2,
           "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 1,
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 5
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 1
         },
         "startTime": 1754027247731,
-        "endTime": 1754027313,
+        "endTime": 1754027379,
         "progress": 100
       }
     ]
@@ -136,9 +143,9 @@
         "status": "active",
         "progress": {
           "collect_res-8bd33b18-a241-4859-ae9f-870fab5673d0": {
-            "current": 2,
+            "current": 5,
             "required": 5,
-            "completed": false
+            "completed": true
           },
           "collect_res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": {
             "current": 3,
