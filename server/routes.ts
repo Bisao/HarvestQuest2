@@ -415,8 +415,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ error: "Item is not a consumable" });
         }
 
-        // Verify subcategory matches slot
-        if (resourceData.subcategory !== slot) {
+        console.log(`Equipping consumable: ${resourceData.name} (${resourceData.id})`);
+        console.log(`Resource data:`, {
+          category: resourceData.category,
+          subcategory: resourceData.subcategory,
+          type: resourceData.type,
+          slot: slot
+        });
+
+        // Check if it's a consumable item
+        const isConsumable = resourceData.category === 'consumables' || resourceData.type === 'consumable';
+        if (!isConsumable) {
+          console.log(`Item ${resourceData.name} is not consumable: category=${resourceData.category}, type=${resourceData.type}`);
+          return res.status(400).json({ error: "Item is not a consumable" });
+        }
+
+        // Verify consumable type matches slot - flexible matching
+        const isValidConsumable = (slot === 'food' && resourceData.subcategory === 'food') || 
+                                 (slot === 'drink' && resourceData.subcategory === 'drink');
+        
+        if (!isValidConsumable) {
+          console.log(`Validation failed for ${resourceData.name}: subcategory '${resourceData.subcategory}' doesn't match slot '${slot}'`);
           return res.status(400).json({ error: `Item is not a ${slot} consumable` });
         }
 

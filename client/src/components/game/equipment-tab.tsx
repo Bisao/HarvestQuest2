@@ -313,7 +313,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                   }
 
                   const { slot: slotKey, name, emoji, equippedId } = slot;
-                  const equippedItem = getEquippedItem(equippedId);
+                  const equippedItem = getEquippedItem(equippedId || null);
                   const isDisabled = equippedId === null && !["helmet", "chestplate", "leggings", "boots", "weapon", "tool", "food", "drink"].includes(slotKey);
 
                   return (

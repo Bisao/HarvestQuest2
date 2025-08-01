@@ -205,7 +205,7 @@ export class MemStorage implements IStorage {
     // Initialize all resources using modern game items system
     const resourceIds: string[] = [];
     const allItems = getAllGameItems();
-    const resourceItems = allItems.filter(item => item.category === 'resource');
+    const resourceItems = allItems.filter(item => item.category === 'resource' || item.category === 'consumable');
 
     for (const resource of resourceItems) {
       // Convert modern item to legacy resource format for storage compatibility
@@ -215,11 +215,12 @@ export class MemStorage implements IStorage {
         emoji: resource.iconPath,
         rarity: resource.rarity,
         experienceValue: resource.xpReward,
-        category: 'raw_materials' as const,
+        category: resource.category === 'consumable' ? 'consumables' as const : 'raw_materials' as const,
         subcategory: resource.subcategory,
+        type: resource.category,
         spawnRate: resource.spawnRate,
         yieldAmount: resource.yieldAmount,
-        requiredTool: resource.requiredTool,
+        requiredTool: resource.requiredTool || undefined,
         sellPrice: resource.sellPrice,
         buyPrice: resource.buyPrice,
         weight: resource.weight,
@@ -231,7 +232,8 @@ export class MemStorage implements IStorage {
           durability: 100, 
           efficiency: 100, 
           rarity: resource.rarity,
-          baseValue: resource.sellPrice 
+          baseValue: resource.sellPrice,
+          ...resource.attributes
         },
         value: resource.sellPrice
       };
