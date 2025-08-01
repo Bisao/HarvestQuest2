@@ -63,8 +63,12 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       if (location === 'inventory') {
         const inventoryItems = await storage.getPlayerInventory(playerId);
 
-        // Modern system: Find by resource ID only
-        targetItem = inventoryItems.find((item: any) => item.resourceId === itemId);
+        // Try to find by inventoryItemId first, then by resourceId
+        if (inventoryItemId) {
+          targetItem = inventoryItems.find((item: any) => item.id === inventoryItemId);
+        } else {
+          targetItem = inventoryItems.find((item: any) => item.resourceId === itemId);
+        }
 
         if (targetItem && targetItem.quantity > 0) {
           hasItem = true;

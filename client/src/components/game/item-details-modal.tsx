@@ -262,29 +262,33 @@ export function ItemDetailsModal({
           <div className="flex space-x-2 pt-2 border-t">
             {itemIsConsumable && (
               <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                if (item && itemData && isConsumable(itemData)) {
                   setConsumeQuantity(1);
                   consumeMutation.mutate();
-                }}
-                disabled={consumeMutation.isPending}
-                className="flex-1"
-              >
-                Consumir 1
-              </Button>
+                }
+              }}
+              disabled={consumeMutation.isPending || !itemIsConsumable}
+              className="flex-1"
+            >
+              {consumeMutation.isPending ? "..." : "Consumir 1"}
+            </Button>
             )}
             <Button 
               variant="outline" 
               size="sm"
               onClick={() => {
-                setMoveQuantity(item.quantity);
-                moveToStorageMutation.mutate();
+                if (item) {
+                  setMoveQuantity(item.quantity);
+                  moveToStorageMutation.mutate();
+                }
               }}
               disabled={moveToStorageMutation.isPending}
               className="flex-1"
             >
-              Mover Tudo
+              {moveToStorageMutation.isPending ? "..." : "Mover Tudo"}
             </Button>
           </div>
         </div>
