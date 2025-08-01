@@ -177,17 +177,37 @@ export default function ExpeditionModal({
       biomeId: string;
       selectedResources: string[];
     }) => {
-      const response = await fetch('/api/expeditions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(expeditionData),
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to start expedition' }));
-        throw new Error(errorData.message || 'Failed to start expedition');
+      // First check if there's an active expedition and try to complete it
+      try {
+        const activeExpeditionResponse = await fetch(`/api/player/${player.id}/expeditions/active`);
+        if (activeExpeditionResponse.ok) {
+          const activeExpedition = await activeExpeditionResponse.json();
+          if (activeExpedition && activeExpedition.id) {
+            console.log('Found active expedition, attempting to complete it first');
+            // Try to complete the active expedition
+            const completeResponse = await fetch(`/api/expeditions/${activeExpedition.id}/complete`, {
+              method: 'POST'
+            });
+            if (completeResponse.ok) {
+              console.log('Successfully completed previous expedition');
+            }
+          }
+        }
+      } catch (error) {
+        console.log('No active expedition found or failed to complete:', error);
       }
+
+      const response = await fetch(`/api/expeditions/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(expeditionData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to start expedition');
+      }
+
       return response.json();
     },
     onSuccess: (data) => {

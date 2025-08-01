@@ -433,7 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Verify consumable type matches slot - flexible matching
         const isValidConsumable = (slot === 'food' && resourceData.subcategory === 'food') || 
                                  (slot === 'drink' && resourceData.subcategory === 'drink');
-        
+
         if (!isValidConsumable) {
           console.log(`Validation failed for ${resourceData.name}: subcategory '${resourceData.subcategory}' doesn't match slot '${slot}'`);
           return res.status(400).json({ error: `Item is not a ${slot} consumable` });
@@ -537,8 +537,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const expeditions = await storage.getPlayerExpeditions(playerId);
       res.json(expeditions);
     } catch (error) {
-      console.error("Get expeditions error:", error);
+      console.error("Get player expeditions error:", error);
       res.status(500).json({ message: "Failed to get expeditions" });
+    }
+  });
+
+  // Get active expedition for player
+  app.get("/api/player/:playerId/expeditions/active", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
+
+      if (!activeExpedition) {
+        return res.status(404).json({ message: "No active expedition found" });
+      }
+
+      res.json(activeExpedition);
+    } catch (error) {
+      console.error("Get active expedition error:", error);
+      res.status(500).json({ message: "Failed to get active expedition" });
     }
   });
 
@@ -547,11 +564,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId } = req.params;
       const activeExpedition = await expeditionService.getActiveExpedition(playerId);
-      
+
       if (activeExpedition) {
         await expeditionService.cancelExpedition(activeExpedition.id);
       }
-      
+
       res.json({ success: true, message: "Expedition cancelled" });
     } catch (error) {
       console.error("Cancel expedition error:", error);
