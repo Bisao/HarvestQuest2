@@ -187,7 +187,7 @@ export default function EnhancedStorageTab({
       return response.json();
     },
     onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       
       const hungerGain = data.hungerRestored || 0;
@@ -217,7 +217,7 @@ export default function EnhancedStorageTab({
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       toast({
         title: "Água consumida!",

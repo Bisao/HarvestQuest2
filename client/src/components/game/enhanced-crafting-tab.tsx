@@ -69,7 +69,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       // CRITICAL: Force complete cache invalidation for real-time sync
       queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
-      queryClient.removeQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
       queryClient.removeQueries({ queryKey: ["/api/player", playerId, "quests"] });
       
       // Force immediate refetch

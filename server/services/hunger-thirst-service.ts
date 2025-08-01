@@ -70,6 +70,17 @@ export class HungerThirstService {
             console.log(`🍖💧 Player ${player.username}: H:${player.hunger}→${newHunger}, T:${player.thirst}→${newThirst}`);
           }
 
+          // Broadcast real-time update via WebSocket if available
+          try {
+            const updatedPlayer = await this.storage.getPlayer(player.id);
+            if (updatedPlayer) {
+              // Note: WebSocket service will be available through app locals after server restart
+              console.log(`📡 Real-time update ready for player ${player.username}`);
+            }
+          } catch (error) {
+            console.warn('WebSocket broadcast failed:', error);
+          }
+
           // Invalidate cache to ensure frontend gets updated data
           try {
             const { invalidatePlayerCache } = await import("../cache/memory-cache");

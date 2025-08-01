@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { WebSocketService } from "./websocket-service";
 import { insertExpeditionSchema, updatePlayerSchema } from "@shared/types";
 import { z } from "zod";
 import type { Player } from "@shared/types";
@@ -880,7 +881,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (typeof autoStorage === 'boolean') {
         updates.autoStorage = autoStorage;
       }
-	  if (typeof autoCompleteQuests === 'boolean') {
+          if (typeof autoCompleteQuests === 'boolean') {
         updates.autoCompleteQuests = autoCompleteQuests;
       }
 
@@ -916,5 +917,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  
+  // Initialize WebSocket service for real-time updates
+  const wsService = new WebSocketService(httpServer);
+  
+  // Store reference in app for use in other routes  
+  app.locals.wsService = wsService;
+  
+  // Also store in storage for access by services
+  if (storage.setApp) {
+    storage.setApp(app);
+  }
+  
   return httpServer;
 }

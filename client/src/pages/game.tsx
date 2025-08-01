@@ -13,6 +13,7 @@ import LoadingScreen from "@/components/game/loading-screen";
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
 import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
 import { useQuestStatus } from "@/hooks/use-quest-status";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
@@ -55,6 +56,9 @@ export default function Game() {
     retry: 1,
     enabled: !!playerUsername,
   });
+
+  // Initialize WebSocket for real-time updates
+  const { isConnected, connectionError } = useWebSocket(player?.id || null);
 
   const { data: biomes = [] } = useQuery<Biome[]>({
     queryKey: ["/api/biomes"],

@@ -128,7 +128,7 @@ export default function EnhancedInventory({
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       toast({
         title: "Item equipado",
         description: "Equipamento atualizado com sucesso.",
@@ -148,7 +148,7 @@ export default function EnhancedInventory({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       setSelectedItem(null);
       toast({
         title: "Sucesso!",
@@ -178,7 +178,7 @@ export default function EnhancedInventory({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       setSelectedItem(null);
       toast({
         title: "Item movido",
