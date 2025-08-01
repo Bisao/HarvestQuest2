@@ -25,6 +25,7 @@ interface SaveGame {
   level: number;
   experience: number;
   lastPlayed: number;
+  offlineExpeditionActive?: boolean;
 }
 
 export default function MainMenu() {
@@ -276,6 +277,11 @@ export default function MainMenu() {
                           <Badge variant="secondary">
                             Nível {save.level}
                           </Badge>
+                          {save.offlineExpeditionActive && (
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                              🏃 Expedição Offline
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-sm text-gray-600">
                           Última sessão: {formatLastPlayed(save.lastPlayed)}
