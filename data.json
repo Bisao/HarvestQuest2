@@ -1,0 +1,127 @@
+{
+  "players": [
+    [
+      "62a0fdb4-62cc-4302-b19e-e6863956b243",
+      {
+        "id": "62a0fdb4-62cc-4302-b19e-e6863956b243",
+        "username": "Bison",
+        "level": 1,
+        "experience": 77,
+        "hunger": 96,
+        "maxHunger": 100,
+        "thirst": 96,
+        "maxThirst": 100,
+        "coins": 100,
+        "inventoryWeight": 0,
+        "maxInventoryWeight": 50000,
+        "autoStorage": false,
+        "craftedItemsDestination": "storage",
+        "hungerDegradationMode": "automatic",
+        "waterStorage": 0,
+        "maxWaterStorage": 500,
+        "waterTanks": 0,
+        "equippedHelmet": null,
+        "equippedChestplate": null,
+        "equippedLeggings": null,
+        "equippedBoots": null,
+        "equippedWeapon": null,
+        "equippedTool": null,
+        "equippedFood": null,
+        "equippedDrink": null,
+        "autoCompleteQuests": false,
+        "lastOnlineTime": 1754068156882,
+        "offlineActivityConfig": {
+          "enabled": false,
+          "maxDuration": 12,
+          "stopOnLowResources": true,
+          "minHunger": 20,
+          "minThirst": 20,
+          "preferredResources": []
+        }
+      }
+    ]
+  ],
+  "inventoryItems": [],
+  "storageItems": [
+    [
+      "11ec4a7f-1649-4c1e-8a53-8c3dc903b58f",
+      {
+        "id": "11ec4a7f-1649-4c1e-8a53-8c3dc903b58f",
+        "playerId": "62a0fdb4-62cc-4302-b19e-e6863956b243",
+        "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+        "quantity": 13,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "8359ea83-dde8-4a40-902f-d25638c03bc0",
+      {
+        "id": "8359ea83-dde8-4a40-902f-d25638c03bc0",
+        "playerId": "62a0fdb4-62cc-4302-b19e-e6863956b243",
+        "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+        "quantity": 10,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "fb0235db-94a6-492a-b39f-ad810039d6b3",
+      {
+        "id": "fb0235db-94a6-492a-b39f-ad810039d6b3",
+        "playerId": "62a0fdb4-62cc-4302-b19e-e6863956b243",
+        "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+        "quantity": 10,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "a7f13dc5-2b39-4df6-8e8b-36d17859dbb7",
+      {
+        "id": "a7f13dc5-2b39-4df6-8e8b-36d17859dbb7",
+        "playerId": "62a0fdb4-62cc-4302-b19e-e6863956b243",
+        "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+        "quantity": 16,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "fb5c255d-52f1-4298-aca1-cdeffdd12894",
+      {
+        "id": "fb5c255d-52f1-4298-aca1-cdeffdd12894",
+        "playerId": "62a0fdb4-62cc-4302-b19e-e6863956b243",
+        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+        "quantity": 12,
+        "itemType": "resource"
+      }
+    ]
+  ],
+  "expeditions": [
+    [
+      "67e5cb12-ec8d-4563-8e2a-5bf67e5726b8",
+      {
+        "id": "67e5cb12-ec8d-4563-8e2a-5bf67e5726b8",
+        "playerId": "62a0fdb4-62cc-4302-b19e-e6863956b243",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "completed",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 3,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 4,
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 4,
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 5,
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 1
+        },
+        "startTime": 1754068168232,
+        "endTime": 1754068432,
+        "progress": 100
+      }
+    ]
+  ],
+  "playerQuests": []
+}
