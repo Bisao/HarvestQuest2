@@ -1,18 +1,18 @@
 {
   "players": [
     [
-      "ae325087-b0f0-4c73-8732-31996e424b8d",
+      "9bba42cf-a235-479b-9bdd-075d7271456e",
       {
-        "id": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "username": "oChaps",
-        "level": 2,
-        "experience": 189,
-        "hunger": 38,
+        "id": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "username": "Bison",
+        "level": 3,
+        "experience": 265,
+        "hunger": 79,
         "maxHunger": 100,
-        "thirst": 36,
+        "thirst": 79,
         "maxThirst": 100,
-        "coins": 180,
-        "inventoryWeight": 0,
+        "coins": 150,
+        "inventoryWeight": 19190,
         "maxInventoryWeight": 50000,
         "autoStorage": true,
         "craftedItemsDestination": "storage",
@@ -29,109 +29,125 @@
         "equippedFood": null,
         "equippedDrink": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754072237850
+        "lastOnlineTime": 1754072622442
       }
     ]
   ],
-  "inventoryItems": [],
+  "inventoryItems": [
+    [
+      "ee0d5c31-0f08-4257-b103-da9cbfd62ab2",
+      {
+        "id": "ee0d5c31-0f08-4257-b103-da9cbfd62ab2",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+        "quantity": 18
+      }
+    ],
+    [
+      "5f2409ae-7838-4dbb-a4c5-cd670958d1b7",
+      {
+        "id": "5f2409ae-7838-4dbb-a4c5-cd670958d1b7",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+        "quantity": 28
+      }
+    ],
+    [
+      "e32d3250-4248-4502-bd2d-a84b93deb72e",
+      {
+        "id": "e32d3250-4248-4502-bd2d-a84b93deb72e",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+        "quantity": 18
+      }
+    ],
+    [
+      "23366ead-06b0-4dd2-be32-d39e4bafed60",
+      {
+        "id": "23366ead-06b0-4dd2-be32-d39e4bafed60",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+        "quantity": 29
+      }
+    ],
+    [
+      "9aa425c1-5aae-4a94-b543-af88ee324914",
+      {
+        "id": "9aa425c1-5aae-4a94-b543-af88ee324914",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+        "quantity": 19
+      }
+    ]
+  ],
   "storageItems": [
     [
-      "8512da2b-adaf-4411-b3bb-9688ad89a4a0",
+      "41ce281e-4762-44fb-ace6-d274bcb4921b",
       {
-        "id": "8512da2b-adaf-4411-b3bb-9688ad89a4a0",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
+        "id": "41ce281e-4762-44fb-ace6-d274bcb4921b",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+        "quantity": 17,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "0572a577-0b3c-4c2f-86c8-efc0e4148f89",
+      {
+        "id": "0572a577-0b3c-4c2f-86c8-efc0e4148f89",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+        "quantity": 15,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "7b4052a7-1249-4e72-950a-fc07779e0cb5",
+      {
+        "id": "7b4052a7-1249-4e72-950a-fc07779e0cb5",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+        "quantity": 15,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "5316f8ab-bbbc-4aeb-9c6b-97d9218b4c36",
+      {
+        "id": "5316f8ab-bbbc-4aeb-9c6b-97d9218b4c36",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+        "quantity": 18,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "a119f7a3-17cf-45b2-9137-6a5e6af3de3f",
+      {
+        "id": "a119f7a3-17cf-45b2-9137-6a5e6af3de3f",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+        "quantity": 16,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "58119463-0652-4104-b1ee-c8f74ad46394",
+      {
+        "id": "58119463-0652-4104-b1ee-c8f74ad46394",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "resourceId": "res-4b7e1a9c-5d8f-4e32-9a76-8c2e5f1b9d48",
         "quantity": 2,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "dd97e126-8f09-41e5-81f7-e427cc7e0b7c",
-      {
-        "id": "dd97e126-8f09-41e5-81f7-e427cc7e0b7c",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 0,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "3b30927e-545d-4ecc-aa54-e3c1c1daa26e",
-      {
-        "id": "3b30927e-545d-4ecc-aa54-e3c1c1daa26e",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 33,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "73b00b2a-5f83-4453-88f9-02111e286a9d",
-      {
-        "id": "73b00b2a-5f83-4453-88f9-02111e286a9d",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 24,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "2fa33f80-bbda-404f-8dc8-c1a00d095a76",
-      {
-        "id": "2fa33f80-bbda-404f-8dc8-c1a00d095a76",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 11,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "e95e3fd1-7f7a-4f98-b1ec-a499865d606b",
-      {
-        "id": "e95e3fd1-7f7a-4f98-b1ec-a499865d606b",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 20,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "5f305c8b-4c68-4727-ae31-edc91ea1fbf2",
-      {
-        "id": "5f305c8b-4c68-4727-ae31-edc91ea1fbf2",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
-        "quantity": 0,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "53051578-36b8-471f-839b-ce0e34a00a6f",
-      {
-        "id": "53051578-36b8-471f-839b-ce0e34a00a6f",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "eq-tool-0123abcd-789a-1234-4567-89012345678a",
-        "quantity": 1,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "343b6664-2b46-477d-afad-830aa1da26eb",
-      {
-        "id": "343b6664-2b46-477d-afad-830aa1da26eb",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "eq-tool-2b3c4d5e-6f78-9012-bcde-f12345678901",
-        "quantity": 1,
         "itemType": "resource"
       }
     ]
   ],
   "expeditions": [
     [
-      "db0eee50-80fb-40c5-9c94-c4f60293b602",
+      "f85cad11-debb-4b37-b41a-af3192ae6e0f",
       {
-        "id": "db0eee50-80fb-40c5-9c94-c4f60293b602",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
+        "id": "f85cad11-debb-4b37-b41a-af3192ae6e0f",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
         "status": "completed",
         "selectedResources": [
@@ -143,106 +159,25 @@
         ],
         "selectedEquipment": [],
         "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 4,
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 5,
-          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 4,
-          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 1,
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 1
-        },
-        "startTime": 1754069490558,
-        "endTime": 1754069622,
-        "progress": 100
-      }
-    ],
-    [
-      "4f351f9b-8fff-45f4-be2c-792f51451387",
-      {
-        "id": "4f351f9b-8fff-45f4-be2c-792f51451387",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
-        "status": "completed",
-        "selectedResources": [
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
-        ],
-        "selectedEquipment": [],
-        "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 3,
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 2,
           "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 5,
           "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 3,
           "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 4,
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 3
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 5
         },
-        "startTime": 1754069707888,
-        "endTime": 1754069858,
-        "progress": 100
-      }
-    ],
-    [
-      "8981ff6c-dfdd-4945-8b87-76da7e5138f0",
-      {
-        "id": "8981ff6c-dfdd-4945-8b87-76da7e5138f0",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
-        "status": "completed",
-        "selectedResources": [
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
-        ],
-        "selectedEquipment": [],
-        "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 4,
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 4,
-          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 5,
-          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 5,
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 2
-        },
-        "startTime": 1754069859481,
-        "endTime": 1754069925,
-        "progress": 100
-      }
-    ],
-    [
-      "e6f7d15a-75c5-42f2-9e34-dbedd12fe006",
-      {
-        "id": "e6f7d15a-75c5-42f2-9e34-dbedd12fe006",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
-        "status": "completed",
-        "selectedResources": [
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
-        ],
-        "selectedEquipment": [],
-        "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 4,
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 5,
-          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 1,
-          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 1,
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 1
-        },
-        "startTime": 1754070007344,
-        "endTime": 1754070271,
+        "startTime": 1754072627210,
+        "endTime": 1754073463,
         "progress": 100
       }
     ]
   ],
   "playerQuests": [
     [
-      "d490c25e-798d-4a4a-9b7c-f17aeca3debe",
+      "abae4e46-38be-4742-ac2a-dc7cd140be79",
       {
-        "id": "d490c25e-798d-4a4a-9b7c-f17aeca3debe",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "questId": "1f3195a9-f635-4299-9e69-1538a91662ad",
+        "id": "abae4e46-38be-4742-ac2a-dc7cd140be79",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "questId": "a091ded5-dbee-40e1-a870-5daf2b5d1c31",
         "status": "completed",
         "progress": {
           "expedition_61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47": {
@@ -251,17 +186,17 @@
             "completed": true
           }
         },
-        "startedAt": 1754069546,
-        "completedAt": 1754069560
+        "startedAt": 1754073322,
+        "completedAt": 1754073339
       }
     ],
     [
-      "b0ef4cc1-6b61-4813-872a-c69411be3e24",
+      "4ace9ef7-2864-4c7e-a7db-347e261947e3",
       {
-        "id": "b0ef4cc1-6b61-4813-872a-c69411be3e24",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "questId": "717bc2b0-b345-495d-aa2e-34cf98fec91e",
-        "status": "completed",
+        "id": "4ace9ef7-2864-4c7e-a7db-347e261947e3",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "questId": "5205e5fe-985d-4964-ba95-1799fb31024f",
+        "status": "active",
         "progress": {
           "collect_res-8bd33b18-a241-4859-ae9f-870fab5673d0": {
             "current": 5,
@@ -274,16 +209,16 @@
             "completed": true
           }
         },
-        "startedAt": 1754069548,
-        "completedAt": 1754069676
+        "startedAt": 1754073323,
+        "completedAt": null
       }
     ],
     [
-      "143314aa-d125-44c1-97b4-8c31fc14c31a",
+      "c20e7945-6401-4b01-995a-75f05c16dc46",
       {
-        "id": "143314aa-d125-44c1-97b4-8c31fc14c31a",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "questId": "1b48f97d-4337-407e-96c7-0c7f92c26f9f",
+        "id": "c20e7945-6401-4b01-995a-75f05c16dc46",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "questId": "79fd44c9-1b83-4291-99d1-011149bfe8b1",
         "status": "active",
         "progress": {
           "craft_res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1": {
@@ -292,7 +227,7 @@
             "completed": false
           }
         },
-        "startedAt": 1754069550,
+        "startedAt": 1754073325,
         "completedAt": null
       }
     ]
