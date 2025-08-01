@@ -9,26 +9,31 @@ export interface Player {
   maxHunger: number;
   thirst: number;
   maxThirst: number;
-  health?: number;
   coins: number;
   inventoryWeight: number;
   maxInventoryWeight: number;
   autoStorage: boolean;
-  autoCompleteQuests?: boolean;
-  craftedItemsDestination: 'inventory' | 'storage';
+  craftedItemsDestination: "inventory" | "storage";
   hungerDegradationMode: HungerDegradationMode;
-  onExpedition?: boolean;
   waterStorage: number;
   maxWaterStorage: number;
-  waterTanks: number; // Number of unlocked water tanks
-  equippedHelmet: string | null;
-  equippedChestplate: string | null;
-  equippedLeggings: string | null;
-  equippedBoots: string | null;
-  equippedWeapon: string | null;
-  equippedTool: string | null;
-  lastOnlineTime?: number; // Timestamp for offline calculations
-  offlineActivityConfig?: OfflineActivityConfig; // Configuration for offline activities
+  waterTanks: number;
+  equippedHelmet?: string | null;
+  equippedChestplate?: string | null;
+  equippedLeggings?: string | null;
+  equippedBoots?: string | null;
+  equippedWeapon?: string | null;
+  equippedTool?: string | null;
+  equippedFood?: string | null;
+  equippedDrink?: string | null;
+  autoCompleteQuests: boolean;
+  lastOnlineTime?: number;
+  health?: number;
+  maxHealth?: number;
+  onExpedition?: boolean;
+  expeditionEndTime?: number;
+  offlineActivityConfig?: OfflineActivityConfig;
+  autoConsume?: boolean;
 }
 
 export interface InsertPlayer {
@@ -80,33 +85,33 @@ export interface Resource {
   emoji: string;
   rarity: RarityLevel;
   experienceValue: number;
-  
+
   // Fundamental Attributes
   attributes: ItemAttributes;
-  
+
   // Resource Classification  
   category: ResourceCategory;
   subcategory: string;
   type?: string; // Legacy compatibility
-  
+
   // Spawn Properties
   spawnRate: number;
   yieldAmount: number;
   requiredTool?: string;
-  
+
   // Economy
   sellPrice: number;
   buyPrice: number;
-  
+
   // Physical Properties
   weight: number;
   stackable: boolean;
   maxStackSize: number;
-  
+
   // Effects & Tags
   effects: string[];
   tags: string[];
-  
+
   // Derived Properties (calculated from attributes)
   value: number; // calculated from baseValue * rarityMultiplier
 }
@@ -118,6 +123,8 @@ export type ResourceCategory =
   | 'organic'           // Carne, Couro, Ossos
   | 'consumables'       // Food, Potions
   | 'liquids'           // Água, Suco
+  | 'food'
+  | 'drink'
   | 'creatures'         // Live animals
   | 'treasures';        // Cristais, Conchas
 
@@ -179,29 +186,29 @@ export interface InsertResource {
   emoji: string;
   rarity?: RarityLevel;
   experienceValue?: number;
-  
+
   // Fundamental Attributes
   attributes?: ItemAttributes;
-  
+
   // Resource Classification  
   category?: ResourceCategory;
   subcategory?: string;
   type?: string; // Legacy compatibility
-  
+
   // Spawn Properties
   spawnRate?: number;
   yieldAmount?: number;
   requiredTool?: string;
-  
+
   // Economy
   sellPrice?: number;
   buyPrice?: number;
-  
+
   // Physical Properties
   weight?: number;
   stackable?: boolean;
   maxStackSize?: number;
-  
+
   // Effects & Tags
   effects?: string[];
   tags?: string[];
@@ -275,21 +282,21 @@ export interface Equipment {
   id: string;
   name: string;
   emoji: string;
-  
+
   // Fundamental Attributes
   attributes: ItemAttributes;
-  
+
   // Equipment Classification
   category: EquipmentCategory;
   slot: EquipmentSlot;
   toolType?: ToolType;
-  
+
   // Equipment Effects
   effects: EquipmentEffect[];
-  
+
   // Requirements to use
   requirements: EquipmentRequirement[];
-  
+
   // Derived Properties
   weight: number; // calculated from attributes
   value: number; // calculated from attributes
@@ -299,7 +306,7 @@ export interface InsertEquipment {
   id?: string;
   name: string;
   emoji: string;
-  
+
   attributes?: ItemAttributes;
   category: EquipmentCategory;
   slot?: EquipmentSlot;
@@ -314,21 +321,21 @@ export interface Recipe {
   id: string;
   name: string;
   emoji: string;
-  
+
   // Recipe Classification
   category: RecipeCategory;
   subcategory: string;
   difficulty: RecipeDifficulty;
-  
+
   // Requirements
   requiredLevel: number;
   requiredSkills?: SkillRequirement[];
   requiredTools?: ToolRequirement[];
-  
+
   // Recipe Data
   ingredients: RecipeIngredient[];
   outputs: RecipeOutput[];
-  
+
   // Process Information
   craftingTime: number; // in seconds
   experienceGained: number;
@@ -378,18 +385,18 @@ export interface InsertRecipe {
   id?: string;
   name: string;
   emoji: string;
-  
+
   category: RecipeCategory;
   subcategory?: string;
   difficulty?: RecipeDifficulty;
-  
+
   requiredLevel?: number;
   requiredSkills?: SkillRequirement[];
   requiredTools?: ToolRequirement[];
-  
+
   ingredients: RecipeIngredient[];
   outputs: RecipeOutput[];
-  
+
   craftingTime?: number;
   experienceGained?: number;
   successRate?: number;

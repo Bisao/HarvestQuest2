@@ -8,11 +8,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Player, Equipment, StorageItem } from "@shared/types";
+import { resources } from "@/lib/game-data";
 
 interface EquipmentTabProps {
   player: Player;
   equipment: Equipment[];
 }
+
+// Helper function to get item data by ID
+const getItemById = (id: string) => {
+  return resources.find(r => r.id === id);
+};
 
 export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
   const { toast } = useToast();
@@ -37,9 +43,9 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
     { slot: "tool", name: "Off-Hand", emoji: "🔧", equippedId: player.equippedTool, position: { row: 1, col: 2 } },
     
     // Row 2
-    { slot: "potion", name: "Potion", emoji: "🧪", equippedId: null, position: { row: 2, col: 0 } },
+    { slot: "drink", name: "Drink", emoji: "🥤", equippedId: player.equippedDrink, position: { row: 2, col: 0 } },
     { slot: "boots", name: "Foot Slot", emoji: "🥾", equippedId: player.equippedBoots, position: { row: 2, col: 1 } },
-    { slot: "food", name: "Food", emoji: "🍖", equippedId: null, position: { row: 2, col: 2 } },
+    { slot: "food", name: "Food", emoji: "🍖", equippedId: player.equippedFood, position: { row: 2, col: 2 } },
     
     // Row 3
     { slot: "leggings", name: "Mount", emoji: "🐎", equippedId: player.equippedLeggings, position: { row: 3, col: 1 } },
@@ -106,13 +112,33 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
   };
 
   const handleEquipSlotClick = (slotKey: string, hasEquippedItem: boolean) => {
-    if (["helmet", "chestplate", "leggings", "boots", "weapon", "tool"].includes(slotKey)) {
+    if (["helmet", "chestplate", "leggings", "boots", "weapon", "tool", "food", "drink"].includes(slotKey)) {
       setSelectedSlot(slotKey);
       setEquipModalOpen(true);
     }
   };
 
   const getAvailableEquipmentForSlot = (slotType: string) => {
+    // For food and drink slots, look at consumables in storage
+    if (slotType === 'food' || slotType === 'drink') {
+      return storageData
+        .filter(item => {
+          // Get the actual resource data
+          const resourceData = getItemById(item.resourceId);
+          if (!resourceData) return false;
+          
+          // Check if it's a consumable with the right category
+          return resourceData.type === 'consumable' && 
+                 resourceData.category === slotType &&
+                 item.quantity > 0;
+        })
+        .map(item => {
+          const resourceData = getItemById(item.resourceId);
+          return resourceData ? { ...resourceData, quantity: item.quantity } : null;
+        })
+        .filter((item): item is any => item !== null);
+    }
+
     // Filter storage items that are equipment and match the slot type
     const availableEquipment = storageData
       .filter(item => item.itemType === 'equipment')
@@ -179,7 +205,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                   
                   const { slot: slotKey, name, emoji, equippedId } = slot;
                   const equippedItem = getEquippedItem(equippedId);
-                  const isDisabled = equippedId === null && !["helmet", "chestplate", "leggings", "boots", "weapon", "tool"].includes(slotKey);
+                  const isDisabled = equippedId === null && !["helmet", "chestplate", "leggings", "boots", "weapon", "tool", "food", "drink"].includes(slotKey);
                   
                   return (
                     <div 
@@ -235,7 +261,9 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                      selectedSlot === 'leggings' ? 'Calças' :
                      selectedSlot === 'boots' ? 'Botas' :
                      selectedSlot === 'weapon' ? 'Arma' :
-                     selectedSlot === 'tool' ? 'Ferramenta' : 'Item'}
+                     selectedSlot === 'tool' ? 'Ferramenta' :
+                     selectedSlot === 'food' ? 'Comida' :
+                     selectedSlot === 'drink' ? 'Bebida' : 'Item'}
             </DialogTitle>
           </DialogHeader>
           

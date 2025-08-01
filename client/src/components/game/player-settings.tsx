@@ -24,11 +24,12 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
   const [autoCompleteQuests, setAutoCompleteQuests] = useState(player.autoCompleteQuests ?? true);
   const [hungerDegradationMode, setHungerDegradationMode] = useState(player.hungerDegradationMode || 'automatic');
   const [isNavigatingToMenu, setIsNavigatingToMenu] = useState(false);
-  
+  const [autoConsume, setAutoConsume] = useState(player.autoConsume ?? false);
+
   const saveGame = useSaveGame();
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async (settings: { autoStorage?: boolean; autoCompleteQuests?: boolean; hungerDegradationMode?: HungerDegradationMode }) => {
+    mutationFn: async (settings: { autoStorage?: boolean; autoCompleteQuests?: boolean; hungerDegradationMode?: HungerDegradationMode; autoConsume?: boolean }) => {
       const response = await fetch(`/api/player/${player.id}/settings`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -62,16 +63,17 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
       autoStorage,
       autoCompleteQuests,
       hungerDegradationMode,
+      autoConsume,
     });
   };
 
   const handleBackToMainMenu = async () => {
     setIsNavigatingToMenu(true);
-    
+
     try {
       // Save the game first
       await saveGame.mutateAsync(player.id);
-      
+
       // Wait a bit for user to see the save confirmation
       setTimeout(() => {
         setLocation('/');
@@ -131,6 +133,21 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
             />
           </div>
 
+          {/* Auto Consume Setting */}
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <span className="text-lg">🍖</span>
+              <div>
+                <p className="font-medium text-gray-800">Auto-consumir Itens</p>
+                <p className="text-sm text-gray-600">Consumir automaticamente comida e bebida equipadas quando fome/sede estiverem baixas (15%) até atingir 75%</p>
+              </div>
+            </div>
+            <Switch
+              checked={autoConsume}
+              onCheckedChange={setAutoConsume}
+            />
+          </div>
+
           {/* Hunger Degradation Mode Setting */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center space-x-3 mb-3">
@@ -166,7 +183,7 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
             <Home className="w-4 h-4" />
             <span>{isNavigatingToMenu ? "Salvando..." : "Menu Principal"}</span>
           </Button>
-          
+
           <div className="flex space-x-3">
             <Button variant="outline" onClick={onClose}>
               Cancelar

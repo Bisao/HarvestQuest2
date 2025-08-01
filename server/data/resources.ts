@@ -71,6 +71,7 @@ export function createResourcesWithIds(): InsertResource[] {
       sellPrice: 5, 
       buyPrice: 10, 
       type: "consumable", 
+      category: "drink",
       rarity: "common", 
       experienceValue: 2,
       attributes: { hunger_restore: 3, thirst_restore: 12, consumable: true }
@@ -83,6 +84,7 @@ export function createResourcesWithIds(): InsertResource[] {
       sellPrice: 6, 
       buyPrice: 12, 
       type: "consumable", 
+      category: "food",
       rarity: "common", 
       experienceValue: 3,
       attributes: { hunger_restore: 8, thirst_restore: 1, consumable: true }
@@ -95,6 +97,7 @@ export function createResourcesWithIds(): InsertResource[] {
       sellPrice: 12, 
       buyPrice: 24, 
       type: "consumable", 
+      category: "food",
       rarity: "common", 
       experienceValue: 4,
       attributes: { hunger_restore: 12, thirst_restore: 2, consumable: true }
@@ -107,6 +110,7 @@ export function createResourcesWithIds(): InsertResource[] {
       sellPrice: 15, 
       buyPrice: 30, 
       type: "consumable", 
+      category: "food",
       rarity: "common", 
       experienceValue: 5,
       attributes: { hunger_restore: 25, thirst_restore: 5, consumable: true }
@@ -119,6 +123,7 @@ export function createResourcesWithIds(): InsertResource[] {
       sellPrice: 25, 
       buyPrice: 50, 
       type: "consumable", 
+      category: "food",
       rarity: "uncommon", 
       experienceValue: 8,
       attributes: { hunger_restore: 20, thirst_restore: 8, consumable: true }

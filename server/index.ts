@@ -58,10 +58,23 @@ app.use((req, res, next) => {
   const server = await registerRoutes(app);
 
   // Initialize and start hunger/thirst degradation system
-  const { HungerThirstService } = await import("./services/hunger-thirst-service");
+  const { HungerThirstService } from './services/hunger-thirst-service';
+  import { AutoConsumeService } from './services/auto-consume-service';
+
+// Create services
+const gameService = new GameService(storage);
+const hungerThirstService = new HungerThirstService(storage);
+const autoConsumeService = new AutoConsumeService(storage);
   const { storage } = await import("./storage");
   const hungerThirstService = new HungerThirstService(storage);
+  const autoConsumeService = new AutoConsumeService(storage);
   hungerThirstService.startPassiveDegradation();
+
+// Start degradation system
+hungerThirstService.startPassiveDegradation();
+
+// Start auto consume system
+autoConsumeService.startAutoConsume();
 
   // Use the centralized error handler
   app.use(errorHandler);

@@ -159,7 +159,7 @@ export function registerEnhancedGameRoutes(
           for (const ingredient of recipe.ingredients) {
             ingredients[ingredient.itemId] = ingredient.quantity;
           }
-        } else if (typeof recipe.ingredients === 'object' && recipe.ingredients !== null) {
+        } else if (typeof recipe.ingredients === 'object' && recipe.ingredients.ingredients !== null) {
           ingredients = recipe.ingredients as Record<string, number>;
         } else {
           throw new InvalidOperationError(`Recipe ${recipe.name} has no valid ingredients defined`);
