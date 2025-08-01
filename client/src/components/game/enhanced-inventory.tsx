@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useGameData } from "@/hooks/useGamePolling";
 import { ItemFinder } from "@shared/utils/item-finder";
@@ -312,7 +312,8 @@ export default function EnhancedInventory({
           <TooltipTrigger asChild>
             <div
               onClick={() => {
-                if (item) {
+                if (item && itemData) {
+                  console.log("Opening modal for item:", item, itemData);
                   setModalItem(item);
                   setShowItemModal(true);
                 } else {
@@ -655,6 +656,7 @@ export default function EnhancedInventory({
       <ItemDetailsModal
         isOpen={showItemModal}
         onClose={() => {
+          console.log("Closing item modal");
           setShowItemModal(false);
           setModalItem(null);
         }}
