@@ -1,0 +1,110 @@
+📋 Lista Completa de Receitas de Crafting
+🧵 MATERIAIS BÁSICOS
+Barbante (rec-barbante-001)
+Ingredientes: RESOURCE_IDS.FIBRA (5x) - ID: res-8bd33b18-a241-4859-ae9f-870fab5673d0
+Output: RESOURCE_IDS.BARBANTE (1x)
+🔨 FERRAMENTAS
+Machado (rec-machado-001)
+
+Ingredientes:
+RESOURCE_IDS.PEDRAS_SOLTAS (1x)
+RESOURCE_IDS.BARBANTE (2x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+RESOURCE_IDS.GRAVETOS (1x)
+Picareta (rec-picareta-001)
+
+Ingredientes:
+RESOURCE_IDS.PEDRAS_SOLTAS (2x)
+RESOURCE_IDS.BARBANTE (2x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+RESOURCE_IDS.GRAVETOS (1x)
+Faca (rec-faca-001)
+
+Ingredientes:
+RESOURCE_IDS.PEDRAS_SOLTAS (1x)
+RESOURCE_IDS.BARBANTE (1x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+RESOURCE_IDS.GRAVETOS (1x)
+Vara de Pesca (rec-vara-pesca-001)
+
+Ingredientes:
+RESOURCE_IDS.GRAVETOS (3x)
+RESOURCE_IDS.FIBRA (2x)
+Foice (rec-foice-001)
+
+Ingredientes:
+RESOURCE_IDS.PEDRA (1x)
+RESOURCE_IDS.BARBANTE (2x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+RESOURCE_IDS.GRAVETOS (1x)
+⚔️ ARMAS
+Arco e Flecha (rec-arco-flecha-001)
+
+Ingredientes:
+RESOURCE_IDS.GRAVETOS (2x)
+RESOURCE_IDS.BARBANTE (2x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+RESOURCE_IDS.PEDRAS_SOLTAS (1x)
+Lança (rec-lanca-001)
+
+Ingredientes:
+RESOURCE_IDS.GRAVETOS (2x)
+RESOURCE_IDS.BARBANTE (4x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+RESOURCE_IDS.PEDRAS_SOLTAS (1x)
+📦 CONTAINERS/UTILITÁRIOS
+Balde de Madeira (rec-balde-madeira-001)
+
+Ingredientes:
+RESOURCE_IDS.MADEIRA (1x)
+RESOURCE_IDS.BARBANTE (2x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+Garrafa de Bambu (rec-garrafa-bambu-001)
+
+Ingredientes:
+RESOURCE_IDS.BAMBU (1x)
+RESOURCE_IDS.BARBANTE (1x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+Mochila (rec-mochila-001)
+
+Ingredientes:
+RESOURCE_IDS.COURO (2x)
+RESOURCE_IDS.BARBANTE (5x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+Corda (rec-corda-001)
+
+Ingredientes:
+RESOURCE_IDS.BARBANTE (3x) - ⚠️ POSSÍVEL PROBLEMA: ID res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+Panela de Barro (rec-panela-barro-001)
+
+Ingredientes:
+RESOURCE_IDS.ARGILA (2x)
+RESOURCE_IDS.AGUA_FRESCA (1x)
+Panela (rec-panela-001)
+
+Ingredientes:
+RESOURCE_IDS.FERRO_FUNDIDO (1x)
+RESOURCE_IDS.MADEIRA (1x)
+🍖 COMIDAS/CONSUMÍVEIS
+Cogumelos Assados (rec-cogumelos-assados-001)
+
+Ingredientes:
+RESOURCE_IDS.COGUMELOS (3x)
+RESOURCE_IDS.GRAVETOS (1x)
+Carne Assada (rec-carne-assada-001)
+
+Ingredientes:
+RESOURCE_IDS.CARNE (1x)
+RESOURCE_IDS.GRAVETOS (1x)
+Peixe Grelhado (rec-peixe-grelhado-001)
+
+Ingredientes:
+RESOURCE_IDS.PEIXE_PEQUENO (1x)
+RESOURCE_IDS.GRAVETOS (1x)
+Ensopado de Carne (rec-ensopado-carne-001)
+
+Ingredientes:
+RESOURCE_IDS.CARNE (2x)
+RESOURCE_IDS.COGUMELOS (1x)
+RESOURCE_IDS.AGUA_FRESCA (1x)
+RESOURCE_IDS.GRAVETOS (2x)
+Suco de Frutas (rec-suco-frutas-001)
+
+Ingredientes:
+RESOURCE_IDS.FRUTAS_SILVESTRES (3x)
+Isca para Pesca (rec-isca-pesca-001)
+
+Ingredientes:
+RESOURCE_IDS.COGUMELOS (1x)
+RESOURCE_IDS.FRUTAS_SILVESTRES (1x)

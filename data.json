@@ -7,7 +7,7 @@
         "username": "Bison",
         "level": 5,
         "experience": 705,
-        "hunger": 5,
+        "hunger": 1,
         "maxHunger": 100,
         "thirst": 0,
         "maxThirst": 100,
@@ -29,7 +29,7 @@
         "equippedFood": null,
         "equippedDrink": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754065107308,
+        "lastOnlineTime": 1754065506695,
         "offlineActivityConfig": {
           "enabled": true,
           "maxDuration": 12,
