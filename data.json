@@ -7,9 +7,9 @@
         "username": "oChaps",
         "level": 2,
         "experience": 189,
-        "hunger": 42,
+        "hunger": 38,
         "maxHunger": 100,
-        "thirst": 40,
+        "thirst": 36,
         "maxThirst": 100,
         "coins": 180,
         "inventoryWeight": 0,
@@ -29,7 +29,7 @@
         "equippedFood": null,
         "equippedDrink": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754072198970
+        "lastOnlineTime": 1754072237850
       }
     ]
   ],
@@ -61,7 +61,7 @@
         "id": "3b30927e-545d-4ecc-aa54-e3c1c1daa26e",
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 34,
+        "quantity": 33,
         "itemType": "resource"
       }
     ],
@@ -71,7 +71,7 @@
         "id": "73b00b2a-5f83-4453-88f9-02111e286a9d",
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 25,
+        "quantity": 24,
         "itemType": "resource"
       }
     ],
@@ -101,7 +101,7 @@
         "id": "5f305c8b-4c68-4727-ae31-edc91ea1fbf2",
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
-        "quantity": 2,
+        "quantity": 0,
         "itemType": "resource"
       }
     ],
@@ -111,6 +111,16 @@
         "id": "53051578-36b8-471f-839b-ce0e34a00a6f",
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "eq-tool-0123abcd-789a-1234-4567-89012345678a",
+        "quantity": 1,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "343b6664-2b46-477d-afad-830aa1da26eb",
+      {
+        "id": "343b6664-2b46-477d-afad-830aa1da26eb",
+        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
+        "resourceId": "eq-tool-2b3c4d5e-6f78-9012-bcde-f12345678901",
         "quantity": 1,
         "itemType": "resource"
       }
