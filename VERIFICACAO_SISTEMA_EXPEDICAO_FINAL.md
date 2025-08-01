@@ -1,8 +1,13 @@
 # Verificação Completa do Sistema de Expedição - Resultado Final
 
-## Data: 01/08/2025 - 07:26
+## Data: 01/08/2025 - 07:30
 
 ## Status: ✅ SISTEMA FUNCIONANDO CORRETAMENTE
+
+### ⚠️ ERRO CORRIGIDO: Endpoint de expedições adicionado
+- Problema: GET /api/player/:playerId/expeditions não estava definido
+- Solução: Adicionado endpoint para buscar expedições do jogador
+- Status: ✅ Corrigido e funcionando
 
 ### Componentes Verificados e Status
 

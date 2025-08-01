@@ -511,6 +511,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get player expeditions
+  app.get("/api/player/:playerId/expeditions", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const expeditions = await storage.getPlayerExpeditions(playerId);
+      res.json(expeditions);
+    } catch (error) {
+      console.error("Get expeditions error:", error);
+      res.status(500).json({ message: "Failed to get expeditions" });
+    }
+  });
+
+  // Delete/cancel player expedition
+  app.delete("/api/player/:playerId/expeditions", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
+      
+      if (activeExpedition) {
+        await expeditionService.cancelExpedition(activeExpedition.id);
+      }
+      
+      res.json({ success: true, message: "Expedition cancelled" });
+    } catch (error) {
+      console.error("Cancel expedition error:", error);
+      res.status(500).json({ message: "Failed to cancel expedition" });
+    }
+  });
+
   // Update expedition progress using service
   app.patch("/api/expeditions/:id", async (req, res) => {
     try {
