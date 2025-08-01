@@ -1,3 +1,4 @@
+
 // WebSocket Service for Real-time Updates in Coletor Adventures
 import { WebSocketServer, WebSocket } from 'ws';
 import type { Server } from 'http';
@@ -7,6 +8,8 @@ interface ConnectedClient {
   playerId: string;
   lastPing: number;
 }
+
+let globalWebSocketService: WebSocketService | null = null;
 
 export class WebSocketService {
   private wss: WebSocketServer;
@@ -25,6 +28,9 @@ export class WebSocketService {
     this.heartbeatInterval = setInterval(() => {
       this.heartbeat();
     }, 30000); // 30 seconds
+
+    // Set global reference
+    globalWebSocketService = this;
 
     console.log('🔌 WebSocket server initialized on /ws');
   }
@@ -139,10 +145,13 @@ export class WebSocketService {
     const client = this.clients.get(playerId);
     if (client && client.ws.readyState === WebSocket.OPEN) {
       this.sendToClient(client.ws, {
-        type: 'player_update',
+        type: 'player_updated',
         data: playerData,
         timestamp: Date.now()
       });
+      console.log(`📡 Player update sent to ${playerId}`);
+    } else {
+      console.log(`🔌 No active connection for player ${playerId}`);
     }
   }
 
@@ -203,6 +212,39 @@ export class WebSocketService {
     
     this.clients.clear();
     this.wss.close();
+    globalWebSocketService = null;
     console.log('🔌 WebSocket service shut down');
+  }
+}
+
+// Global broadcast functions
+export function broadcastToPlayer(playerId: string, message: any) {
+  if (globalWebSocketService) {
+    const client = globalWebSocketService['clients'].get(playerId);
+    if (client && client.ws.readyState === WebSocket.OPEN) {
+      client.ws.send(JSON.stringify({
+        ...message,
+        timestamp: Date.now()
+      }));
+      console.log(`📡 Message sent to player ${playerId}:`, message.type);
+    }
+  }
+}
+
+export function broadcastPlayerUpdate(playerId: string, playerData: any) {
+  if (globalWebSocketService) {
+    globalWebSocketService.broadcastPlayerUpdate(playerId, playerData);
+  }
+}
+
+export function broadcastInventoryUpdate(playerId: string, inventoryData: any) {
+  if (globalWebSocketService) {
+    globalWebSocketService.broadcastInventoryUpdate(playerId, inventoryData);
+  }
+}
+
+export function broadcastStorageUpdate(playerId: string, storageData: any) {
+  if (globalWebSocketService) {
+    globalWebSocketService.broadcastStorageUpdate(playerId, storageData);
   }
 }

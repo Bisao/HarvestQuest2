@@ -4,6 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { corsMiddleware, securityHeaders } from "./middleware/cors";
 import { errorHandler, requestLogger } from "./middleware/error-handler";
 import { rateLimit } from "./middleware/auth";
+import { WebSocketService } from "./services/websocket"; // Assuming the path
 
 const app = express();
 
@@ -54,8 +55,13 @@ app.use((req, res, next) => {
   next();
 });
 
+let wsService: WebSocketService; // Declare wsService outside the scope of the async function
+
 (async () => {
   const server = await registerRoutes(app);
+
+  // Initialize WebSocket service
+  wsService = new WebSocketService(server);
 
   // Use the centralized error handler
   app.use(errorHandler);
@@ -84,3 +90,6 @@ app.use((req, res, next) => {
 })();
 // Import consumption routes
 import { createConsumptionRoutes } from "./routes/consumption";
+
+// Export for global access
+export { wsService };

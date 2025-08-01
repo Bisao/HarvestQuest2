@@ -139,21 +139,12 @@ export function createConsumptionRoutes(storage: IStorage): Router {
 
       // Broadcast real-time update via WebSocket
       try {
-        const { broadcastToPlayer } = await import("../websocket-service");
-        broadcastToPlayer(playerId, {
-          type: 'player_updated',
-          data: updatedPlayer
-        });
-        broadcastToPlayer(playerId, {
-          type: 'item_consumed',
-          data: {
-            itemId,
-            location,
-            quantity,
-            hungerRestored: newHunger - player.hunger,
-            thirstRestored: newThirst - player.thirst
-          }
-        });
+        const webSocketService = await import("../websocket-service");
+        webSocketService.broadcastPlayerUpdate(playerId, updatedPlayer);
+        webSocketService.broadcastInventoryUpdate(playerId, location === 'inventory' ? await storage.getPlayerInventory(playerId) : null);
+        webSocketService.broadcastStorageUpdate(playerId, location === 'storage' ? await storage.getPlayerStorage(playerId) : null);
+        
+        console.log(`📡 Player update broadcast sent for ${playerId}`);
       } catch (error) {
         console.warn('WebSocket broadcast failed:', error);
       }

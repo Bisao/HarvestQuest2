@@ -124,9 +124,12 @@ export function useWebSocket(playerId: string | null) {
       case 'player_update':
       case 'player_updated':
         console.log('📡 Real-time player update received:', message.data);
-        // Force refresh player data when receiving real-time updates
-        queryClient.invalidateQueries({ queryKey: [`/api/player/${message.data.id}`] });
-        queryClient.refetchQueries({ queryKey: [`/api/player/${message.data.id}`] });
+        // Update player data directly in cache and force refetch
+        if (playerId && message.data) {
+          queryClient.setQueryData([`/api/player/${playerId}`], message.data);
+          queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
+          queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+        }
         break;
 
       case 'item_consumed':
