@@ -54,11 +54,11 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         
         const result = await response.json();
         console.log("Craft Success:", result);
-        return result;
+        return { ...result, recipeId }; // Include recipeId in return for cleanup
       } catch (error) {
         console.error("Craft Error Details:", error);
         if (error instanceof Error) {
-          throw error;
+          throw { ...error, recipeId }; // Include recipeId in error for cleanup
         }
         throw new Error("Erro de conexão com o servidor");
       }
@@ -68,6 +68,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       const data = response.data || response;
       const quantity = data?.quantity || 1;
       const recipeName = data?.recipe?.name || data?.recipe || "Item";
+      const recipeId = response.recipeId || data?.recipe?.id;
 
       toast({
         title: "Item Craftado!",
@@ -75,8 +76,10 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       });
 
       // Reset craft quantity for this recipe
-      if (data?.recipe?.id) {
-        setCraftQuantities(prev => ({ ...prev, [data.recipe.id]: 1 }));
+      if (recipeId) {
+        setCraftQuantities(prev => ({ ...prev, [recipeId]: 1 }));
+        // Clear the crafting in progress state
+        setCraftingInProgress(prev => ({ ...prev, [recipeId]: false }));
       }
 
       // CRITICAL: Force complete cache invalidation for real-time sync
@@ -93,6 +96,12 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     },
     onError: (error: any) => {
       console.error("Craft error:", error);
+      
+      // Clear the crafting in progress state for this recipe
+      if (error.recipeId) {
+        setCraftingInProgress(prev => ({ ...prev, [error.recipeId]: false }));
+      }
+      
       toast({
         title: "Erro no Crafting",
         description: error.message || "Não foi possível craftar o item",
@@ -185,9 +194,15 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     return getMaxCraftable(recipe) > 0;
   };
 
+  // State to track which recipes are currently being crafted
+  const [craftingInProgress, setCraftingInProgress] = useState<Record<string, boolean>>({});
+
   // Handle craft action
   const handleCraft = (recipe: Recipe) => {
-    if (isBlocked || !canCraftRecipe(recipe) || craftMutation.isPending) return;
+    if (isBlocked || !canCraftRecipe(recipe) || craftMutation.isPending || craftingInProgress[recipe.id]) return;
+    
+    // Mark this recipe as being crafted
+    setCraftingInProgress(prev => ({ ...prev, [recipe.id]: true }));
     
     const quantity = craftQuantities[recipe.id] || 1;
     craftMutation.mutate({ recipeId: recipe.id, quantity });
@@ -277,15 +292,19 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
         <Button
           onClick={() => handleCraft(recipe)}
-          disabled={!canCraft || isBlocked || craftMutation.isPending}
+          disabled={!canCraft || isBlocked || craftMutation.isPending || craftingInProgress[recipe.id]}
           className={`w-full ${
-            canCraft 
+            canCraft && !craftingInProgress[recipe.id]
               ? "bg-green-600 hover:bg-green-700 text-white" 
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
-          {craftMutation.isPending ? "Craftando..." : 
-           !canCraft ? "Não pode craftar" : 
+          {(craftMutation.isPending || craftingInProgress[recipe.id]) ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Craftando...
+            </div>
+          ) : !canCraft ? "Não pode craftar" : 
            `Craftar ${currentQuantity > 1 ? `(${currentQuantity}x)` : ""}`}
         </Button>
       </div>

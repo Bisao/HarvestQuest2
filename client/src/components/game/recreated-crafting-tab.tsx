@@ -61,11 +61,12 @@ const CATEGORY_CONFIG = {
 export default function RecreatedCraftingTab({ recipes, resources, playerLevel, playerId, isBlocked = false }: RecreatedCraftingTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // State management
   const [activeCategory, setActiveCategory] = useState<string>("Materiais");
   const [craftQuantities, setCraftQuantities] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [craftingInProgress, setCraftingInProgress] = useState<Record<string, boolean>>({});
 
   // Get storage items for ingredient checking
   const { data: storageItems = [] } = useQuery<StorageItem[]>({
@@ -82,12 +83,12 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ playerId, recipeId, quantity: quantity || 1 }),
         });
-        
+
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ message: "Erro desconhecido no servidor" }));
           throw new Error(errorData.message || `Erro HTTP ${response.status}: ${response.statusText}`);
         }
-        
+
         const result = await response.json();
         console.log("Craft Success:", result);
         return result;
@@ -112,6 +113,7 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
       // Reset craft quantity for this recipe
       if (data?.recipe?.id) {
         setCraftQuantities(prev => ({ ...prev, [data.recipe.id]: 1 }));
+        setCraftingInProgress(prev => ({ ...prev, [data.recipe.id]: false }));
       }
 
       // Force complete cache invalidation for real-time sync
@@ -150,7 +152,7 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
       "res-b8e3f1a6-7d29-4c8e-a5f2-9b6e3d8a1c47": { name: "Gravetos", emoji: "🪵" },
       "res-c9d4e2b7-8a31-4f6e-b8g3-2c7f4e9b5d68": { name: "Madeira", emoji: "🪵" }
     };
-    
+
     // Check direct mapping
     if (resourceMap[resourceId]) {
       return {
@@ -159,11 +161,11 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
         emoji: resourceMap[resourceId].emoji
       };
     }
-    
+
     // Pattern-based fallback
     let mappedName = "Item Desconhecido";
     let emoji = "📦";
-    
+
     if (resourceId.includes("barbante")) {
       mappedName = "Barbante";
       emoji = "🧵";
@@ -180,7 +182,7 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
       mappedName = "Madeira";
       emoji = "🪵";
     }
-    
+
     return {
       id: resourceId,
       name: mappedName,
@@ -194,14 +196,14 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
     return storageItem ? storageItem.quantity : 0;
   };
 
-  // Enhanced recipe analysis
+    // Enhanced recipe analysis
   const analyzeRecipe = (recipe: Recipe) => {
     if (!recipe.ingredients) return { ingredients: [], maxCraftable: 0, canCraft: false };
-    
+
     const ingredients = recipe.ingredients.map(ingredient => {
       const resourceData = getResourceData(ingredient.itemId);
       const availableQuantity = getStorageQuantity(ingredient.itemId);
-      
+
       return {
         ...ingredient,
         resourceData,
@@ -224,7 +226,7 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
   const categorizedRecipes = useMemo(() => {
     return recipes.reduce((acc, recipe) => {
       let category = "Materiais";
-      
+
       // Enhanced categorization logic
       if (recipe.category === "tools" || recipe.subcategory?.includes("tool")) {
         category = "Ferramentas";
@@ -239,10 +241,10 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
       } else if (recipe.category === "basic_materials" || recipe.subcategory?.includes("material")) {
         category = "Materiais";
       }
-      
+
       if (!acc[category]) acc[category] = [];
       acc[category].push(recipe);
-      
+
       return acc;
     }, {} as Record<string, Recipe[]>);
   }, [recipes]);
@@ -250,7 +252,7 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
   // Filter recipes based on search query
   const filteredRecipes = useMemo(() => {
     if (!searchQuery.trim()) return categorizedRecipes[activeCategory] || [];
-    
+
     const query = searchQuery.toLowerCase();
     return (categorizedRecipes[activeCategory] || []).filter(recipe =>
       recipe.name.toLowerCase().includes(query) ||
@@ -259,13 +261,17 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
     );
   }, [categorizedRecipes, activeCategory, searchQuery]);
 
-  // Handle craft action
+  const canCraftRecipe = (recipe: Recipe) => {
+    return analyzeRecipe(recipe).canCraft;
+  }
+
+  // Handle crafting action
   const handleCraft = (recipe: Recipe) => {
-    if (isBlocked || craftMutation.isPending) return;
-    
-    const { canCraft } = analyzeRecipe(recipe);
-    if (!canCraft) return;
-    
+    if (isBlocked || !canCraftRecipe(recipe) || craftMutation.isPending || craftingInProgress[recipe.id]) return;
+
+    // Mark this recipe as being crafted
+    setCraftingInProgress(prev => ({ ...prev, [recipe.id]: true }));
+
     const quantity = craftQuantities[recipe.id] || 1;
     craftMutation.mutate({ recipeId: recipe.id, quantity });
   };
@@ -319,7 +325,7 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
                 </div>
               </div>
             </div>
-            
+
             {/* Status indicators */}
             <div className="flex flex-col items-end gap-1">
               {isLevelLocked && (
@@ -408,14 +414,14 @@ export default function RecreatedCraftingTab({ recipes, resources, playerLevel, 
           {/* Craft button */}
           <Button
             onClick={() => handleCraft(recipe)}
-            disabled={!canCraft || isBlocked || craftMutation.isPending}
+            disabled={!canCraft || isBlocked || craftMutation.isPending || craftingInProgress[recipe.id]}
             className={`w-full font-medium ${
               canCraft 
                 ? "bg-green-600 hover:bg-green-700 text-white" 
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
-            {craftMutation.isPending ? (
+            {craftMutation.isPending || craftingInProgress[recipe.id] ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 Craftando...
