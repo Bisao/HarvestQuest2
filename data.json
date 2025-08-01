@@ -12,7 +12,7 @@
         "thirst": 83,
         "maxThirst": 100,
         "coins": 100,
-        "inventoryWeight": 6930,
+        "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -27,58 +27,63 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": true,
-        "lastOnlineTime": 1754031525964
+        "lastOnlineTime": 1754031748327
       }
     ]
   ],
-  "inventoryItems": [
+  "inventoryItems": [],
+  "storageItems": [
     [
-      "ab667eea-e8e0-459d-9a78-9cdef897e635",
+      "2f4fac3e-f6a1-4196-b043-547f8b96b240",
       {
-        "id": "ab667eea-e8e0-459d-9a78-9cdef897e635",
+        "id": "2f4fac3e-f6a1-4196-b043-547f8b96b240",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 10
+        "quantity": 10,
+        "itemType": "resource"
       }
     ],
     [
-      "0709f809-d80c-4b5d-971c-4b6edd13c376",
+      "5cc8bc04-502b-48fe-90d4-f7093fde729d",
       {
-        "id": "0709f809-d80c-4b5d-971c-4b6edd13c376",
+        "id": "5cc8bc04-502b-48fe-90d4-f7093fde729d",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 10
+        "quantity": 10,
+        "itemType": "resource"
       }
     ],
     [
-      "52ad3117-14bd-455f-8775-63ffba71dd70",
+      "c725a8a3-6c3f-4c00-84b5-fed9d02d478a",
       {
-        "id": "52ad3117-14bd-455f-8775-63ffba71dd70",
+        "id": "c725a8a3-6c3f-4c00-84b5-fed9d02d478a",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 12
+        "quantity": 12,
+        "itemType": "resource"
       }
     ],
     [
-      "de69a00c-22ac-45d3-a603-e77a254e91ce",
+      "0a02ac4c-3704-4197-bbc9-b798a17d2106",
       {
-        "id": "de69a00c-22ac-45d3-a603-e77a254e91ce",
+        "id": "0a02ac4c-3704-4197-bbc9-b798a17d2106",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 16
+        "quantity": 16,
+        "itemType": "resource"
       }
     ],
     [
-      "bbf67c89-28f5-42f2-bf9d-3fe419032b66",
+      "4e7e594c-62ea-41ce-bfba-0c24a452a025",
       {
-        "id": "bbf67c89-28f5-42f2-bf9d-3fe419032b66",
+        "id": "4e7e594c-62ea-41ce-bfba-0c24a452a025",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 14
+        "quantity": 14,
+        "itemType": "resource"
       }
     ]
   ],
-  "storageItems": [],
   "expeditions": [
     [
       "1716eaef-9c15-4fe2-be61-fd39d4ee9d3b",
