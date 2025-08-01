@@ -111,24 +111,6 @@ export default function EnhancedInventory({
     },
   ];
 
-  // Quick access slots for consumables
-  const quickSlots = [
-    {
-      id: "food_slot",
-      name: "Comida",
-      emoji: "🍖",
-      type: "food",
-      equipped: null // Will be populated from inventory
-    },
-    {
-      id: "potion_slot", 
-      name: "Poção",
-      emoji: "🧪",
-      type: "potion",
-      equipped: null // Will be populated from inventory
-    }
-  ];
-
   // Main inventory: 9x4 grid (36 slots)
   const inventoryRows = 4;
   const inventoryCols = 9;
@@ -493,86 +475,6 @@ export default function EnhancedInventory({
               <div></div>
               {renderEquipmentSlot(equipmentSlots[3])}
               <div></div>
-            </div>
-            
-            <Separator className="my-4" />
-            
-            {/* Quick Access Slots for Consumables */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-2 text-center">🍽️ Acesso Rápido</p>
-              <div className="grid grid-cols-2 gap-2">
-                {quickSlots.map(slot => {
-                  // Find first consumable item of this type in inventory
-                  const consumableItem = inventory.find(item => {
-                    const itemData = getItemById(item.resourceId);
-                    if (!itemData || !isConsumable(itemData)) return false;
-                    
-                    if (slot.type === "food") {
-                      const effects = getConsumableEffects(itemData);
-                      return effects.hungerRestore > 0;
-                    } else if (slot.type === "potion") {
-                      const effects = getConsumableEffects(itemData);
-                      return effects.thirstRestore > 0 && effects.hungerRestore === 0;
-                    }
-                    return false;
-                  });
-                  
-                  const itemData = consumableItem ? getItemById(consumableItem.resourceId) : null;
-                  
-                  return (
-                    <TooltipProvider key={slot.id}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div
-                            onClick={() => {
-                              if (consumableItem) {
-                                consumeMutation.mutate(consumableItem.resourceId);
-                              }
-                            }}
-                            className={`
-                              aspect-square border-2 rounded-lg flex flex-col items-center justify-center
-                              cursor-pointer transition-all hover:scale-105
-                              ${consumableItem ? "bg-green-50 border-green-300 hover:bg-green-100" : "bg-gray-50 border-dashed border-gray-300"}
-                            `}
-                          >
-                            {consumableItem && itemData ? (
-                              <>
-                                <span className="text-xl mb-1">{itemData.emoji}</span>
-                                <span className="text-xs font-semibold text-center px-1">
-                                  {consumableItem.quantity}
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="text-xl mb-1 opacity-50">{slot.emoji}</span>
-                                <span className="text-xs text-gray-500 text-center">{slot.name}</span>
-                              </>
-                            )}
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <div className="text-center">
-                            <p className="font-semibold">{slot.name}</p>
-                            {consumableItem && itemData ? (
-                              <div>
-                                <p className="text-sm">{itemData.name}</p>
-                                <p className="text-xs text-gray-500">
-                                  {getConsumableDescription(itemData)}
-                                </p>
-                                <p className="text-xs text-green-600">Clique para consumir</p>
-                              </div>
-                            ) : (
-                              <p className="text-sm text-gray-500">
-                                Nenhum item de {slot.name.toLowerCase()} disponível
-                              </p>
-                            )}
-                          </div>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  );
-                })}
-              </div>
             </div>
             
             <Separator className="my-4" />
