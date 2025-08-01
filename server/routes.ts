@@ -939,11 +939,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get biome resources - simple route for frontend
+  // Get biome resources - enhanced for expedition system
   app.get("/api/biomes/:biomeId/resources", async (req, res) => {
     try {
       const { biomeId } = req.params;
-      const biome = await storage.getBiome(biomeId);
+      
+      // Handle both formats: with and without "biome-" prefix
+      const actualBiomeId = biomeId.startsWith('biome-') ? biomeId : `biome-${biomeId}`;
+      const biome = await storage.getBiome(actualBiomeId);
 
       if (!biome) {
         return res.status(404).json({ message: "Biome not found" });
@@ -955,7 +958,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const biomeResources = resources.filter(r => 
         availableResources.includes(r.id)
-      );
+      ).map(resource => ({
+        ...resource,
+        // Ensure proper emoji display for expedition system
+        emoji: resource.emoji && !resource.emoji.startsWith('res-') 
+          ? resource.emoji 
+          : getResourceEmoji(resource.name)
+      }));
 
       res.json(biomeResources);
     } catch (error) {
@@ -963,6 +972,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to get biome resources" });
     }
   });
+
+  // Helper function for resource emojis
+  function getResourceEmoji(resourceName: string): string {
+    const emojiMap: Record<string, string> = {
+      "Fibra": "🌾",
+      "Pedra": "🪨", 
+      "Pedras Soltas": "🪨",
+      "Pedras Pequenas": "🪨",
+      "Gravetos": "🪵",
+      "Água Fresca": "💧",
+      "Bambu": "🎋",
+      "Madeira": "🌳",
+      "Argila": "🧱",
+      "Ferro Fundido": "⚙️",
+      "Couro": "🦫",
+      "Carne": "🥩",
+      "Ossos": "🦴",
+      "Pelo": "🧶",
+      "Barbante": "🧵",
+      "Linho": "🌾",
+      "Algodão": "☁️",
+      "Juta": "🌾",
+      "Sisal": "🌾",
+      "Cânhamo": "🌾",
+      "Coelho": "🐰",
+      "Veado": "🦌", 
+      "Javali": "🐗",
+      "Peixe Pequeno": "🐟",
+      "Peixe Grande": "🐠",
+      "Salmão": "🍣",
+      "Cogumelos": "🍄",
+      "Frutas Silvestres": "🫐",
+      "Areia": "⏳",
+      "Cristais": "💎",
+      "Conchas": "🐚"
+    };
+    return emojiMap[resourceName] || "📦";
+  }
 
   // Get biome details with enhanced information
   app.get("/api/biomes/:id/details", async (req, res) => {

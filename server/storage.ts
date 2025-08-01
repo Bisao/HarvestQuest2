@@ -212,7 +212,7 @@ export class MemStorage implements IStorage {
       const legacyResource = {
         id: resource.id,
         name: resource.name,
-        emoji: resource.id, // Use ID as emoji placeholder
+        emoji: getResourceEmojiByName(resource.name), // Use actual emoji
         rarity: resource.rarity,
         experienceValue: resource.baseValue || 10,
         category: resource.type === 'consumable' ? 'consumables' as const : 'raw_materials' as const,
@@ -220,13 +220,13 @@ export class MemStorage implements IStorage {
         type: resource.type,
         spawnRate: resource.spawnRate || 0.1,
         yieldAmount: 1,
-        requiredTool: resource.toolRequired || undefined,
+        requiredTool: Array.isArray(resource.toolRequired) ? resource.toolRequired[0] : resource.toolRequired,
         sellPrice: resource.baseValue,
         buyPrice: resource.baseValue * 1.5,
         weight: resource.weight,
         stackable: resource.stackable,
         maxStackSize: resource.maxStack || 100,
-        effects: resource.buffs || [],
+        effects: resource.buffs ? resource.buffs.map(buff => buff.type) : [],
         tags: resource.tags,
         attributes: { 
           durability: resource.durability || 100, 
@@ -238,6 +238,38 @@ export class MemStorage implements IStorage {
       };
       const created = await this.createResource(legacyResource);
       resourceIds.push(created.id);
+    }
+
+    // Helper function for resource emojis
+    function getResourceEmojiByName(resourceName: string): string {
+      const emojiMap: Record<string, string> = {
+        "Fibra": "🌾",
+        "Pedra": "🪨", 
+        "Pedras Pequenas": "🪨",
+        "Gravetos": "🪵",
+        "Água Fresca": "💧",
+        "Bambu": "🎋",
+        "Madeira": "🌳",
+        "Argila": "🧱",
+        "Ferro Fundido": "⚙️",
+        "Couro": "🦫",
+        "Carne": "🥩",
+        "Ossos": "🦴",
+        "Pelo": "🧶",
+        "Barbante": "🧵",
+        "Coelho": "🐰",
+        "Veado": "🦌", 
+        "Javali": "🐗",
+        "Peixe Pequeno": "🐟",
+        "Peixe Grande": "🐠",
+        "Salmão": "🍣",
+        "Cogumelos": "🍄",
+        "Frutas Silvestres": "🫐",
+        "Areia": "⏳",
+        "Cristais": "💎",
+        "Conchas": "🐚"
+      };
+      return emojiMap[resourceName] || "📦";
     }
 
     // Initialize biomes using modular data
@@ -254,7 +286,10 @@ export class MemStorage implements IStorage {
     // Initialize recipes using modular data
     const recipesData = ALL_MODERN_RECIPES;
     for (const recipe of recipesData) {
-      await this.createRecipe(recipe);
+      await this.createRecipe({
+        ...recipe,
+        emoji: "⚙️" // Default emoji for recipes
+      });
     }
 
     // Initialize quests using modular data
