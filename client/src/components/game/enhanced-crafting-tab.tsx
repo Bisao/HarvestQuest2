@@ -180,7 +180,7 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       }
 
       // Fallback if not found
-      console.warn(`Ingredient not found: ${ingredient.itemId}`);
+      console.error(`Ingredient not found: ${ingredient.itemId} - Please check resource IDs consistency`);
       return {
         resource: null,
         name: `Item Desconhecido (${ingredient.itemId})`,
