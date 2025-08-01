@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { OfflineActivityConfig } from "@shared/types";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface OfflineConfigModalProps {
   isOpen: boolean;
@@ -36,6 +37,7 @@ export function OfflineConfigModal({
     stopOnLowResources: currentConfig?.stopOnLowResources ?? true,
     minHunger: currentConfig?.minHunger ?? 20,
     minThirst: currentConfig?.minThirst ?? 20,
+    preferredResources: currentConfig?.preferredResources ?? [],
   });
 
   const { data: biomes } = useQuery({
@@ -44,6 +46,14 @@ export function OfflineConfigModal({
 
   const { data: player } = useQuery({
     queryKey: ['/api/player', playerId]
+  });
+
+  const { data: resources } = useQuery({
+    queryKey: ['/api/resources']
+  });
+
+  const { data: inventory } = useQuery({
+    queryKey: ['/api/inventory', playerId]
   });
 
   const updateConfigMutation = useMutation({
@@ -84,6 +94,7 @@ export function OfflineConfigModal({
         stopOnLowResources: currentConfig.stopOnLowResources ?? true,
         minHunger: currentConfig.minHunger ?? 20,
         minThirst: currentConfig.minThirst ?? 20,
+        preferredResources: currentConfig.preferredResources ?? [],
       });
     }
   }, [currentConfig]);
@@ -91,6 +102,69 @@ export function OfflineConfigModal({
   const accessibleBiomes = (Array.isArray(biomes) ? biomes : []).filter((biome: any) => 
     biome.requiredLevel <= ((player as any)?.level || 1)
   );
+
+  // Função para verificar se o jogador pode coletar um recurso
+  const canCollectResource = (resource: any) => {
+    if (!resource.requirements) return true;
+    
+    const playerLevel = (player as any)?.level || 1;
+    const playerInventory = Array.isArray(inventory) ? inventory : [];
+    
+    // Verifica requisito de nível
+    if (resource.requirements.level && playerLevel < resource.requirements.level) {
+      return false;
+    }
+    
+    // Verifica requisito de ferramenta
+    if (resource.requirements.tool) {
+      const hasTool = playerInventory.some((item: any) => 
+        item.itemId === resource.requirements.tool && item.quantity > 0
+      ) || (player as any)?.equippedTool === resource.requirements.tool;
+      
+      if (!hasTool) return false;
+    }
+    
+    // Verifica requisito de bioma
+    if (resource.requirements.biomes && resource.requirements.biomes.length > 0) {
+      const selectedBiome = config.preferredBiome;
+      if (selectedBiome && !resource.requirements.biomes.includes(selectedBiome)) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  // Recursos disponíveis para coleta baseado nos requisitos
+  const availableResources = (Array.isArray(resources) ? resources : [])
+    .filter((resource: any) => resource.type === 'resource' && canCollectResource(resource))
+    .sort((a: any, b: any) => (a.requirements?.level || 0) - (b.requirements?.level || 0));
+
+  const handleResourceToggle = (resourceId: string, checked: boolean) => {
+    setConfig(prev => ({
+      ...prev,
+      preferredResources: checked 
+        ? [...(prev.preferredResources || []), resourceId]
+        : (prev.preferredResources || []).filter(id => id !== resourceId)
+    }));
+  };
+
+  const getResourceRequirementsText = (resource: any) => {
+    const reqs = [];
+    if (resource.requirements?.level) reqs.push(`Nível ${resource.requirements.level}`);
+    if (resource.requirements?.tool) {
+      const toolName = availableResources.find((r: any) => r.id === resource.requirements.tool)?.name || resource.requirements.tool;
+      reqs.push(`Ferramenta: ${toolName}`);
+    }
+    if (resource.requirements?.biomes?.length > 0) {
+      const biomeNames = resource.requirements.biomes.map((biomeId: string) => {
+        const biome = accessibleBiomes.find((b: any) => b.id === biomeId);
+        return biome ? biome.name : biomeId;
+      }).join(', ');
+      reqs.push(`Biomas: ${biomeNames}`);
+    }
+    return reqs.length > 0 ? reqs.join(' • ') : 'Sem requisitos especiais';
+  };
 
   const handleSave = () => {
     updateConfigMutation.mutate(config);
@@ -176,6 +250,80 @@ export function OfflineConfigModal({
                       Automático escolhe o bioma de maior nível que você pode acessar
                     </p>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Configurações de Recursos */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Package className="h-5 w-5" />
+                    Recursos para Coletar
+                  </CardTitle>
+                  <CardDescription>
+                    Escolha quais recursos você quer focar durante as expedições offline
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {availableResources.length > 0 ? (
+                    <div className="space-y-3 max-h-48 overflow-y-auto">
+                      <div className="flex items-center space-x-2 pb-2 border-b">
+                        <Checkbox
+                          id="select-all-resources"
+                          checked={config.preferredResources?.length === availableResources.length}
+                          onCheckedChange={(checked) => {
+                            setConfig(prev => ({
+                              ...prev,
+                              preferredResources: checked 
+                                ? availableResources.map((r: any) => r.id)
+                                : []
+                            }));
+                          }}
+                        />
+                        <Label htmlFor="select-all-resources" className="font-medium">
+                          Selecionar Todos os Recursos
+                        </Label>
+                      </div>
+                      
+                      {availableResources.map((resource: any) => (
+                        <div key={resource.id} className="space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`resource-${resource.id}`}
+                              checked={config.preferredResources?.includes(resource.id) || false}
+                              onCheckedChange={(checked) => 
+                                handleResourceToggle(resource.id, checked as boolean)
+                              }
+                            />
+                            <Label 
+                              htmlFor={`resource-${resource.id}`} 
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <span>{resource.emoji}</span>
+                              <span>{resource.name}</span>
+                            </Label>
+                          </div>
+                          <p className="text-xs text-muted-foreground ml-6">
+                            {getResourceRequirementsText(resource)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground">
+                      <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>Nenhum recurso disponível para seu nível atual</p>
+                      <p className="text-xs">Melhore seu nível e equipamentos para desbloquear mais recursos</p>
+                    </div>
+                  )}
+                  
+                  {config.preferredResources?.length === 0 && (
+                    <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-200 dark:border-amber-800">
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        💡 <strong>Dica:</strong> Se nenhum recurso for selecionado, a expedição coletará automaticamente os recursos mais valiosos disponíveis no bioma escolhido.
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

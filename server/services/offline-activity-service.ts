@@ -35,7 +35,7 @@ export class OfflineActivityService {
 
     // Limita o tempo offline para evitar exploits (máximo 24 horas)
     const effectiveHours = Math.min(hoursOffline, 24);
-    
+
     const report = await this.generateOfflineReport(player, effectiveHours, timeOffline);
     const { playerUpdates, inventoryUpdates, storageUpdates } = await this.applyOfflineRewards(player, report);
 
@@ -147,7 +147,18 @@ export class OfflineActivityService {
     const resources = await this.storage.getAllResources();
     const availableResources = biome.availableResources || [];
 
+    // Obtém recursos preferidos do jogador
+    const preferredResources = player.offlineActivityConfig?.preferredResources || [];
+    const allResources = await this.storage.getAllResources();
+
     for (let i = 0; i < expeditionsCount; i++) {
+      // Filtra recursos do bioma baseado nas preferências e requisitos
+      const availableResources = biome.availableResources.filter(resourceId => {
+        const resource = resources.find(r => r.id === resourceId);
+        if (!resource) return false;
+        return true;
+      });
+
       // Simula coleta para cada recurso disponível no bioma
       for (const resourceId of availableResources) {
         const resource = resources.find(r => r.id === resourceId);
@@ -207,7 +218,7 @@ export class OfflineActivityService {
         'Achou pegadas de uma criatura rara!',
         'Encontrou ruínas antigas misteriosas!'
       ];
-      
+
       events.push({
         type: 'special_find',
         description: finds[Math.floor(Math.random() * finds.length)],
@@ -269,9 +280,9 @@ export class OfflineActivityService {
   private async getDefaultBiome(player: Player): Promise<string | null> {
     const biomes = await this.storage.getAllBiomes();
     const accessibleBiomes = biomes.filter(biome => biome.requiredLevel <= player.level);
-    
+
     if (accessibleBiomes.length === 0) return null;
-    
+
     // Retorna o bioma de maior nível que o jogador pode acessar
     return accessibleBiomes.sort((a, b) => b.requiredLevel - a.requiredLevel)[0].id;
   }

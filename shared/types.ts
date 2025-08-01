@@ -500,6 +500,7 @@ export interface OfflineActivityConfig {
   stopOnLowResources?: boolean;
   minHunger?: number;
   minThirst?: number;
+  preferredResources?: string[]; // IDs dos recursos que o jogador quer focar
 }
 
 export interface OfflineActivityReport {
