@@ -382,6 +382,7 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
   const [processQuantity, setProcessQuantity] = useState<number>(1);
   const [processingInProgress, setProcessingInProgress] = useState<boolean>(false);
   const [outputItems, setOutputItems] = useState<Array<{resourceId: string, quantity: number}>>([]);
+  const [activeFilter, setActiveFilter] = useState<string>("all");
 
   // Get storage items
   const { data: storageItems = [] } = useQuery<StorageItem[]>({
@@ -612,6 +613,59 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
   const maxProcessable = selectedProcess ? getMaxProcessable(selectedProcess) : 0;
   const canProcessSelected = selectedProcess ? canProcess(selectedProcess) : false;
 
+  // Filtros por tipo de item
+  const itemFilters = {
+    all: { name: "Todos", emoji: "📋", description: "Todos os processos" },
+    tools: { name: "Ferramentas", emoji: "🔧", description: "Machados, picaretas, etc." },
+    weapons: { name: "Armas", emoji: "⚔️", description: "Espadas, arcos, etc." },
+    metals: { name: "Metais", emoji: "🔩", description: "Barras e ligas metálicas" },
+    equipment: { name: "Equipamentos", emoji: "🎒", description: "Mochilas e equipamentos" },
+    materials: { name: "Materiais", emoji: "🧵", description: "Materiais básicos" }
+  };
+
+  // Função para determinar o tipo de item baseado no ID do resultado
+  const getItemType = (process: WorkshopProcess): string => {
+    const outputId = process.output.resourceId;
+    
+    // Ferramentas
+    if (outputId.includes("machado") || outputId.includes("picareta") || outputId.includes("pá")) {
+      return "tools";
+    }
+    
+    // Armas
+    if (outputId.includes("espada") || outputId.includes("arco") || outputId.includes("flecha")) {
+      return "weapons";
+    }
+    
+    // Metais
+    if (outputId.includes("barra") || outputId.includes("liga") || outputId.includes("metal") || outputId.includes("ferro") || outputId.includes("cobre")) {
+      return "metals";
+    }
+    
+    // Equipamentos
+    if (outputId.includes("mochila") || outputId.includes("equipamento")) {
+      return "equipment";
+    }
+    
+    // Materiais básicos
+    if (outputId.includes("barbante") || outputId.includes("corda") || outputId.includes("fibra") || outputId.includes("couro")) {
+      return "materials";
+    }
+    
+    return "materials"; // Default
+  };
+
+  // Filtrar processos por categoria e tipo
+  const getFilteredProcesses = () => {
+    const categoryProcesses = categorizedProcesses[activeCategory] || [];
+    
+    if (activeFilter === "all") {
+      return categoryProcesses;
+    }
+    
+    return categoryProcesses.filter(process => getItemType(process) === activeFilter);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -660,9 +714,28 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
         <Card>
           <CardHeader>
             <CardTitle>Processos Disponíveis</CardTitle>
+            
+            {/* Filtros por tipo de item */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {Object.entries(itemFilters).map(([key, filter]) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveFilter(key)}
+                  className={`px-3 py-1 rounded-full text-xs transition-colors ${
+                    activeFilter === key
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                  title={filter.description}
+                >
+                  <span className="mr-1">{filter.emoji}</span>
+                  {filter.name}
+                </button>
+              ))}
+            </div>
           </CardHeader>
           <CardContent className="space-y-3 max-h-96 overflow-y-auto">
-            {(categorizedProcesses[activeCategory] || []).map((process) => {
+            {getFilteredProcesses().map((process) => {
               const isAvailable = canProcess(process);
               const isSelected = selectedProcess?.id === process.id;
               
