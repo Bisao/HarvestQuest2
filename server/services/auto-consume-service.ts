@@ -1,6 +1,7 @@
 
 import type { IStorage } from "../storage";
 import { getAllGameItems } from "../data/items-modern";
+import { CONSUMPTION_CONFIG } from "@shared/config/consumption-config";
 
 export class AutoConsumeService {
   private checkTimer: NodeJS.Timeout | null = null;
@@ -51,13 +52,17 @@ export class AutoConsumeService {
         const hungerPercentage = (player.hunger / player.maxHunger) * 100;
         const thirstPercentage = (player.thirst / player.maxThirst) * 100;
 
-        // Auto consume food if hunger is 15% or below and we have food equipped
-        if (hungerPercentage <= 15 && player.equippedFood && player.hunger < player.maxHunger * 0.75) {
+        // Auto consume food if hunger is below trigger threshold and we have food equipped
+        if (hungerPercentage <= CONSUMPTION_CONFIG.AUTO_CONSUME.TRIGGER_THRESHOLD && 
+            player.equippedFood && 
+            player.hunger < player.maxHunger * (CONSUMPTION_CONFIG.AUTO_CONSUME.MAX_THRESHOLD / 100)) {
           await this.autoConsumeItem(player.id, player.equippedFood, 'food');
         }
 
-        // Auto consume drink if thirst is 15% or below and we have drink equipped
-        if (thirstPercentage <= 15 && player.equippedDrink && player.thirst < player.maxThirst * 0.75) {
+        // Auto consume drink if thirst is below trigger threshold and we have drink equipped
+        if (thirstPercentage <= CONSUMPTION_CONFIG.AUTO_CONSUME.TRIGGER_THRESHOLD && 
+            player.equippedDrink && 
+            player.thirst < player.maxThirst * (CONSUMPTION_CONFIG.AUTO_CONSUME.MAX_THRESHOLD / 100)) {
           await this.autoConsumeItem(player.id, player.equippedDrink, 'drink');
         }
       }
@@ -99,8 +104,8 @@ export class AutoConsumeService {
       const currentHungerPercentage = (player.hunger / player.maxHunger) * 100;
       const currentThirstPercentage = (player.thirst / player.maxThirst) * 100;
 
-      if (type === 'food' && currentHungerPercentage >= 75) return;
-      if (type === 'drink' && currentThirstPercentage >= 75) return;
+      if (type === 'food' && currentHungerPercentage >= CONSUMPTION_CONFIG.AUTO_CONSUME.MAX_THRESHOLD) return;
+      if (type === 'drink' && currentThirstPercentage >= CONSUMPTION_CONFIG.AUTO_CONSUME.MAX_THRESHOLD) return;
 
       const newHunger = Math.min(player.hunger + hungerRestore, player.maxHunger);
       const newThirst = Math.min(player.thirst + thirstRestore, player.maxThirst);
@@ -145,7 +150,7 @@ export class AutoConsumeService {
   getStatus(): { isRunning: boolean; intervalMs: number } {
     return {
       isRunning: this.isRunning,
-      intervalMs: 30000 // 30 seconds
+      intervalMs: CONSUMPTION_CONFIG.AUTO_CONSUME.CHECK_INTERVAL
     };
   }
 }

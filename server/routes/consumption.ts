@@ -129,10 +129,8 @@ export function createConsumptionRoutes(storage: IStorage): Router {
 
       // Invalidate cache to ensure frontend sees updated data immediately
       try {
-        const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("../cache/memory-cache");
-        invalidateStorageCache(playerId);
-        invalidateInventoryCache(playerId);
-        invalidatePlayerCache(playerId);
+        const { CacheManager } = await import("@shared/utils/cache-manager");
+        await CacheManager.updateAfterMutation(playerId);
         console.log(`✅ Cache invalidated for player ${playerId} after consumption`);
       } catch (error) {
         console.warn('Cache invalidation failed:', error);

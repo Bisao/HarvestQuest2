@@ -1,6 +1,7 @@
 // Hunger and Thirst Degradation Service for Coletor Adventures
 import type { IStorage } from "../storage";
 import type { HungerDegradationMode } from "@shared/types";
+import { CONSUMPTION_CONFIG } from "@shared/config/consumption-config";
 
 export class HungerThirstService {
   private degradationTimer: NodeJS.Timeout | null = null;
@@ -64,7 +65,7 @@ export class HungerThirstService {
         let naturalHungerRegen = 0;
         let naturalThirstRegen = 0;
 
-        if (!player.onExpedition && player.hunger > 80 && player.thirst > 80) {
+        if (!player.onExpedition && player.hunger > CONSUMPTION_CONFIG.STATUS.WELL_FED_THRESHOLD && player.thirst > CONSUMPTION_CONFIG.STATUS.WELL_FED_THRESHOLD) {
           // Slight natural regeneration when well-fed and hydrated
           if (Math.random() < 0.2) { // 20% chance
             naturalHungerRegen = Math.min(1, player.maxHunger - player.hunger);
@@ -100,8 +101,8 @@ export class HungerThirstService {
           }
 
           // Check for critical status and broadcast warnings
-          const CRITICAL_THRESHOLD = 20;
-          const EMERGENCY_THRESHOLD = 5;
+          const CRITICAL_THRESHOLD = CONSUMPTION_CONFIG.STATUS.CRITICAL_THRESHOLD;
+          const EMERGENCY_THRESHOLD = CONSUMPTION_CONFIG.STATUS.EMERGENCY_THRESHOLD;
 
           if (newHunger <= EMERGENCY_THRESHOLD || newThirst <= EMERGENCY_THRESHOLD) {
             // Broadcast emergency warning
@@ -161,15 +162,16 @@ export class HungerThirstService {
     // Apply mode-specific multipliers
     switch (mode) {
       case 'slow':
-        hungerRate *= 0.5; // 50% slower
-        thirstRate *= 0.5;
+        hungerRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.SLOW;
+        thirstRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.SLOW;
         break;
       case 'normal':
-        // Standard fixed rate - no multiplier needed
+        hungerRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.NORMAL;
+        thirstRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.NORMAL;
         break;
       case 'fast':
-        hungerRate *= 1.5; // 50% faster
-        thirstRate *= 1.5;
+        hungerRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.FAST;
+        thirstRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.FAST;
         break;
       case 'automatic':
       default:
@@ -266,14 +268,14 @@ export class HungerThirstService {
 
     // Severe penalties for critical status
     if (hunger <= 0 || thirst <= 0) {
-      healthPenalty = 5; // Lose 5 health when completely starved/dehydrated
-      experiencePenalty = 0.5; // 50% XP penalty
-    } else if (hunger <= 5 || thirst <= 5) {
-      healthPenalty = 2; // Lose 2 health when very low
-      experiencePenalty = 0.25; // 25% XP penalty
-    } else if (hunger <= 10 || thirst <= 10) {
-      healthPenalty = 1; // Lose 1 health when low
-      experiencePenalty = 0.1; // 10% XP penalty
+      healthPenalty = CONSUMPTION_CONFIG.PENALTIES.EMERGENCY.health;
+      experiencePenalty = CONSUMPTION_CONFIG.PENALTIES.EMERGENCY.xp;
+    } else if (hunger <= CONSUMPTION_CONFIG.STATUS.EMERGENCY_THRESHOLD || thirst <= CONSUMPTION_CONFIG.STATUS.EMERGENCY_THRESHOLD) {
+      healthPenalty = CONSUMPTION_CONFIG.PENALTIES.CRITICAL.health;
+      experiencePenalty = CONSUMPTION_CONFIG.PENALTIES.CRITICAL.xp;
+    } else if (hunger <= CONSUMPTION_CONFIG.STATUS.CRITICAL_THRESHOLD || thirst <= CONSUMPTION_CONFIG.STATUS.CRITICAL_THRESHOLD) {
+      healthPenalty = CONSUMPTION_CONFIG.PENALTIES.LOW.health;
+      experiencePenalty = CONSUMPTION_CONFIG.PENALTIES.LOW.xp;
     }
 
     return { healthPenalty, experiencePenalty };
