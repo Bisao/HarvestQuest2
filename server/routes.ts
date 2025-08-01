@@ -411,7 +411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const resources = await storage.getAllResources();
         const resourceData = resources.find(r => r.id === equipmentId);
 
-        if (!resourceData || resourceData.category !== 'consumable') {
+        if (!resourceData) {
           return res.status(400).json({ error: "Item is not a consumable" });
         }
 
