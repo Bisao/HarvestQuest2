@@ -1,17 +1,14 @@
 // Central recipe system - ALL IDs must reference shared/constants/game-ids.ts
 import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from "@shared/constants/game-ids";
-import { GameIdResolver } from "@shared/utils/id-resolver";
-import type { Recipe } from "@shared/types";
-
-// Modern recipe system with fundamental attributes
 import type { InsertRecipe } from "@shared/types";
-import { RESOURCE_IDS, EQUIPMENT_IDS } from "@shared/constants/game-ids";
 
 export function createModernRecipeData(): InsertRecipe[] {
+  console.log('🔧 RECIPE-LOADING: Using corrected IDs from game-ids.ts master file');
+  
   return [
     // MATERIAIS BÁSICOS
     {
-      id: "rec-barbante-001",
+      id: RECIPE_IDS.BARBANTE,
       name: "Barbante",
       emoji: "🧵",
       category: "basic_materials",
@@ -19,10 +16,10 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "trivial",
       requiredLevel: 1,
       ingredients: [
-        { itemId: RESOURCE_IDS.FIBRA, quantity: 5, consumed: true } // Fibra: res-8bd33b18-a241-4859-ae9f-870fab5673d0
+        { itemId: RESOURCE_IDS.FIBRA, quantity: 5, consumed: true }
       ],
       outputs: [
-        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, chance: 100 } // Barbante: res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, chance: 100 }
       ],
       craftingTime: 5,
       experienceGained: 10,
@@ -31,7 +28,7 @@ export function createModernRecipeData(): InsertRecipe[] {
 
     // FERRAMENTAS
     {
-      id: "rec-machado-001", 
+      id: RECIPE_IDS.MACHADO, 
       name: "Machado",
       emoji: "🪓",
       category: "tools",
@@ -52,7 +49,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-picareta-001",
+      id: RECIPE_IDS.PICARETA,
       name: "Picareta", 
       emoji: "⛏️",
       category: "tools",
@@ -73,7 +70,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-faca-001",
+      id: RECIPE_IDS.FACA,
       name: "Faca",
       emoji: "🗡️", 
       category: "weapons",
@@ -94,7 +91,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-vara-pesca-001",
+      id: RECIPE_IDS.VARA_PESCA,
       name: "Vara de Pesca",
       emoji: "🎣",
       category: "tools",
@@ -114,7 +111,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-foice-001",
+      id: RECIPE_IDS.FOICE,
       name: "Foice",
       emoji: "🔪",
       category: "tools",
@@ -219,7 +216,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-mochila-001",
+      id: RECIPE_IDS.MOCHILA,
       name: "Mochila",
       emoji: "🎒",
       category: "containers",
@@ -239,7 +236,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-corda-001",
+      id: RECIPE_IDS.CORDA,
       name: "Corda",
       emoji: "🪢",
       category: "basic_materials",
@@ -259,7 +256,7 @@ export function createModernRecipeData(): InsertRecipe[] {
 
     // CONSUMABLES
     {
-      id: "rec-cogumelos-assados-001",
+      id: RECIPE_IDS.COGUMELOS_ASSADOS,
       name: "Cogumelos Assados",
       emoji: "🍄",
       category: "consumables",
@@ -279,7 +276,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-carne-assada-001",
+      id: RECIPE_IDS.CARNE_ASSADA,
       name: "Carne Assada",
       emoji: "🥩",
       category: "consumables", 
@@ -299,7 +296,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-peixe-grelhado-001",
+      id: RECIPE_IDS.PEIXE_GRELHADO,
       name: "Peixe Grelhado",
       emoji: "🐟",
       category: "consumables",
@@ -319,7 +316,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-ensopado-carne-001",
+      id: RECIPE_IDS.ENSOPADO_CARNE,
       name: "Ensopado de Carne",
       emoji: "🍲",
       category: "consumables",
@@ -342,7 +339,7 @@ export function createModernRecipeData(): InsertRecipe[] {
 
     // SUCO DE FRUTAS
     {
-      id: "rec-suco-frutas-001",
+      id: RECIPE_IDS.SUCO_FRUTAS,
       name: "Suco de Frutas",
       emoji: "🧃",
       category: "consumables",
@@ -362,7 +359,7 @@ export function createModernRecipeData(): InsertRecipe[] {
 
     // PANELAS E UTENSÍLIOS DE COZINHA
     {
-      id: "rec-panela-barro-001",
+      id: RECIPE_IDS.PANELA_BARRO,
       name: "Panela de Barro",
       emoji: "🏺",
       category: "tools",
@@ -382,7 +379,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-panela-001",
+      id: RECIPE_IDS.PANELA,
       name: "Panela",
       emoji: "🍲",
       category: "tools",
@@ -403,7 +400,7 @@ export function createModernRecipeData(): InsertRecipe[] {
 
     // ISCA PARA PESCA
     {
-      id: "rec-isca-pesca-001",
+      id: RECIPE_IDS.ISCA_PESCA,
       name: "Isca para Pesca",
       emoji: "🪱",
       category: "consumables",

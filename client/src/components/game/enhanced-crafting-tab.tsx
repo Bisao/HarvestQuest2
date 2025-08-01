@@ -94,16 +94,32 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     const resource = resources.find(r => r.id === resourceId);
     if (resource) return resource;
 
-    // Simple fallback for unknown resources
-    const mappedName = resourceId === "string" ? "Barbante" : resourceId;
+    // Enhanced fallback mapping based on game-ids.ts
+    let mappedName = "Item Desconhecido";
+    let emoji = "📦";
+    
+    // Map common resource IDs to proper names
+    if (resourceId.includes("barbante") || resourceId === "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1") {
+      mappedName = "Barbante";
+      emoji = "🧵";
+    } else if (resourceId.includes("fibra") || resourceId === "res-8bd33b18-a241-4859-ae9f-870fab5673d0") {
+      mappedName = "Fibra";
+      emoji = "🌾";
+    } else if (resourceId.includes("pedras") || resourceId.includes("stone")) {
+      mappedName = "Pedras Soltas";
+      emoji = "🗿";
+    } else if (resourceId.includes("gravetos") || resourceId.includes("stick")) {
+      mappedName = "Gravetos";
+      emoji = "🪵";
+    } else if (resourceId.includes("madeira") || resourceId.includes("wood")) {
+      mappedName = "Madeira";
+      emoji = "🪵";
+    }
     
     return {
       id: resourceId,
       name: mappedName,
-      emoji: mappedName === "Barbante" ? "🧵" : 
-             mappedName === "Fibra" ? "🌾" :
-             mappedName === "Pedras Soltas" ? "🗿" :
-             mappedName === "Gravetos" ? "🪵" : "📦"
+      emoji: emoji
     };
   };
 
