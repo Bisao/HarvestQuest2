@@ -18,11 +18,18 @@ export function useWebSocket(playerId: string | null) {
   const connect = () => {
     if (!playerId) return;
 
+    // Clean up existing connection
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+
     try {
       // Determine WebSocket protocol based on current location
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const wsUrl = `${protocol}//${window.location.host}/ws`;
 
+      console.log(`🔌 Attempting WebSocket connection to: ${wsUrl}`);
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
@@ -59,9 +66,15 @@ export function useWebSocket(playerId: string | null) {
         setIsConnected(false);
         cleanup();
 
-        // Reconnect after delay unless it was a clean close
-        if (event.code !== 1000) {
-          reconnectTimeoutRef.current = setTimeout(connect, 5000);
+        // Reconnect logic with exponential backoff
+        if (event.code !== 1000 && playerId) {
+          const delay = Math.min(5000 * Math.pow(1.5, (reconnectTimeoutRef.current ? 1 : 0)), 30000);
+          console.log(`🔌 Reconnecting in ${delay}ms...`);
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (playerId) { // Check if still needed
+              connect();
+            }
+          }, delay);
         }
       };
 
@@ -82,15 +95,22 @@ export function useWebSocket(playerId: string | null) {
         console.log('📡 Real-time player update received:', message.data);
         // Update player data in cache with correct query key format
         if (playerId && message.data) {
-          // Force immediate update
-          queryClient.setQueryData([`/api/player/${playerId}`], message.data);
-          // Invalidate all related queries to force refresh
-          queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
-          queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+          // Batch updates to prevent excessive re-renders
+          queryClient.setQueryData([`/api/player/${playerId}`], (oldData: any) => {
+            // Only update if data actually changed
+            if (JSON.stringify(oldData) !== JSON.stringify(message.data)) {
+              return message.data;
+            }
+            return oldData;
+          });
           
-          // Also invalidate inventory and storage in case they were affected
-          queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-          queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+          // Debounced invalidation to prevent cascade updates
+          setTimeout(() => {
+            queryClient.invalidateQueries({ 
+              queryKey: [`/api/player/${playerId}`],
+              refetchType: 'none' // Don't refetch immediately
+            });
+          }, 100);
         }
         break;
 

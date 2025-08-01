@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo, useMemo } from "react";
 import type { Player } from "@shared/types";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
@@ -8,8 +8,22 @@ interface GameHeaderProps {
   player: Player;
 }
 
-export default function GameHeader({ player }: GameHeaderProps) {
+const GameHeader = memo(({ player }: GameHeaderProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  
+  // Memoize calculated values to prevent unnecessary re-renders
+  const playerStats = useMemo(() => ({
+    level: player.level,
+    experience: player.experience,
+    hunger: player.hunger,
+    maxHunger: player.maxHunger,
+    thirst: player.thirst,
+    maxThirst: player.maxThirst,
+    coins: player.coins || 0,
+    experiencePercentage: Math.min(((player.experience % 100) / 100) * 100, 100),
+    hungerPercentage: Math.min((player.hunger / player.maxHunger) * 100, 100),
+    thirstPercentage: Math.min((player.thirst / player.maxThirst) * 100, 100)
+  }), [player.level, player.experience, player.hunger, player.maxHunger, player.thirst, player.maxThirst, player.coins]);
 
   return (
     <>
@@ -24,14 +38,14 @@ export default function GameHeader({ player }: GameHeaderProps) {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">⭐</span>
-                  <span className="font-semibold whitespace-nowrap">Nível {player.level}</span>
+                  <span className="font-semibold whitespace-nowrap">Nível {playerStats.level}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
                       className="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
                       style={{ 
-                        width: `${Math.min(((player.experience % 100) / 100) * 100, 100)}%` 
+                        width: `${playerStats.experiencePercentage}%` 
                       }}
                     />
                   </div>
@@ -40,14 +54,14 @@ export default function GameHeader({ player }: GameHeaderProps) {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">🍖</span>
-                  <span className="font-semibold whitespace-nowrap" key={`hunger-${player.hunger}-${Date.now()}`}>{player.hunger}/{player.maxHunger}</span>
+                  <span className="font-semibold whitespace-nowrap">{playerStats.hunger}/{playerStats.maxHunger}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
                       className="bg-orange-500 h-1.5 rounded-full transition-all duration-500"
                       style={{ 
-                        width: `${Math.min((player.hunger / player.maxHunger) * 100, 100)}%` 
+                        width: `${playerStats.hungerPercentage}%` 
                       }}
                     />
                   </div>
@@ -56,14 +70,14 @@ export default function GameHeader({ player }: GameHeaderProps) {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">💧</span>
-                  <span className="font-semibold whitespace-nowrap" key={`thirst-${player.thirst}-${Date.now()}`}>{player.thirst}/{player.maxThirst}</span>
+                  <span className="font-semibold whitespace-nowrap">{playerStats.thirst}/{playerStats.maxThirst}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
                       className="bg-blue-500 h-1.5 rounded-full transition-all duration-500"
                       style={{ 
-                        width: `${Math.min((player.thirst / player.maxThirst) * 100, 100)}%` 
+                        width: `${playerStats.thirstPercentage}%` 
                       }}
                     />
                   </div>
@@ -71,7 +85,7 @@ export default function GameHeader({ player }: GameHeaderProps) {
               </div>
               <div className="flex items-center space-x-1 md:space-x-2">
                 <span className="text-sm md:text-lg">💰</span>
-                <span className="font-semibold">{(player.coins || 0).toLocaleString()}</span>
+                <span className="font-semibold">{playerStats.coins.toLocaleString()}</span>
               </div>
               <Button
                 variant="ghost"
@@ -93,4 +107,8 @@ export default function GameHeader({ player }: GameHeaderProps) {
       />
     </>
   );
-}
+});
+
+GameHeader.displayName = 'GameHeader';
+
+export default GameHeader;

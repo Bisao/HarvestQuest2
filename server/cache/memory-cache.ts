@@ -124,10 +124,29 @@ export const CACHE_TTL = {
 // Global cache instance
 export const gameCache = new MemoryCache();
 
-// Cache cleanup interval (every 5 minutes)
-setInterval(() => {
-  gameCache.cleanup();
-}, 5 * 60 * 1000);
+// Cache cleanup interval (every 2 minutes) with error handling
+const cacheCleanupInterval = setInterval(() => {
+  try {
+    gameCache.cleanup();
+    const stats = gameCache.getStats();
+    if (stats.totalItems > 1000) {
+      console.warn(`Cache growing large: ${stats.totalItems} items`);
+    }
+  } catch (error) {
+    console.error('Cache cleanup failed:', error);
+  }
+}, 2 * 60 * 1000);
+
+// Graceful shutdown cleanup
+process.on('SIGTERM', () => {
+  clearInterval(cacheCleanupInterval);
+  gameCache.clear();
+});
+
+process.on('SIGINT', () => {
+  clearInterval(cacheCleanupInterval);
+  gameCache.clear();
+});
 
 // Cache utility functions
 export function cacheGetOrSet<T>(

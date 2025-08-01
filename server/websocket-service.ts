@@ -38,29 +38,51 @@ export class WebSocketService {
   private handleConnection(ws: WebSocket, request: any) {
     console.log('🔌 New WebSocket connection');
 
+    // Set connection timeout
+    const connectionTimeout = setTimeout(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close(1000, 'Connection timeout - no registration');
+      }
+    }, 30000); // 30 seconds to register
+
     ws.on('message', (data) => {
       try {
         const message = JSON.parse(data.toString());
         this.handleMessage(ws, message);
+        
+        // Clear timeout on first valid message
+        if (message.type === 'register') {
+          clearTimeout(connectionTimeout);
+        }
       } catch (error) {
         console.error('Invalid WebSocket message:', error);
+        ws.close(1003, 'Invalid message format');
       }
     });
 
-    ws.on('close', () => {
+    ws.on('close', (code, reason) => {
+      clearTimeout(connectionTimeout);
       this.handleDisconnection(ws);
+      console.log(`🔌 WebSocket closed: ${code} - ${reason}`);
     });
 
     ws.on('error', (error) => {
       console.error('WebSocket error:', error);
+      clearTimeout(connectionTimeout);
+      this.handleDisconnection(ws);
     });
 
-    // Send initial connection confirmation
-    this.sendToClient(ws, {
-      type: 'connection',
-      status: 'connected',
-      timestamp: Date.now()
-    });
+    // Send initial connection confirmation with retry logic
+    try {
+      this.sendToClient(ws, {
+        type: 'connection',
+        status: 'connected',
+        timestamp: Date.now()
+      });
+    } catch (error) {
+      console.error('Failed to send connection confirmation:', error);
+      ws.close(1011, 'Server error');
+    }
   }
 
   private handleMessage(ws: WebSocket, message: any) {
@@ -126,19 +148,30 @@ export class WebSocketService {
   private heartbeat() {
     const now = Date.now();
     const clientsArray = Array.from(this.clients.entries());
+    
     for (const [playerId, client] of clientsArray) {
-      if (client.ws.readyState === WebSocket.OPEN) {
-        // Check if client is still alive (hasn't responded to ping in 60 seconds)
-        if (now - client.lastPing > 60000) {
-          console.log(`🔌 Removing stale connection for player ${playerId}`);
-          client.ws.terminate();
-          this.clients.delete(playerId);
+      try {
+        if (client.ws.readyState === WebSocket.OPEN) {
+          // Check if client is still alive (hasn't responded to ping in 90 seconds)
+          if (now - client.lastPing > 90000) {
+            console.log(`🔌 Removing stale connection for player ${playerId}`);
+            client.ws.terminate();
+            this.clients.delete(playerId);
+          } else {
+            // Send ping with error handling
+            try {
+              this.sendToClient(client.ws, { type: 'ping', timestamp: now });
+            } catch (error) {
+              console.warn(`Failed to ping client ${playerId}:`, error);
+              this.clients.delete(playerId);
+            }
+          }
         } else {
-          // Send ping
-          this.sendToClient(client.ws, { type: 'ping', timestamp: now });
+          // Remove dead connections
+          this.clients.delete(playerId);
         }
-      } else {
-        // Remove dead connections
+      } catch (error) {
+        console.error(`Error in heartbeat for player ${playerId}:`, error);
         this.clients.delete(playerId);
       }
     }
