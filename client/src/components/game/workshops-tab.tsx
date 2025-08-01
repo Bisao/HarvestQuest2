@@ -41,13 +41,13 @@ interface WorkshopProcess {
 }
 
 const WORKSHOP_PROCESSES: WorkshopProcess[] = [
-  // MATERIAIS BÁSICOS
+  // SERRA (MADEIRA) - CABOS E PARTES DE MADEIRA
   {
-    id: "proc-barbante-001",
-    name: "Barbante",
-    emoji: "🧵",
-    description: "Processe fibras em barbante útil",
-    category: "bancada",
+    id: "proc-cabo-machado-001",
+    name: "Cabo de Machado",
+    emoji: "🪵",
+    description: "Serrar madeira para criar cabo de machado",
+    category: "madeira",
     requiredLevel: 1,
     input: { resourceId: RESOURCE_IDS.FIBRA, quantity: 5 },
     output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 1 },
@@ -375,6 +375,11 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
 ];
 
 export default function WorkshopsTab({ resources, playerLevel, playerId, isBlocked = false }: WorkshopTabProps) {
+  // Usar o novo sistema robusto de oficinas
+  return <RobustWorkshopsTab resources={resources} playerLevel={playerLevel} playerId={playerId} isBlocked={isBlocked} />;
+}
+
+function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = false }: WorkshopTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeCategory, setActiveCategory] = useState<string>("bancada");
