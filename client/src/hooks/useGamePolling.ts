@@ -1,21 +1,32 @@
-import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 
-interface UseGamePollingOptions {
+import { useQuery } from '@tanstack/react-query';
+import { CacheManager } from '@shared/utils/cache-manager';
+import type { Player, InventoryItem, StorageItem } from '@shared/types/inventory-types';
+
+interface UseGameDataOptions {
   playerId: string | null;
   enabled?: boolean;
   pollInterval?: number;
 }
 
-export function useGamePolling({ 
+interface GameData {
+  player: Player | null;
+  inventory: InventoryItem[];
+  storage: StorageItem[];
+  isLoading: boolean;
+  error: Error | null;
+  isConnected: boolean;
+}
+
+export function useGameData({ 
   playerId, 
   enabled = true, 
-  pollInterval = 2000 // 2 seconds for real-time updates
-}: UseGamePollingOptions) {
+  pollInterval = 2000 
+}: UseGameDataOptions): GameData {
 
-  // Poll player data
+  // Single player query
   const playerQuery = useQuery({
-    queryKey: [`/api/player/${playerId}`],
+    queryKey: CacheManager.KEYS.PLAYER(playerId!),
     queryFn: async () => {
       if (!playerId) return null;
       const response = await fetch(`/api/player/${playerId}`);
@@ -25,12 +36,12 @@ export function useGamePolling({
     enabled: enabled && !!playerId,
     refetchInterval: pollInterval,
     refetchIntervalInBackground: true,
-    staleTime: 1000, // Consider data stale after 1 second
+    staleTime: 1000,
   });
 
-  // Poll inventory data
+  // Single inventory query
   const inventoryQuery = useQuery({
-    queryKey: ["/api/inventory", playerId],
+    queryKey: CacheManager.KEYS.INVENTORY(playerId!),
     queryFn: async () => {
       if (!playerId) return [];
       const response = await fetch(`/api/inventory/${playerId}`);
@@ -43,9 +54,9 @@ export function useGamePolling({
     staleTime: 500,
   });
 
-  // Poll storage data
+  // Single storage query
   const storageQuery = useQuery({
-    queryKey: ["/api/storage", playerId],
+    queryKey: CacheManager.KEYS.STORAGE(playerId!),
     queryFn: async () => {
       if (!playerId) return [];
       const response = await fetch(`/api/storage/${playerId}`);
@@ -59,11 +70,14 @@ export function useGamePolling({
   });
 
   return {
-    player: playerQuery.data,
-    inventory: inventoryQuery.data,
-    storage: storageQuery.data,
+    player: playerQuery.data || null,
+    inventory: inventoryQuery.data || [],
+    storage: storageQuery.data || [],
     isLoading: playerQuery.isLoading || inventoryQuery.isLoading || storageQuery.isLoading,
     error: playerQuery.error || inventoryQuery.error || storageQuery.error,
-    isConnected: true, // Always connected with polling
+    isConnected: true,
   };
 }
+
+// Backward compatibility
+export { useGameData as useGamePolling };

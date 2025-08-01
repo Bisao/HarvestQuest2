@@ -2,9 +2,12 @@
 // Unified item management with proper type handling and inventory integration
 
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useGameData } from "@/hooks/useGamePolling";
+import { ItemFinder } from "@shared/utils/item-finder";
+import { CacheManager } from "@shared/utils/cache-manager";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -53,22 +56,14 @@ export default function EnhancedStorageTab({
   const [rarityFilter, setRarityFilter] = useState<"all" | "common" | "uncommon" | "rare" | "epic" | "legendary">("all");
   const [filtersExpanded, setFiltersExpanded] = useState(false);
 
-  // Fetch storage data with enhanced information
-  const { data: storageItems = [], isLoading } = useQuery<StorageItem[]>({
-    queryKey: ["/api/storage", playerId],
-    refetchInterval: 1000, // Real-time updates every second
-  });
+  // Initialize ItemFinder with current data
+  ItemFinder.initialize(resources, equipment);
+  
+  // Use unified game data hook
+  const { storage: storageItems = [], isLoading } = useGameData({ playerId });
 
-  // Helper function to get item data by ID
-  const getItemById = (id: string): (Resource | Equipment) | null => {
-    const resource = resources.find(r => r.id === id);
-    if (resource) return resource;
-    
-    const equipmentItem = equipment.find(e => e.id === id);
-    if (equipmentItem) return equipmentItem;
-    
-    return null;
-  };
+  // Use centralized item finder
+  const getItemById = ItemFinder.getItemById;
 
   // Enhanced storage data with item information
   const enhancedStorageData = storageItems
@@ -139,9 +134,8 @@ export default function EnhancedStorageTab({
         quantity
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
+    onSuccess: async () => {
+      await CacheManager.updateAfterMutation(playerId);
       setWithdrawDialog({ open: false, item: null, amount: 1 });
       toast({
         title: "Item retirado com sucesso!",

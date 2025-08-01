@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useGameData } from "@/hooks/useGamePolling";
+import { ItemFinder } from "@shared/utils/item-finder";
+import { CacheManager } from "@shared/utils/cache-manager";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,18 +49,15 @@ export default function EnhancedInventory({
   } | null>(null);
   const { toast } = useToast();
 
-  const { data: inventoryData = [] } = useQuery<InventoryItem[]>({
-    queryKey: ["/api/inventory", playerId],
-  });
-
-  // Helper functions to get items by ID
-  const getResourceById = (resourceId: string) => {
-    return resources.find(r => r.id === resourceId);
-  };
+  // Initialize ItemFinder with current data
+  ItemFinder.initialize(resources, equipment);
   
-  const getItemById = (itemId: string) => {
-    return resources.find(r => r.id === itemId) || equipment.find(e => e.id === itemId);
-  };
+  // Use unified game data hook
+  const { inventory: inventoryData = [] } = useGameData({ playerId });
+
+  // Use centralized item finder
+  const getResourceById = ItemFinder.getResourceById;
+  const getItemById = ItemFinder.getItemById;
 
   // Filter out water from inventory since it goes to special compartment
   const inventory = inventoryData.filter(item => {
@@ -145,10 +145,8 @@ export default function EnhancedInventory({
 
   const storeAllMutation = useMutation({
     mutationFn: () => apiRequest("POST", `/api/storage/store-all/${playerId}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
+    onSuccess: async () => {
+      await CacheManager.updateAfterMutation(playerId);
       setSelectedItem(null);
       toast({
         title: "Sucesso!",
@@ -214,15 +212,7 @@ export default function EnhancedInventory({
       return response.json();
     },
     onSuccess: async (data) => {
-      // Force immediate cache invalidation and refetch with correct keys
-      await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-      await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      await queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
-      
-      // Force immediate refetch of all player-related data
-      await queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
-      await queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
-      
+      await CacheManager.updateAfterMutation(playerId);
       setSelectedItem(null);
       toast({
         title: "Item consumido!",
