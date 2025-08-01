@@ -250,30 +250,9 @@ export class HungerThirstService {
   }
 
   /**
-   * Manual degradation for a specific player (used during expeditions)
+   * Manual degradation for a specific player - REMOVED to prevent conflicts with configured degradation mode
+   * All degradation is now handled by the configured mode system
    */
-  async degradePlayer(playerId: string, hungerDecrease: number, thirstDecrease: number): Promise<void> {
-    const player = await this.storage.getPlayer(playerId);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-
-    const newHunger = Math.max(0, player.hunger - hungerDecrease);
-    const newThirst = Math.max(0, player.thirst - thirstDecrease);
-
-    await this.storage.updatePlayer(playerId, {
-      hunger: newHunger,
-      thirst: newThirst
-    });
-
-    // Invalidate cache
-    try {
-      const { invalidatePlayerCache } = await import("../cache/memory-cache");
-      invalidatePlayerCache(playerId);
-    } catch (error) {
-      console.warn('Cache invalidation failed:', error);
-    }
-  }
 
   /**
    * Calculate penalties for low hunger/thirst status
@@ -301,29 +280,9 @@ export class HungerThirstService {
   }
 
   /**
-   * Calculate hunger/thirst degradation for offline players
+   * OFFLINE DEGRADATION REMOVED - Only configured degradation mode is used
+   * The normal passive degradation system handles all degradation consistently
    */
-  async calculateOfflineDegradation(playerId: string, lastOnlineTime: number): Promise<void> {
-    const player = await this.storage.getPlayer(playerId);
-    if (!player) return;
-
-    const offlineMinutes = Math.floor((Date.now() - lastOnlineTime) / 60000);
-    if (offlineMinutes < 1) return;
-
-    // Calculate degradation based on offline time (slower rate)
-    const offlineRate = 0.5; // 50% of normal rate when offline
-    const hungerLoss = Math.min(player.hunger, Math.floor(offlineMinutes * offlineRate));
-    const thirstLoss = Math.min(player.thirst, Math.floor(offlineMinutes * offlineRate));
-
-    if (hungerLoss > 0 || thirstLoss > 0) {
-      await this.storage.updatePlayer(playerId, {
-        hunger: Math.max(0, player.hunger - hungerLoss),
-        thirst: Math.max(0, player.thirst - thirstLoss)
-      });
-
-      console.log(`⏰ Offline degradation applied to ${player.username}: -${hungerLoss}H, -${thirstLoss}T`);
-    }
-  }
 
   /**
    * Get current status of the degradation system
@@ -331,7 +290,7 @@ export class HungerThirstService {
   getStatus(): { isRunning: boolean; intervalMs: number } {
     return {
       isRunning: this.isRunning,
-      intervalMs: 40000 // 40 seconds
+      intervalMs: 120000 // 2 minutes (120 seconds)
     };
   }
 }

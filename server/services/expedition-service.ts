@@ -108,12 +108,7 @@ export class ExpeditionService {
 
     console.log('Expedition created:', expedition);
 
-    // Deduct hunger and thirst for expedition
-    await this.storage.updatePlayer(playerId, {
-      hunger: Math.max(0, player.hunger - 15),
-      thirst: Math.max(0, player.thirst - 10)
-    });
-
+    // No longer deduct hunger/thirst on expedition start - handled by configured degradation mode
     return expedition;
   }
 
