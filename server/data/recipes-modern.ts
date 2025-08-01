@@ -218,7 +218,7 @@ export function createModernRecipeData(): InsertRecipe[] {
       id: "rec-mochila-001",
       name: "Mochila",
       emoji: "🎒",
-      category: "equipment",
+      category: "containers",
       subcategory: "storage_equipment",
       difficulty: "hard",
       requiredLevel: 5,

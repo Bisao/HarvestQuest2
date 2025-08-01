@@ -25,7 +25,7 @@ import { readFileSync, writeFileSync, existsSync } from "fs";
 import { getAllGameItems } from "./data/items-modern";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
-import { createRecipeData } from "./data/recipes";
+import { createModernRecipeData } from "./data/recipes-modern";
 import { ALL_QUESTS } from "./data/quests";
 
 export interface IStorage {
@@ -253,7 +253,7 @@ export class MemStorage implements IStorage {
     }
 
     // Initialize recipes using modular data
-    const recipesData = createRecipeData();
+    const recipesData = createModernRecipeData();
     for (const recipe of recipesData) {
       await this.createRecipe(recipe);
     }
