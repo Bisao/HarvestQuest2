@@ -27,8 +27,8 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": true,
-        "lastOnlineTime": 1754031857607,
-        "equippedFood": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23"
+        "lastOnlineTime": 1754031967570,
+        "equippedFood": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8"
       }
     ]
   ],
@@ -40,7 +40,7 @@
         "id": "2f4fac3e-f6a1-4196-b043-547f8b96b240",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 10,
+        "quantity": 0,
         "itemType": "resource"
       }
     ],
@@ -50,7 +50,7 @@
         "id": "5cc8bc04-502b-48fe-90d4-f7093fde729d",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 9,
+        "quantity": 10,
         "itemType": "resource"
       }
     ],
@@ -70,7 +70,7 @@
         "id": "0a02ac4c-3704-4197-bbc9-b798a17d2106",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 16,
+        "quantity": 13,
         "itemType": "resource"
       }
     ],
@@ -81,6 +81,16 @@
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
         "quantity": 14,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "636c5795-9108-4c1c-b77d-68ecb7a7ccc1",
+      {
+        "id": "636c5795-9108-4c1c-b77d-68ecb7a7ccc1",
+        "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
+        "resourceId": "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
+        "quantity": 2,
         "itemType": "resource"
       }
     ]
