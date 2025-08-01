@@ -293,7 +293,7 @@ export function registerEnhancedGameRoutes(
                     const currentProgressObj = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
                     const currentProgress = currentProgressObj.current || 0;
                     const required = objective.quantity || objective.amount || 1;
-                    const newProgress = Math.min(currentProgress + totalCraftedAmount, required);d);
+                    const newProgress = Math.min(currentProgress + totalCraftedAmount, required);
 
                   console.log(`[CRAFT QUEST] Quest ${quest.name} progress update: ${progressKey} from ${currentProgress} to ${newProgress} (added ${totalCraftedAmount})`);
 
