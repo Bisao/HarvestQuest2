@@ -297,7 +297,7 @@ export default function EnhancedInventory({
               {equippedItem ? (
                 <div>
                   <p className="text-sm">{equippedItem.effect}</p>
-                  <p className="text-xs text-gray-500">Peso: {equippedItem.weight}kg</p>
+                  <p className="text-xs text-gray-500">Peso: {equippedItem.weight >= 1000 ? `${(equippedItem.weight / 1000).toFixed(2)}kg` : `${equippedItem.weight.toFixed(2)}g`}</p>
                 </div>
               ) : (
                 <p className="text-sm text-gray-500">Slot vazio</p>
