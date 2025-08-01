@@ -1114,6 +1114,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get player quests with proper error handling
+  app.get("/api/player/:playerId/quests", validateParams(playerIdParamSchema), async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const quests = await storage.getPlayerQuests(playerId);
+      res.json(quests);
+    } catch (error) {
+      console.error("Error fetching player quests:", error);
+      res.status(500).json({ message: "Failed to fetch quests" });
+    }
+  });
+
+  // Crafting endpoint
+  app.post("/api/craft", async (req, res) => {
+    try {
+      const { playerId, recipeId, quantity = 1 } = req.body;
+
+      if (!playerId || !recipeId) {
+        return res.status(400).json({ message: "playerId e recipeId são obrigatórios" });
+      }
+
+      // Get player
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Jogador não encontrado" });
+      }
+
+      // Get recipe
+      const recipes = await storage.getAllRecipes();
+      const recipe = recipes.find(r => r.id === recipeId);
+      if (!recipe) {
+        return res.status(404).json({ message: "Receita não encontrada" });
+      }
+
+      // Check level requirement
+      if (player.level < recipe.requiredLevel) {
+        return res.status(400).json({ 
+          message: `Nível ${recipe.requiredLevel} necessário para craftar ${recipe.name}` 
+        });
+      }
+
+      // Get player storage
+      const storageItems = await storage.getPlayerStorage(playerId);
+
+      // Check ingredients
+      if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) {
+        return res.status(400).json({ message: "Receita sem ingredientes válidos" });
+      }
+
+      for (const ingredient of recipe.ingredients) {
+        const required = ingredient.quantity * quantity;
+        const available = storageItems.find(item => item.resourceId === ingredient.itemId)?.quantity || 0;
+
+        if (available < required) {
+          return res.status(400).json({ 
+            message: `Ingredientes insuficientes: ${ingredient.itemId} (precisa ${required}, tem ${available})` 
+          });
+        }
+      }
+
+      // Consume ingredients
+      for (const ingredient of recipe.ingredients) {
+        const required = ingredient.quantity * quantity;
+        const storageItem = storageItems.find(item => item.resourceId === ingredient.itemId);
+
+        if (storageItem) {
+          await storage.updateStorageItem(storageItem.id, {
+            quantity: storageItem.quantity - required
+          });
+        }
+      }
+
+      // Add crafted items to storage
+      if (recipe.outputs && Array.isArray(recipe.outputs)) {
+        for (const output of recipe.outputs) {
+          const totalAmount = output.quantity * quantity;
+          const existingItem = storageItems.find(item => item.resourceId === output.itemId);
+
+          if (existingItem) {
+            await storage.updateStorageItem(existingItem.id, {
+              quantity: existingItem.quantity + totalAmount
+            });
+          } else {
+            await storage.addStorageItem({
+              playerId,
+              resourceId: output.itemId,
+              quantity: totalAmount,
+              itemType: 'resource'
+            });
+          }
+        }
+      }
+
+      res.json({
+        success: true,
+        message: `${quantity}x ${recipe.name} criado com sucesso!`,
+        recipe: { id: recipe.id, name: recipe.name },
+        quantity
+      });
+
+    } catch (error) {
+      console.error("Crafting error:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Erro interno do servidor" 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // Store reference in app for use in other routes  

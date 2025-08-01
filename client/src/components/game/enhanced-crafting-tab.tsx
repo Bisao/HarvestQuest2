@@ -39,16 +39,29 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
 
   const craftMutation = useMutation({
     mutationFn: async ({ recipeId, quantity = 1 }: { recipeId: string; quantity?: number }) => {
-      const response = await fetch("/api/v2/craft", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId, recipeId, quantity: quantity || 1 }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Erro no crafting");
+      try {
+        const response = await fetch("/api/craft", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ playerId, recipeId, quantity: quantity || 1 }),
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: "Erro desconhecido no servidor" }));
+          console.error("Craft API Error:", errorData);
+          throw new Error(errorData.message || `Erro HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log("Craft Success:", result);
+        return result;
+      } catch (error) {
+        console.error("Craft Error Details:", error);
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error("Erro de conexão com o servidor");
       }
-      return response.json();
     },
     onSuccess: (response) => {
       // Handle both wrapped and direct response formats
