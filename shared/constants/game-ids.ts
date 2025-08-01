@@ -97,27 +97,27 @@ export const QUEST_IDS = {
 } as const;
 
 export const RECIPE_IDS = {
-  BARBANTE: "recipe-barbante-001",
-  MACHADO: "recipe-machado-001", 
-  PICARETA: "recipe-picareta-001",
-  FOICE: "recipe-foice-001",
-  BALDE_MADEIRA: "recipe-balde-001",
-  FACA: "recipe-faca-001",
-  VARA_PESCA: "recipe-vara-001",
-  ARCO_FLECHA: "recipe-arco-001",
-  LANCA: "recipe-lanca-001",
-  MOCHILA: "recipe-mochila-001",
-  CORDA: "recipe-corda-001",
-  ISCA_PESCA: "recipe-isca-001",
-  PANELA_BARRO: "recipe-panela-barro-001",
-  PANELA: "recipe-panela-001",
-  GARRAFA_BAMBU: "recipe-garrafa-001",
-  SUCO_FRUTAS: "recipe-suco-001",
-  COGUMELOS_ASSADOS: "recipe-cogumelos-001",
-  PEIXE_GRELHADO: "recipe-peixe-001",
-  CARNE_ASSADA: "recipe-carne-001",
-  ENSOPADO_CARNE: "recipe-ensopado-001",
-  BARRIL_IMPROVISADO: "recipe-barril-001"
+  BARBANTE: "rec-barbante-001",
+  MACHADO: "rec-machado-001", 
+  PICARETA: "rec-picareta-001",
+  FOICE: "rec-foice-001",
+  BALDE_MADEIRA: "rec-balde-madeira-001",
+  FACA: "rec-faca-001",
+  VARA_PESCA: "rec-vara-pesca-001",
+  ARCO_FLECHA: "rec-arco-flecha-001",
+  LANCA: "rec-lanca-001",
+  MOCHILA: "rec-mochila-001",
+  CORDA: "rec-corda-001",
+  ISCA_PESCA: "rec-isca-pesca-001",
+  PANELA_BARRO: "rec-panela-barro-001",
+  PANELA: "rec-panela-001",
+  GARRAFA_BAMBU: "rec-garrafa-bambu-001",
+  SUCO_FRUTAS: "rec-suco-frutas-001",
+  COGUMELOS_ASSADOS: "rec-cogumelos-assados-001",
+  PEIXE_GRELHADO: "rec-peixe-grelhado-001",
+  CARNE_ASSADA: "rec-carne-assada-001",
+  ENSOPADO_CARNE: "rec-ensopado-carne-001",
+  BARRIL_IMPROVISADO: "rec-barril-improvisado-001"
 } as const;
 
 // Helper functions for type safety

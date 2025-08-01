@@ -95,309 +95,160 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     if (resource) return resource;
 
     // Simple fallback for unknown resources
-
-      return {
-        id: resourceId,
-        name: mappedName,
-        emoji: mappedName === "Barbante" ? "🧵" : 
-               mappedName === "Fibra" ? "🌾" :
-               mappedName === "Pedras Soltas" ? "🗿" :
-               mappedName === "Gravetos" ? "🪵" : "📦"
-      };
-    }
-
-    // Final fallback
+    const mappedName = resourceId === "string" ? "Barbante" : resourceId;
+    
     return {
       id: resourceId,
-      name: resourceId === "string" ? "Barbante" : resourceId,
-      emoji: resourceId === "string" ? "🧵" : "📦"
+      name: mappedName,
+      emoji: mappedName === "Barbante" ? "🧵" : 
+             mappedName === "Fibra" ? "🌾" :
+             mappedName === "Pedras Soltas" ? "🗿" :
+             mappedName === "Gravetos" ? "🪵" : "📦"
     };
   };
 
+  // Get available quantity in storage
   const getStorageQuantity = (resourceId: string) => {
     // Check storage items for resources
     const storageItem = storageItems.find(item => item.resourceId === resourceId);
     if (storageItem) return storageItem.quantity;
 
-    // ID mapping for known inconsistencies
-    const idMappings: Record<string, string> = {
-      "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1": "Barbante",
-      "res-8bd33b18-a241-4859-ae9f-870fab5673d0": "Fibra",
-      "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": "Pedras Soltas",
-      "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": "Gravetos"
-    };
-
-    // Try to find by mapped name
-    const mappedName = idMappings[resourceId];
-    if (mappedName) {
-      const mappedResource = resources.find(r => r.name === mappedName);
-      if (mappedResource) {
-        const mappedStorageItem = storageItems.find(item => item.resourceId === mappedResource.id);
-        return mappedStorageItem?.quantity || 0;
-      }
-    }
-
-    // Equipment mappings fallback
-    const equipmentMappings: Record<string, string> = {
-      "string": "Barbante",
-      "bamboo_bottle": "Garrafa de Bambu",
-      "wooden_bucket": "Balde de Madeira",
-      "rope": "Corda"
-    };
-
-    if (equipmentMappings[resourceId]) {
-      const equipmentName = equipmentMappings[resourceId];
-      const equipmentInStorage = storageItems.find(item => {
-        const resource = resources.find(r => r.id === item.resourceId);
-        return resource?.name === equipmentName;
-      });
-      return equipmentInStorage?.quantity || 0;
+    // Check if this is actually a resource in the resources list
+    const resourceData = resources.find(r => r.id === resourceId);
+    if (resourceData) {
+      const storageMatch = storageItems.find(item => item.resourceId === resourceId);
+      return storageMatch ? storageMatch.quantity : 0;
     }
 
     return 0;
   };
 
-  // Get equipment data for ingredient resolution
-  const { data: equipment = [] } = useQuery<Equipment[]>({
-    queryKey: ["/api/equipment"],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
-
+  // Get recipe ingredients
   const getRecipeIngredients = (recipe: Recipe) => {
-    if (!recipe.ingredients || !Array.isArray(recipe.ingredients)) return [];
-
+    if (!recipe.ingredients) return [];
+    
     return recipe.ingredients.map(ingredient => {
-      // First try resources
-      const resource = resources.find(r => r.id === ingredient.itemId);
-      if (resource) {
-        const available = storageItems.find(item => item.resourceId === ingredient.itemId)?.quantity || 0;
-        return {
-          resource,
-          name: resource.name,
-          emoji: resource.emoji,
-          quantity: ingredient.quantity,
-          available,
-          hasEnough: available >= ingredient.quantity
-        };
-      }
-
-      // Then try equipment
-      const equipmentItem = equipment.find(e => e.id === ingredient.itemId);
-      if (equipmentItem) {
-        const available = storageItems.find(item => item.resourceId === ingredient.itemId)?.quantity || 0;
-        return {
-          resource: {
-            id: equipmentItem.id,
-            name: equipmentItem.name,
-            emoji: equipmentItem.emoji
-          },
-          quantity: ingredient.quantity,
-          available,
-          hasEnough: available >= ingredient.quantity
-        };
-      }
-
-      // Enhanced fallback system
-      const fallbackResource = getResourceData(ingredient.itemId);
-      const available = getStorageQuantity(ingredient.itemId);
-
-      // Direct lookup without special handling
-
+      const resourceData = getResourceData(ingredient.itemId);
+      const availableQuantity = getStorageQuantity(ingredient.itemId);
+      
       return {
-        resource: fallbackResource,
-        quantity: ingredient.quantity,
-        available,
-        hasEnough: available >= ingredient.quantity
+        ...ingredient,
+        resourceData,
+        availableQuantity,
+        hasEnough: availableQuantity >= ingredient.quantity
       };
     });
   };
 
-  const canCraftRecipe = (recipe: Recipe, quantity = 1) => {
-    if (playerLevel < recipe.requiredLevel) return false;
-
+  // Calculate max craftable quantity
+  const getMaxCraftable = (recipe: Recipe) => {
     const ingredients = getRecipeIngredients(recipe);
-    return ingredients.every(ingredient => ingredient.available >= (ingredient.quantity * quantity));
-  };
-
-  const getMaxCraftableQuantity = (recipe: Recipe) => {
-    if (playerLevel < recipe.requiredLevel) return 0;
-
-    const ingredients = getRecipeIngredients(recipe);
-    const maxQuantities = ingredients.map(ingredient => 
-      Math.floor(ingredient.available / ingredient.quantity)
+    if (ingredients.length === 0) return 0;
+    
+    return Math.min(
+      ...ingredients.map(ing => Math.floor(ing.availableQuantity / ing.quantity))
     );
-    return Math.min(...maxQuantities, 99); // Cap at 99 for UI reasons
   };
 
-  const isRecipeUnlocked = (recipe: Recipe) => {
-    return playerLevel >= recipe.requiredLevel;
+  // Check if recipe can be crafted
+  const canCraftRecipe = (recipe: Recipe) => {
+    if (playerLevel < recipe.requiredLevel) return false;
+    return getMaxCraftable(recipe) > 0;
   };
 
+  // Handle craft action
   const handleCraft = (recipe: Recipe) => {
+    if (isBlocked || !canCraftRecipe(recipe) || craftMutation.isPending) return;
+    
     const quantity = craftQuantities[recipe.id] || 1;
-    if (!canCraftRecipe(recipe, quantity)) return;
     craftMutation.mutate({ recipeId: recipe.id, quantity });
   };
 
-  const updateCraftQuantity = (recipeId: string, quantity: number) => {
-    setCraftQuantities(prev => ({ ...prev, [recipeId]: Math.max(1, quantity) }));
-  };
+  // Categorize recipes
+  const categorizedRecipes = recipes.reduce((acc, recipe) => {
+    let category = "Materiais";
+    
+    if (recipe.category === "tools") category = "Ferramentas";
+    else if (recipe.category === "weapons") category = "Armas";
+    else if (recipe.category === "armor") category = "Equipamentos";
+    else if (recipe.category === "consumables") category = "Comidas";
+    else if (recipe.subcategory?.includes("cooking") || recipe.subcategory?.includes("container")) category = "Utensílios";
+    
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(recipe);
+    
+    return acc;
+  }, {} as Record<string, Recipe[]>);
 
-  const getCraftQuantity = (recipeId: string) => {
-    return craftQuantities[recipeId] || 1;
-  };
-
-  const toggleCategory = (category: string) => {
-    // Only show one category at a time (tab behavior)
-    setExpandedCategories(prev => {
-      const newState: Record<string, boolean> = {};
-      Object.keys(prev).forEach(key => {
-        newState[key] = key === category;
-      });
-      return newState;
-    });
-  };
-
-  const categorizeRecipes = (recipes: Recipe[]) => {
-    const categories: Record<string, Recipe[]> = {
-      "Materiais": [],
-      "Ferramentas": [],
-      "Armas": [],
-      "Equipamentos": [],
-      "Utensílios": [],
-      "Comidas": []
-    };
-
-    recipes.forEach(recipe => {
-      const name = recipe.name.toLowerCase();
-
-      // Materiais básicos
-      if (name.includes("barbante") || name.includes("corda") || name.includes("isca")) {
-        categories["Materiais"].push(recipe);
-      }
-      // Ferramentas de trabalho
-      else if (name.includes("machado") || name.includes("picareta") || name.includes("foice") || name.includes("balde") || name.includes("vara")) {
-        categories["Ferramentas"].push(recipe);
-      }
-      // Equipamentos de proteção e acessórios
-      else if (name.includes("mochila") || name.includes("capacete") || name.includes("armadura") || name.includes("escudo")) {
-        categories["Equipamentos"].push(recipe);
-      }
-      // Armas
-      else if (name.includes("arco") || name.includes("lança") || name.includes("faca")) {
-        categories["Armas"].push(recipe);
-      }
-      // Utensílios (cozinha e outros)
-      else if (name.includes("panela") || name.includes("garrafa")) {
-        categories["Utensílios"].push(recipe);
-      }
-      // Comidas e bebidas
-      else if (name.includes("suco") || name.includes("assados") || name.includes("grelhado") || name.includes("assada") || name.includes("ensopado")) {
-        categories["Comidas"].push(recipe);
-      }
-      // Fallback para materiais
-      else {
-        categories["Materiais"].push(recipe);
-      }
-    });
-
-    return categories;
-  };
-
-  const categorizedRecipes = categorizeRecipes(recipes);
-
+  // Render recipe card
   const renderRecipeCard = (recipe: Recipe) => {
     const ingredients = getRecipeIngredients(recipe);
-    const unlocked = isRecipeUnlocked(recipe);
-    const maxQuantity = getMaxCraftableQuantity(recipe);
-    const currentQuantity = getCraftQuantity(recipe.id);
-    const canCraft = canCraftRecipe(recipe, currentQuantity);
+    const maxCraftable = getMaxCraftable(recipe);
+    const canCraft = canCraftRecipe(recipe);
+    const currentQuantity = craftQuantities[recipe.id] || 1;
 
     return (
       <div
         key={recipe.id}
-        className={`recipe-card bg-white border-2 rounded-xl p-3 sm:p-6 hover:shadow-lg transition-all ${
+        className={`p-4 border-2 rounded-lg transition-all duration-200 ${
           canCraft 
-            ? "border-green-200 hover:border-green-300" 
-            : unlocked 
-            ? "border-gray-200" 
-            : "border-gray-300 opacity-60"
+            ? "border-green-200 bg-green-50 hover:bg-green-100" 
+            : "border-gray-200 bg-gray-50"
         }`}
       >
-        <div className="text-center mb-4">
-          <div className={`text-5xl mb-2 ${!unlocked ? "grayscale" : ""}`}>
-            {recipe.emoji}
-          </div>
-          <h4 className={`text-lg font-bold ${unlocked ? "text-gray-800" : "text-gray-600"}`}>
-            {recipe.name}
-          </h4>
-          <div className="flex items-center justify-center space-x-2 mt-1">
-            {!unlocked && (
-              <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
-                🔒 Nível {recipe.requiredLevel}
-              </span>
-            )}
-            {unlocked && canCraft && (
-              <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
-                ✅ Disponível
-              </span>
-            )}
-            {unlocked && !canCraft && (
-              <span className="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded">
-                ⚠️ Recursos insuficientes
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-2 mb-4">
-          <h5 className="text-sm font-semibold text-gray-700">Ingredientes:</h5>
-          {ingredients.map(({ resource, quantity, available, hasEnough }) => (
-            resource && (
-              <div
-                key={resource.id}
-                className={`flex items-center justify-between text-sm ${
-                  available >= (quantity * currentQuantity) ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                <span className="flex items-center space-x-1">
-                  <span>{resource.emoji}</span>
-                  <span>{resource.name}</span>
-                </span>
-                <span className="font-semibold">
-                  {available}/{quantity * currentQuantity}
-                </span>
-              </div>
-            )
-          ))}
-        </div>
-
-        {/* Quantity Slider */}
-        {unlocked && maxQuantity > 1 && (
-          <div className="mb-4">
-            <Label className="text-sm font-semibold text-gray-700 mb-2 block">
-              Quantidade: {currentQuantity} (Máx: {maxQuantity})
-            </Label>
-            <div className="px-2">
-              <Slider
-                value={[currentQuantity]}
-                onValueChange={(value) => updateCraftQuantity(recipe.id, value[0])}
-                max={maxQuantity}
-                min={1}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>1</span>
-                <span>{maxQuantity}</span>
-              </div>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">{recipe.emoji || "🔨"}</span>
+            <div>
+              <h4 className="font-semibold text-gray-800">{recipe.name}</h4>
+              <p className="text-xs text-gray-500">Nível {recipe.requiredLevel}</p>
             </div>
+          </div>
+          {playerLevel < recipe.requiredLevel && (
+            <span className="text-xs text-red-500 font-medium">Nível insuficiente</span>
+          )}
+        </div>
+
+        {/* Ingredients */}
+        <div className="mb-4">
+          <h5 className="text-sm font-medium text-gray-700 mb-2">Ingredientes:</h5>
+          <div className="space-y-1">
+            {ingredients.map((ingredient, idx) => (
+              <div key={idx} className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <span>{ingredient.resourceData.emoji}</span>
+                  <span>{ingredient.resourceData.name}</span>
+                </div>
+                <span className={`font-medium ${
+                  ingredient.hasEnough ? "text-green-600" : "text-red-500"
+                }`}>
+                  {ingredient.availableQuantity}/{ingredient.quantity}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quantity selector and craft button */}
+        {canCraft && maxCraftable > 1 && (
+          <div className="mb-3">
+            <Label className="text-sm">Quantidade: {currentQuantity}</Label>
+            <Slider
+              value={[currentQuantity]}
+              onValueChange={([value]) => {
+                setCraftQuantities(prev => ({ ...prev, [recipe.id]: value }));
+              }}
+              max={maxCraftable}
+              min={1}
+              step={1}
+              className="mt-2"
+            />
           </div>
         )}
 
         <Button
           onClick={() => handleCraft(recipe)}
-          disabled={!canCraft || craftMutation.isPending || isBlocked || maxQuantity === 0}
+          disabled={!canCraft || isBlocked || craftMutation.isPending}
           className={`w-full ${
             canCraft 
               ? "bg-green-600 hover:bg-green-700 text-white" 
@@ -405,8 +256,8 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
           }`}
         >
           {craftMutation.isPending ? "Craftando..." : 
-           isBlocked ? "🚫 Bloqueado" : 
-           canCraft ? `🔨 Craftar ${currentQuantity}x` : "Indisponível"}
+           !canCraft ? "Não pode craftar" : 
+           `Craftar ${currentQuantity > 1 ? `(${currentQuantity}x)` : ""}`}
         </Button>
       </div>
     );
@@ -427,21 +278,24 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
           {Object.entries(categorizedRecipes).map(([categoryName, categoryRecipes]) => {
             if (categoryRecipes.length === 0) return null;
 
-            const isActive = expandedCategories[categoryName];
-
             return (
               <button
                 key={categoryName}
-                onClick={() => toggleCategory(categoryName)}
-                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 sm:py-3 rounded-t-lg font-medium transition-all whitespace-nowrap flex-shrink-0 text-xs sm:text-sm ${
-                  isActive 
-                    ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
-                    : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
+                onClick={() => {
+                  setExpandedCategories(prev => ({
+                    ...prev,
+                    [categoryName]: !prev[categoryName]
+                  }));
+                }}
+                className={`px-3 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap flex items-center gap-2 transition-colors ${
+                  expandedCategories[categoryName]
+                    ? "bg-blue-100 text-blue-700 border-b-2 border-blue-500"
+                    : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
                 }`}
               >
-                <span className="text-sm sm:text-lg">
+                <span>
                   {categoryName === "Materiais" && "🧵"}
-                  {categoryName === "Ferramentas" && "🔧"}
+                  {categoryName === "Ferramentas" && "🔨"}
                   {categoryName === "Armas" && "⚔️"}
                   {categoryName === "Utensílios" && "🍳"}
                   {categoryName === "Comidas" && "🍽️"}

@@ -88,7 +88,7 @@ export function validateRecipeIngredients(recipes: any[]): {
   return {
     isValid: errors.length === 0,
     errors,
-    invalidIds: [...new Set(invalidIds)] // Remove duplicates
+    invalidIds: Array.from(new Set(invalidIds)) // Remove duplicates
   };
 }
 
@@ -124,6 +124,7 @@ export function validateGameDataConsistency(): {
   };
 }
 
+/**
  * Standardizes item references across all systems
  */
 export function standardizeItemReference(
