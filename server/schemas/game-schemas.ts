@@ -3,7 +3,9 @@ import { z } from "zod";
 // Player schemas
 export const updatePlayerSettingsSchema = z.object({
   autoStorage: z.boolean().optional(),
-  craftedItemsDestination: z.enum(['inventory', 'storage']).optional()
+  autoCompleteQuests: z.boolean().optional(),
+  craftedItemsDestination: z.enum(['inventory', 'storage']).optional(),
+  hungerDegradationMode: z.enum(['automatic', 'slow', 'normal', 'fast', 'disabled']).optional()
 });
 
 export const consumeItemSchema = z.object({

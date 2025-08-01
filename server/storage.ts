@@ -304,6 +304,7 @@ export class MemStorage implements IStorage {
       maxInventoryWeight: insertPlayer.maxInventoryWeight ?? 50000,
       autoStorage: insertPlayer.autoStorage ?? false,
       craftedItemsDestination: insertPlayer.craftedItemsDestination ?? 'storage',
+      hungerDegradationMode: insertPlayer.hungerDegradationMode ?? 'automatic',
       waterStorage: insertPlayer.waterStorage ?? 0,
       maxWaterStorage: insertPlayer.maxWaterStorage ?? 500,
       waterTanks: insertPlayer.waterTanks ?? 0,

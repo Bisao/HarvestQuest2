@@ -9,12 +9,15 @@ export interface Player {
   maxHunger: number;
   thirst: number;
   maxThirst: number;
+  health?: number;
   coins: number;
   inventoryWeight: number;
   maxInventoryWeight: number;
   autoStorage: boolean;
   autoCompleteQuests?: boolean;
   craftedItemsDestination: 'inventory' | 'storage';
+  hungerDegradationMode: HungerDegradationMode;
+  onExpedition?: boolean;
   waterStorage: number;
   maxWaterStorage: number;
   waterTanks: number; // Number of unlocked water tanks
@@ -34,12 +37,15 @@ export interface InsertPlayer {
   maxHunger?: number;
   thirst?: number;
   maxThirst?: number;
+  health?: number;
   coins?: number;
   inventoryWeight?: number;
   maxInventoryWeight?: number;
   autoStorage?: boolean;
   autoCompleteQuests?: boolean;
   craftedItemsDestination?: 'inventory' | 'storage';
+  hungerDegradationMode?: HungerDegradationMode;
+  onExpedition?: boolean;
   waterStorage?: number;
   maxWaterStorage?: number;
   waterTanks?: number;
@@ -119,6 +125,14 @@ export type RarityLevel =
   | 'rare'        // Blue - 2.0x value
   | 'epic'        // Purple - 3.0x value
   | 'legendary';  // Orange - 5.0x value
+
+// Hunger degradation modes
+export type HungerDegradationMode = 
+  | 'automatic'   // Default - dynamic based on player activities
+  | 'slow'        // 50% slower degradation
+  | 'normal'      // Standard fixed rate
+  | 'fast'        // 50% faster degradation
+  | 'disabled';   // No degradation
 
 // Equipment system types
 export type EquipmentCategory = 

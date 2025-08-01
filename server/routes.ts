@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { WebSocketService } from "./websocket-service";
 import { insertExpeditionSchema, updatePlayerSchema } from "@shared/types";
 import { z } from "zod";
-import type { Player } from "@shared/types";
+import type { Player, HungerDegradationMode } from "@shared/types";
 import { GameService } from "./services/game-service";
 import { ExpeditionService } from "./services/expedition-service";
 import { QuestService } from "./services/quest-service";
@@ -130,7 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/player/:playerId/settings", async (req, res) => {
     try {
       const { playerId } = req.params;
-      const { autoStorage, craftedItemsDestination } = req.body;
+      const { autoStorage, autoCompleteQuests, craftedItemsDestination, hungerDegradationMode } = req.body;
 
       const player = await storage.getPlayer(playerId);
       if (!player) {
@@ -141,10 +141,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (typeof autoStorage === 'boolean') {
         updates.autoStorage = autoStorage;
       }
+      if (typeof autoCompleteQuests === 'boolean') {
+        updates.autoCompleteQuests = autoCompleteQuests;
+      }
+      if (typeof craftedItemsDestination === 'string') {
+        updates.craftedItemsDestination = craftedItemsDestination as 'inventory' | 'storage';
+      }
+      if (typeof hungerDegradationMode === 'string') {
+        updates.hungerDegradationMode = hungerDegradationMode as HungerDegradationMode;
+      }
 
       const updatedPlayer = await storage.updatePlayer(playerId, updates);
+      
+      // Invalidate cache to ensure frontend gets updated data
+      try {
+        const { invalidatePlayerCache } = await import("./cache/memory-cache");
+        invalidatePlayerCache(playerId);
+      } catch (error) {
+        console.warn('Cache invalidation failed:', error);
+      }
+      
       res.json(updatedPlayer);
     } catch (error) {
+      console.error('Update player settings error:', error);
       res.status(500).json({ message: "Failed to update player settings" });
     }
   });

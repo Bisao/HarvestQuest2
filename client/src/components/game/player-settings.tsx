@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useSaveGame } from "@/hooks/use-save-game";
-import type { Player } from "@shared/types";
+import type { Player, HungerDegradationMode } from "@shared/types";
 import { Settings, Archive, Home } from "lucide-react";
 import LoadingScreen from "./loading-screen";
 
@@ -22,12 +22,13 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
   const [, setLocation] = useLocation();
   const [autoStorage, setAutoStorage] = useState(player.autoStorage);
   const [autoCompleteQuests, setAutoCompleteQuests] = useState(player.autoCompleteQuests ?? true);
+  const [hungerDegradationMode, setHungerDegradationMode] = useState(player.hungerDegradationMode || 'automatic');
   const [isNavigatingToMenu, setIsNavigatingToMenu] = useState(false);
   
   const saveGame = useSaveGame();
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async (settings: { autoStorage?: boolean; autoCompleteQuests?: boolean }) => {
+    mutationFn: async (settings: { autoStorage?: boolean; autoCompleteQuests?: boolean; hungerDegradationMode?: HungerDegradationMode }) => {
       const response = await fetch(`/api/player/${player.id}/settings`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -60,6 +61,7 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
     updateSettingsMutation.mutate({
       autoStorage,
       autoCompleteQuests,
+      hungerDegradationMode,
     });
   };
 
@@ -129,6 +131,28 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
             />
           </div>
 
+          {/* Hunger Degradation Mode Setting */}
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3 mb-3">
+              <span className="text-lg">🍖</span>
+              <div>
+                <p className="font-medium text-gray-800">Modo de Degradação de Fome/Sede</p>
+                <p className="text-sm text-gray-600">Controla a velocidade de perda de fome e sede (tempo alterado para 2 minutos)</p>
+              </div>
+            </div>
+            <Select value={hungerDegradationMode} onValueChange={(value: HungerDegradationMode) => setHungerDegradationMode(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="automatic">🤖 Automático (baseado em atividades)</SelectItem>
+                <SelectItem value="slow">🐌 Lento (50% mais devagar)</SelectItem>
+                <SelectItem value="normal">⚖️ Normal (taxa padrão)</SelectItem>
+                <SelectItem value="fast">⚡ Rápido (50% mais rápido)</SelectItem>
+                <SelectItem value="disabled">🚫 Desabilitado (sem degradação)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
         </div>
 

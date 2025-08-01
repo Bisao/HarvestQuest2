@@ -1,5 +1,6 @@
 // Hunger and Thirst Degradation Service for Coletor Adventures
 import type { IStorage } from "../storage";
+import type { HungerDegradationMode } from "@shared/types";
 
 export class HungerThirstService {
   private degradationTimer: NodeJS.Timeout | null = null;
@@ -20,10 +21,10 @@ export class HungerThirstService {
     this.isRunning = true;
     console.log('🍖💧 Starting passive hunger/thirst degradation system');
 
-    // Degrade every 40 seconds (40,000ms)
+    // Degrade every 2 minutes (120,000ms)
     this.degradationTimer = setInterval(async () => {
       await this.degradeAllPlayers();
-    }, 40000); // 40 seconds
+    }, 120000); // 2 minutes
   }
 
   /**
@@ -51,8 +52,8 @@ export class HungerThirstService {
           continue;
         }
 
-        // Dynamic degradation rates based on player status and activities
-        const baseDegradation = this.calculateDynamicDegradation(player);
+        // Calculate degradation based on player's selected mode
+        const baseDegradation = this.calculateDegradationByMode(player);
         const hungerDecrease = Math.min(baseDegradation.hunger, player.hunger); 
         const thirstDecrease = Math.min(baseDegradation.thirst, player.thirst);
 
@@ -85,7 +86,7 @@ export class HungerThirstService {
           };
 
           // Apply penalties if any
-          if (penalties.healthPenalty > 0) {
+          if (penalties.healthPenalty > 0 && player.health !== undefined) {
             const newHealth = Math.max(1, player.health - penalties.healthPenalty);
             updateData.health = newHealth;
             console.log(`🩺 Player ${player.id} lost ${penalties.healthPenalty} health due to low hunger/thirst`);
@@ -144,7 +145,46 @@ export class HungerThirstService {
   }
 
   /**
-   * Calculate dynamic degradation rates based on player status
+   * Calculate degradation rates based on player's selected mode
+   */
+  private calculateDegradationByMode(player: any): { hunger: number; thirst: number } {
+    const mode: HungerDegradationMode = player.hungerDegradationMode || 'automatic';
+    
+    // Disabled mode - no degradation
+    if (mode === 'disabled') {
+      return { hunger: 0, thirst: 0 };
+    }
+    
+    let hungerRate = 1; // Base rate
+    let thirstRate = 1; // Base rate
+    
+    // Apply mode-specific multipliers
+    switch (mode) {
+      case 'slow':
+        hungerRate *= 0.5; // 50% slower
+        thirstRate *= 0.5;
+        break;
+      case 'normal':
+        // Standard fixed rate - no multiplier needed
+        break;
+      case 'fast':
+        hungerRate *= 1.5; // 50% faster
+        thirstRate *= 1.5;
+        break;
+      case 'automatic':
+      default:
+        // Use dynamic calculation for automatic mode
+        return this.calculateDynamicDegradation(player);
+    }
+    
+    return {
+      hunger: Math.ceil(hungerRate),
+      thirst: Math.ceil(thirstRate)
+    };
+  }
+
+  /**
+   * Calculate dynamic degradation rates based on player status (for automatic mode)
    */
   private calculateDynamicDegradation(player: any): { hunger: number; thirst: number } {
     let hungerRate = 1; // Base rate
