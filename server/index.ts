@@ -4,7 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { corsMiddleware, securityHeaders } from "./middleware/cors";
 import { errorHandler, requestLogger } from "./middleware/error-handler";
 import { rateLimit } from "./middleware/auth";
-import { WebSocketService } from "./services/websocket"; // Assuming the path
+import { WebSocketService } from "./websocket-service";
 
 const app = express();
 
