@@ -6,15 +6,15 @@
         "id": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "username": "oChaps",
         "level": 2,
-        "experience": 123,
+        "experience": 137,
         "hunger": 94,
         "maxHunger": 100,
         "thirst": 92,
         "maxThirst": 100,
         "coins": 180,
-        "inventoryWeight": 6380,
+        "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
-        "autoStorage": false,
+        "autoStorage": true,
         "craftedItemsDestination": "storage",
         "hungerDegradationMode": "automatic",
         "waterStorage": 0,
@@ -29,57 +29,11 @@
         "equippedFood": null,
         "equippedDrink": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754069849087
+        "lastOnlineTime": 1754070000101
       }
     ]
   ],
-  "inventoryItems": [
-    [
-      "8fe067b7-3e47-40ad-ba7c-abe1ce801577",
-      {
-        "id": "8fe067b7-3e47-40ad-ba7c-abe1ce801577",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 6
-      }
-    ],
-    [
-      "2b69282a-c930-415a-a880-316365af6136",
-      {
-        "id": "2b69282a-c930-415a-a880-316365af6136",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 10
-      }
-    ],
-    [
-      "a36ab88b-2232-45d5-aa47-a7fda07b65f3",
-      {
-        "id": "a36ab88b-2232-45d5-aa47-a7fda07b65f3",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 9
-      }
-    ],
-    [
-      "cd8fdd55-8020-4717-9f0e-8e1cc597845c",
-      {
-        "id": "cd8fdd55-8020-4717-9f0e-8e1cc597845c",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 8
-      }
-    ],
-    [
-      "67771c91-5bcf-44e2-9964-98bfd29ff238",
-      {
-        "id": "67771c91-5bcf-44e2-9964-98bfd29ff238",
-        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
-        "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 9
-      }
-    ]
-  ],
+  "inventoryItems": [],
   "storageItems": [
     [
       "8512da2b-adaf-4411-b3bb-9688ad89a4a0",
@@ -97,7 +51,7 @@
         "id": "dd97e126-8f09-41e5-81f7-e427cc7e0b7c",
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 4,
+        "quantity": 9,
         "itemType": "resource"
       }
     ],
@@ -107,7 +61,7 @@
         "id": "3b30927e-545d-4ecc-aa54-e3c1c1daa26e",
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 12,
+        "quantity": 24,
         "itemType": "resource"
       }
     ],
@@ -117,7 +71,27 @@
         "id": "73b00b2a-5f83-4453-88f9-02111e286a9d",
         "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 6,
+        "quantity": 17,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "2fa33f80-bbda-404f-8dc8-c1a00d095a76",
+      {
+        "id": "2fa33f80-bbda-404f-8dc8-c1a00d095a76",
+        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
+        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+        "quantity": 7,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "e95e3fd1-7f7a-4f98-b1ec-a499865d606b",
+      {
+        "id": "e95e3fd1-7f7a-4f98-b1ec-a499865d606b",
+        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
+        "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+        "quantity": 10,
         "itemType": "resource"
       }
     ]
@@ -201,6 +175,33 @@
         },
         "startTime": 1754069859481,
         "endTime": 1754069925,
+        "progress": 100
+      }
+    ],
+    [
+      "e6f7d15a-75c5-42f2-9e34-dbedd12fe006",
+      {
+        "id": "e6f7d15a-75c5-42f2-9e34-dbedd12fe006",
+        "playerId": "ae325087-b0f0-4c73-8732-31996e424b8d",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "completed",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 5,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 3,
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 3,
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 1,
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 1
+        },
+        "startTime": 1754070007344,
+        "endTime": 1754070072,
         "progress": 100
       }
     ]
