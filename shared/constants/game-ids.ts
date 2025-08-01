@@ -1,4 +1,3 @@
-
 // ⭐ ARQUIVO CENTRAL DE IDs - AGORA COM UUIDs PADRONIZADOS ⭐
 // Este é o ÚNICO local onde IDs devem ser definidos no projeto
 // TODOS os IDs agora são UUIDs v4 para garantir unicidade global
@@ -233,7 +232,7 @@ export const RESOURCE_IDS = {
 
   // === PLANTAS E VEGETAIS SELVAGENS ===
   COGUMELOS: "res-d0e1f2a3-b4c5-4678-def0-123456789018",
-  COGUMELOS_SHITAKE: "res-e1f2a3b4-c5d6-4789-efa1-234567890129",
+  COGUMELOS_SHIITAKE: "res-e1f2a3b4-c5d6-4789-efa1-234567890129",
   COGUMELOS_OSTRA: "res-f2a3b4c5-d6e7-4890-fab2-345678901240",
   FRUTAS_SILVESTRES: "res-a3b4c5d6-e7f8-4901-abc3-456789012351",
   AMORAS: "res-b4c5d6e7-f8a9-4012-bcd4-567890123462",
@@ -421,7 +420,7 @@ export const EQUIPMENT_IDS = {
 
   // === UTENSÍLIOS DE COZINHA ===
   PANELA_FERRO: "eq-b8c9d0e1-f2a3-4456-bcd8-901234567893",
-  FRIGIDEIRA: "eq-c9d0e1f2-a3b4-4567-cde9-012345678904",
+  FRIGIDEIRA: "eq-c9d0e1f2-a3b4-4567-cde9-012345678904",<previous_generation>
   CALDEIRAO: "eq-d0e1f2a3-b4c5-4678-def0-123456789015",
   ESPETO: "eq-e1f2a3b4-c5d6-4789-efa1-234567890126",
   GRELHA: "eq-f2a3b4c5-d6e7-4890-fab2-345678901237",
