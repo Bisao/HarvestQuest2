@@ -4,7 +4,7 @@ import type { IStorage } from "../storage";
 export class HungerThirstService {
   private degradationTimer: NodeJS.Timeout | null = null;
   private isRunning = false;
-  
+
   constructor(private storage: IStorage) {}
 
   /**
@@ -44,7 +44,7 @@ export class HungerThirstService {
   private async degradeAllPlayers(): Promise<void> {
     try {
       const players = await this.storage.getAllPlayers();
-      
+
       for (const player of players) {
         // Skip if player has very low hunger/thirst to avoid going negative
         if (player.hunger <= 2 && player.thirst <= 2) {
@@ -62,7 +62,7 @@ export class HungerThirstService {
         // Natural regeneration when player is resting (not on expedition)
         let naturalHungerRegen = 0;
         let naturalThirstRegen = 0;
-        
+
         if (!player.onExpedition && player.hunger > 80 && player.thirst > 80) {
           // Slight natural regeneration when well-fed and hydrated
           if (Math.random() < 0.2) { // 20% chance
@@ -78,7 +78,7 @@ export class HungerThirstService {
         if (finalHunger !== player.hunger || finalThirst !== player.thirst) {
           // Calculate penalties for low hunger/thirst
           const penalties = this.calculateStatusPenalties(newHunger, newThirst);
-          
+
           const updateData: any = {
             hunger: newHunger,
             thirst: newThirst
@@ -109,7 +109,7 @@ export class HungerThirstService {
               const message = newHunger <= EMERGENCY_THRESHOLD 
                 ? "⚠️ EMERGÊNCIA: Sua fome está criticamente baixa! Coma algo imediatamente!"
                 : "⚠️ EMERGÊNCIA: Sua sede está criticamente baixa! Beba água imediatamente!";
-              
+
               broadcastToPlayer(player.id, {
                 type: 'notification',
                 level: 'emergency',
@@ -127,7 +127,7 @@ export class HungerThirstService {
                 const message = newHunger <= CRITICAL_THRESHOLD 
                   ? "⚠️ Sua fome está baixa. Considere consumir alimentos."
                   : "⚠️ Sua sede está baixa. Considere beber água.";
-                
+
                 broadcastToPlayer(player.id, {
                   type: 'notification',
                   level: 'warning',
@@ -206,7 +206,7 @@ export class HungerThirstService {
     // Environmental factors
     const currentTime = new Date();
     const hour = currentTime.getHours();
-    
+
     // Night time increases degradation slightly
     if (hour >= 22 || hour <= 6) {
       hungerRate *= 1.1;
@@ -248,30 +248,6 @@ export class HungerThirstService {
       console.warn('Cache invalidation failed:', error);
     }
   }
-
-  /**
-   * Calculate penalties for low hunger/thirst status
-   */
-  private calculateStatusPenalties(hunger: number, thirst: number): {
-    healthPenalty: number;
-    experiencePenalty: number;
-  } {
-    let healthPenalty = 0;
-    let experiencePenalty = 0;
-
-    // Severe penalties for critical status
-    if (hunger <= 0 || thirst <= 0) {
-      healthPenalty = 5; // Lose 5 health when completely starved/dehydrated
-      experiencePenalty = 0.5; // 50% XP penalty
-    } else if (hunger <= 5 || thirst <= 5) {
-      healthPenalty = 2; // Lose 2 health when very low
-      experiencePenalty = 0.25; // 25% XP penalty
-    } else if (hunger <= 10 || thirst <= 10) {
-      healthPenalty = 1; // Lose 1 health when low
-      experiencePenalty = 0.1; // 10% XP penalty
-    }
-
-
 
   /**
    * Calculate penalties for low hunger/thirst status
