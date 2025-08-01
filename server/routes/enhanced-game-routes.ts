@@ -295,18 +295,19 @@ export function registerEnhancedGameRoutes(
                     const required = objective.quantity || objective.amount || 1;
                     const newProgress = Math.min(currentProgress + totalCraftedAmount, required);
 
-                  console.log(`[CRAFT QUEST] Quest ${quest.name} progress update: ${progressKey} from ${currentProgress} to ${newProgress} (added ${totalCraftedAmount})`);
+                    console.log(`[CRAFT QUEST] Quest ${quest.name} progress update: ${progressKey} from ${currentProgress} to ${newProgress} (added ${totalCraftedAmount})`);
 
-                  await storage.updatePlayerQuest(playerQuest.id, {
-                    progress: {
-                      ...(playerQuest.progress as any || {}),
-                      [progressKey]: {
-                        current: newProgress,
-                        required: required,
-                        completed: newProgress >= required
+                    await storage.updatePlayerQuest(playerQuest.id, {
+                      progress: {
+                        ...(playerQuest.progress as any || {}),
+                        [progressKey]: {
+                          current: newProgress,
+                          required: required,
+                          completed: newProgress >= required
+                        }
                       }
-                    }
-                  });
+                    });
+                  }
                 }
               }
             }
