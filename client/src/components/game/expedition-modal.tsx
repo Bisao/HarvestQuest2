@@ -185,7 +185,8 @@ export default function ExpeditionModal({
         body: JSON.stringify(expeditionData),
       });
       if (!response.ok) {
-        throw new Error('Failed to start expedition');
+        const errorData = await response.json().catch(() => ({ message: 'Failed to start expedition' }));
+        throw new Error(errorData.message || 'Failed to start expedition');
       }
       return response.json();
     },

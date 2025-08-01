@@ -7,9 +7,9 @@
         "username": "Bison",
         "level": 1,
         "experience": 81,
-        "hunger": 80,
+        "hunger": 78,
         "maxHunger": 100,
-        "thirst": 70,
+        "thirst": 68,
         "maxThirst": 100,
         "coins": 100,
         "inventoryWeight": 0,
@@ -129,7 +129,7 @@
         "id": "f8c33dac-099d-4552-b2f2-a2b09bfd9a06",
         "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
         "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
-        "status": "in_progress",
+        "status": "cancelled",
         "selectedResources": [
           "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
           "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
@@ -140,6 +140,23 @@
         "selectedEquipment": [],
         "collectedResources": {},
         "startTime": 1754031751758,
+        "endTime": 1754033508,
+        "progress": 0
+      }
+    ],
+    [
+      "6397417a-88b9-44c4-9b04-68e785ad86e4",
+      {
+        "id": "6397417a-88b9-44c4-9b04-68e785ad86e4",
+        "playerId": "875f56c7-a9aa-4fcd-a640-bb9f96afb50b",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "in_progress",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {},
+        "startTime": 1754033521457,
         "endTime": null,
         "progress": 0
       }

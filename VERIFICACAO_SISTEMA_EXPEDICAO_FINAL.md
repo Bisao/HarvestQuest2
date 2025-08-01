@@ -4,10 +4,22 @@
 
 ## Status: ✅ SISTEMA FUNCIONANDO CORRETAMENTE
 
-### ⚠️ ERRO CORRIGIDO: Endpoint de expedições adicionado
-- Problema: GET /api/player/:playerId/expeditions não estava definido
-- Solução: Adicionado endpoint para buscar expedições do jogador
-- Status: ✅ Corrigido e funcionando
+### ✅ ERROS CORRIGIDOS:
+
+1. **Endpoint de expedições adicionado**
+   - Problema: GET /api/player/:playerId/expeditions não estava definido
+   - Solução: Adicionado endpoint para buscar expedições do jogador
+   - Status: ✅ Corrigido e funcionando
+
+2. **Limpeza de expedições ativas**
+   - Problema: Expedição fantasma bloqueando criação de novas
+   - Solução: Sistema de cancelamento funcionando via DELETE endpoint  
+   - Status: ✅ Corrigido e funcionando
+
+3. **Mensagens de erro melhoradas**
+   - Problema: Frontend não mostrava detalhes específicos dos erros
+   - Solução: Tratamento melhorado para exibir mensagens do servidor
+   - Status: ✅ Implementado
 
 ### Componentes Verificados e Status
 
