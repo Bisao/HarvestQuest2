@@ -132,7 +132,7 @@ export default function Game() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       markOnline();
     };
-  }, [player?.id, markOnlineMutation]);
+  }, [player?.id]);
 
   const { data: biomes = [] } = useQuery<Biome[]>({
     queryKey: ["/api/biomes"],
