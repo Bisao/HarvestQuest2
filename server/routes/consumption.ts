@@ -137,26 +137,7 @@ export function createConsumptionRoutes(storage: IStorage): Router {
         console.warn('Cache invalidation failed:', error);
       }
 
-      // Broadcast real-time update via WebSocket
-      try {
-        const { broadcastPlayerUpdate, broadcastInventoryUpdate, broadcastStorageUpdate } = await import("../websocket-service");
-
-        // Always broadcast player update with latest data
-        broadcastPlayerUpdate(playerId, updatedPlayer);
-
-        // Broadcast inventory/storage updates based on location
-        if (location === 'inventory') {
-          const updatedInventory = await storage.getPlayerInventory(playerId);
-          broadcastInventoryUpdate(playerId, updatedInventory);
-        } else if (location === 'storage') {
-          const updatedStorage = await storage.getPlayerStorage(playerId);
-          broadcastStorageUpdate(playerId, updatedStorage);
-        }
-
-        console.log(`📡 Real-time consumption updates broadcast sent for ${playerId}`);
-      } catch (error) {
-        console.warn('WebSocket broadcast failed:', error);
-      }
+      // Real-time updates handled by polling system
 
       res.json({
         success: true,

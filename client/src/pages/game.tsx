@@ -56,8 +56,8 @@ export default function Game() {
     enabled: !!playerUsername,
   });
 
-  // Real-time updates via polling (more reliable than WebSocket)
-  const { isConnected: pollingConnected } = useGamePolling({ 
+  // Real-time updates via polling
+  const { isConnected } = useGamePolling({ 
     playerId: player?.id || null,
     enabled: !!player?.id 
   });

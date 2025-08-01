@@ -4,7 +4,6 @@ import { setupVite, serveStatic, log } from "./vite";
 import { corsMiddleware, securityHeaders } from "./middleware/cors";
 import { errorHandler, requestLogger } from "./middleware/error-handler";
 import { rateLimit } from "./middleware/auth";
-import { WebSocketService } from "./websocket-service";
 
 const app = express();
 
@@ -55,16 +54,8 @@ app.use((req, res, next) => {
   next();
 });
 
-let wsService: WebSocketService; // Declare wsService outside the scope of the async function
-
 (async () => {
   const server = await registerRoutes(app);
-
-  // Initialize WebSocket service
-  wsService = new WebSocketService(server);
-  
-  // Store reference in app for use in other routes  
-  app.locals.wsService = wsService;
 
   // Initialize and start hunger/thirst degradation system
   const { HungerThirstService } = await import("./services/hunger-thirst-service");
@@ -99,6 +90,3 @@ let wsService: WebSocketService; // Declare wsService outside the scope of the a
 })();
 // Import consumption routes
 import { createConsumptionRoutes } from "./routes/consumption";
-
-// Export for global access
-export { wsService };

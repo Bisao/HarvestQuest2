@@ -2,12 +2,6 @@
 // All game constants and configuration values in one place for easy maintenance
 
 export const GAME_CONFIG = {
-  // WebSocket configuration
-  WEBSOCKET_CONFIG: {
-    HEARTBEAT_INTERVAL: 90000, // 30 seconds
-    RECONNECT_DELAY: 5000,     // 5 seconds
-  },
-
   // Hunger and Thirst system
   HUNGER_THIRST: {
     HUNGER_DECAY_RATE: 1,      // Points per cycle
@@ -167,7 +161,7 @@ export const getConfigValue = <T extends ConfigSection, K extends keyof GameConf
 export const validateConfig = (): boolean => {
   try {
     // Validate critical values
-    if (GAME_CONFIG.WEBSOCKET_CONFIG.HEARTBEAT_INTERVAL <= 0) return false;
+    //if (GAME_CONFIG.WEBSOCKET_CONFIG.HEARTBEAT_INTERVAL <= 0) return false;
     if (GAME_CONFIG.HUNGER_THIRST.UPDATE_INTERVAL <= 0) return false;
     if (GAME_CONFIG.API.TIMEOUT <= 0) return false;
     if (GAME_CONFIG.EXPEDITIONS.MIN_DURATION >= GAME_CONFIG.EXPEDITIONS.MAX_DURATION) return false;
@@ -180,7 +174,7 @@ export const validateConfig = (): boolean => {
 };
 
 // Export individual sections for convenience
-export const WEBSOCKET_CONFIG = GAME_CONFIG.WEBSOCKET_CONFIG;
+// WebSocket removed - using polling system for real-time updates
 export const HUNGER_THIRST_CONFIG = GAME_CONFIG.HUNGER_THIRST;
 export const EXPEDITION_CONFIG = GAME_CONFIG.EXPEDITIONS;
 export const API_CONFIG = GAME_CONFIG.API;

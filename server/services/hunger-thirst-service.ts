@@ -105,17 +105,10 @@ export class HungerThirstService {
           if (newHunger <= EMERGENCY_THRESHOLD || newThirst <= EMERGENCY_THRESHOLD) {
             // Broadcast emergency warning
             try {
-              const { broadcastToPlayer } = await import("../websocket-service");
+              // Real-time updates handled by polling system
               const message = newHunger <= EMERGENCY_THRESHOLD 
                 ? "⚠️ EMERGÊNCIA: Sua fome está criticamente baixa! Coma algo imediatamente!"
                 : "⚠️ EMERGÊNCIA: Sua sede está criticamente baixa! Beba água imediatamente!";
-
-              broadcastToPlayer(player.id, {
-                type: 'notification',
-                level: 'emergency',
-                message,
-                timestamp: Date.now()
-              });
             } catch (error) {
               console.warn('Failed to send emergency notification:', error);
             }
@@ -123,24 +116,17 @@ export class HungerThirstService {
             // Broadcast critical warning (less frequent)
             if (Math.random() < 0.3) { // 30% chance to avoid spam
               try {
-                const { broadcastToPlayer } = await import("../websocket-service");
+                // Real-time updates handled by polling system
                 const message = newHunger <= CRITICAL_THRESHOLD 
                   ? "⚠️ Sua fome está baixa. Considere consumir alimentos."
                   : "⚠️ Sua sede está baixa. Considere beber água.";
-
-                broadcastToPlayer(player.id, {
-                  type: 'notification',
-                  level: 'warning',
-                  message,
-                  timestamp: Date.now()
-                });
               } catch (error) {
                 console.warn('Failed to send warning notification:', error);
               }
             }
           }
 
-          // Data will be updated automatically via polling - no WebSocket needed
+          // Player data will be updated via polling
           console.log(`✅ Hunger/thirst updated for player ${player.id}: hunger=${newHunger}, thirst=${newThirst}`);
 
           // Invalidate cache to ensure frontend gets updated data

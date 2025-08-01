@@ -10,7 +10,7 @@ interface UseGamePollingOptions {
 export function useGamePolling({ 
   playerId, 
   enabled = true, 
-  pollInterval = 2000 // 2 seconds - much more reliable than WebSocket
+  pollInterval = 2000 // 2 seconds for real-time updates
 }: UseGamePollingOptions) {
 
   // Poll player data
