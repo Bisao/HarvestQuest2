@@ -11,10 +11,16 @@ interface GameHeaderProps {
 const GameHeader = ({ player }: GameHeaderProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   
+  // Ensure we have valid values for calculations
+  const currentHunger = Math.max(0, player.hunger || 0);
+  const currentThirst = Math.max(0, player.thirst || 0);
+  const maxHunger = player.maxHunger || 100;
+  const maxThirst = player.maxThirst || 100;
+  
   // Calculate values directly to ensure real-time updates
   const experiencePercentage = Math.min(((player.experience % 100) / 100) * 100, 100);
-  const hungerPercentage = Math.min((player.hunger / player.maxHunger) * 100, 100);
-  const thirstPercentage = Math.min((player.thirst / player.maxThirst) * 100, 100);
+  const hungerPercentage = Math.min((currentHunger / maxHunger) * 100, 100);
+  const thirstPercentage = Math.min((currentThirst / maxThirst) * 100, 100);
 
   return (
     <>
@@ -45,7 +51,7 @@ const GameHeader = ({ player }: GameHeaderProps) => {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">🍖</span>
-                  <span className="font-semibold whitespace-nowrap">{player.hunger}/{player.maxHunger}</span>
+                  <span className="font-semibold whitespace-nowrap">{currentHunger}/{maxHunger}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
@@ -66,7 +72,7 @@ const GameHeader = ({ player }: GameHeaderProps) => {
               <div className="flex flex-col items-center space-y-1">
                 <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
                   <span className="text-sm md:text-lg">💧</span>
-                  <span className="font-semibold whitespace-nowrap">{player.thirst}/{player.maxThirst}</span>
+                  <span className="font-semibold whitespace-nowrap">{currentThirst}/{maxThirst}</span>
                 </div>
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">

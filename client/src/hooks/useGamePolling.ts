@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
@@ -13,7 +12,7 @@ export function useGamePolling({
   enabled = true, 
   pollInterval = 2000 // 2 seconds - much more reliable than WebSocket
 }: UseGamePollingOptions) {
-  
+
   // Poll player data
   const playerQuery = useQuery({
     queryKey: [`/api/player/${playerId}`],
