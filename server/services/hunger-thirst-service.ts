@@ -59,8 +59,23 @@ export class HungerThirstService {
         const newHunger = Math.max(0, player.hunger - hungerDecrease);
         const newThirst = Math.max(0, player.thirst - thirstDecrease);
 
+        // Natural regeneration when player is resting (not on expedition)
+        let naturalHungerRegen = 0;
+        let naturalThirstRegen = 0;
+        
+        if (!player.onExpedition && player.hunger > 80 && player.thirst > 80) {
+          // Slight natural regeneration when well-fed and hydrated
+          if (Math.random() < 0.2) { // 20% chance
+            naturalHungerRegen = Math.min(1, player.maxHunger - player.hunger);
+            naturalThirstRegen = Math.min(1, player.maxThirst - player.thirst);
+          }
+        }
+
+        const finalHunger = Math.min(player.maxHunger, newHunger + naturalHungerRegen);
+        const finalThirst = Math.min(player.maxThirst, newThirst + naturalThirstRegen);
+
         // Only update if there's actually a change
-        if (newHunger !== player.hunger || newThirst !== player.thirst) {
+        if (finalHunger !== player.hunger || finalThirst !== player.thirst) {
           // Calculate penalties for low hunger/thirst
           const penalties = this.calculateStatusPenalties(newHunger, newThirst);
           
@@ -78,9 +93,9 @@ export class HungerThirstService {
 
           await this.storage.updatePlayer(player.id, updateData);
 
-          // Log degradation for debugging (can be removed in production)
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`🍖💧 Player ${player.id}: H:${player.hunger}→${newHunger}, T:${player.thirst}→${newThirst}`);
+          // Log degradation with throttling to reduce spam
+          if (process.env.NODE_ENV === 'development' && Math.random() < 0.1) {
+            console.log(`🍖💧 Player ${player.username}: H:${player.hunger}→${newHunger}, T:${player.thirst}→${newThirst}`);
           }
 
           // Check for critical status and broadcast warnings
@@ -90,13 +105,14 @@ export class HungerThirstService {
           if (newHunger <= EMERGENCY_THRESHOLD || newThirst <= EMERGENCY_THRESHOLD) {
             // Broadcast emergency warning
             try {
-              const { broadcastPlayerNotification } = await import("../websocket-service");
+              const { broadcastToPlayer } = await import("../websocket-service");
               const message = newHunger <= EMERGENCY_THRESHOLD 
                 ? "⚠️ EMERGÊNCIA: Sua fome está criticamente baixa! Coma algo imediatamente!"
                 : "⚠️ EMERGÊNCIA: Sua sede está criticamente baixa! Beba água imediatamente!";
               
-              broadcastPlayerNotification(player.id, {
-                type: 'emergency',
+              broadcastToPlayer(player.id, {
+                type: 'notification',
+                level: 'emergency',
                 message,
                 timestamp: Date.now()
               });
@@ -107,13 +123,14 @@ export class HungerThirstService {
             // Broadcast critical warning (less frequent)
             if (Math.random() < 0.3) { // 30% chance to avoid spam
               try {
-                const { broadcastPlayerNotification } = await import("../websocket-service");
+                const { broadcastToPlayer } = await import("../websocket-service");
                 const message = newHunger <= CRITICAL_THRESHOLD 
                   ? "⚠️ Sua fome está baixa. Considere consumir alimentos."
                   : "⚠️ Sua sede está baixa. Considere beber água.";
                 
-                broadcastPlayerNotification(player.id, {
-                  type: 'warning',
+                broadcastToPlayer(player.id, {
+                  type: 'notification',
+                  level: 'warning',
                   message,
                   timestamp: Date.now()
                 });
@@ -169,9 +186,42 @@ export class HungerThirstService {
       thirstRate *= 0.9; // 10% less thirst loss with helmet
     }
 
+    // Apply temporary effects (if player has active buffs/debuffs)
+    if (player.temporaryEffects) {
+      for (const effect of player.temporaryEffects) {
+        if (effect.expiresAt > Date.now()) {
+          switch (effect.type) {
+            case 'well_fed':
+              hungerRate *= 0.5; // 50% slower hunger loss
+              break;
+            case 'hydrated':
+              thirstRate *= 0.5; // 50% slower thirst loss
+              break;
+            case 'exhausted':
+              hungerRate *= 1.5; // 50% faster hunger loss
+              thirstRate *= 1.5; // 50% faster thirst loss
+              break;
+            case 'fasting':
+              hungerRate *= 2; // Double hunger loss
+              break;
+          }
+        }
+      }
+    }
+
+    // Environmental factors
+    const currentTime = new Date();
+    const hour = currentTime.getHours();
+    
+    // Night time increases degradation slightly
+    if (hour >= 22 || hour <= 6) {
+      hungerRate *= 1.1;
+      thirstRate *= 1.1;
+    }
+
     // Cap the rates to reasonable values
-    hungerRate = Math.min(2, Math.max(0.5, hungerRate));
-    thirstRate = Math.min(2, Math.max(0.5, thirstRate));
+    hungerRate = Math.min(3, Math.max(0.25, hungerRate));
+    thirstRate = Math.min(3, Math.max(0.25, thirstRate));
 
     return {
       hunger: Math.ceil(hungerRate),
@@ -226,6 +276,33 @@ export class HungerThirstService {
       healthPenalty = 1; // Lose 1 health when low
       experiencePenalty = 0.1; // 10% XP penalty
     }
+
+
+
+  /**
+   * Calculate hunger/thirst degradation for offline players
+   */
+  async calculateOfflineDegradation(playerId: string, lastOnlineTime: number): Promise<void> {
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) return;
+
+    const offlineMinutes = Math.floor((Date.now() - lastOnlineTime) / 60000);
+    if (offlineMinutes < 1) return;
+
+    // Calculate degradation based on offline time (slower rate)
+    const offlineRate = 0.5; // 50% of normal rate when offline
+    const hungerLoss = Math.min(player.hunger, Math.floor(offlineMinutes * offlineRate));
+    const thirstLoss = Math.min(player.thirst, Math.floor(offlineMinutes * offlineRate));
+
+    if (hungerLoss > 0 || thirstLoss > 0) {
+      await this.storage.updatePlayer(playerId, {
+        hunger: Math.max(0, player.hunger - hungerLoss),
+        thirst: Math.max(0, player.thirst - thirstLoss)
+      });
+
+      console.log(`⏰ Offline degradation applied to ${player.username}: -${hungerLoss}H, -${thirstLoss}T`);
+    }
+  }
 
     return { healthPenalty, experiencePenalty };
   }

@@ -13,8 +13,8 @@ export const GAME_CONFIG = {
 
   // Hunger and Thirst system
   HUNGER_THIRST: {
-    HUNGER_DECAY_RATE: 1,      // Base points per degradation cycle
-    THIRST_DECAY_RATE: 1,      // Base points per degradation cycle
+    HUNGER_DECAY_RATE: 1,      // Points per cycle
+    THIRST_DECAY_RATE: 1,      // Points per cycle  
     UPDATE_INTERVAL: 40000,    // 40 seconds in milliseconds
     MIN_HUNGER: 0,
     MAX_HUNGER: 100,
@@ -22,14 +22,11 @@ export const GAME_CONFIG = {
     MAX_THIRST: 100,
     CRITICAL_THRESHOLD: 20,    // Below this = critical status
     EMERGENCY_THRESHOLD: 5,    // Below this = emergency status
-    LEVEL_SCALING: 0.05,       // 5% increase per level
-    EQUIPMENT_BONUS: 0.1,      // 10% reduction with equipment
-    HEALTH_PENALTY: {
-      EMERGENCY: 5,            // Health loss when at 0
-      CRITICAL: 2,             // Health loss when <= 5
-      LOW: 1                   // Health loss when <= 10
-    },
-    NOTIFICATION_CHANCE: 0.3   // 30% chance for non-emergency warnings
+    NATURAL_REGEN_CHANCE: 0.2, // 20% chance for natural regeneration
+    NIGHT_MULTIPLIER: 1.1,     // 10% more degradation at night
+    EQUIPMENT_REDUCTION: 0.9,  // 10% less degradation with equipment
+    MAX_DEGRADATION_RATE: 3,   // Maximum degradation per cycle
+    MIN_DEGRADATION_RATE: 0.25 // Minimum degradation per cycle
   },
 
   // Expedition system
@@ -172,7 +169,7 @@ export const validateConfig = (): boolean => {
     if (GAME_CONFIG.HUNGER_THIRST.UPDATE_INTERVAL <= 0) return false;
     if (GAME_CONFIG.API.TIMEOUT <= 0) return false;
     if (GAME_CONFIG.EXPEDITIONS.MIN_DURATION >= GAME_CONFIG.EXPEDITIONS.MAX_DURATION) return false;
-    
+
     return true;
   } catch (error) {
     console.error('Configuration validation failed:', error);
