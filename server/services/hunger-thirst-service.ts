@@ -67,7 +67,7 @@ export class HungerThirstService {
 
           // Log degradation for debugging (can be removed in production)
           if (process.env.NODE_ENV === 'development') {
-            console.log(`🍖💧 Player ${player.username}: H:${player.hunger}→${newHunger}, T:${player.thirst}→${newThirst}`);
+            console.log(`🍖💧 Player ${player.id}: H:${player.hunger}→${newHunger}, T:${player.thirst}→${newThirst}`);
           }
 
           // Broadcast real-time update via WebSocket
@@ -76,7 +76,7 @@ export class HungerThirstService {
             if (updatedPlayer) {
               const { broadcastPlayerUpdate } = await import("../websocket-service");
               broadcastPlayerUpdate(player.id, updatedPlayer);
-              console.log(`📡 Real-time hunger/thirst update sent to player ${player.username}`);
+              console.log(`📡 Real-time hunger/thirst update sent to player ${player.id}`);
             }
           } catch (error) {
             console.warn('WebSocket broadcast failed:', error);

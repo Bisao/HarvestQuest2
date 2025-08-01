@@ -6,6 +6,13 @@
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Updates
+
+- **January 2025**: Successfully migrated project from Replit Agent to standard Replit environment
+- Fixed duplicate key errors in game constants for cleaner build warnings
+- Standardized all logging to use player ID instead of username for consistency
+- Verified full functionality including WebSocket real-time updates, hunger/thirst system, and expeditions
+
 ## System Architecture
 
 ### Frontend Architecture
