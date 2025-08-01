@@ -568,6 +568,14 @@ export function registerEnhancedGameRoutes(
   });
 
     
+          // Workshop processing endpoint
+  app.post("/api/workshop/process",
+    async (req, res, next) => {
+      try {
+        const { playerId, processId, quantity } = req.body;
+
+        // Workshop processes data
+        const WORKSHOP_PROCESSES = [
           {
             id: "proc-fibra-processada-001",
             name: "Fibra Processada",
@@ -609,7 +617,7 @@ export function registerEnhancedGameRoutes(
             experienceGained: 18
           }
         ];
-    
+
         const process = WORKSHOP_PROCESSES.find(p => p.id === processId);
         if (!process) {
           return res.status(404).json({ 
@@ -617,7 +625,7 @@ export function registerEnhancedGameRoutes(
             message: "Processo não encontrado" 
           });
         }
-    
+
         // Get player
         const player = await storage.getPlayer(playerId);
         if (!player) {
@@ -626,7 +634,7 @@ export function registerEnhancedGameRoutes(
             message: "Jogador não encontrado" 
           });
         }
-    
+
         // Check level requirement
         if (player.level < process.requiredLevel) {
           return res.status(400).json({ 
@@ -634,20 +642,20 @@ export function registerEnhancedGameRoutes(
             message: `Nível ${process.requiredLevel} necessário` 
           });
         }
-    
+
         // Get storage items
         const storageItems = await storage.getPlayerStorage(playerId);
         const inputItem = storageItems.find(item => item.resourceId === process.input.resourceId);
-    
+
         const requiredQuantity = process.input.quantity * quantity;
-    
+
         if (!inputItem || inputItem.quantity < requiredQuantity) {
           return res.status(400).json({ 
             success: false, 
             message: `Recursos insuficientes: precisa ${requiredQuantity} de ${process.input.resourceId}` 
           });
         }
-    
+
         // Process transaction
         await storage.db.transaction(async (trx) => {
           // Remove input resources
@@ -658,11 +666,11 @@ export function registerEnhancedGameRoutes(
               .where('id', inputItem.id)
               .update({ quantity: inputItem.quantity - requiredQuantity });
           }
-    
+
           // Add output resources
           const outputQuantity = process.output.quantity * quantity;
           const existingOutput = storageItems.find(item => item.resourceId === process.output.resourceId);
-    
+
           if (existingOutput) {
             await trx('storage_items')
               .where('id', existingOutput.id)
@@ -676,17 +684,17 @@ export function registerEnhancedGameRoutes(
               itemType: 'resource'
             });
           }
-    
+
           // Award experience
           const expGained = process.experienceGained * quantity;
           const newExp = player.experience + expGained;
           let newLevel = player.level;
-    
+
           // Simple level calculation
           while (newLevel < 20 && newExp >= (newLevel * 100)) {
             newLevel++;
           }
-    
+
           await trx('players')
             .where('id', playerId)
             .update({ 
@@ -694,7 +702,7 @@ export function registerEnhancedGameRoutes(
               level: newLevel
             });
         });
-    
+
         // Update quest progress
         try {
           const { QuestService } = await import('../services/quest-service');
@@ -706,19 +714,19 @@ export function registerEnhancedGameRoutes(
         } catch (questError) {
           console.error('Quest update error:', questError);
         }
-    
+
         // CRITICAL: Invalidate ALL caches to ensure frontend sees updated data immediately
         invalidatePlayerCache(playerId);
         invalidateStorageCache(playerId);
         invalidateInventoryCache(playerId);
-    
+
         // Clear cache keys manually to ensure immediate update
         const { gameCache } = await import("../cache/memory-cache");
         gameCache.del(`player:${playerId}`);
         gameCache.del(`storage:${playerId}`);
         gameCache.del(`inventory:${playerId}`);
         gameCache.del(`player:username:${player.username}`);
-    
+
         successResponse(res, {
           message: `${quantity}x ${process.name} processado com sucesso!`,
           process: {
@@ -728,7 +736,7 @@ export function registerEnhancedGameRoutes(
           quantity,
           experienceGained: process.experienceGained * quantity
         }, `${quantity}x ${process.name} processado com sucesso!`);
-    
+
       } catch (error) {
         next(error);
       }
