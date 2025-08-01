@@ -122,23 +122,62 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
   const getAvailableEquipmentForSlot = (slotType: string) => {
     // For food and drink slots, look at consumables in storage
     if (slotType === 'food' || slotType === 'drink') {
-      return storageData
+      console.log('Looking for', slotType, 'items in storage:', storageData);
+      
+      const filteredItems = storageData
         .filter(item => {
           // Get the actual resource data
           const resourceData = getItemById(item.resourceId);
-          if (!resourceData) return false;
+          if (!resourceData) {
+            console.log('No resource data found for:', item.resourceId);
+            return false;
+          }
+
+          console.log('Checking resource:', resourceData.name, {
+            category: resourceData.category,
+            subcategory: resourceData.subcategory,
+            type: resourceData.type,
+            isConsumable: isConsumable(resourceData)
+          });
 
           // Check if it's a consumable using the utility function
-          if (!isConsumable(resourceData)) return false;
+          if (!isConsumable(resourceData)) {
+            console.log('Not consumable:', resourceData.name);
+            return false;
+          }
 
           // For modern consumables, check category and subcategory
           if (resourceData.category === 'consumable') {
-            return resourceData.subcategory === slotType && item.quantity > 0;
+            const matches = resourceData.subcategory === slotType && item.quantity > 0;
+            console.log('Modern consumable check:', resourceData.name, 'subcategory:', resourceData.subcategory, 'matches:', matches);
+            return matches;
           }
 
           // For legacy consumables, check by type
           if (resourceData.type === 'consumable') {
-            return resourceData.category === slotType && item.quantity > 0;
+            const matches = resourceData.category === slotType && item.quantity > 0;
+            console.log('Legacy consumable check:', resourceData.name, 'category:', resourceData.category, 'matches:', matches);
+            return matches;
+          }
+
+          // Additional check for food/drink items that might have different categorization
+          if (slotType === 'food' && (
+            resourceData.name.toLowerCase().includes('carne') ||
+            resourceData.name.toLowerCase().includes('cogumelos') ||
+            resourceData.name.toLowerCase().includes('fruta') ||
+            resourceData.name.toLowerCase().includes('peixe') ||
+            resourceData.name.toLowerCase().includes('ensopado')
+          )) {
+            console.log('Food item by name match:', resourceData.name);
+            return item.quantity > 0;
+          }
+
+          if (slotType === 'drink' && (
+            resourceData.name.toLowerCase().includes('água') ||
+            resourceData.name.toLowerCase().includes('suco')
+          )) {
+            console.log('Drink item by name match:', resourceData.name);
+            return item.quantity > 0;
           }
 
           return false;
@@ -148,6 +187,9 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
           return resourceData ? { ...resourceData, quantity: item.quantity } : null;
         })
         .filter((item): item is any => item !== null);
+
+      console.log('Filtered items for', slotType, ':', filteredItems);
+      return filteredItems;
     }
 
     // Filter storage items that are equipment and match the slot type
