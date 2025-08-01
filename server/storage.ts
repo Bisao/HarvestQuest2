@@ -1,4 +1,3 @@
-
 import { 
   type Player, 
   type InsertPlayer,
@@ -87,7 +86,7 @@ export interface IStorage {
 
   // Game initialization
   initializeGameData(): Promise<void>;
-  
+
   // Persistence methods
   saveData(): Promise<void>;
   loadData(): Promise<void>;
@@ -131,7 +130,7 @@ export class MemStorage implements IStorage {
 
   async saveData(): Promise<void> {
     if (!this.isInitialized) return;
-    
+
     try {
       const data: StorageData = {
         players: Array.from(this.players.entries()),
@@ -265,7 +264,7 @@ export class MemStorage implements IStorage {
     // No default player creation - players must be created via the main menu
 
     this.isInitialized = true;
-    
+
     // Setup auto-save every 30 seconds
     setInterval(async () => {
       await this.saveData();
@@ -343,14 +342,16 @@ export class MemStorage implements IStorage {
       equippedBoots: insertPlayer.equippedBoots || null,
       equippedWeapon: insertPlayer.equippedWeapon || null,
       equippedTool: insertPlayer.equippedTool || null,
+      equippedFood: null,
+      equippedDrink: null,
       autoCompleteQuests: insertPlayer.autoCompleteQuests ?? true,
     };
-    
+
     this.players.set(id, player);
-    
+
     // Auto-save after creating player
     await this.saveData();
-    
+
     return player;
   }
 
@@ -360,10 +361,10 @@ export class MemStorage implements IStorage {
 
     const updated = { ...player, ...updates };
     this.players.set(id, updated);
-    
+
     // Auto-save after updating player
     await this.saveData();
-    
+
     return updated;
   }
 

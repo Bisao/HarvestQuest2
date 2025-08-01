@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { isConsumable, getConsumableEffects, getConsumableDescription } from "@shared/utils/consumable-utils";
 import type { Player, Equipment, StorageItem } from "@shared/types";
 import { resources } from "@/lib/game-data";
 
@@ -36,17 +37,17 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
     { slot: "bag", name: "Bag", emoji: "🎒", equippedId: null, position: { row: 0, col: 0 } },
     { slot: "helmet", name: "Head Slot", emoji: "⛑️", equippedId: player.equippedHelmet, position: { row: 0, col: 1 } },
     { slot: "cape", name: "Cape", emoji: "🧥", equippedId: null, position: { row: 0, col: 2 } },
-    
+
     // Row 1  
     { slot: "weapon", name: "Main Hand", emoji: "⚔️", equippedId: player.equippedWeapon, position: { row: 1, col: 0 } },
     { slot: "chestplate", name: "Chest Slot", emoji: "👕", equippedId: player.equippedChestplate, position: { row: 1, col: 1 } },
     { slot: "tool", name: "Off-Hand", emoji: "🔧", equippedId: player.equippedTool, position: { row: 1, col: 2 } },
-    
+
     // Row 2
     { slot: "drink", name: "Drink", emoji: "🥤", equippedId: player.equippedDrink, position: { row: 2, col: 0 } },
     { slot: "boots", name: "Foot Slot", emoji: "🥾", equippedId: player.equippedBoots, position: { row: 2, col: 1 } },
     { slot: "food", name: "Food", emoji: "🍖", equippedId: player.equippedFood, position: { row: 2, col: 2 } },
-    
+
     // Row 3
     { slot: "leggings", name: "Mount", emoji: "🐎", equippedId: player.equippedLeggings, position: { row: 3, col: 1 } },
   ];
@@ -126,7 +127,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
           // Get the actual resource data
           const resourceData = getItemById(item.resourceId);
           if (!resourceData) return false;
-          
+
           // Check if it's a consumable with the right category
           return resourceData.type === 'consumable' && 
                  resourceData.category === slotType &&
@@ -152,12 +153,12 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
     return availableEquipment.filter(eq => {
       // Primary slot matching
       if (eq.slot === slotType) return true;
-      
+
       // Special handling for knife - can be equipped in both weapon and tool slots
       if (eq.name === "Faca") {
         return (slotType === "weapon" && eq.slot === "tool") || (slotType === "tool" && eq.slot === "weapon");
       }
-      
+
       // Category-based matching for better compatibility
       switch (slotType) {
         case 'helmet':
@@ -198,15 +199,15 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
               {Array.from({ length: 4 }, (_, row) => 
                 Array.from({ length: 3 }, (_, col) => {
                   const slot = equipmentSlots.find(s => s.position.row === row && s.position.col === col);
-                  
+
                   if (!slot) {
                     return <div key={`${row}-${col}`} className="aspect-square"></div>;
                   }
-                  
+
                   const { slot: slotKey, name, emoji, equippedId } = slot;
                   const equippedItem = getEquippedItem(equippedId);
                   const isDisabled = equippedId === null && !["helmet", "chestplate", "leggings", "boots", "weapon", "tool", "food", "drink"].includes(slotKey);
-                  
+
                   return (
                     <div 
                       key={slotKey} 
@@ -220,7 +221,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                       }`}>
                       <div className="text-lg">{emoji}</div>
                       <div className="font-medium text-xs">{name}</div>
-                      
+
                       {equippedItem ? (
                         <div className="text-lg">{equippedItem.emoji}</div>
                       ) : (
@@ -234,7 +235,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
               )}
             </div>
           </div>
-          
+
           {/* Currency/Resource Bars */}
           <div className="mt-4 space-y-2">
             <div className="flex items-center space-x-2">
@@ -243,13 +244,13 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                 <div className="bg-yellow-500 h-2 rounded-full" style={{ width: "0%" }}></div>
               </div>
             </div>
-            
+
           </div>
-          
+
         </CardContent>
       </Card>
 
-      
+
 
       {/* Equipment Selection Modal */}
       <Dialog open={equipModalOpen} onOpenChange={setEquipModalOpen}>
@@ -266,7 +267,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                      selectedSlot === 'drink' ? 'Bebida' : 'Item'}
             </DialogTitle>
           </DialogHeader>
-          
+
           <ScrollArea className="max-h-80">
             <div className="space-y-2">
               {/* Current equipped item with unequip option */}
@@ -274,7 +275,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                 const slotData = equipmentSlots.find(s => s.slot === selectedSlot);
                 const currentEquippedId = slotData?.equippedId;
                 const currentEquippedItem = currentEquippedId ? getEquippedItem(currentEquippedId) : null;
-                
+
                 return currentEquippedItem ? (
                   <div className="p-3 border-2 border-blue-300 rounded-lg bg-blue-50">
                     <div className="flex items-center justify-between">
@@ -297,7 +298,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                   </div>
                 ) : null;
               })()}
-              
+
               {/* Available equipment */}
               {selectedSlot && getAvailableEquipmentForSlot(selectedSlot).length > 0 ? (
                 getAvailableEquipmentForSlot(selectedSlot).map((eq) => (
@@ -310,7 +311,10 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                       <div>
                         <p className="font-medium">{eq.name}</p>
                         <p className="text-sm text-gray-600">
-                          Disponível: {eq.quantity}x
+                          {isConsumable(eq) ? getConsumableDescription(eq) : eq.effect}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Peso: {eq.weight}kg • {eq.quantity}x
                         </p>
                       </div>
                     </div>

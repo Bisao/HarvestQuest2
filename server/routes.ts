@@ -154,7 +154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const updatedPlayer = await storage.updatePlayer(playerId, updates);
-      
+
       // Invalidate cache to ensure frontend gets updated data
       try {
         const { invalidatePlayerCache } = await import("./cache/memory-cache");
@@ -162,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         console.warn('Cache invalidation failed:', error);
       }
-      
+
       res.json(updatedPlayer);
     } catch (error) {
       console.error('Update player settings error:', error);
@@ -175,16 +175,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/player/:playerId/offline-activity", async (req, res) => {
     try {
       const { playerId } = req.params;
-      
+
       const result = await offlineActivityService.calculateOfflineActivity(playerId);
-      
+
       if (!result) {
         return res.json({ hasOfflineActivity: false });
       }
 
       // Aplica as recompensas e atualizações
       const { report, playerUpdates, inventoryUpdates, storageUpdates } = result;
-      
+
       // Atualiza o jogador
       if (Object.keys(playerUpdates).length > 0) {
         await storage.updatePlayer(playerId, playerUpdates);
@@ -194,7 +194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const update of inventoryUpdates) {
         const existingItem = await storage.getPlayerInventory(playerId);
         const existing = existingItem.find(item => item.resourceId === update.resourceId);
-        
+
         if (existing) {
           await storage.updateInventoryItem(existing.id, {
             quantity: existing.quantity + update.quantity
@@ -212,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const update of storageUpdates) {
         const existingStorage = await storage.getPlayerStorage(playerId);
         const existing = existingStorage.find(item => item.resourceId === update.resourceId);
-        
+
         if (existing) {
           await storage.updateStorageItem(existing.id, {
             quantity: existing.quantity + update.quantity
@@ -262,9 +262,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { playerId } = req.params;
       const config = req.body;
-      
+
       await offlineActivityService.updateOfflineConfig(playerId, config);
-      
+
       res.json({ success: true });
     } catch (error) {
       console.error("Update offline config error:", error);
@@ -379,29 +379,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Player not found" });
       }
 
+      const validSlots = ['helmet', 'chestplate', 'leggings', 'boots', 'weapon', 'tool', 'food', 'drink'];
+      if (!validSlots.includes(slot)) {
+        return res.status(400).json({ error: "Invalid slot" });
+      }
+
       // Get current equipped item for this slot
       let currentEquippedId: string | null = null;
+      let slotKey: keyof Player | null = null;
+
       switch (slot) {
-        case "helmet":
-          currentEquippedId = player.equippedHelmet;
-          break;
-        case "chestplate":
-          currentEquippedId = player.equippedChestplate;
-          break;
-        case "leggings":
-          currentEquippedId = player.equippedLeggings;
-          break;
-        case "boots":
-          currentEquippedId = player.equippedBoots;
-          break;
-        case "weapon":
-          currentEquippedId = player.equippedWeapon;
-          break;
-        case "tool":
-          currentEquippedId = player.equippedTool;
-          break;
+        case "helmet": slotKey = 'equippedHelmet'; break;
+        case "chestplate": slotKey = 'equippedChestplate'; break;
+        case "leggings": slotKey = 'equippedLeggings'; break;
+        case "boots": slotKey = 'equippedBoots'; break;
+        case "weapon": slotKey = 'equippedWeapon'; break;
+        case "tool": slotKey = 'equippedTool'; break;
+        case "food": slotKey = 'equippedFood'; break;
+        case "drink": slotKey = 'equippedDrink'; break;
         default:
           return res.status(400).json({ error: "Invalid slot" });
+      }
+
+      if (slotKey) {
+        currentEquippedId = player[slotKey] as string | null;
       }
 
       // If unequipping (equipmentId is null)
@@ -483,6 +484,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         case "tool":
           updates.equippedTool = equipmentId;
           break;
+        case "food":
+            updates.equippedFood = equipmentId;
+            break;
+        case "drink":
+            updates.equippedDrink = equipmentId;
+            break;
       }
 
       const updatedPlayer = await storage.updatePlayer(playerId, updates);
@@ -889,7 +896,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { biomeId } = req.params;
       const biome = await storage.getBiome(biomeId);
-      
+
       if (!biome) {
         return res.status(404).json({ message: "Biome not found" });
       }
@@ -1065,11 +1072,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
-  
+
   // Store reference in app for use in other routes  
   // WebSocket service will be initialized in index.ts
-  
+
   // WebSocket service will be initialized in index.ts
-  
+
   return httpServer;
 }
