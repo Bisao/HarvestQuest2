@@ -251,6 +251,57 @@ export default function EnhancedStorageTab({
     return colors[rarity as keyof typeof colors] || 'text-gray-600';
   };
 
+  const getRarityConfig = (rarity: string) => {
+    const configs = {
+      common: {
+        gradient: 'from-gray-600 to-gray-700',
+        border: 'border-gray-500',
+        bg: 'bg-gray-600',
+        stars: 1,
+        starColor: 'text-gray-300',
+        shadowColor: '#6b7280',
+        pattern: 'bg-gray-400'
+      },
+      uncommon: {
+        gradient: 'from-green-600 to-green-700',
+        border: 'border-green-500',
+        bg: 'bg-green-600',
+        stars: 2,
+        starColor: 'text-green-300',
+        shadowColor: '#16a34a',
+        pattern: 'bg-green-400'
+      },
+      rare: {
+        gradient: 'from-blue-600 to-blue-700',
+        border: 'border-blue-500',
+        bg: 'bg-blue-600',
+        stars: 3,
+        starColor: 'text-blue-300',
+        shadowColor: '#2563eb',
+        pattern: 'bg-blue-400'
+      },
+      epic: {
+        gradient: 'from-purple-600 to-purple-700',
+        border: 'border-purple-500',
+        bg: 'bg-purple-600',
+        stars: 4,
+        starColor: 'text-purple-300',
+        shadowColor: '#9333ea',
+        pattern: 'bg-purple-400'
+      },
+      legendary: {
+        gradient: 'from-orange-500 via-yellow-500 to-orange-600',
+        border: 'border-orange-400',
+        bg: 'bg-gradient-to-r from-orange-500 to-yellow-500',
+        stars: 5,
+        starColor: 'text-yellow-300',
+        shadowColor: '#f59e0b',
+        pattern: 'bg-gradient-to-br from-orange-400 to-yellow-400'
+      }
+    };
+    return configs[rarity as keyof typeof configs] || configs.common;
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -413,106 +464,149 @@ export default function EnhancedStorageTab({
           {/* Storage Items Grid with ScrollArea */}
           <ScrollArea className="h-[600px] w-full rounded-md border">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 p-4">
-              {filteredStorageData.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white border border-gray-200 rounded-xl p-3 sm:p-5 hover:shadow-lg transition-all duration-200"
-                >
-                  <div className="flex items-center justify-between mb-3 sm:mb-4">
-                    <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                      <span className="text-2xl sm:text-4xl flex-shrink-0">{item.itemData.emoji}</span>
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-bold text-gray-800 text-sm sm:text-base truncate">{item.itemData.name}</h4>
-                        <div className="flex items-center space-x-2">
-                          <span className={`text-xs sm:text-sm font-medium ${getTypeColor(item.itemData.type)}`}>
-                            {item.itemData.type === 'equipment' ? 'Equip.' : 'Recurso'}
-                          </span>
+              {filteredStorageData.map((item) => {
+                const rarity = (item.itemData as any).rarity || 'common';
+                const rarityConfig = getRarityConfig(rarity);
+                
+                return (
+                  <div
+                    key={item.id}
+                    className={`relative bg-gradient-to-br ${rarityConfig.gradient} border-2 ${rarityConfig.border} rounded-xl p-4 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden`}
+                    style={{
+                      boxShadow: `0 4px 20px ${rarityConfig.shadowColor}40`
+                    }}
+                  >
+                    {/* Rarity Background Pattern */}
+                    <div className={`absolute inset-0 opacity-5 ${rarityConfig.pattern}`}></div>
+                    
+                    {/* Header with Icon and Rarity Stars */}
+                    <div className="relative z-10 flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        {/* Large Item Icon */}
+                        <div className={`relative bg-white/20 backdrop-blur-sm rounded-lg p-3 border ${rarityConfig.border}`}>
+                          <span className="text-4xl">{item.itemData.emoji}</span>
+                          {/* Rarity indicator corner */}
+                          <div className={`absolute -top-1 -right-1 w-4 h-4 ${rarityConfig.bg} rounded-full border-2 border-white`}></div>
+                        </div>
+                        
+                        {/* Item Info */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-white text-lg mb-1 drop-shadow-sm">
+                            {item.itemData.name}
+                          </h4>
+                          
+                          {/* Rarity Stars */}
+                          <div className="flex items-center space-x-1 mb-2">
+                            {Array.from({ length: 5 }, (_, i) => (
+                              <span 
+                                key={i} 
+                                className={`text-lg ${i < rarityConfig.stars ? rarityConfig.starColor : 'text-gray-400/50'}`}
+                              >
+                                ⭐
+                              </span>
+                            ))}
+                            <span className={`ml-2 text-xs font-semibold px-2 py-1 rounded-full ${rarityConfig.bg} text-white uppercase tracking-wider`}>
+                              {rarity}
+                            </span>
+                          </div>
+                          
+                          {/* Type Badge */}
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs bg-white/20 backdrop-blur-sm text-white font-medium px-3 py-1 rounded-full border border-white/30">
+                              {item.itemData.type === 'equipment' ? '⚔️ Equipamento' : '🌿 Recurso'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Quantity Display */}
+                      <div className="text-right">
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
+                          <div className="text-2xl font-bold text-white drop-shadow">
+                            {item.quantity}
+                          </div>
+                          <div className="text-xs text-white/80">unidades</div>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className={`text-xl sm:text-3xl font-bold ${getTypeColor(item.itemData.type)}`}>
-                        {item.quantity}
+
+                    {/* Item Statistics Grid */}
+                    <div className="relative z-10 grid grid-cols-2 gap-3 mb-4">
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                        <div className="text-xs text-white/80 mb-1">💎 Valor Unitário</div>
+                        <div className="text-lg font-bold text-yellow-300">{(item.itemData.value || 0).toLocaleString()}</div>
                       </div>
-                      <div className="text-xs text-gray-500">unid.</div>
-                    </div>
-                  </div>
-
-                  {/* Item Details */}
-                  <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
-                    <div className="flex justify-between text-xs sm:text-sm">
-                      <span className="text-gray-600">Peso unit.:</span>
-                      <span className="font-semibold">
-                        {item.itemData.weight >= 1000 ? `${(item.itemData.weight / 1000).toFixed(1)}kg` : `${item.itemData.weight}g`}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs sm:text-sm">
-                      <span className="text-gray-600">Valor unit.:</span>
-                      <span className="font-semibold text-green-600">{item.itemData.value} 💰</span>
-                    </div>
-                    <div className="flex justify-between text-xs sm:text-sm">
-                      <span className="text-gray-600">Peso total:</span>
-                      <span className="font-semibold">
-                        {(() => {
-                          const totalWeight = item.itemData.weight * item.quantity;
-                          return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
-                        })()}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="space-y-2">
-                    {/* First Row - Main Actions */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setWithdrawDialog({ 
-                          open: true, 
-                          item, 
-                          amount: Math.min(1, item.quantity) 
-                        })}
-                        disabled={isBlocked}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-2 sm:px-3 rounded-lg transition-colors text-xs sm:text-sm"
-                      >
-                        {item.itemData.type === 'equipment' ? '⚔️ Equipar' : '📦 Retirar'}
-                      </button>
-                      <button
-                        disabled={isBlocked}
-                        className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-2 sm:px-3 rounded-lg transition-colors text-xs sm:text-sm"
-                      >
-                        💰 Vender
-                      </button>
+                      
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                        <div className="text-xs text-white/80 mb-1">⚖️ Peso</div>
+                        <div className="text-lg font-bold text-blue-300">
+                          {item.itemData.weight >= 1000 ? `${(item.itemData.weight / 1000).toFixed(1)}kg` : `${item.itemData.weight}g`}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                        <div className="text-xs text-white/80 mb-1">💰 Valor Total</div>
+                        <div className="text-lg font-bold text-green-300">{item.totalValue.toLocaleString()}</div>
+                      </div>
+                      
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                        <div className="text-xs text-white/80 mb-1">📏 Peso Total</div>
+                        <div className="text-lg font-bold text-purple-300">
+                          {(() => {
+                            const totalWeight = item.itemData.weight * item.quantity;
+                            return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
+                          })()}
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Second Row - Consume Button (if consumable) */}
-                    {(isConsumable(item.itemData) || isConsumable({ id: item.resourceId, name: item.itemData?.name || '' })) && (
-                      <div className="space-y-1">
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => consumeMutation.mutate(item.resourceId)}
-                          disabled={consumeMutation.isPending || isBlocked}
-                          className="bg-orange-600 hover:bg-orange-700 w-full"
+                    {/* Action Buttons */}
+                    <div className="relative z-10 space-y-2">
+                      {/* Primary Actions */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setWithdrawDialog({ 
+                            open: true, 
+                            item, 
+                            amount: Math.min(1, item.quantity) 
+                          })}
+                          disabled={isBlocked}
+                          className="flex-1 bg-white/20 hover:bg-white/30 backdrop-blur-sm disabled:bg-gray-500/50 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 border border-white/30 hover:border-white/50"
                         >
-                          {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
-                        </Button>
-                        <p className="text-xs text-gray-600 text-center">
-                          {getConsumableDescription(item.itemData)}
-                        </p>
+                          {item.itemData.type === 'equipment' ? '⚔️ Equipar' : '📦 Retirar'}
+                        </button>
+                        <button
+                          disabled={isBlocked}
+                          className="flex-1 bg-gradient-to-r from-yellow-500/80 to-yellow-600/80 hover:from-yellow-400/90 hover:to-yellow-500/90 disabled:bg-gray-500/50 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 border border-yellow-400/50"
+                        >
+                          💰 Vender
+                        </button>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Item Value Display */}
-                  <div className="mt-3 pt-3 border-t border-gray-100 text-center">
-                    <span className="text-sm text-gray-600">
-                      Valor: <span className="font-semibold text-green-600">
-                        {item.totalValue.toLocaleString()} moedas
-                      </span>
-                    </span>
+                      {/* Consume Button (if consumable) */}
+                      {(isConsumable(item.itemData) || isConsumable({ id: item.resourceId, name: item.itemData?.name || '' })) && (
+                        <div className="space-y-2">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => consumeMutation.mutate(item.resourceId)}
+                            disabled={consumeMutation.isPending || isBlocked}
+                            className="bg-gradient-to-r from-orange-500/80 to-red-500/80 hover:from-orange-400/90 hover:to-red-400/90 w-full py-3 border border-orange-400/50"
+                          >
+                            {consumeMutation.isPending ? "⏳ Consumindo..." : "🍽️ Consumir"}
+                          </Button>
+                          <p className="text-xs text-white/80 text-center bg-black/20 rounded-lg py-2 px-3">
+                            {getConsumableDescription(item.itemData)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Decorative Corner Element */}
+                    <div className={`absolute top-0 right-0 w-20 h-20 ${rarityConfig.bg} opacity-20 transform rotate-45 translate-x-10 -translate-y-10`}></div>
                   </div>
-                </div>
-                ))}
+                );
+              })}
 
               {/* Empty State */}
               {filteredStorageData.length === 0 && enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length === 0 && (
