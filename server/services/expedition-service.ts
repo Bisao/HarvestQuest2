@@ -24,6 +24,14 @@ export class ExpeditionService {
   ): Promise<Expedition> {
     console.log('ExpeditionService.startExpedition called with:', { playerId, biomeId, selectedResources, selectedEquipment });
 
+    // Invalidate cache to get fresh player data
+    try {
+      const { invalidatePlayerCache } = await import("../cache/memory-cache");
+      invalidatePlayerCache(playerId);
+    } catch (error) {
+      console.warn('Cache invalidation failed:', error);
+    }
+
     const player = await this.storage.getPlayer(playerId);
     if (!player) {
       console.error('Player not found:', playerId);
@@ -38,12 +46,12 @@ export class ExpeditionService {
     }
     console.log('Biome found:', { id: biome.id, name: biome.name, requiredLevel: biome.requiredLevel });
 
-    // Check if player has enough hunger and thirst for expedition
+    // Check if player has enough hunger and thirst for expedition with updated values
     if (player.hunger < 5) {
-      throw new Error("Jogador com muita fome para expedição");
+      throw new Error(`Jogador com muita fome para expedição (${player.hunger}/100). Consuma alimentos primeiro.`);
     }
     if (player.thirst < 5) {
-      throw new Error("Jogador com muita sede para expedição");
+      throw new Error(`Jogador com muita sede para expedição (${player.thirst}/100). Beba água primeiro.`);
     }
 
     // Check if player has required level

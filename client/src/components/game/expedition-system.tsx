@@ -283,6 +283,9 @@ export default function ExpeditionSystem({
       return;
     }
 
+    // Invalidate player cache to get fresh data before starting expedition
+    queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
+
     startExpeditionMutation.mutate({
       playerId,
       biomeId: biome.id,

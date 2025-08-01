@@ -127,12 +127,13 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       // Return updated player data
       const updatedPlayer = await storage.getPlayer(playerId);
 
-      // Invalidate cache to ensure frontend sees updated data
+      // Invalidate cache to ensure frontend sees updated data immediately
       try {
         const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("../cache/memory-cache");
         invalidateStorageCache(playerId);
         invalidateInventoryCache(playerId);
         invalidatePlayerCache(playerId);
+        console.log(`✅ Cache invalidated for player ${playerId} after consumption`);
       } catch (error) {
         console.warn('Cache invalidation failed:', error);
       }
