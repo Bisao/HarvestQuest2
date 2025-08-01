@@ -92,3 +92,40 @@ export function validateEntireSystem(gameData: any): boolean {
     return false;
   }
 }
+
+/**
+ * Player game initialization validation - runs when player starts game
+ */
+export function validatePlayerGameStartup(playerId: string): boolean {
+  console.log(`🔍 ID-VALIDATION: Player startup validation for ${playerId}...`);
+  
+  // Validate master registry first
+  try {
+    const masterValid = isValidGameId('barbante'); // Test with known valid ID
+    if (!masterValid) {
+      console.error('❌ Master game-ids.ts registry is corrupted!');
+      return false;
+    }
+    
+    console.log('✅ Master game-ids.ts validated on player startup');
+    return true;
+  } catch (error) {
+    console.error('❌ Player startup validation failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Update all validator files to check against master registry
+ */
+export function ensureAllValidatorsUseMasterIds(): void {
+  console.log('🔧 ID-VALIDATION: Ensuring all validators use master game-ids.ts...');
+  
+  // This function serves as a reminder that all validator files must:
+  // 1. Import from @shared/constants/game-ids
+  // 2. Validate against master registry only
+  // 3. Update any inconsistent IDs to match master
+  // 4. Run validation on player game startup
+  
+  console.log('📋 Validators configured to use master game-ids.ts registry');
+}

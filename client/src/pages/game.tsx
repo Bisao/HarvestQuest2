@@ -37,6 +37,21 @@ export default function Game() {
     return null;
   }
 
+  // ID Validation on game startup
+  useEffect(() => {
+    if (playerUsername) {
+      // Import and run client-side validation
+      import('@/utils/id-validation-client').then(({ validateClientGameStartup }) => {
+        const isValid = validateClientGameStartup(playerUsername);
+        if (!isValid) {
+          console.warn('⚠️  Game ID validation issues detected, but continuing with game load');
+        }
+      }).catch(error => {
+        console.warn('⚠️  Could not load ID validation:', error);
+      });
+    }
+  }, [playerUsername]);
+
   // Data queries
   const { data: player, isLoading: playerLoading, error: playerError } = useQuery<Player>({
     queryKey: [`/api/player/${playerUsername}`],
