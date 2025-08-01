@@ -1,4 +1,3 @@
-
 // Quest data management module - Completely redesigned with 50 progressive quests
 import type { InsertQuest } from "@shared/types";
 import { RESOURCE_IDS, EQUIPMENT_IDS, QUEST_IDS } from "@shared/constants/game-ids";

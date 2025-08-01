@@ -8,7 +8,7 @@ export function createResourcesWithIds(): InsertResource[] {
     // Basic resources
     { id: RESOURCE_IDS.FIBRA, name: "Fibra", emoji: "🌾", weight: 1, sellPrice: 2, buyPrice: 4, type: "basic", rarity: "common", experienceValue: 1 },
     { id: RESOURCE_IDS.PEDRA, name: "Pedra", emoji: "🪨", weight: 3, sellPrice: 3, buyPrice: 6, type: "basic", rarity: "common", requiredTool: "pickaxe", experienceValue: 2 },
-    { id: RESOURCE_IDS.PEDRAS_SOLTAS, name: "Pedras Soltas", emoji: "🗿", weight: 1, sellPrice: 1, buyPrice: 2, type: "basic", rarity: "common", experienceValue: 1 },
+    { id: RESOURCE_IDS.PEDRAS_SOLTAS, name: "Pedras Pequenas", emoji: "🪨", weight: 1, sellPrice: 1, buyPrice: 2, type: "basic", rarity: "common", experienceValue: 1 },
     { id: RESOURCE_IDS.GRAVETOS, name: "Gravetos", emoji: "🪵", weight: 2, sellPrice: 2, buyPrice: 4, type: "basic", rarity: "common", experienceValue: 1 },
     { id: RESOURCE_IDS.AGUA_FRESCA, name: "Água Fresca", emoji: "💧", weight: 1, sellPrice: 1, buyPrice: 2, type: "basic", rarity: "common", requiredTool: "bucket", experienceValue: 1 },
     { id: RESOURCE_IDS.BAMBU, name: "Bambu", emoji: "🎋", weight: 2, sellPrice: 4, buyPrice: 8, type: "basic", rarity: "common", requiredTool: "axe", experienceValue: 2 },

@@ -77,9 +77,9 @@ export function createModernGameItems(): (Resource | Equipment)[] {
     {
       id: RESOURCE_IDS.PEDRAS_SOLTAS,
       name: "loose_stones",
-      displayName: "Pedras Soltas",
+      displayName: "Pedras Pequenas",
       description: "Pequenas pedras espalhadas pelo chão, fáceis de coletar",
-      iconPath: "🗿",
+      iconPath: "🪨",
       category: "resource",
       subcategory: "mineral",
       weight: 350, // 350 gramas por pedra solta

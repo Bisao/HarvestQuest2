@@ -325,7 +325,7 @@ export class ExpeditionService {
   private addPickaxeBonus(rewards: Record<string, number>, playerEquipment: Equipment[], allResources: Resource[]): void {
     const hasPickaxe = playerEquipment.some(eq => eq.toolType === "pickaxe");
     const stoneResource = allResources.find(r => r.name === "Pedra");
-    const looseStoneResource = allResources.find(r => r.name === "Pedras Soltas");
+    const looseStoneResource = allResources.find(r => r.name === "Pedras Pequenas");
     
     if (hasPickaxe && stoneResource && looseStoneResource && rewards[stoneResource.id]) {
       // Add loose stones equal to the amount of stone mined
