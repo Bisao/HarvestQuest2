@@ -298,7 +298,7 @@ export default function ExpeditionModal({
             <Badge variant="outline">{biome?.emoji}</Badge>
           </DialogTitle>
           <DialogDescription>
-            Selecione os recursos que deseja coletar durante a expedição. Verifique se você possui as ferramentas necessárias.
+            Selecione os recursos que deseja coletar durante a expedição. Total de recursos disponíveis: {collectableResources.length}
           </DialogDescription>
         </DialogHeader>
 
@@ -308,72 +308,111 @@ export default function ExpeditionModal({
           {/* Resource selection */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-medium">Recursos Disponíveis para Coleta:</h4>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const availableResources = collectableResources.filter(r => r.canCollect);
-                  const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
+              <h4 className="font-medium">
+                Recursos Disponíveis para Coleta ({collectableResources.filter(r => r.canCollect).length}/{collectableResources.length} acessíveis):
+              </h4>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const availableResources = collectableResources.filter(r => r.canCollect);
+                    const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
 
-                  if (allAvailableSelected) {
-                    // Desmarcar todos os disponíveis
-                    setSelectedResources(prev => prev.filter(id => !availableResources.some(r => r.id === id)));
-                  } else {
-                    // Marcar todos os disponíveis
-                    const newSelected = [...selectedResources];
-                    availableResources.forEach(resource => {
-                      if (!newSelected.includes(resource.id)) {
-                        newSelected.push(resource.id);
-                      }
-                    });
-                    setSelectedResources(newSelected);
-                  }
-                }}
-                className="text-xs"
-              >
-                {(() => {
-                  const availableResources = collectableResources.filter(r => r.canCollect);
-                  const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
-                  return allAvailableSelected ? "❌ Desmarcar Tudo" : "✅ Marcar Tudo";
-                })()}
-              </Button>
+                    if (allAvailableSelected) {
+                      // Desmarcar todos os disponíveis
+                      setSelectedResources(prev => prev.filter(id => !availableResources.some(r => r.id === id)));
+                    } else {
+                      // Marcar todos os disponíveis
+                      const newSelected = [...selectedResources];
+                      availableResources.forEach(resource => {
+                        if (!newSelected.includes(resource.id)) {
+                          newSelected.push(resource.id);
+                        }
+                      });
+                      setSelectedResources(newSelected);
+                    }
+                  }}
+                  className="text-xs"
+                >
+                  {(() => {
+                    const availableResources = collectableResources.filter(r => r.canCollect);
+                    const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
+                    return allAvailableSelected ? "❌ Desmarcar Tudo" : "✅ Marcar Tudo";
+                  })()}
+                </Button>
+                <Badge variant="secondary" className="text-xs">
+                  {selectedResources.length} selecionados
+                </Badge>
+              </div>
             </div>
-            <ScrollArea className="h-64 border rounded-lg p-3">
+            <ScrollArea className="h-80 border rounded-lg p-3">
               <div className="space-y-2">
-                {collectableResources.map((resource) => (
-                  <div
-                    key={resource.id}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${
-                      resource.canCollect 
-                        ? "bg-white hover:bg-gray-50" 
-                        : "bg-gray-100 opacity-60"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Checkbox
-                        checked={selectedResources.includes(resource.id)}
-                        onCheckedChange={() => toggleResourceSelection(resource.id)}
-                        disabled={!resource.canCollect}
-                      />
-                      <span className="text-lg">{resource.emoji}</span>
-                      <div>
-                        <p className="font-medium">{resource.name}</p>
-                        <p className="text-xs text-gray-600">
-                          XP: {resource.experienceValue} | Valor: {resource.value}
-                        </p>
+                {/* Categorize resources for better organization */}
+                {(() => {
+                  const categories = [
+                    { title: "🌾 Recursos Básicos", items: collectableResources.filter(r => ["Fibra", "Pedra", "Pedras Pequenas", "Gravetos", "Água Fresca", "Bambu", "Madeira", "Argila", "Ferro Fundido", "Couro", "Barbante"].includes(r.name)) },
+                    { title: "🐾 Animais", items: collectableResources.filter(r => ["Coelho", "Veado", "Javali"].includes(r.name)) },
+                    { title: "🐟 Peixes", items: collectableResources.filter(r => ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(r.name)) },
+                    { title: "🌿 Plantas e Comida", items: collectableResources.filter(r => ["Cogumelos", "Frutas Silvestres", "Carne", "Ossos", "Pelo"].includes(r.name)) },
+                    { title: "💎 Recursos Especiais", items: collectableResources.filter(r => !["Fibra", "Pedra", "Pedras Pequenas", "Gravetos", "Água Fresca", "Bambu", "Madeira", "Argila", "Ferro Fundido", "Couro", "Barbante", "Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão", "Cogumelos", "Frutas Silvestres", "Carne", "Ossos", "Pelo"].includes(r.name)) }
+                  ];
+
+                  return categories.map(category => (
+                    category.items.length > 0 && (
+                      <div key={category.title} className="mb-4">
+                        <h5 className="font-semibold text-sm mb-2 text-gray-700 border-b pb-1">
+                          {category.title}
+                        </h5>
+                        <div className="space-y-2">
+                          {category.items.map((resource) => (
+                            <div
+                              key={resource.id}
+                              className={`flex items-center justify-between p-3 rounded-lg border ${
+                                resource.canCollect 
+                                  ? "bg-white hover:bg-gray-50 border-gray-200" 
+                                  : "bg-gray-100 opacity-60 border-gray-300"
+                              }`}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <Checkbox
+                                  checked={selectedResources.includes(resource.id)}
+                                  onCheckedChange={() => toggleResourceSelection(resource.id)}
+                                  disabled={!resource.canCollect}
+                                />
+                                <span className="text-xl">{resource.emoji}</span>
+                                <div>
+                                  <p className="font-medium">{resource.name}</p>
+                                  <p className="text-xs text-gray-600">
+                                    XP: {resource.experienceValue} | Valor: {resource.value}
+                                    {resource.rarity && (
+                                      <span className={`ml-2 px-1 py-0.5 rounded text-xs ${
+                                        resource.rarity === 'rare' ? 'bg-purple-100 text-purple-700' :
+                                        resource.rarity === 'uncommon' ? 'bg-blue-100 text-blue-700' :
+                                        'bg-gray-100 text-gray-700'
+                                      }`}>
+                                        {resource.rarity === 'rare' ? 'Raro' : 
+                                         resource.rarity === 'uncommon' ? 'Incomum' : 'Comum'}
+                                      </span>
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm">{resource.toolIcon}</span>
+                                  <span className={`text-xs font-medium ${resource.canCollect ? "text-green-600" : "text-red-600"}`}>
+                                    {resource.requirementText}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm">{resource.toolIcon}</span>
-                        <span className={`text-xs ${resource.canCollect ? "text-green-600" : "text-red-600"}`}>
-                          {resource.requirementText}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    )
+                  ));
+                })()}
               </div>
             </ScrollArea>
           </div>
