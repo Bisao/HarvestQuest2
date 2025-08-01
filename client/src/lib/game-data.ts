@@ -1,15 +1,25 @@
-// Game configuration and constants
+/**
+ * DEPRECATED CLIENT-SIDE GAME DATA
+ * 
+ * This file contains hardcoded game data that should be removed.
+ * All game data should come from the server APIs which use IDs from game-ids.ts
+ * 
+ * TODO: Remove this file completely once all components use server data
+ */
 
+import { RESOURCE_IDS } from '@shared/constants/game-ids';
+
+// Use proper IDs from game-ids.ts
 export const BASIC_RESOURCES = [
-  { id: "fibra", name: "Fibra", emoji: "🌾", weight: 1, value: 2 },
-  { id: "pedra", name: "Pedra", emoji: "🪨", weight: 3, value: 3 },
-  { id: "gravetos", name: "Gravetos", emoji: "🪵", weight: 2, value: 2 },
+  { id: RESOURCE_IDS.FIBRA, name: "Fibra", emoji: "🌾", weight: 1, value: 2 },
+  { id: RESOURCE_IDS.PEDRA, name: "Pedra", emoji: "🪨", weight: 3, value: 3 },
+  { id: RESOURCE_IDS.GRAVETOS, name: "Gravetos", emoji: "🪵", weight: 2, value: 2 },
 ];
 
-// Add the missing resources export for equipment-tab.tsx
+// DEPRECATED: Use server APIs instead
 export const resources = [
   {
-    id: "res-madeira-001",
+    id: RESOURCE_IDS.MADEIRA,
     name: "Madeira",
     emoji: "🪵",
     type: "basic",
@@ -18,9 +28,8 @@ export const resources = [
     value: 2,
     rarity: "common"
   },
-  // Legacy consumable IDs for compatibility
   {
-    id: "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+    id: RESOURCE_IDS.AGUA_FRESCA,
     name: "Água Fresca",
     emoji: "💧",
     type: "consumable",
@@ -35,7 +44,7 @@ export const resources = [
     }
   },
   {
-    id: "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+    id: RESOURCE_IDS.CARNE_ASSADA,
     name: "Carne Assada",
     emoji: "🍖",
     type: "consumable",
@@ -50,7 +59,7 @@ export const resources = [
     }
   },
   {
-    id: "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+    id: RESOURCE_IDS.COGUMELOS,
     name: "Cogumelos",
     emoji: "🍄",
     type: "consumable",
@@ -65,7 +74,7 @@ export const resources = [
     }
   },
   {
-    id: "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+    id: RESOURCE_IDS.FRUTAS_SILVESTRES,
     name: "Frutas Silvestres",
     emoji: "🫐",
     type: "consumable",
@@ -80,7 +89,7 @@ export const resources = [
     }
   },
   {
-    id: "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+    id: RESOURCE_IDS.SUCO_FRUTAS,
     name: "Suco de Frutas",
     emoji: "🧃",
     type: "consumable",

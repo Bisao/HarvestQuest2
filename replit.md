@@ -2,6 +2,26 @@
 
 "Coletor Adventures" is a full-stack web application for a resource collection adventure game. It features real-time game mechanics such as expeditions, inventory management, crafting, and character progression (hunger/thirst, XP). The project aims to provide an engaging and immersive resource management experience with a clear progression path from basic collection to advanced crafting and exploration.
 
+## ID Validation System (CRITICAL RULE)
+
+**MASTER RULE: game-ids.ts is the ONLY source of truth for ALL game IDs**
+
+- **Never replace or modify `shared/constants/game-ids.ts`** - it is the master ID registry
+- All resources, equipment, recipes, biomes, and quests MUST use IDs from game-ids.ts
+- Any ID not in game-ids.ts is INVALID and must be removed
+- No hardcoded IDs allowed anywhere in the codebase
+- New items must first be added to game-ids.ts before use
+
+**Validation System Components:**
+- `shared/utils/id-validator-strict.ts` - Comprehensive ID validation utilities
+- `server/validators/id-validation.ts` - Server-side validation middleware
+- System validates all game data at startup and runtime
+- Invalid IDs are automatically filtered out or rejected
+
+**Files Cleaned:**
+- `client/src/lib/game-data.ts` - Updated to use proper IDs from game-ids.ts
+- All legacy UUIDs replaced with proper game-ids.ts references
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
