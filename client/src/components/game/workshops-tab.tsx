@@ -21,7 +21,7 @@ interface WorkshopProcess {
   name: string;
   emoji: string;
   description: string;
-  category: "madeira" | "pedras" | "fibras" | "forja" | "fogueira";
+  category: "madeira" | "pedras" | "fibras" | "forja" | "fogueira" | "equipamentos";
   requiredLevel: number;
   input: {
     resourceId: string;
@@ -41,6 +41,180 @@ interface WorkshopProcess {
 }
 
 const WORKSHOP_PROCESSES: WorkshopProcess[] = [
+  // MATERIAIS BÁSICOS
+  {
+    id: "proc-barbante-001",
+    name: "Barbante",
+    emoji: "🧵",
+    description: "Processe fibras em barbante útil",
+    category: "fibras",
+    requiredLevel: 1,
+    input: { resourceId: RESOURCE_IDS.FIBRA, quantity: 5 },
+    output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 1 },
+    processingTime: 5,
+    efficiency: 100,
+    experienceGained: 10
+  },
+
+  // FERRAMENTAS BÁSICAS
+  {
+    id: "proc-machado-001",
+    name: "Machado",
+    emoji: "🪓",
+    description: "Crie um machado para cortar madeira",
+    category: "madeira",
+    requiredLevel: 1,
+    input: { resourceId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
+    output: { resourceId: "eq-tool-2b3c4d5e-6f78-9012-bcde-f12345678901", quantity: 1 }, // EQUIPMENT_IDS.MACHADO
+    processingTime: 30,
+    efficiency: 95,
+    experienceGained: 25
+  },
+  {
+    id: "proc-picareta-001",
+    name: "Picareta", 
+    emoji: "⛏️",
+    description: "Forje uma picareta para mineração",
+    category: "forja",
+    requiredLevel: 1,
+    input: { resourceId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 2 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
+    output: { resourceId: "eq-tool-1a2b3c4d-5e6f-7890-abcd-ef1234567890", quantity: 1 }, // EQUIPMENT_IDS.PICARETA
+    processingTime: 35,
+    efficiency: 95,
+    experienceGained: 30
+  },
+  {
+    id: "proc-faca-001",
+    name: "Faca",
+    emoji: "🗡️",
+    description: "Forje uma faca para caça e corte",
+    category: "forja",
+    requiredLevel: 1,
+    input: { resourceId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 1 },
+    output: { resourceId: "eq-tool-6f789012-3456-7890-f123-456789012345", quantity: 1 }, // EQUIPMENT_IDS.FACA
+    processingTime: 25,
+    efficiency: 95,
+    experienceGained: 20
+  },
+  {
+    id: "proc-vara-pesca-001",
+    name: "Vara de Pesca",
+    emoji: "🎣",
+    description: "Monte uma vara de pesca",
+    category: "madeira",
+    requiredLevel: 3,
+    input: { resourceId: RESOURCE_IDS.GRAVETOS, quantity: 3 },
+    fuel: { resourceId: RESOURCE_IDS.FIBRA, quantity: 2 },
+    output: { resourceId: "eq-tool-4d5e6f78-9012-3456-def1-234567890123", quantity: 1 }, // EQUIPMENT_IDS.VARA_PESCA
+    processingTime: 45,
+    efficiency: 85,
+    experienceGained: 40
+  },
+  {
+    id: "proc-foice-001",
+    name: "Foice",
+    emoji: "🔪",
+    description: "Forje uma foice para colheita",
+    category: "forja",
+    requiredLevel: 2,
+    input: { resourceId: RESOURCE_IDS.PEDRA, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
+    output: { resourceId: "eq-tool-5e6f7890-1234-5678-ef12-345678901234", quantity: 1 }, // EQUIPMENT_IDS.FOICE
+    processingTime: 40,
+    efficiency: 90,
+    experienceGained: 35
+  },
+
+  // ARMAS
+  {
+    id: "proc-arco-flecha-001",
+    name: "Arco e Flecha",
+    emoji: "🏹",
+    description: "Crie um arco para caça à distância",
+    category: "madeira",
+    requiredLevel: 5,
+    input: { resourceId: RESOURCE_IDS.GRAVETOS, quantity: 2 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
+    output: { resourceId: "eq-weap-a1b2c3d4-5e6f-7890-abcd-ef1234567890", quantity: 1 }, // EQUIPMENT_IDS.ARCO_FLECHA
+    processingTime: 60,
+    efficiency: 70,
+    experienceGained: 60
+  },
+  {
+    id: "proc-lanca-001",
+    name: "Lança",
+    emoji: "🔱",
+    description: "Forje uma lança para combate",
+    category: "forja",
+    requiredLevel: 4,
+    input: { resourceId: RESOURCE_IDS.GRAVETOS, quantity: 2 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 4 },
+    output: { resourceId: "eq-weap-b2c3d4e5-6f78-9012-bcde-f12345678901", quantity: 1 }, // EQUIPMENT_IDS.LANCA
+    processingTime: 50,
+    efficiency: 80,
+    experienceGained: 50
+  },
+
+  // UTENSÍLIOS
+  {
+    id: "proc-balde-madeira-001",
+    name: "Balde de Madeira",
+    emoji: "🪣",
+    description: "Construa um balde para transportar água",
+    category: "madeira",
+    requiredLevel: 2,
+    input: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
+    output: { resourceId: "eq-tool-7890123a-4567-8901-1234-567890123456", quantity: 1 }, // EQUIPMENT_IDS.BALDE_MADEIRA
+    processingTime: 40,
+    efficiency: 90,
+    experienceGained: 35
+  },
+  {
+    id: "proc-garrafa-bambu-001",
+    name: "Garrafa de Bambu",
+    emoji: "🧴",
+    description: "Crie uma garrafa para armazenar líquidos",
+    category: "madeira",
+    requiredLevel: 3,
+    input: { resourceId: RESOURCE_IDS.BAMBU, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 1 },
+    output: { resourceId: "eq-tool-890123ab-5678-9012-2345-678901234567", quantity: 1 }, // EQUIPMENT_IDS.GARRAFA_BAMBU
+    processingTime: 35,
+    efficiency: 90,
+    experienceGained: 30
+  },
+  {
+    id: "proc-mochila-001",
+    name: "Mochila",
+    emoji: "🎒",
+    description: "Costure uma mochila para mais capacidade",
+    category: "fibras",
+    requiredLevel: 5,
+    input: { resourceId: RESOURCE_IDS.COURO, quantity: 2 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 5 },
+    output: { resourceId: "eq-util-78901234-5678-9012-1234-567890123456", quantity: 1 }, // EQUIPMENT_IDS.MOCHILA
+    processingTime: 60,
+    efficiency: 80,
+    experienceGained: 50
+  },
+  {
+    id: "proc-corda-001",
+    name: "Corda",
+    emoji: "🪢",
+    description: "Trança barbante em corda resistente",
+    category: "fibras",
+    requiredLevel: 2,
+    input: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 3 },
+    output: { resourceId: "eq-tool-0123abcd-789a-1234-4567-89012345678a", quantity: 1 }, // EQUIPMENT_IDS.CORDA
+    processingTime: 20,
+    efficiency: 90,
+    experienceGained: 15
+  },
+
   // MADEIRA
   {
     id: "proc-madeira-refinada-001",
@@ -191,7 +365,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     description: "Defume peixe para preservação prolongada",
     category: "fogueira",
     requiredLevel: 5,
-    input: { resourceId: RESOURCE_IDS.PEIXE, quantity: 2 },
+    input: { resourceId: RESOURCE_IDS.PEIXE_PEQUENO, quantity: 2 },
     fuel: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
     output: { resourceId: RESOURCE_IDS.PEIXE_GRELHADO, quantity: 3 },
     processingTime: 45,
@@ -330,7 +504,7 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
       [RESOURCE_IDS.CARNE_ASSADA]: { name: "Carne Assada", emoji: "🍖" },
       [RESOURCE_IDS.COGUMELOS]: { name: "Cogumelos", emoji: "🍄" },
       [RESOURCE_IDS.COGUMELOS_ASSADOS]: { name: "Cogumelos Assados", emoji: "🍄" },
-      [RESOURCE_IDS.PEIXE]: { name: "Peixe", emoji: "🐟" },
+      [RESOURCE_IDS.PEIXE_PEQUENO]: { name: "Peixe", emoji: "🐟" },
       [RESOURCE_IDS.PEIXE_GRELHADO]: { name: "Peixe Grelhado", emoji: "🐟" }
     };
 
@@ -432,7 +606,8 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
     pedras: { name: "Pedras", emoji: "🪨", color: "bg-gray-50 border-gray-200" },
     fibras: { name: "Fibras", emoji: "🌾", color: "bg-green-50 border-green-200" },
     forja: { name: "Forja", emoji: "🔥", color: "bg-red-50 border-red-200" },
-    fogueira: { name: "Fogueira", emoji: "🏕️", color: "bg-orange-50 border-orange-200" }
+    fogueira: { name: "Fogueira", emoji: "🏕️", color: "bg-orange-50 border-orange-200" },
+    equipamentos: { name: "Equipamentos", emoji: "⚔️", color: "bg-purple-50 border-purple-200" }
   };
 
   const maxProcessable = selectedProcess ? getMaxProcessable(selectedProcess) : 0;

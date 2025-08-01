@@ -6,7 +6,7 @@ import BiomesTab from "@/components/game/biomes-tab-new";
 import QuestsTab from "@/components/game/quests-tab";
 import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
 import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
-import RecreatedCraftingTab from "@/components/game/recreated-crafting-tab";
+// import RecreatedCraftingTab from "@/components/game/recreated-crafting-tab"; // REMOVIDO - MIGRADO PARA OFICINAS
 import WorkshopsTab from "@/components/game/workshops-tab";
 import LoadingScreen from "@/components/game/loading-screen";
 import { OfflineActivityReportDialog } from "@/components/game/offline-activity-report";
@@ -247,7 +247,6 @@ export default function Game() {
     { id: "biomes", label: "Biomas", emoji: "🌍" },
     { id: "inventory", label: "Inventário", emoji: "🎒" },
     { id: "storage", label: "Armazém", emoji: "🏠" },
-    { id: "crafting", label: "Crafting", emoji: "🔨" },
     { id: "workshops", label: "Oficinas", emoji: "🏭" },
     { id: "quests", label: "Missões", emoji: "📜" },
   ];
@@ -317,14 +316,7 @@ export default function Game() {
                 player={player}
               />
             )}
-            {activeTab === "crafting" && (
-              <RecreatedCraftingTab
-                recipes={recipes}
-                playerId={player.id}
-                resources={resources}
-                playerLevel={player.level}
-              />
-            )}
+            {/* CRAFTING REMOVIDO - MIGRADO PARA OFICINAS */}
             {activeTab === "workshops" && (
               <WorkshopsTab
                 playerId={player.id}

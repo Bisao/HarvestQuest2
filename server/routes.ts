@@ -17,6 +17,7 @@ import { registerAdminRoutes } from "./routes/admin";
 import { registerStorageRoutes } from "./routes/storage-routes";
 import { createConsumptionRoutes } from "./routes/consumption";
 import savesRouter from "./routes/saves";
+import workshopRouter from "./routes/workshop-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -45,6 +46,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register saves routes  
   app.use('/api/saves', savesRouter);
+
+  // Register workshop routes
+  app.use('/api/v2/workshop', workshopRouter);
 
   // Create new player
   app.post("/api/player", async (req, res) => {
