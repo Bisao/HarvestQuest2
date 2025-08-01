@@ -1021,20 +1021,61 @@ export default function EnhancedStorageTab({
             </div>
             
             <div>
-              <label className="text-sm font-semibold text-gray-700 block mb-2">
-                Quantidade a retirar:
-              </label>
-              <Input
-                type="number"
-                min={1}
-                max={withdrawDialog.item?.quantity || 1}
-                value={withdrawDialog.amount}
-                onChange={(e) => setWithdrawDialog(prev => ({
-                  ...prev,
-                  amount: Math.max(1, Math.min(parseInt(e.target.value) || 1, prev.item?.quantity || 1))
-                }))}
-                className="text-center text-lg font-semibold"
-              />
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-semibold text-gray-700">
+                  Quantidade a retirar:
+                </label>
+                <span className="text-lg font-bold text-blue-600">
+                  {withdrawDialog.amount}
+                </span>
+              </div>
+              
+              <div className="px-3 py-4">
+                <input
+                  type="range"
+                  min={1}
+                  max={withdrawDialog.item?.quantity || 1}
+                  value={withdrawDialog.amount}
+                  onChange={(e) => setWithdrawDialog(prev => ({
+                    ...prev,
+                    amount: parseInt(e.target.value)
+                  }))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+                  style={{
+                    background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((withdrawDialog.amount - 1) / ((withdrawDialog.item?.quantity || 1) - 1)) * 100}%, #e5e7eb ${((withdrawDialog.amount - 1) / ((withdrawDialog.item?.quantity || 1) - 1)) * 100}%, #e5e7eb 100%)`
+                  }}
+                />
+                
+                <div className="flex justify-between text-xs text-gray-500 mt-2">
+                  <span>1</span>
+                  <span>{withdrawDialog.item?.quantity || 1}</span>
+                </div>
+              </div>
+              
+              {/* Quick select buttons */}
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={() => setWithdrawDialog(prev => ({ ...prev, amount: 1 }))}
+                  className="flex-1 py-2 px-3 text-xs bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                >
+                  Mín (1)
+                </button>
+                <button
+                  onClick={() => setWithdrawDialog(prev => ({ 
+                    ...prev, 
+                    amount: Math.max(1, Math.floor((prev.item?.quantity || 1) / 2))
+                  }))}
+                  className="flex-1 py-2 px-3 text-xs bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                >
+                  Metade
+                </button>
+                <button
+                  onClick={() => setWithdrawDialog(prev => ({ ...prev, amount: prev.item?.quantity || 1 }))}
+                  className="flex-1 py-2 px-3 text-xs bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                >
+                  Máx ({withdrawDialog.item?.quantity || 1})
+                </button>
+              </div>
             </div>
 
             <div className="flex space-x-3">
