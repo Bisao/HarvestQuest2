@@ -6,7 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Clock, MapPin, AlertTriangle, Settings, Heart, Droplet } from "lucide-react";
+import { Clock, MapPin, AlertTriangle, Settings, Heart, Droplet, Package } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { OfflineActivityConfig } from "@shared/types";
