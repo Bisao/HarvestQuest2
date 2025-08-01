@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab-new";
@@ -8,16 +8,24 @@ import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with
 import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 import LoadingScreen from "@/components/game/loading-screen";
+import { OfflineActivityReportDialog } from "@/components/game/offline-activity-report";
+import { OfflineConfigModal } from "@/components/game/offline-config-modal";
 
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
-import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
+import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem, OfflineActivityReport } from "@shared/types";
 import { useQuestStatus } from "@/hooks/use-quest-status";
 import { useGamePolling } from '@/hooks/useGamePolling';
+import { useToast } from "@/hooks/use-toast";
 
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
   const [activeExpedition, setActiveExpedition] = useState<ActiveExpedition | null>(null);
   const [location, setLocation] = useLocation();
+  const [offlineReport, setOfflineReport] = useState<OfflineActivityReport | null>(null);
+  const [showOfflineReport, setShowOfflineReport] = useState(false);
+  const [showOfflineConfig, setShowOfflineConfig] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Get player from URL parameter
   const urlParams = new URLSearchParams(window.location.search);
@@ -61,6 +69,70 @@ export default function Game() {
     playerId: player?.id || null,
     enabled: !!player?.id 
   });
+
+  // Marca jogador como online quando entra no jogo
+  const markOnlineMutation = useMutation({
+    mutationFn: async (playerId: string) => {
+      const response = await fetch(`/api/player/${playerId}/mark-online`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!response.ok) throw new Error('Failed to mark online');
+      return response.json();
+    }
+  });
+
+  // Verifica atividade offline quando jogador carrega
+  useEffect(() => {
+    if (!player?.id) return;
+
+    const checkOfflineActivity = async () => {
+      try {
+        const response = await fetch(`/api/player/${player.id}/offline-activity`);
+        if (!response.ok) return;
+        
+        const data = await response.json();
+        
+        if (data.hasOfflineActivity && data.report) {
+          setOfflineReport(data.report);
+          setShowOfflineReport(true);
+          
+          // Atualiza os dados do jogador para refletir as mudanças
+          queryClient.invalidateQueries({ queryKey: [`/api/player/${playerUsername}`] });
+          queryClient.invalidateQueries({ queryKey: ["/api/inventory", player.id] });
+          queryClient.invalidateQueries({ queryKey: ["/api/storage", player.id] });
+        }
+      } catch (error) {
+        console.error('Failed to check offline activity:', error);
+      }
+    };
+
+    checkOfflineActivity();
+  }, [player?.id, queryClient, playerUsername]);
+
+  // Marca jogador como online quando sai
+  useEffect(() => {
+    if (!player?.id) return;
+
+    const markOnline = () => {
+      markOnlineMutation.mutate(player.id);
+    };
+
+    // Marca como online ao entrar
+    markOnline();
+
+    // Marca como online ao sair/fechar
+    const handleBeforeUnload = () => {
+      markOnline();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      markOnline();
+    };
+  }, [player?.id, markOnlineMutation]);
 
   const { data: biomes = [] } = useQuery<Biome[]>({
     queryKey: ["/api/biomes"],
@@ -248,6 +320,30 @@ export default function Game() {
           />
         )}
       </main>
+
+      {/* Offline Activity Report Modal */}
+      {offlineReport && (
+        <OfflineActivityReportDialog
+          isOpen={showOfflineReport}
+          onClose={() => {
+            setShowOfflineReport(false);
+            setOfflineReport(null);
+          }}
+          report={offlineReport}
+          onConfigureOffline={() => {
+            setShowOfflineReport(false);
+            setShowOfflineConfig(true);
+          }}
+        />
+      )}
+
+      {/* Offline Configuration Modal */}
+      <OfflineConfigModal
+        isOpen={showOfflineConfig}
+        onClose={() => setShowOfflineConfig(false)}
+        playerId={player?.id || ''}
+        currentConfig={player?.offlineActivityConfig}
+      />
     </div>
   );
 }

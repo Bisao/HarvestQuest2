@@ -8,6 +8,7 @@ import type { Player, HungerDegradationMode } from "@shared/types";
 import { GameService } from "./services/game-service";
 import { ExpeditionService } from "./services/expedition-service";
 import { QuestService } from "./services/quest-service";
+import { OfflineActivityService } from "./services/offline-activity-service";
 import { randomUUID } from "crypto";
 import { registerHealthRoutes } from "./routes/health";
 import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
@@ -24,6 +25,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gameService = new GameService(storage);
   const expeditionService = new ExpeditionService(storage);
   const questService = new QuestService(storage);
+  const offlineActivityService = new OfflineActivityService(storage);
 
   // Register health and monitoring routes
   registerHealthRoutes(app);
@@ -165,6 +167,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Update player settings error:', error);
       res.status(500).json({ message: "Failed to update player settings" });
+    }
+  });
+
+  // Sistema de Notificações/Resumos Offline
+  // Verifica atividade offline quando jogador faz login
+  app.get("/api/player/:playerId/offline-activity", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      
+      const result = await offlineActivityService.calculateOfflineActivity(playerId);
+      
+      if (!result) {
+        return res.json({ hasOfflineActivity: false });
+      }
+
+      // Aplica as recompensas e atualizações
+      const { report, playerUpdates, inventoryUpdates, storageUpdates } = result;
+      
+      // Atualiza o jogador
+      if (Object.keys(playerUpdates).length > 0) {
+        await storage.updatePlayer(playerId, playerUpdates);
+      }
+
+      // Atualiza inventário
+      for (const update of inventoryUpdates) {
+        const existingItem = await storage.getPlayerInventory(playerId);
+        const existing = existingItem.find(item => item.resourceId === update.resourceId);
+        
+        if (existing) {
+          await storage.updateInventoryItem(existing.id, {
+            quantity: existing.quantity + update.quantity
+          });
+        } else {
+          await storage.addInventoryItem({
+            playerId,
+            resourceId: update.resourceId,
+            quantity: update.quantity
+          });
+        }
+      }
+
+      // Atualiza storage
+      for (const update of storageUpdates) {
+        const existingStorage = await storage.getPlayerStorage(playerId);
+        const existing = existingStorage.find(item => item.resourceId === update.resourceId);
+        
+        if (existing) {
+          await storage.updateStorageItem(existing.id, {
+            quantity: existing.quantity + update.quantity
+          });
+        } else {
+          await storage.addStorageItem({
+            playerId,
+            resourceId: update.resourceId,
+            quantity: update.quantity
+          });
+        }
+      }
+
+      // Invalida cache para garantir dados atualizados no frontend
+      try {
+        const { invalidatePlayerCache } = await import("./cache/memory-cache");
+        invalidatePlayerCache(playerId);
+      } catch (error) {
+        console.warn('Cache invalidation failed:', error);
+      }
+
+      res.json({
+        hasOfflineActivity: true,
+        report
+      });
+
+    } catch (error) {
+      console.error("Offline activity error:", error);
+      res.status(500).json({ message: "Failed to process offline activity" });
+    }
+  });
+
+  // Marca jogador como online
+  app.post("/api/player/:playerId/mark-online", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      await offlineActivityService.markPlayerOnline(playerId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Mark online error:", error);
+      res.status(500).json({ message: "Failed to mark player online" });
+    }
+  });
+
+  // Configura atividades offline
+  app.patch("/api/player/:playerId/offline-config", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const config = req.body;
+      
+      await offlineActivityService.updateOfflineConfig(playerId, config);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Update offline config error:", error);
+      res.status(500).json({ message: "Failed to update offline config" });
     }
   });
 

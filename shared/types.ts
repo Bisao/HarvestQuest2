@@ -27,6 +27,8 @@ export interface Player {
   equippedBoots: string | null;
   equippedWeapon: string | null;
   equippedTool: string | null;
+  lastOnlineTime?: number; // Timestamp for offline calculations
+  offlineActivityConfig?: OfflineActivityConfig; // Configuration for offline activities
 }
 
 export interface InsertPlayer {
@@ -489,3 +491,39 @@ export const updatePlayerSchema = z.object({
   equippedWeapon: z.string().nullable().optional(),
   equippedTool: z.string().nullable().optional(),
 });
+
+// Sistema de Notificações/Resumos Offline
+export interface OfflineActivityConfig {
+  enabled: boolean;
+  preferredBiome?: string;
+  maxDuration?: number; // em horas
+  stopOnLowResources?: boolean;
+  minHunger?: number;
+  minThirst?: number;
+}
+
+export interface OfflineActivityReport {
+  timeOffline: number; // em milissegundos
+  hoursOffline: number; // calculado para display
+  resourcesCollected: Record<string, number>;
+  experienceGained: number;
+  expeditionsCompleted: number;
+  hungerConsumed: number;
+  thirstConsumed: number;
+  specialEvents: OfflineEvent[];
+  efficiency: number; // 0-100, baseado em condições
+}
+
+export interface OfflineEvent {
+  type: 'resource_bonus' | 'tool_break' | 'level_up' | 'quest_complete' | 'special_find';
+  description: string;
+  timestamp: number;
+  data?: any;
+}
+
+export interface OfflineCalculationResult {
+  report: OfflineActivityReport;
+  playerUpdates: Partial<Player>;
+  inventoryUpdates: { resourceId: string; quantity: number }[];
+  storageUpdates: { resourceId: string; quantity: number }[];
+}
