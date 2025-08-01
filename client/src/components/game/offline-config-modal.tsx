@@ -29,7 +29,7 @@ export function OfflineConfigModal({
 }: OfflineConfigModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [config, setConfig] = useState<OfflineActivityConfig>({
     enabled: currentConfig?.enabled ?? true,
     preferredBiome: currentConfig?.preferredBiome,
@@ -106,31 +106,31 @@ export function OfflineConfigModal({
   // Função para verificar se o jogador pode coletar um recurso
   const canCollectResource = (resource: any) => {
     if (!resource.requirements) return true;
-    
+
     const playerLevel = (player as any)?.level || 1;
     const playerInventory = Array.isArray(inventory) ? inventory : [];
-    
+
     // Verifica requisito de nível
     if (resource.requirements.level && playerLevel < resource.requirements.level) {
       return false;
     }
-    
+
     // Verifica requisito de ferramenta
     if (resource.requirements.tool) {
       const hasTool = playerInventory.some((item: any) => 
         item.itemId === resource.requirements.tool && item.quantity > 0
       ) || (player as any)?.equippedTool === resource.requirements.tool;
-      
+
       if (!hasTool) return false;
     }
-    
+
     // Verifica requisito de bioma apenas se um bioma específico foi selecionado
     if (resource.requirements.biomes && resource.requirements.biomes.length > 0 && config.preferredBiome) {
       if (!resource.requirements.biomes.includes(config.preferredBiome)) {
         return false;
       }
     }
-    
+
     return true;
   };
 
@@ -139,13 +139,13 @@ export function OfflineConfigModal({
     .filter((resource: any) => {
       // Filtra apenas recursos (não equipamentos)
       if (resource.type !== 'resource') return false;
-      
+
       // Se não tem requisitos, pode coletar
       if (!resource.requirements) return true;
-      
+
       // Verifica se pode coletar baseado nos requisitos
       if (!canCollectResource(resource)) return false;
-      
+
       // Se nenhum bioma foi selecionado, verifica se o recurso está disponível em algum bioma acessível
       if (!config.preferredBiome && resource.requirements.biomes && resource.requirements.biomes.length > 0) {
         const hasAccessibleBiome = resource.requirements.biomes.some((biomeId: string) => 
@@ -153,7 +153,7 @@ export function OfflineConfigModal({
         );
         return hasAccessibleBiome;
       }
-      
+
       return true;
     })
     .sort((a: any, b: any) => (a.requirements?.level || 0) - (b.requirements?.level || 0));
@@ -187,6 +187,20 @@ export function OfflineConfigModal({
   const handleSave = () => {
     updateConfigMutation.mutate(config);
   };
+
+  const { data: availableResources = [], isLoading: resourcesLoading } = useQuery({
+    queryKey: [`/api/player/${playerId}/offline-resources`],
+    queryFn: async () => {
+      if (!playerId) return [];
+      const response = await fetch(`/api/player/${playerId}/offline-resources`);
+      if (!response.ok) {
+        console.error('Failed to fetch offline resources:', response.status);
+        return [];
+      }
+      return response.json();
+    },
+    enabled: !!playerId,
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -302,7 +316,7 @@ export function OfflineConfigModal({
                           Selecionar Todos os Recursos
                         </Label>
                       </div>
-                      
+
                       {availableResources.map((resource: any) => (
                         <div key={resource.id} className="space-y-1">
                           <div className="flex items-center space-x-2">
@@ -334,7 +348,7 @@ export function OfflineConfigModal({
                       <p className="text-xs">Melhore seu nível e equipamentos para desbloquear mais recursos</p>
                     </div>
                   )}
-                  
+
                   {config.preferredResources?.length === 0 && (
                     <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border border-amber-200 dark:border-amber-800">
                       <p className="text-sm text-amber-700 dark:text-amber-300">

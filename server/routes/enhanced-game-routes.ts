@@ -327,6 +327,55 @@ export function registerEnhancedGameRoutes(
     }
   );
 
+  // Enhanced offline resources endpoint for offline activity configuration
+  app.get("/api/player/:playerId/offline-resources",
+    validateParams(playerIdParamSchema),
+    async (req, res, next) => {
+      try {
+        const { playerId } = req.params;
+
+        const player = await storage.getPlayer(playerId);
+        if (!player) {
+          throw new NotFoundError("Player");
+        }
+
+        // Get all resources that can be collected
+        const allResources = await storage.getAllResources();
+        const playerLevel = player.level;
+
+        // Filter resources based on player level and collection requirements
+        const availableResources = [];
+
+        for (const resource of allResources) {
+          // Check level requirement
+          if (resource.requiredLevel && resource.requiredLevel > playerLevel) {
+            continue;
+          }
+
+          // Check if player has required tools
+          const hasTools = await gameService.hasRequiredTool(playerId, resource.id);
+          if (!hasTools) {
+            continue;
+          }
+
+          // Check if resource can be collected (has collection requirements or is basic)
+          if (resource.collectionRequirements && resource.collectionRequirements.length > 0) {
+            availableResources.push({
+              id: resource.id,
+              name: resource.name,
+              requiredLevel: resource.requiredLevel || 1,
+              collectionRequirements: resource.collectionRequirements
+            });
+          }
+        }
+
+        successResponse(res, availableResources);
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
+
   // Enhanced expedition start with validation
   app.post("/api/v2/expeditions",
     validateBody(startExpeditionSchema),
