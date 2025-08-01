@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import type { Resource, StorageItem } from "@shared/types";
 import { Button } from "@/components/ui/button";
@@ -27,6 +26,10 @@ interface WorkshopProcess {
     resourceId: string;
     quantity: number;
   };
+  secondary?: {
+    resourceId: string;
+    quantity: number;
+  };
   fuel?: {
     resourceId: string;
     quantity: number;
@@ -40,182 +43,37 @@ interface WorkshopProcess {
   experienceGained: number;
 }
 
-const WORKSHOP_PROCESSES: WorkshopProcess[] = [
-  // SERRA (MADEIRA) - CABOS E PARTES DE MADEIRA
+// SISTEMA ROBUSTO DE OFICINAS - PRODUÇÃO REALISTA POR PARTES
+const ROBUST_WORKSHOP_PROCESSES: WorkshopProcess[] = [
+  // ===== BANCADA - MATERIAIS BÁSICOS =====
   {
-    id: "proc-cabo-machado-001",
-    name: "Cabo de Machado",
-    emoji: "🪵",
-    description: "Serrar madeira para criar cabo de machado",
-    category: "madeira",
-    requiredLevel: 1,
-    input: { resourceId: RESOURCE_IDS.FIBRA, quantity: 5 },
-    output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 1 },
-    processingTime: 5,
-    efficiency: 100,
-    experienceGained: 10
-  },
-
-  // FERRAMENTAS BÁSICAS
-  {
-    id: "proc-machado-001",
-    name: "Machado",
-    emoji: "🪓",
-    description: "Crie um machado para cortar madeira",
-    category: "madeira",
-    requiredLevel: 1,
-    input: { resourceId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1 },
-    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
-    output: { resourceId: "eq-tool-2b3c4d5e-6f78-9012-bcde-f12345678901", quantity: 1 }, // EQUIPMENT_IDS.MACHADO
-    processingTime: 30,
-    efficiency: 95,
-    experienceGained: 25
-  },
-  {
-    id: "proc-picareta-001",
-    name: "Picareta", 
-    emoji: "⛏️",
-    description: "Forje uma picareta para mineração",
-    category: "forja",
-    requiredLevel: 1,
-    input: { resourceId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 2 },
-    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
-    output: { resourceId: "eq-tool-1a2b3c4d-5e6f-7890-abcd-ef1234567890", quantity: 1 }, // EQUIPMENT_IDS.PICARETA
-    processingTime: 35,
-    efficiency: 95,
-    experienceGained: 30
-  },
-  {
-    id: "proc-faca-001",
-    name: "Faca",
-    emoji: "🗡️",
-    description: "Forje uma faca para caça e corte",
-    category: "forja",
-    requiredLevel: 1,
-    input: { resourceId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1 },
-    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 1 },
-    output: { resourceId: "eq-tool-6f789012-3456-7890-f123-456789012345", quantity: 1 }, // EQUIPMENT_IDS.FACA
-    processingTime: 25,
-    efficiency: 95,
-    experienceGained: 20
-  },
-  {
-    id: "proc-vara-pesca-001",
-    name: "Vara de Pesca",
-    emoji: "🎣",
-    description: "Monte uma vara de pesca",
-    category: "madeira",
-    requiredLevel: 3,
-    input: { resourceId: RESOURCE_IDS.GRAVETOS, quantity: 3 },
-    fuel: { resourceId: RESOURCE_IDS.FIBRA, quantity: 2 },
-    output: { resourceId: "eq-tool-4d5e6f78-9012-3456-def1-234567890123", quantity: 1 }, // EQUIPMENT_IDS.VARA_PESCA
-    processingTime: 45,
-    efficiency: 85,
-    experienceGained: 40
-  },
-  {
-    id: "proc-foice-001",
-    name: "Foice",
-    emoji: "🔪",
-    description: "Forje uma foice para colheita",
-    category: "forja",
-    requiredLevel: 2,
-    input: { resourceId: RESOURCE_IDS.PEDRA, quantity: 1 },
-    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
-    output: { resourceId: "eq-tool-5e6f7890-1234-5678-ef12-345678901234", quantity: 1 }, // EQUIPMENT_IDS.FOICE
-    processingTime: 40,
-    efficiency: 90,
-    experienceGained: 35
-  },
-
-  // ARMAS
-  {
-    id: "proc-arco-flecha-001",
-    name: "Arco e Flecha",
-    emoji: "🏹",
-    description: "Crie um arco para caça à distância",
-    category: "madeira",
-    requiredLevel: 5,
-    input: { resourceId: RESOURCE_IDS.GRAVETOS, quantity: 2 },
-    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
-    output: { resourceId: "eq-weap-a1b2c3d4-5e6f-7890-abcd-ef1234567890", quantity: 1 }, // EQUIPMENT_IDS.ARCO_FLECHA
-    processingTime: 60,
-    efficiency: 70,
-    experienceGained: 60
-  },
-  {
-    id: "proc-lanca-001",
-    name: "Lança",
-    emoji: "🔱",
-    description: "Forje uma lança para combate",
-    category: "forja",
-    requiredLevel: 4,
-    input: { resourceId: RESOURCE_IDS.GRAVETOS, quantity: 2 },
-    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 4 },
-    output: { resourceId: "eq-weap-b2c3d4e5-6f78-9012-bcde-f12345678901", quantity: 1 }, // EQUIPMENT_IDS.LANCA
-    processingTime: 50,
-    efficiency: 80,
-    experienceGained: 50
-  },
-
-  // UTENSÍLIOS
-  {
-    id: "proc-balde-madeira-001",
-    name: "Balde de Madeira",
-    emoji: "🪣",
-    description: "Construa um balde para transportar água",
-    category: "madeira",
-    requiredLevel: 2,
-    input: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
-    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
-    output: { resourceId: "eq-tool-7890123a-4567-8901-1234-567890123456", quantity: 1 }, // EQUIPMENT_IDS.BALDE_MADEIRA
-    processingTime: 40,
-    efficiency: 90,
-    experienceGained: 35
-  },
-  {
-    id: "proc-garrafa-bambu-001",
-    name: "Garrafa de Bambu",
-    emoji: "🧴",
-    description: "Crie uma garrafa para armazenar líquidos",
-    category: "madeira",
-    requiredLevel: 3,
-    input: { resourceId: RESOURCE_IDS.BAMBU, quantity: 1 },
-    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 1 },
-    output: { resourceId: "eq-tool-890123ab-5678-9012-2345-678901234567", quantity: 1 }, // EQUIPMENT_IDS.GARRAFA_BAMBU
-    processingTime: 35,
-    efficiency: 90,
-    experienceGained: 30
-  },
-  {
-    id: "proc-mochila-001",
-    name: "Mochila",
-    emoji: "🎒",
-    description: "Costure uma mochila para mais capacidade",
+    id: "proc-barbante-001",
+    name: "Barbante",
+    emoji: "🧵",
+    description: "Processar fibras em barbante resistente",
     category: "bancada",
-    requiredLevel: 5,
-    input: { resourceId: RESOURCE_IDS.COURO, quantity: 2 },
-    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 5 },
-    output: { resourceId: "eq-util-78901234-5678-9012-1234-567890123456", quantity: 1 }, // EQUIPMENT_IDS.MOCHILA
-    processingTime: 60,
-    efficiency: 80,
-    experienceGained: 50
+    requiredLevel: 1,
+    input: { resourceId: RESOURCE_IDS.FIBRA, quantity: 4 },
+    output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 3 },
+    processingTime: 15,
+    efficiency: 85,
+    experienceGained: 5
   },
   {
     id: "proc-corda-001",
     name: "Corda",
     emoji: "🪢",
-    description: "Trança barbante em corda resistente",
+    description: "Trançar barbante em corda resistente",
     category: "bancada",
     requiredLevel: 2,
-    input: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 3 },
-    output: { resourceId: "eq-tool-0123abcd-789a-1234-4567-89012345678a", quantity: 1 }, // EQUIPMENT_IDS.CORDA
-    processingTime: 20,
-    efficiency: 90,
-    experienceGained: 15
+    input: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 6 },
+    output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 }, // Placeholder - precisa criar RESOURCE_IDS.CORDA
+    processingTime: 25,
+    efficiency: 80,
+    experienceGained: 12
   },
 
-  // MADEIRA
+  // ===== MADEIRA - PROCESSAMENTO DE MADEIRA =====
   {
     id: "proc-madeira-refinada-001",
     name: "Madeira Refinada",
@@ -243,7 +101,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     experienceGained: 12
   },
 
-  // PEDRAS
+  // ===== PEDRAS - PROCESSAMENTO DE MINERAIS =====
   {
     id: "proc-pedras-lapidadas-001",
     name: "Pedras Lapidadas", 
@@ -271,35 +129,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     experienceGained: 25
   },
 
-  // BANCADA (CRIAÇÃO DE ITENS)
-  {
-    id: "proc-fibra-processada-001",
-    name: "Fibra Processada",
-    emoji: "🌾",
-    description: "Processe fibras brutas em material têxtil",
-    category: "bancada",
-    requiredLevel: 1,
-    input: { resourceId: RESOURCE_IDS.FIBRA, quantity: 10 },
-    output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 4 },
-    processingTime: 20,
-    efficiency: 80,
-    experienceGained: 10
-  },
-  {
-    id: "proc-couro-tratado-001",
-    name: "Couro Tratado",
-    emoji: "🦫",
-    description: "Trate couro bruto para melhor qualidade",
-    category: "bancada", 
-    requiredLevel: 5,
-    input: { resourceId: RESOURCE_IDS.COURO, quantity: 2 },
-    output: { resourceId: RESOURCE_IDS.COURO, quantity: 3 },
-    processingTime: 60,
-    efficiency: 110,
-    experienceGained: 30
-  },
-
-  // FORJA (METAIS)
+  // ===== FORJA - METAIS =====
   {
     id: "proc-ferro-fundido-001",
     name: "Fundição de Ferro",
@@ -314,22 +144,8 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
     efficiency: 70,
     experienceGained: 40
   },
-  {
-    id: "proc-ferro-avancado-001",
-    name: "Ferro Refinado",
-    emoji: "⚙️",
-    description: "Refine ferro fundido em ferro de alta qualidade",
-    category: "forja",
-    requiredLevel: 8,
-    input: { resourceId: RESOURCE_IDS.FERRO_FUNDIDO, quantity: 3 },
-    fuel: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 3 },
-    output: { resourceId: RESOURCE_IDS.FERRO_FUNDIDO, quantity: 4 },
-    processingTime: 120,
-    efficiency: 85,
-    experienceGained: 60
-  },
 
-  // FOGUEIRA (ALIMENTOS)
+  // ===== FOGUEIRA - ALIMENTOS =====
   {
     id: "proc-conservas-001",
     name: "Conservas de Carne",
@@ -374,593 +190,7 @@ const WORKSHOP_PROCESSES: WorkshopProcess[] = [
   }
 ];
 
-// SISTEMA ROBUSTO DE OFICINAS - PRODUÇÃO REALISTA POR PARTES
-const ROBUST_WORKSHOP_PROCESSES: WorkshopProcess[] = [
-  // ===== SERRA (MADEIRA) - CABOS E PARTES DE MADEIRA =====
-  {
-    id: "proc-cabo-machado-001",
-    name: "Cabo de Machado",
-    emoji: "🪵",
-    description: "Serrar madeira para criar cabo resistente de machado",
-    category: "madeira",
-    requiredLevel: 2,
-    input: {
-      resourceId: RESOURCE_IDS.MADEIRA,
-      quantity: 2
-    },
-    output: {
-      resourceId: RESOURCE_IDS.CABO_MACHADO,
-      quantity: 1
-    },
-    processingTime: 30,
-    efficiency: 90,
-    experienceGained: 15
-  },
-  {
-    id: "proc-cabo-picareta-001",
-    name: "Cabo de Picareta",
-    emoji: "🪵",
-    description: "Serrar madeira para criar cabo de picareta",
-    category: "madeira",
-    requiredLevel: 2,
-    input: {
-      resourceId: RESOURCE_IDS.MADEIRA,
-      quantity: 2
-    },
-    output: {
-      resourceId: RESOURCE_IDS.CABO_PICARETA,
-      quantity: 1
-    },
-    processingTime: 30,
-    efficiency: 90,
-    experienceGained: 15
-  },
-  {
-    id: "proc-cabo-espada-001",
-    name: "Empunhadura de Espada",
-    emoji: "🪵",
-    description: "Esculpir madeira para empunhadura de espada",
-    category: "madeira",
-    requiredLevel: 3,
-    input: {
-      resourceId: RESOURCE_IDS.MADEIRA,
-      quantity: 1
-    },
-    output: {
-      resourceId: RESOURCE_IDS.CABO_ESPADA,
-      quantity: 1
-    },
-    processingTime: 25,
-    efficiency: 85,
-    experienceGained: 12
-  },
-  {
-    id: "proc-haste-flecha-001",
-    name: "Haste de Flecha",
-    emoji: "🏹",
-    description: "Cortar madeira em hastes finas para flechas",
-    category: "madeira",
-    requiredLevel: 1,
-    input: {
-      resourceId: RESOURCE_IDS.MADEIRA,
-      quantity: 1
-    },
-    output: {
-      resourceId: RESOURCE_IDS.HASTE_FLECHA,
-      quantity: 5
-    },
-    processingTime: 15,
-    efficiency: 85,
-    experienceGained: 8
-  },
-
-  // ===== FORJA - PARTES METÁLICAS E FUNDIÇÃO =====
-  {
-    id: "proc-barra-ferro-001",
-    name: "Barra de Ferro",
-    emoji: "🔩",
-    description: "Fundir minério de ferro em barras utilizáveis",
-    category: "forja",
-    requiredLevel: 2,
-    input: {
-      resourceId: RESOURCE_IDS.MINERAL_FERRO,
-      quantity: 3
-    },
-    fuel: {
-      resourceId: RESOURCE_IDS.CARVAO,
-      quantity: 1
-    },
-    output: {
-      resourceId: RESOURCE_IDS.BARRA_FERRO,
-      quantity: 1
-    },
-    processingTime: 45,
-    efficiency: 80,
-    experienceGained: 20
-  },
-  {
-    id: "proc-cabeca-machado-001",
-    name: "Cabeça de Machado",
-    emoji: "🔨",
-    description: "Forjar cabeça cortante do machado",
-    category: "forja",
-    requiredLevel: 3,
-    input: {
-      resourceId: RESOURCE_IDS.BARRA_FERRO,
-      quantity: 2
-    },
-    fuel: {
-      resourceId: RESOURCE_IDS.CARVAO,
-      quantity: 1
-    },
-    output: {
-      resourceId: RESOURCE_IDS.CABECA_MACHADO,
-      quantity: 1
-    },
-    processingTime: 50,
-    efficiency: 85,
-    experienceGained: 25
-  },
-  {
-    id: "proc-cabeca-picareta-001",
-    name: "Cabeça de Picareta",
-    emoji: "⛏️",
-    description: "Forjar cabeça perfurante da picareta",
-    category: "forja",
-    requiredLevel: 3,
-    input: {
-      resourceId: RESOURCE_IDS.BARRA_FERRO,
-      quantity: 2
-    },
-    fuel: {
-      resourceId: RESOURCE_IDS.CARVAO,
-      quantity: 1
-    },
-    output: {
-      resourceId: RESOURCE_IDS.CABECA_PICARETA,
-      quantity: 1
-    },
-    processingTime: 50,
-    efficiency: 85,
-    experienceGained: 25
-  },
-  {
-    id: "proc-lamina-espada-001",
-    name: "Lâmina de Espada",
-    emoji: "⚔️",
-    description: "Forjar lâmina afiada e equilibrada",
-    category: "forja",
-    requiredLevel: 4,
-    input: {
-      resourceId: RESOURCE_IDS.BARRA_FERRO,
-      quantity: 3
-    },
-    fuel: {
-      resourceId: RESOURCE_IDS.CARVAO,
-      quantity: 2
-    },
-    output: {
-      resourceId: RESOURCE_IDS.LAMINA_ESPADA,
-      quantity: 1
-    },
-    processingTime: 70,
-    efficiency: 80,
-    experienceGained: 35
-  },
-  {
-    id: "proc-ponta-flecha-001",
-    name: "Ponta de Flecha",
-    emoji: "🏹",
-    description: "Forjar pontas afiadas para flechas",
-    category: "forja",
-    requiredLevel: 2,
-    input: {
-      resourceId: RESOURCE_IDS.BARRA_FERRO,
-      quantity: 1
-    },
-    fuel: {
-      resourceId: RESOURCE_IDS.CARVAO,
-      quantity: 1
-    },
-    output: {
-      resourceId: RESOURCE_IDS.PONTA_FLECHA,
-      quantity: 8
-    },
-    processingTime: 30,
-    efficiency: 90,
-    experienceGained: 15
-  },
-
-  // ===== BANCADA - MONTAGEM DE ITENS FINAIS =====
-  {
-    id: "proc-machado-ferro-completo-001",
-    name: "Machado de Ferro",
-    emoji: "🪓",
-    description: "Montar machado unindo cabo e cabeça",
-    category: "bancada",
-    requiredLevel: 3,
-    input: {
-      resourceId: RESOURCE_IDS.CABO_MACHADO,
-      quantity: 1
-    },
-    fuel: {
-      resourceId: RESOURCE_IDS.CABECA_MACHADO,
-      quantity: 1
-    },
-    output: {
-      resourceId: RESOURCE_IDS.MACHADO_FERRO,
-      quantity: 1
-    },
-    processingTime: 20,
-    efficiency: 95,
-    experienceGained: 30
-  },
-  {
-    id: "proc-picareta-ferro-completa-001",
-    name: "Picareta de Ferro",
-    emoji: "⛏️",
-    description: "Montar picareta unindo cabo e cabeça",
-    category: "bancada",
-    requiredLevel: 3,
-    input: {
-      resourceId: RESOURCE_IDS.CABO_PICARETA,
-      quantity: 1
-    },
-    fuel: {
-      resourceId: RESOURCE_IDS.CABECA_PICARETA,
-      quantity: 1
-    },
-    output: {
-      resourceId: RESOURCE_IDS.PICARETA_FERRO,
-      quantity: 1
-    },
-    processingTime: 20,
-    efficiency: 95,
-    experienceGained: 30
-  },
-  {
-    id: "proc-espada-ferro-completa-001",
-    name: "Espada de Ferro",
-    emoji: "⚔️",
-    description: "Montar espada unindo empunhadura e lâmina",
-    category: "bancada",
-    requiredLevel: 4,
-    input: {
-      resourceId: RESOURCE_IDS.CABO_ESPADA,
-      quantity: 1
-    },
-    fuel: {
-      resourceId: RESOURCE_IDS.LAMINA_ESPADA,
-      quantity: 1
-    },
-    output: {
-      resourceId: RESOURCE_IDS.ESPADA_FERRO,
-      quantity: 1
-    },
-    processingTime: 25,
-    efficiency: 90,
-    experienceGained: 45
-  },
-  {
-    id: "proc-flecha-completa-001",
-    name: "Flecha",
-    emoji: "🏹",
-    description: "Montar flechas com hastes e pontas",
-    category: "bancada",
-    requiredLevel: 2,
-    input: {
-      resourceId: RESOURCE_IDS.HASTE_FLECHA,
-      quantity: 3
-    },
-    fuel: {
-      resourceId: RESOURCE_IDS.PONTA_FLECHA,
-      quantity: 3
-    },
-    output: {
-      resourceId: RESOURCE_IDS.FLECHA,
-      quantity: 3
-    },
-    processingTime: 12,
-    efficiency: 85,
-    experienceGained: 18
-  }
-];
-
 export default function WorkshopsTab({ resources, playerLevel, playerId, isBlocked = false }: WorkshopTabProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [activeCategory, setActiveCategory] = useState<string>("bancada");
-  const [selectedProcess, setSelectedProcess] = useState<WorkshopProcess | null>(null);
-  const [processQuantity, setProcessQuantity] = useState<number>(1);
-  const [processingInProgress, setProcessingInProgress] = useState<boolean>(false);
-  const [outputItems, setOutputItems] = useState<Array<{resourceId: string, quantity: number}>>([]);
-  const [activeFilter, setActiveFilter] = useState<string>("all");
-
-  // Informações das categorias
-  const categoryInfo = {
-    bancada: { name: "Bancada", emoji: "🔨", color: "bg-blue-50 border-blue-200", description: "Montagem e criação final de itens" },
-    madeira: { name: "Serra", emoji: "🪚", color: "bg-amber-50 border-amber-200", description: "Processamento de madeira e cabos" },
-    pedras: { name: "Pedras", emoji: "🪨", color: "bg-gray-50 border-gray-200", description: "Processamento de minerais e pedras" },
-    forja: { name: "Forja", emoji: "🔥", color: "bg-red-50 border-red-200", description: "Fundição e forja de partes metálicas" },
-    fogueira: { name: "Fogueira", emoji: "🏕️", color: "bg-orange-50 border-orange-200", description: "Cozimento e tratamento de materiais" }
-  };
-
-  // Filtros por tipo de item melhorados
-  const itemFilters = {
-    all: { name: "Todos", emoji: "📋", description: "Todos os processos" },
-    parts: { name: "Partes", emoji: "🔧", description: "Cabos, cabeças e componentes" },
-    tools: { name: "Ferramentas", emoji: "🛠️", description: "Machados, picaretas completas" },
-    weapons: { name: "Armas", emoji: "⚔️", description: "Espadas, flechas completas" },
-    materials: { name: "Materiais", emoji: "🧵", description: "Barbante, corda, couro" }
-  };
-
-  // Função para determinar o tipo de item
-  const getItemType = (process: WorkshopProcess): string => {
-    const outputId = process.output.resourceId;
-    
-    if (outputId.includes("cabo-") || outputId.includes("cabeca-") || outputId.includes("lamina-") || 
-        outputId.includes("ponta-") || outputId.includes("haste-") || outputId.includes("barra-")) {
-      return "parts";
-    }
-    
-    if (outputId.includes("machado") || outputId.includes("picareta")) {
-      return "tools";
-    }
-    
-    if (outputId.includes("espada") || outputId.includes("flecha")) {
-      return "weapons";
-    }
-    
-    return "materials";
-  };
-
-  // Usar o sistema robusto ao invés do legado
-  const allProcesses = ROBUST_WORKSHOP_PROCESSES;
-
-  // Agrupar processos por categoria
-  const categorizedProcesses = allProcesses.reduce((acc, process) => {
-    if (!acc[process.category]) {
-      acc[process.category] = [];
-    }
-    acc[process.category].push(process);
-    return acc;
-  }, {} as Record<string, WorkshopProcess[]>);
-
-  // Filtrar processos por categoria e tipo
-  const getFilteredProcesses = () => {
-    const categoryProcesses = categorizedProcesses[activeCategory] || [];
-    
-    if (activeFilter === "all") {
-      return categoryProcesses;
-    }
-    
-    return categoryProcesses.filter(process => getItemType(process) === activeFilter);
-  };
-
-  const getResourceQuantity = (resourceId: string): number => {
-    const resource = resources.find(r => r.resourceId === resourceId);
-    return resource ? resource.quantity : 0;
-  };
-
-  const canProcess = (process: WorkshopProcess): boolean => {
-    if (playerLevel < process.requiredLevel) return false;
-    
-    const hasInput = getResourceQuantity(process.input.resourceId) >= process.input.quantity * processQuantity;
-    const hasFuel = !process.fuel || getResourceQuantity(process.fuel.resourceId) >= process.fuel.quantity * processQuantity;
-    
-    return hasInput && hasFuel;
-  };
-
-  const getMaxProcessable = (process: WorkshopProcess): number => {
-    if (playerLevel < process.requiredLevel) return 0;
-    
-    let max = Math.floor(getResourceQuantity(process.input.resourceId) / process.input.quantity);
-    
-    if (process.fuel) {
-      max = Math.min(max, Math.floor(getResourceQuantity(process.fuel.resourceId) / process.fuel.quantity));
-    }
-    
-    return Math.max(0, max);
-  };
-
-  const maxProcessable = selectedProcess ? getMaxProcessable(selectedProcess) : 0;
-  const canProcessSelected = selectedProcess ? canProcess(selectedProcess) : false;
-
-  const handleProcess = async () => {
-    if (!selectedProcess || !canProcessSelected || processingInProgress) return;
-
-    setProcessingInProgress(true);
-    
-    try {
-      const response = await fetch("/api/v2/workshop/process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          playerId,
-          processId: selectedProcess.id,
-          quantity: processQuantity
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setOutputItems(data.outputItems || []);
-        await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-        await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-        
-        toast({
-          title: "Processamento Concluído!",
-          description: `${selectedProcess.name} processado com sucesso.`,
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Erro no Processamento",
-        description: "Não foi possível processar o item.",
-        variant: "destructive"
-      });
-    } finally {
-      setProcessingInProgress(false);
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Categoria Tabs */}
-      <div className="flex flex-wrap gap-2">
-        {Object.entries(categoryInfo).map(([key, category]) => (
-          <button
-            key={key}
-            onClick={() => {
-              setActiveCategory(key);
-              setActiveFilter("all");
-              setSelectedProcess(null);
-            }}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              activeCategory === key
-                ? `${category.color} border-2`
-                : "bg-white border border-gray-200 hover:bg-gray-50"
-            }`}
-            title={category.description}
-          >
-            <span className="mr-2">{category.emoji}</span>
-            {category.name}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Process Selection */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {categoryInfo[activeCategory as keyof typeof categoryInfo]?.name} - Processos Disponíveis
-            </CardTitle>
-            
-            {/* Filtros por tipo de item */}
-            <div className="flex flex-wrap gap-2 mt-3">
-              {Object.entries(itemFilters).map(([key, filter]) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveFilter(key)}
-                  className={`px-3 py-1 rounded-full text-xs transition-colors ${
-                    activeFilter === key
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-                  title={filter.description}
-                >
-                  <span className="mr-1">{filter.emoji}</span>
-                  {filter.name}
-                </button>
-              ))}
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3 max-h-96 overflow-y-auto">
-            {getFilteredProcesses().map((process) => {
-              const isAvailable = canProcess(process);
-              const isSelected = selectedProcess?.id === process.id;
-              
-              return (
-                <div
-                  key={process.id}
-                  onClick={() => {
-                    setSelectedProcess(process);
-                    setProcessQuantity(1);
-                    setOutputItems([]);
-                  }}
-                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                    isSelected
-                      ? "border-blue-500 bg-blue-50"
-                      : isAvailable
-                        ? "border-green-200 bg-green-50 hover:bg-green-100"
-                        : "border-gray-200 bg-gray-50"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{process.emoji}</span>
-                      <div>
-                        <div className="font-medium">{process.name}</div>
-                        <div className="text-xs text-gray-500">Nível {process.requiredLevel}</div>
-                      </div>
-                    </div>
-                    {playerLevel < process.requiredLevel && (
-                      <span className="text-xs text-red-500">Bloqueado</span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1">{process.description}</p>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-
-        {/* Workshop Interface */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Estação de Trabalho</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {selectedProcess ? (
-              <>
-                <div className="text-center">
-                  <div className="text-4xl mb-2">{selectedProcess.emoji}</div>
-                  <h3 className="text-lg font-semibold">{selectedProcess.name}</h3>
-                  <p className="text-sm text-gray-600">{selectedProcess.description}</p>
-                </div>
-
-                {/* Quantity Slider */}
-                {maxProcessable > 1 && (
-                  <div>
-                    <Label className="text-sm">Quantidade: {processQuantity}</Label>
-                    <Slider
-                      value={[processQuantity]}
-                      onValueChange={([value]) => setProcessQuantity(value)}
-                      max={maxProcessable}
-                      min={1}
-                      step={1}
-                      className="mt-2"
-                    />
-                  </div>
-                )}
-
-                {/* Process Button */}
-                <Button
-                  onClick={handleProcess}
-                  disabled={!canProcessSelected || isBlocked || processingInProgress}
-                  className={`w-full ${
-                    canProcessSelected && !processingInProgress
-                      ? "bg-green-600 hover:bg-green-700" 
-                      : "bg-gray-300"
-                  }`}
-                >
-                  {processingInProgress ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Processando...
-                    </div>
-                  ) : !canProcessSelected ? (
-                    playerLevel < selectedProcess.requiredLevel ? "Nível insuficiente" : "Recursos insuficientes"
-                  ) : (
-                    `Processar ${processQuantity > 1 ? `(${processQuantity}x)` : ""}`
-                  )}
-                </Button>
-              </>
-            ) : (
-              <div className="text-center text-gray-500 py-12">
-                <div className="text-4xl mb-4">🏭</div>
-                <p>Selecione um processo para começar</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = false }: WorkshopTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeCategory, setActiveCategory] = useState<string>("bancada");
@@ -976,106 +206,86 @@ function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = fals
     enabled: !!playerId,
   });
 
-  const processMutation = useMutation({
-    mutationFn: async ({ processId, quantity = 1 }: { processId: string; quantity?: number }) => {
-      try {
-        const response = await fetch("/api/v2/workshop/process", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerId, processId, quantity: quantity || 1 }),
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: "Erro desconhecido no servidor" }));
-          console.error("Workshop Process API Error:", errorData);
-          throw new Error(errorData.message || `Erro HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        console.log("Workshop Process Success:", result);
-        return result;
-      } catch (error) {
-        console.error("Workshop Process Error Details:", error);
-        if (error instanceof Error) {
-          throw error;
-        }
-        throw new Error("Erro de conexão com o servidor");
-      }
-    },
-    onSuccess: (response) => {
-      const data = response.data || response;
-      const quantity = data?.quantity || processQuantity;
-      const processName = selectedProcess?.name || "Item";
+  // Informações das categorias
+  const categoryInfo = {
+    bancada: { name: "Bancada", emoji: "🔨", color: "bg-blue-50 border-blue-200", description: "Montagem e criação final de itens" },
+    madeira: { name: "Serra", emoji: "🪚", color: "bg-amber-50 border-amber-200", description: "Processamento de madeira e cabos" },
+    pedras: { name: "Pedras", emoji: "🪨", color: "bg-gray-50 border-gray-200", description: "Processamento de minerais e pedras" },
+    forja: { name: "Forja", emoji: "🔥", color: "bg-red-50 border-red-200", description: "Fundição e forja de partes metálicas" },
+    fogueira: { name: "Fogueira", emoji: "🏕️", color: "bg-orange-50 border-orange-200", description: "Cozimento e tratamento de materiais" }
+  };
 
-      // Add to output
-      const outputResource = selectedProcess?.output;
-      if (outputResource) {
-        setOutputItems(prev => [
-          ...prev,
-          { resourceId: outputResource.resourceId, quantity: outputResource.quantity * quantity }
-        ]);
-      }
+  // Filtros por tipo de item melhorados
+  const itemFilters = {
+    all: { name: "Todos", emoji: "📋", description: "Todos os processos" },
+    materials: { name: "Materiais", emoji: "🧵", description: "Barbante, corda, couro" },
+    resources: { name: "Recursos", emoji: "🪵", description: "Madeira, pedras processadas" },
+    metals: { name: "Metais", emoji: "🔩", description: "Ferro e ligas metálicas" },
+    food: { name: "Alimentos", emoji: "🍖", description: "Carnes e alimentos processados" }
+  };
 
-      toast({
-        title: "Processamento Concluído!",
-        description: `${quantity}x ${processName} foi processado com sucesso!`,
-      });
+  // Função para determinar o tipo de item - CORRIGIDA
+  const getItemType = (process: WorkshopProcess): string => {
+    const outputId = process.output?.resourceId;
 
-      setProcessingInProgress(false);
-      setProcessQuantity(1);
-
-      // Force cache invalidation
-      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
-    },
-    onError: (error: any) => {
-      console.error("Workshop process error:", error);
-      setProcessingInProgress(false);
-      
-      toast({
-        title: "Erro no Processamento",
-        description: error.message || "Não foi possível processar o recurso",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Store output items mutation
-  const storeOutputMutation = useMutation({
-    mutationFn: async (items: Array<{resourceId: string, quantity: number}>) => {
-      for (const item of items) {
-        const response = await fetch("/api/v2/storage/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            playerId, 
-            resourceId: item.resourceId, 
-            quantity: item.quantity 
-          }),
-        });
-        if (!response.ok) throw new Error("Falha ao armazenar item");
-      }
-    },
-    onSuccess: () => {
-      setOutputItems([]);
-      toast({
-        title: "Itens Armazenados!",
-        description: "Todos os itens foram transferidos para o armazém",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-    },
-    onError: () => {
-      toast({
-        title: "Erro ao Armazenar",
-        description: "Não foi possível transferir os itens para o armazém",
-        variant: "destructive",
-      });
+    if (!outputId || typeof outputId !== 'string') {
+      return "materials"; // Default seguro
     }
-  });
 
-  // Get resource data
+    // Materiais básicos
+    if (outputId.includes("barbante") || outputId.includes("corda") || outputId.includes("couro")) {
+      return "materials";
+    }
+
+    // Recursos processados
+    if (outputId.includes("madeira") || outputId.includes("pedra") || outputId.includes("argila")) {
+      return "resources";
+    }
+
+    // Metais
+    if (outputId.includes("ferro") || outputId.includes("metal") || outputId.includes("barra")) {
+      return "metals";
+    }
+
+    // Alimentos
+    if (outputId.includes("carne") || outputId.includes("peixe") || outputId.includes("cogumelo")) {
+      return "food";
+    }
+
+    return "materials"; // Default
+  };
+
+  // Agrupar processos por categoria
+  const categorizedProcesses = ROBUST_WORKSHOP_PROCESSES.reduce((acc, process) => {
+    if (!acc[process.category]) {
+      acc[process.category] = [];
+    }
+    acc[process.category].push(process);
+    return acc;
+  }, {} as Record<string, WorkshopProcess[]>);
+
+  // Filtrar processos por categoria e tipo
+  const getFilteredProcesses = () => {
+    const categoryProcesses = categorizedProcesses[activeCategory] || [];
+
+    if (activeFilter === "all") {
+      return categoryProcesses;
+    }
+
+    return categoryProcesses.filter(process => {
+      try {
+        return getItemType(process) === activeFilter;
+      } catch (error) {
+        console.error("Erro ao filtrar processo:", process, error);
+        return false;
+      }
+    });
+  };
+
+  // Get resource data safely
   const getResourceData = (resourceId: string) => {
+    if (!resourceId) return { id: "unknown", name: "Recurso Desconhecido", emoji: "📦" };
+
     const resource = resources.find(r => r.id === resourceId);
     if (resource) return resource;
 
@@ -1104,37 +314,102 @@ function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = fals
 
   // Get available quantity in storage
   const getStorageQuantity = (resourceId: string) => {
+    if (!resourceId) return 0;
     const storageItem = storageItems.find(item => item.resourceId === resourceId);
     return storageItem ? storageItem.quantity : 0;
   };
 
   // Calculate max processable quantity
   const getMaxProcessable = (process: WorkshopProcess) => {
-    const availableInput = getStorageQuantity(process.input.resourceId);
-    const inputLimit = Math.floor(availableInput / process.input.quantity);
-    
+    if (!process) return 0;
+
+    const availableInput = getStorageQuantity(process.input?.resourceId);
+    const inputLimit = Math.floor(availableInput / (process.input?.quantity || 1));
+
+    if (process.secondary) {
+      const availableSecondary = getStorageQuantity(process.secondary.resourceId);
+      const secondaryLimit = Math.floor(availableSecondary / process.secondary.quantity);
+      return Math.min(inputLimit, secondaryLimit);
+    }
+
     if (process.fuel) {
       const availableFuel = getStorageQuantity(process.fuel.resourceId);
       const fuelLimit = Math.floor(availableFuel / process.fuel.quantity);
       return Math.min(inputLimit, fuelLimit);
     }
-    
+
     return inputLimit;
   };
 
   // Check if process can be executed
   const canProcess = (process: WorkshopProcess) => {
-    if (playerLevel < process.requiredLevel) return false;
+    if (!process || playerLevel < process.requiredLevel) return false;
     return getMaxProcessable(process) > 0;
   };
+
+  // Process mutation
+  const processMutation = useMutation({
+    mutationFn: async ({ processId, quantity = 1 }: { processId: string; quantity?: number }) => {
+      const response = await fetch("/api/v2/workshop/process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId, processId, quantity }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Erro no servidor" }));
+        throw new Error(errorData.message || `Erro HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    },
+    onSuccess: (response) => {
+      const quantity = processQuantity;
+      const processName = selectedProcess?.name || "Item";
+
+      // Add to output
+      const outputResource = selectedProcess?.output;
+      if (outputResource) {
+        setOutputItems(prev => [
+          ...prev,
+          { resourceId: outputResource.resourceId, quantity: outputResource.quantity * quantity }
+        ]);
+      }
+
+      toast({
+        title: "Processamento Concluído!",
+        description: `${quantity}x ${processName} foi processado com sucesso!`,
+      });
+
+      setProcessingInProgress(false);
+      setProcessQuantity(1);
+
+      // Invalidate queries
+      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
+    },
+    onError: (error: any) => {
+      console.error("Workshop process error:", error);
+      setProcessingInProgress(false);
+
+      toast({
+        title: "Erro no Processamento",
+        description: error.message || "Não foi possível processar o recurso",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Handle process action
   const handleProcess = () => {
     if (!selectedProcess || isBlocked || !canProcess(selectedProcess) || processingInProgress) return;
-    
+
     setProcessingInProgress(true);
     processMutation.mutate({ processId: selectedProcess.id, quantity: processQuantity });
   };
+
+  const maxProcessable = selectedProcess ? getMaxProcessable(selectedProcess) : 0;
+  const canProcessSelected = selectedProcess ? canProcess(selectedProcess) : false;
 
   // Render slot component
   const renderSlot = (
@@ -1181,77 +456,6 @@ function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = fals
     );
   };
 
-  // Categorize processes
-  const categorizedProcesses = WORKSHOP_PROCESSES.reduce((acc, process) => {
-    if (!acc[process.category]) acc[process.category] = [];
-    acc[process.category].push(process);
-    return acc;
-  }, {} as Record<string, WorkshopProcess[]>);
-
-  const categoryInfo = {
-    bancada: { name: "Bancada", emoji: "🔨", color: "bg-blue-50 border-blue-200", description: "Criação de itens e equipamentos" },
-    madeira: { name: "Madeira", emoji: "🪵", color: "bg-amber-50 border-amber-200", description: "Processamento de materiais de madeira" },
-    pedras: { name: "Pedras", emoji: "🪨", color: "bg-gray-50 border-gray-200", description: "Processamento de minerais e pedras" },
-    forja: { name: "Forja", emoji: "🔥", color: "bg-red-50 border-red-200", description: "Fundição e trabalho com metais" },
-    fogueira: { name: "Fogueira", emoji: "🏕️", color: "bg-orange-50 border-orange-200", description: "Cozimento e preservação de alimentos" }
-  };
-
-  const maxProcessable = selectedProcess ? getMaxProcessable(selectedProcess) : 0;
-  const canProcessSelected = selectedProcess ? canProcess(selectedProcess) : false;
-
-  // Filtros por tipo de item
-  const itemFilters = {
-    all: { name: "Todos", emoji: "📋", description: "Todos os processos" },
-    tools: { name: "Ferramentas", emoji: "🔧", description: "Machados, picaretas, etc." },
-    weapons: { name: "Armas", emoji: "⚔️", description: "Espadas, arcos, etc." },
-    metals: { name: "Metais", emoji: "🔩", description: "Barras e ligas metálicas" },
-    equipment: { name: "Equipamentos", emoji: "🎒", description: "Mochilas e equipamentos" },
-    materials: { name: "Materiais", emoji: "🧵", description: "Materiais básicos" }
-  };
-
-  // Função para determinar o tipo de item baseado no ID do resultado
-  const getItemType = (process: WorkshopProcess): string => {
-    const outputId = process.output.resourceId;
-    
-    // Ferramentas
-    if (outputId.includes("machado") || outputId.includes("picareta") || outputId.includes("pá")) {
-      return "tools";
-    }
-    
-    // Armas
-    if (outputId.includes("espada") || outputId.includes("arco") || outputId.includes("flecha")) {
-      return "weapons";
-    }
-    
-    // Metais
-    if (outputId.includes("barra") || outputId.includes("liga") || outputId.includes("metal") || outputId.includes("ferro") || outputId.includes("cobre")) {
-      return "metals";
-    }
-    
-    // Equipamentos
-    if (outputId.includes("mochila") || outputId.includes("equipamento")) {
-      return "equipment";
-    }
-    
-    // Materiais básicos
-    if (outputId.includes("barbante") || outputId.includes("corda") || outputId.includes("fibra") || outputId.includes("couro")) {
-      return "materials";
-    }
-    
-    return "materials"; // Default
-  };
-
-  // Filtrar processos por categoria e tipo
-  const getFilteredProcesses = () => {
-    const categoryProcesses = categorizedProcesses[activeCategory] || [];
-    
-    if (activeFilter === "all") {
-      return categoryProcesses;
-    }
-    
-    return categoryProcesses.filter(process => getItemType(process) === activeFilter);
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1265,42 +469,36 @@ function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = fals
       </div>
 
       {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
-        {Object.entries(categoryInfo).map(([categoryKey, categoryData]) => {
-          const categoryProcesses = categorizedProcesses[categoryKey] || [];
-          if (categoryProcesses.length === 0) return null;
-
-          const isActive = activeCategory === categoryKey;
-          
-          return (
-            <button
-              key={categoryKey}
-              onClick={() => {
-                setActiveCategory(categoryKey);
-                setSelectedProcess(null);
-                setProcessQuantity(1);
-                setOutputItems([]);
-              }}
-              className={`px-4 py-3 rounded-t-lg text-sm font-medium whitespace-nowrap flex items-center gap-2 transition-colors ${
-                isActive
-                  ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px"
-                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
-              }`}
-            >
-              <span className="text-lg">{categoryData.emoji}</span>
-              <span>{categoryData.name}</span>
-              <span className="text-xs text-gray-500">({categoryProcesses.length})</span>
-            </button>
-          );
-        })}
+      <div className="flex flex-wrap gap-2">
+        {Object.entries(categoryInfo).map(([key, category]) => (
+          <button
+            key={key}
+            onClick={() => {
+              setActiveCategory(key);
+              setActiveFilter("all");
+              setSelectedProcess(null);
+            }}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              activeCategory === key
+                ? `${category.color} border-2`
+                : "bg-white border border-gray-200 hover:bg-gray-50"
+            }`}
+            title={category.description}
+          >
+            <span className="mr-2">{category.emoji}</span>
+            {category.name}
+          </button>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Process Selection */}
         <Card>
           <CardHeader>
-            <CardTitle>Processos Disponíveis</CardTitle>
-            
+            <CardTitle>
+              {categoryInfo[activeCategory as keyof typeof categoryInfo]?.name} - Processos Disponíveis
+            </CardTitle>
+
             {/* Filtros por tipo de item */}
             <div className="flex flex-wrap gap-2 mt-3">
               {Object.entries(itemFilters).map(([key, filter]) => (
@@ -1324,7 +522,7 @@ function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = fals
             {getFilteredProcesses().map((process) => {
               const isAvailable = canProcess(process);
               const isSelected = selectedProcess?.id === process.id;
-              
+
               return (
                 <div
                   key={process.id}
@@ -1373,13 +571,22 @@ function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = fals
                   {/* Input Slot */}
                   {renderSlot(
                     "Recurso",
-                    selectedProcess.input.resourceId,
-                    selectedProcess.input.quantity * processQuantity,
+                    selectedProcess.input?.resourceId,
+                    (selectedProcess.input?.quantity || 0) * processQuantity,
                     undefined,
                     false
                   )}
 
-                  {/* Fuel Slot (only for forja and fogueira) */}
+                  {/* Secondary Slot */}
+                  {selectedProcess.secondary && renderSlot(
+                    "Material",
+                    selectedProcess.secondary.resourceId,
+                    selectedProcess.secondary.quantity * processQuantity,
+                    undefined,
+                    false
+                  )}
+
+                  {/* Fuel Slot */}
                   {selectedProcess.fuel && renderSlot(
                     "Combustível",
                     selectedProcess.fuel.resourceId,
@@ -1397,8 +604,8 @@ function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = fals
                   {/* Output Slot */}
                   {renderSlot(
                     "Resultado",
-                    selectedProcess.output.resourceId,
-                    selectedProcess.output.quantity * processQuantity,
+                    selectedProcess.output?.resourceId,
+                    (selectedProcess.output?.quantity || 0) * processQuantity,
                     undefined,
                     false,
                     true
@@ -1448,7 +655,7 @@ function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = fals
                   )}
                 </Button>
 
-                {/* Output Items */}
+                {/* Output Items Display */}
                 {outputItems.length > 0 && (
                   <div className="space-y-3">
                     <Label className="text-sm font-medium">Itens Produzidos:</Label>
@@ -1467,11 +674,10 @@ function LegacyWorkshopsTab({ resources, playerLevel, playerId, isBlocked = fals
                       })}
                     </div>
                     <Button
-                      onClick={() => storeOutputMutation.mutate(outputItems)}
-                      disabled={storeOutputMutation.isPending}
+                      onClick={() => setOutputItems([])}
                       className="w-full bg-blue-600 hover:bg-blue-700"
                     >
-                      {storeOutputMutation.isPending ? "Armazenando..." : "Armazenar no Armazém"}
+                      Confirmar
                     </Button>
                   </div>
                 )}

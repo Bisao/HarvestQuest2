@@ -1194,11 +1194,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add crafted items to storage
       if (recipe.outputs && Array.isArray(recipe.outputs)) {
         console.log(`🔧 CRAFT: Adding ${recipe.outputs.length} outputs to storage for recipe ${recipe.name}`);
-        
+
         for (const output of recipe.outputs) {
           const totalAmount = output.quantity * quantity;
           console.log(`🔧 CRAFT: Processing output - itemId: ${output.itemId}, amount: ${totalAmount}`);
-          
+
           // Refresh storage items to get current state
           const currentStorageItems = await storage.getPlayerStorage(playerId);
           const existingItem = currentStorageItems.find(item => item.resourceId === output.itemId);

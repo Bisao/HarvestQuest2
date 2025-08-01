@@ -567,47 +567,7 @@ export function registerEnhancedGameRoutes(
     }
   });
 
-    // Workshop processing endpoint
-    app.post('/api/v2/workshop/process', async (req, res, next) => {
-      try {
-        const { playerId, processId, quantity = 1 } = req.body;
-    
-        if (!playerId || !processId) {
-          return res.status(400).json({ 
-            success: false, 
-            message: "playerId e processId são obrigatórios" 
-          });
-        }
-    
-        // Workshop processes definition (should match frontend)
-        const WORKSHOP_PROCESSES = [
-          {
-            id: "proc-madeira-refinada-001",
-            name: "Madeira Refinada",
-            input: { resourceId: RESOURCE_IDS.GRAVETOS, quantity: 5 },
-            output: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 2 },
-            requiredLevel: 2,
-            experienceGained: 15
-          },
-          {
-            id: "proc-bambu-processado-001", 
-            name: "Bambu Processado",
-            input: { resourceId: RESOURCE_IDS.BAMBU, quantity: 3 },
-            output: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
-            requiredLevel: 3,
-            experienceGained: 12
-          },
-          {
-            id: "proc-pedras-lapidadas-001",
-            name: "Pedras Lapidadas",
-            input: { resourceId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 8 },
-            output: { resourceId: RESOURCE_IDS.PEDRA, quantity: 3 },
-            requiredLevel: 2,
-            experienceGained: 20
-          },
-          {
-            id: "proc-argila-refinada-001",
-            name: "Argila Refinada",
+    // Workshop processing endpoint - removed duplicate, using workshop-routes.ts insteadnada",
             input: { resourceId: RESOURCE_IDS.ARGILA, quantity: 4 },
             output: { resourceId: RESOURCE_IDS.ARGILA, quantity: 6 },
             requiredLevel: 4,
