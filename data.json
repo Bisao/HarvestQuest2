@@ -26,7 +26,8 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": true,
-        "health": 1
+        "health": 1,
+        "lastOnlineTime": 1754027018351
       }
     ]
   ],
