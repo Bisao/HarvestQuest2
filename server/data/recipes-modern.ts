@@ -15,10 +15,10 @@ export function createModernRecipeData(): InsertRecipe[] {
       difficulty: "trivial",
       requiredLevel: 1,
       ingredients: [
-        { itemId: RESOURCE_IDS.FIBRA, quantity: 5, consumed: true } // Fibra
+        { itemId: RESOURCE_IDS.FIBRA, quantity: 5, consumed: true } // Fibra: res-8bd33b18-a241-4859-ae9f-870fab5673d0
       ],
       outputs: [
-        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, chance: 100 } // Barbante
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, chance: 100 } // Barbante: res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1
       ],
       craftingTime: 5,
       experienceGained: 10,

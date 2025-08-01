@@ -232,7 +232,7 @@ export function registerEnhancedGameRoutes(
             // Check if this is equipment or resource
             const isResource = allResources.some(r => r.id === itemId);
             const isEquipment = allEquipment.some(eq => eq.id === itemId);
-            
+
             if (!isResource && !isEquipment) {
               console.error(`ERROR: Item ${itemId} not found in resources or equipment`);
               throw new InvalidOperationError(`Item ${itemId} not found in game data`);

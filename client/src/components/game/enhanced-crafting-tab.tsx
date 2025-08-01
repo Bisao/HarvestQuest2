@@ -88,31 +88,41 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     },
   });
 
+  // Get resource data for ingredient resolution
   const getResourceData = (resourceId: string) => {
-    // First try to find in resources
+    // First: busca em resources
     const resource = resources.find(r => r.id === resourceId);
     if (resource) return resource;
 
-    // If not found, it might be an equipment name (like "string", "bamboo_bottle", etc.)
-    // Return a placeholder with the resourceId as name for display
+    // ID mapping for known inconsistencies
+    const idMappings: Record<string, string> = {
+      "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1": "Barbante",
+      "res-8bd33b18-a241-4859-ae9f-870fab5673d0": "Fibra",
+      "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": "Pedras Soltas",
+      "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": "Gravetos"
+    };
+
+    // Fallback usando mapping
+    const mappedName = idMappings[resourceId];
+    if (mappedName) {
+      const mappedResource = resources.find(r => r.name === mappedName);
+      if (mappedResource) return mappedResource;
+
+      return {
+        id: resourceId,
+        name: mappedName,
+        emoji: mappedName === "Barbante" ? "🧵" : 
+               mappedName === "Fibra" ? "🌾" :
+               mappedName === "Pedras Soltas" ? "🗿" :
+               mappedName === "Gravetos" ? "🪵" : "📦"
+      };
+    }
+
+    // Final fallback
     return {
       id: resourceId,
-      name: resourceId === "string" ? "Barbante" :
-            resourceId === "bamboo_bottle" ? "Garrafa de Bambu" :
-            resourceId === "clay_pot" ? "Panela de Barro" :
-            resourceId === "rope" ? "Corda" :
-            resourceId,
-      emoji: resourceId === "string" ? "🧵" :
-             resourceId === "bamboo_bottle" ? "🎍" :
-             resourceId === "clay_pot" ? "🏺" :
-             resourceId === "rope" ? "🪢" :
-             "📦",
-      weight: 1,
-      value: 1,
-      type: "basic",
-      rarity: "common",
-      requiredTool: null,
-      experienceValue: 1
+      name: resourceId === "string" ? "Barbante" : resourceId,
+      emoji: resourceId === "string" ? "🧵" : "📦"
     };
   };
 
@@ -121,11 +131,29 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
     const storageItem = storageItems.find(item => item.resourceId === resourceId);
     if (storageItem) return storageItem.quantity;
 
-    // For equipment items (like "string", "bamboo_bottle"), check by name match
+    // ID mapping for known inconsistencies
+    const idMappings: Record<string, string> = {
+      "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1": "Barbante",
+      "res-8bd33b18-a241-4859-ae9f-870fab5673d0": "Fibra",
+      "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": "Pedras Soltas",
+      "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": "Gravetos"
+    };
+
+    // Try to find by mapped name
+    const mappedName = idMappings[resourceId];
+    if (mappedName) {
+      const mappedResource = resources.find(r => r.name === mappedName);
+      if (mappedResource) {
+        const mappedStorageItem = storageItems.find(item => item.resourceId === mappedResource.id);
+        return mappedStorageItem?.quantity || 0;
+      }
+    }
+
+    // Equipment mappings fallback
     const equipmentMappings: Record<string, string> = {
       "string": "Barbante",
       "bamboo_bottle": "Garrafa de Bambu",
-      "clay_pot": "Panela de Barro",
+      "wooden_bucket": "Balde de Madeira",
       "rope": "Corda"
     };
 
@@ -166,27 +194,41 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
       }
 
       // Then try equipment
-      const equipmentItem = equipment.find(eq => eq.id === ingredient.itemId);
+      const equipmentItem = equipment.find(e => e.id === ingredient.itemId);
       if (equipmentItem) {
         const available = storageItems.find(item => item.resourceId === ingredient.itemId)?.quantity || 0;
         return {
-          resource: equipmentItem,
-          name: equipmentItem.name,
-          emoji: equipmentItem.emoji,
+          resource: {
+            id: equipmentItem.id,
+            name: equipmentItem.name,
+            emoji: equipmentItem.emoji
+          },
           quantity: ingredient.quantity,
           available,
           hasEnough: available >= ingredient.quantity
         };
       }
 
-      // Use getResourceData as fallback for missing ingredients
+      // Enhanced fallback system
       const fallbackResource = getResourceData(ingredient.itemId);
       const available = getStorageQuantity(ingredient.itemId);
-      
+
+      // Special handling for known problematic IDs
+      if (ingredient.itemId === "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1") {
+        const barbante = resources.find(r => r.name === "Barbante");
+        if (barbante) {
+          const barbanteDispo = storageItems.find(item => item.resourceId === barbante.id)?.quantity || 0;
+          return {
+            resource: barbante,
+            quantity: ingredient.quantity,
+            available: barbanteDispo,
+            hasEnough: barbanteDispo >= ingredient.quantity
+          };
+        }
+      }
+
       return {
         resource: fallbackResource,
-        name: fallbackResource.name,
-        emoji: fallbackResource.emoji,
         quantity: ingredient.quantity,
         available,
         hasEnough: available >= ingredient.quantity
