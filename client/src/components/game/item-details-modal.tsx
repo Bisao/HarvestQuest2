@@ -55,7 +55,7 @@ export function ItemDetailsModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       onClose();
       toast({
         title: "Item movido",
@@ -98,7 +98,6 @@ export function ItemDetailsModal({
       // Force refresh all related queries
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
 
       // Reset consume quantity and close modal

@@ -6,13 +6,13 @@
         "id": "a0cf3295-5b4b-4516-a511-35494dd5646b",
         "username": "Bison",
         "level": 1,
-        "experience": 0,
-        "hunger": 100,
+        "experience": 79,
+        "hunger": 77,
         "maxHunger": 100,
-        "thirst": 100,
+        "thirst": 80,
         "maxThirst": 100,
         "coins": 100,
-        "inventoryWeight": 0,
+        "inventoryWeight": 73,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -29,8 +29,82 @@
       }
     ]
   ],
-  "inventoryItems": [],
+  "inventoryItems": [
+    [
+      "51263b2e-47ae-4601-8251-9419afe8ca89",
+      {
+        "id": "51263b2e-47ae-4601-8251-9419afe8ca89",
+        "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
+        "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+        "quantity": 15
+      }
+    ],
+    [
+      "2f5e7665-2bab-4077-aed2-44f65b2fa8ee",
+      {
+        "id": "2f5e7665-2bab-4077-aed2-44f65b2fa8ee",
+        "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
+        "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+        "quantity": 7
+      }
+    ],
+    [
+      "a995fb4d-8805-4ebf-8bcc-5a3f8edb499d",
+      {
+        "id": "a995fb4d-8805-4ebf-8bcc-5a3f8edb499d",
+        "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
+        "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+        "quantity": 10
+      }
+    ],
+    [
+      "9777e923-24ea-4258-9b00-6d4cdb50e7d5",
+      {
+        "id": "9777e923-24ea-4258-9b00-6d4cdb50e7d5",
+        "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
+        "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+        "quantity": 16
+      }
+    ],
+    [
+      "d838dd57-fc18-403b-822a-66087da5a434",
+      {
+        "id": "d838dd57-fc18-403b-822a-66087da5a434",
+        "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
+        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+        "quantity": 15
+      }
+    ]
+  ],
   "storageItems": [],
-  "expeditions": [],
+  "expeditions": [
+    [
+      "200c6c41-4fd5-4113-8f35-3d11ef4ce3ce",
+      {
+        "id": "200c6c41-4fd5-4113-8f35-3d11ef4ce3ce",
+        "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "completed",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 4,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 1,
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 1,
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 4,
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 5
+        },
+        "startTime": 1754007831989,
+        "endTime": 1754008095,
+        "progress": 100
+      }
+    ]
+  ],
   "playerQuests": []
 }

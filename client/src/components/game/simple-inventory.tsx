@@ -64,7 +64,7 @@ export default function SimpleInventory({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       toast({
         title: "Sucesso!",
         description: "Todos os itens foram armazenados.",
@@ -93,7 +93,7 @@ export default function SimpleInventory({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       setSelectedItem(null);
       toast({
         title: "Item movido!",
@@ -132,10 +132,10 @@ export default function SimpleInventory({
       // Force immediate cache invalidation
       await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      await queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       
       // Force immediate refetch of player data
-      await queryClient.refetchQueries({ queryKey: ["/api/player/Player1"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/player", playerId] });
       
       setSelectedItem(null);
       toast({

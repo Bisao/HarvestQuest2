@@ -62,7 +62,7 @@ export default function MinecraftInventory({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       toast({
         title: "Sucesso!",
         description: "Todos os itens foram armazenados.",
@@ -85,7 +85,7 @@ export default function MinecraftInventory({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/Player1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
       toast({
         title: "Item movido",
         description: "Item transferido para o armazém.",
