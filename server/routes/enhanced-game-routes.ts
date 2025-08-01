@@ -567,12 +567,7 @@ export function registerEnhancedGameRoutes(
     }
   });
 
-    // Workshop processing endpoint - removed duplicate, using workshop-routes.ts insteadnada",
-            input: { resourceId: RESOURCE_IDS.ARGILA, quantity: 4 },
-            output: { resourceId: RESOURCE_IDS.ARGILA, quantity: 6 },
-            requiredLevel: 4,
-            experienceGained: 25
-          },
+    
           {
             id: "proc-fibra-processada-001",
             name: "Fibra Processada",
