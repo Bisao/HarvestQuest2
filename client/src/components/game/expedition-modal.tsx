@@ -186,8 +186,6 @@ export default function ExpeditionModal({
           if (contentType && contentType.includes('application/json')) {
             const activeExpedition = await activeExpeditionResponse.json();
             if (activeExpedition && activeExpedition.id) {
-              console.log('Found active expedition, attempting to complete it first');
-              
               // Try to complete the active expedition
               const completeResponse = await fetch(`/api/expeditions/${activeExpedition.id}/complete`, {
                 method: 'POST',
@@ -198,27 +196,16 @@ export default function ExpeditionModal({
                 const completeContentType = completeResponse.headers.get('content-type');
                 if (completeContentType && completeContentType.includes('application/json')) {
                   await completeResponse.json();
-                  console.log('Successfully completed previous expedition');
                   
                   // Wait a moment for cache invalidation
                   await new Promise(resolve => setTimeout(resolve, 1000));
-                } else {
-                  console.warn('Complete expedition response was not JSON');
                 }
-              } else {
-                console.warn('Failed to complete previous expedition:', completeResponse.status);
               }
             }
-          } else {
-            console.log('Active expedition response was not JSON, likely no active expedition');
           }
-        } else if (activeExpeditionResponse.status === 404) {
-          console.log('No active expedition found');
-        } else {
-          console.warn('Failed to check for active expedition:', activeExpeditionResponse.status);
         }
       } catch (error) {
-        console.log('Error checking/completing active expedition:', error);
+        // Silent error handling - expedition conflicts are common
       }
 
       // Now try to start the new expedition

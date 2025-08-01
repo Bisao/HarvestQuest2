@@ -31,12 +31,8 @@ export default function Game() {
   const urlParams = new URLSearchParams(window.location.search);
   const playerUsername = urlParams.get('player') || '';
 
-  console.log("Game component - location:", location);
-  console.log("Game component - playerUsername:", playerUsername);
-
   // If no player found, redirect to main menu
   if (!playerUsername) {
-    console.log("No player username found, redirecting to main menu");
     setLocation('/');
     return null;
   }
@@ -45,10 +41,8 @@ export default function Game() {
   const { data: player, isLoading: playerLoading, error: playerError } = useQuery<Player>({
     queryKey: [`/api/player/${playerUsername}`],
     queryFn: async () => {
-      console.log("Fetching player data for:", playerUsername);
       const response = await fetch(`/api/player/${encodeURIComponent(playerUsername)}`);
       if (!response.ok) {
-        console.error("Player fetch failed:", response.status, response.statusText);
         if (response.status === 404) {
           // Player not found, redirect to main menu
           setLocation('/');
@@ -57,7 +51,6 @@ export default function Game() {
         throw new Error('Failed to fetch player');
       }
       const playerData = await response.json();
-      console.log("Player data loaded:", playerData);
       return playerData;
     },
     retry: 1,

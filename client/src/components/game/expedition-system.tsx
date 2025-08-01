@@ -135,8 +135,6 @@ export default function ExpeditionSystem({
       biomeId: string;
       selectedResources: string[];
     }) => {
-      console.log('Sending expedition data:', expeditionData);
-      
       const response = await fetch('/api/expeditions', {
         method: 'POST',
         headers: {
@@ -150,12 +148,10 @@ export default function ExpeditionSystem({
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Expedition error response:', errorText);
         throw new Error(errorText || `Failed to start expedition: ${response.status}`);
       }
       
       const result = await response.json();
-      console.log('Expedition started successfully:', result);
       return result;
     },
     onSuccess: (expedition) => {

@@ -6,10 +6,10 @@
         "id": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
         "username": "Bison",
         "level": 5,
-        "experience": 684,
-        "hunger": 2,
+        "experience": 705,
+        "hunger": 0,
         "maxHunger": 100,
-        "thirst": 1,
+        "thirst": 0,
         "maxThirst": 100,
         "coins": 100,
         "inventoryWeight": 49990,
@@ -29,7 +29,7 @@
         "equippedFood": null,
         "equippedDrink": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754038402419,
+        "lastOnlineTime": 1754064798189,
         "offlineActivityConfig": {
           "enabled": true,
           "maxDuration": 12,
@@ -95,7 +95,7 @@
         "id": "b7903464-d64d-4e99-9d71-7c6aaf134152",
         "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 42,
+        "quantity": 48,
         "itemType": "resource"
       }
     ],
@@ -105,7 +105,7 @@
         "id": "dca45133-c73e-483c-87c8-167919aa6dc6",
         "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 48,
+        "quantity": 49,
         "itemType": "resource"
       }
     ],
@@ -115,7 +115,7 @@
         "id": "e8aa1f96-b1c6-4ecc-9939-c14b0d4b6733",
         "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 45,
+        "quantity": 50,
         "itemType": "resource"
       }
     ],
@@ -125,7 +125,7 @@
         "id": "535ad5a3-8d1d-4de7-8619-0545d6977c23",
         "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 38,
+        "quantity": 42,
         "itemType": "resource"
       }
     ],
@@ -135,7 +135,107 @@
         "id": "ea002228-9971-42dd-a55e-57536f536967",
         "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 12,
+        "quantity": 16,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "34754724-8bb6-48da-b582-cac16ac0e6ed",
+      {
+        "id": "34754724-8bb6-48da-b582-cac16ac0e6ed",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-4b7e1a9c-5d8f-4e32-9a76-8c2e5f1b9d48",
+        "quantity": 2,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "d51ed4ff-7b54-48f3-85c7-bcf05219d1ba",
+      {
+        "id": "d51ed4ff-7b54-48f3-85c7-bcf05219d1ba",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-6d3a8e5c-1f9b-4e72-8a05-4c7e9f2b1d59",
+        "quantity": 6,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "bacea6bf-df4f-405a-a221-7ad859a0b565",
+      {
+        "id": "bacea6bf-df4f-405a-a221-7ad859a0b565",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-8e5c2a9f-7b1d-4e63-9a84-6f1c8e5a2b6a",
+        "quantity": 4,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "bfd4d971-e211-4d40-8899-7baad0338a92",
+      {
+        "id": "bfd4d971-e211-4d40-8899-7baad0338a92",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
+        "quantity": 5,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "aa9f1e49-2016-4cbe-a3b2-b05fa86431cc",
+      {
+        "id": "aa9f1e49-2016-4cbe-a3b2-b05fa86431cc",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3",
+        "quantity": 3,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "c491f22f-2fb6-40d2-b83e-5352a0e95cf1",
+      {
+        "id": "c491f22f-2fb6-40d2-b83e-5352a0e95cf1",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-f7a1c9e5-3d8b-4e13-9a24-8c6e2f9b7de4",
+        "quantity": 1,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "f84211ff-3905-4786-b370-42868cb564ad",
+      {
+        "id": "f84211ff-3905-4786-b370-42868cb564ad",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-a1c9f7e5-8b3d-4e12-9a23-2c8e6f5b9df5",
+        "quantity": 4,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "f2d149f7-142a-4599-ade7-99e193bc4d73",
+      {
+        "id": "f2d149f7-142a-4599-ade7-99e193bc4d73",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-c9e5a1f7-3d8b-4e11-9a22-6c2e8f9b5de6",
+        "quantity": 4,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "2259fa03-6a0e-40e7-802d-834f71a7132a",
+      {
+        "id": "2259fa03-6a0e-40e7-802d-834f71a7132a",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-e5a1c9f7-8b3d-4e10-9a21-8c6e2f7b9df7",
+        "quantity": 3,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "1bd4f3ab-15cf-4f09-999b-416dd0816990",
+      {
+        "id": "1bd4f3ab-15cf-4f09-999b-416dd0816990",
+        "playerId": "4b8ede0b-03ad-4e41-ac2f-6f50ae776d97",
+        "resourceId": "res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12",
+        "quantity": 2,
         "itemType": "resource"
       }
     ]
