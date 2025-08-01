@@ -5,11 +5,11 @@
       {
         "id": "6723aecf-ca0d-47eb-9582-de719ca3027f",
         "username": "Bison",
-        "level": 1,
-        "experience": 83,
-        "hunger": 94,
+        "level": 2,
+        "experience": 120,
+        "hunger": 90,
         "maxHunger": 100,
-        "thirst": 94,
+        "thirst": 90,
         "maxThirst": 100,
         "coins": 100,
         "inventoryWeight": 0,
@@ -41,7 +41,7 @@
         "id": "cd61de8e-ea98-49f1-93ed-6aa0d2a9019e",
         "playerId": "6723aecf-ca0d-47eb-9582-de719ca3027f",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 4,
+        "quantity": 12,
         "itemType": "resource"
       }
     ],
@@ -51,7 +51,7 @@
         "id": "da30241c-c321-403f-92ec-12dd2d159e00",
         "playerId": "6723aecf-ca0d-47eb-9582-de719ca3027f",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 14,
+        "quantity": 18,
         "itemType": "resource"
       }
     ],
@@ -61,7 +61,7 @@
         "id": "d0cdf6f2-d7f3-4f21-a746-085a4164112f",
         "playerId": "6723aecf-ca0d-47eb-9582-de719ca3027f",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 14,
+        "quantity": 20,
         "itemType": "resource"
       }
     ],
@@ -71,7 +71,7 @@
         "id": "2c544e5a-6e44-493b-bd97-3ec773511ae7",
         "playerId": "6723aecf-ca0d-47eb-9582-de719ca3027f",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 15,
+        "quantity": 21,
         "itemType": "resource"
       }
     ],
@@ -81,7 +81,7 @@
         "id": "e6143f8e-3a91-42aa-9755-d67cb1798a5f",
         "playerId": "6723aecf-ca0d-47eb-9582-de719ca3027f",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 11,
+        "quantity": 18,
         "itemType": "resource"
       }
     ],
@@ -140,14 +140,14 @@
         ],
         "selectedEquipment": [],
         "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 2,
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 3,
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 3,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 1,
           "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 5,
-          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 1,
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 2
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 5,
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 3
         },
         "startTime": 1754034254009,
-        "endTime": 1754034451,
+        "endTime": 1754034584,
         "progress": 100
       }
     ]
