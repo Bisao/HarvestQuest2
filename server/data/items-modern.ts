@@ -253,7 +253,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🍄",
       category: "consumable",
       subcategory: "food",
-      weight: 200, // 200 gramas por cogumelo
+      weight: 200,
       stackable: true,
       maxStackSize: 50,
       rarity: "common",
@@ -271,7 +271,7 @@ export function createModernGameItems(): InsertGameItem[] {
         food_type: "raw"
       },
       effects: ["hunger_restore"],
-      tags: ["natural", "edible", "craftable", "food"]
+      tags: ["natural", "edible", "craftable", "food", "consumable"]
     },
     {
       id: RESOURCE_IDS.FRUTAS_SILVESTRES,
@@ -281,7 +281,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🫐",
       category: "consumable",
       subcategory: "food",
-      weight: 80, // 80 gramas por porção de frutas
+      weight: 80,
       stackable: true,
       maxStackSize: 99,
       rarity: "common",
@@ -295,29 +295,31 @@ export function createModernGameItems(): InsertGameItem[] {
         harvestable: true, 
         perishable: true,
         hunger_restore: 1,
-        thirst_restore: 2
+        thirst_restore: 2,
+        consumable: true,
+        food_type: "raw"
       },
       effects: ["hunger_restore", "thirst_restore"],
-      tags: ["natural", "edible", "sweet", "food"]
+      tags: ["natural", "edible", "sweet", "food", "consumable"]
     },
 
     // CONSUMABLES - Food and potions
     {
-      id: "res-cogumelos-assados-001",
+      id: RESOURCE_IDS.COGUMELOS_ASSADOS,
       name: "cooked_mushrooms",
       displayName: "Cogumelos Assados",
       description: "Cogumelos preparados no fogo, mais nutritivos que crus",
       iconPath: "🍄‍🟫",
       category: "consumable",
       subcategory: "food",
-      weight: 180, // 180 gramas por porção
+      weight: 180,
       stackable: true,
       maxStackSize: 30,
       rarity: "common",
       xpReward: 3,
       yieldAmount: 1,
       requiredTool: null,
-      spawnRate: 0.0, // Crafted only
+      spawnRate: 0.0,
       sellPrice: 10,
       buyPrice: 20,
       attributes: {
@@ -325,10 +327,10 @@ export function createModernGameItems(): InsertGameItem[] {
         thirst_restore: 1,
         consumable: true,
         food_type: "cooked",
-        cook_time: 20 // seconds
+        cook_time: 20
       },
       effects: ["hunger_restore"],
-      tags: ["food", "cooked", "nutritious"]
+      tags: ["food", "cooked", "nutritious", "consumable"]
     },
     {
       id: RESOURCE_IDS.CARNE_ASSADA,
@@ -338,24 +340,26 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "🍖",
       category: "consumable",
       subcategory: "food",
-      weight: 250, // 250 gramas por porção de carne
+      weight: 250,
       stackable: true,
       maxStackSize: 20,
       rarity: "common",
       xpReward: 5,
       yieldAmount: 1,
       requiredTool: null,
-      spawnRate: 0.0, // Crafted only
+      spawnRate: 0.0,
       sellPrice: 15,
       buyPrice: 30,
       attributes: {
         hunger_restore: 25,
         thirst_restore: 5,
-        spoil_time: 72, // hours
-        cook_time: 30 // seconds
+        spoil_time: 72,
+        cook_time: 30,
+        consumable: true,
+        food_type: "cooked"
       },
       effects: ["hunger_restore", "minor_health_regen"],
-      tags: ["food", "cooked", "nutritious", "perishable"]
+      tags: ["food", "cooked", "nutritious", "perishable", "consumable"]
     },
     {
       id: RESOURCE_IDS.AGUA_FRESCA,
@@ -365,7 +369,7 @@ export function createModernGameItems(): InsertGameItem[] {
       iconPath: "💧",
       category: "consumable",
       subcategory: "drink",
-      weight: 500, // 500 gramas por 500ml de água
+      weight: 500,
       stackable: true,
       maxStackSize: 50,
       rarity: "common",
@@ -378,10 +382,96 @@ export function createModernGameItems(): InsertGameItem[] {
       attributes: {
         thirst_restore: 20,
         purity: "high",
-        temperature: "cool"
+        temperature: "cool",
+        consumable: true,
+        food_type: "drink"
       },
       effects: ["thirst_restore", "cooling"],
-      tags: ["drink", "essential", "pure", "renewable"]
+      tags: ["drink", "essential", "pure", "renewable", "consumable"]
+    },
+    {
+      id: RESOURCE_IDS.PEIXE_GRELHADO,
+      name: "grilled_fish",
+      displayName: "Peixe Grelhado",
+      description: "Peixe cozido, fonte proteica nutritiva",
+      iconPath: "🐟",
+      category: "consumable",
+      subcategory: "food",
+      weight: 200,
+      stackable: true,
+      maxStackSize: 20,
+      rarity: "common",
+      xpReward: 4,
+      yieldAmount: 1,
+      requiredTool: null,
+      spawnRate: 0.0,
+      sellPrice: 12,
+      buyPrice: 24,
+      attributes: {
+        hunger_restore: 12,
+        thirst_restore: 2,
+        consumable: true,
+        food_type: "cooked",
+        cook_time: 25
+      },
+      effects: ["hunger_restore"],
+      tags: ["food", "cooked", "nutritious", "consumable"]
+    },
+    {
+      id: RESOURCE_IDS.ENSOPADO_CARNE,
+      name: "meat_stew",
+      displayName: "Ensopado de Carne",
+      description: "Ensopado rico e nutritivo, muito satisfatório",
+      iconPath: "🍲",
+      category: "consumable",
+      subcategory: "food",
+      weight: 400,
+      stackable: true,
+      maxStackSize: 15,
+      rarity: "uncommon",
+      xpReward: 8,
+      yieldAmount: 1,
+      requiredTool: null,
+      spawnRate: 0.0,
+      sellPrice: 25,
+      buyPrice: 50,
+      attributes: {
+        hunger_restore: 20,
+        thirst_restore: 8,
+        consumable: true,
+        food_type: "cooked",
+        cook_time: 60
+      },
+      effects: ["hunger_restore", "thirst_restore", "minor_health_regen"],
+      tags: ["food", "cooked", "nutritious", "hearty", "consumable"]
+    },
+    {
+      id: RESOURCE_IDS.SUCO_FRUTAS,
+      name: "fruit_juice",
+      displayName: "Suco de Frutas",
+      description: "Bebida refrescante feita de frutas silvestres",
+      iconPath: "🧃",
+      category: "consumable",
+      subcategory: "drink",
+      weight: 250,
+      stackable: true,
+      maxStackSize: 30,
+      rarity: "common",
+      xpReward: 2,
+      yieldAmount: 1,
+      requiredTool: null,
+      spawnRate: 0.0,
+      sellPrice: 5,
+      buyPrice: 10,
+      attributes: {
+        hunger_restore: 3,
+        thirst_restore: 12,
+        consumable: true,
+        food_type: "drink",
+        refreshing: true
+      },
+      effects: ["hunger_restore", "thirst_restore", "refreshing"],
+      tags: ["drink", "refreshing", "sweet", "consumable"]
     },
 
     // MATERIALS - Crafting components

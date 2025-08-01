@@ -62,12 +62,67 @@ export function createResourcesWithIds(): InsertResource[] {
     { id: RESOURCE_IDS.CRISTAIS, name: "Cristais", emoji: "💎", weight: 1, sellPrice: 20, buyPrice: 40, type: "unique", rarity: "rare", requiredTool: "pickaxe", experienceValue: 10 },
     { id: RESOURCE_IDS.CONCHAS, name: "Conchas", emoji: "🐚", weight: 1, sellPrice: 12, buyPrice: 24, type: "unique", rarity: "uncommon", experienceValue: 4 },
 
-    // Food resources
-    { id: RESOURCE_IDS.SUCO_FRUTAS, name: "Suco de Frutas", emoji: "🧃", weight: 1, sellPrice: 5, buyPrice: 10, type: "food", rarity: "common", experienceValue: 2 },
-    { id: RESOURCE_IDS.COGUMELOS_ASSADOS, name: "Cogumelos Assados", emoji: "🍄‍🟫", weight: 1, sellPrice: 6, buyPrice: 12, type: "food", rarity: "common", experienceValue: 3 },
-    { id: RESOURCE_IDS.PEIXE_GRELHADO, name: "Peixe Grelhado", emoji: "🐟", weight: 2, sellPrice: 12, buyPrice: 24, type: "food", rarity: "common", experienceValue: 4 },
-    { id: RESOURCE_IDS.CARNE_ASSADA, name: "Carne Assada", emoji: "🍖", weight: 2, sellPrice: 15, buyPrice: 30, type: "food", rarity: "common", experienceValue: 5 },
-    { id: RESOURCE_IDS.ENSOPADO_CARNE, name: "Ensopado de Carne", emoji: "🍲", weight: 3, sellPrice: 25, buyPrice: 50, type: "food", rarity: "uncommon", experienceValue: 8 },
+    // Food resources (consumables)
+    { 
+      id: RESOURCE_IDS.SUCO_FRUTAS, 
+      name: "Suco de Frutas", 
+      emoji: "🧃", 
+      weight: 1, 
+      sellPrice: 5, 
+      buyPrice: 10, 
+      type: "consumable", 
+      rarity: "common", 
+      experienceValue: 2,
+      attributes: { hunger_restore: 3, thirst_restore: 12, consumable: true }
+    },
+    { 
+      id: RESOURCE_IDS.COGUMELOS_ASSADOS, 
+      name: "Cogumelos Assados", 
+      emoji: "🍄‍🟫", 
+      weight: 1, 
+      sellPrice: 6, 
+      buyPrice: 12, 
+      type: "consumable", 
+      rarity: "common", 
+      experienceValue: 3,
+      attributes: { hunger_restore: 8, thirst_restore: 1, consumable: true }
+    },
+    { 
+      id: RESOURCE_IDS.PEIXE_GRELHADO, 
+      name: "Peixe Grelhado", 
+      emoji: "🐟", 
+      weight: 2, 
+      sellPrice: 12, 
+      buyPrice: 24, 
+      type: "consumable", 
+      rarity: "common", 
+      experienceValue: 4,
+      attributes: { hunger_restore: 12, thirst_restore: 2, consumable: true }
+    },
+    { 
+      id: RESOURCE_IDS.CARNE_ASSADA, 
+      name: "Carne Assada", 
+      emoji: "🍖", 
+      weight: 2, 
+      sellPrice: 15, 
+      buyPrice: 30, 
+      type: "consumable", 
+      rarity: "common", 
+      experienceValue: 5,
+      attributes: { hunger_restore: 25, thirst_restore: 5, consumable: true }
+    },
+    { 
+      id: RESOURCE_IDS.ENSOPADO_CARNE, 
+      name: "Ensopado de Carne", 
+      emoji: "🍲", 
+      weight: 3, 
+      sellPrice: 25, 
+      buyPrice: 50, 
+      type: "consumable", 
+      rarity: "uncommon", 
+      experienceValue: 8,
+      attributes: { hunger_restore: 20, thirst_restore: 8, consumable: true }
+    },
   ];
 }
 

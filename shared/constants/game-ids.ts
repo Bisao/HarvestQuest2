@@ -37,12 +37,17 @@ export const RESOURCE_IDS = {
   CRISTAIS: "res-e5f7a1c9-3d8b-4e05-9a16-6c2e8f9b7dec",
   CONCHAS: "res-f7a1e5c9-8b3d-4e04-9a15-8c6e2f5b9ded",
 
-  // Food resources
-  SUCO_FRUTAS: "res-a1c9e5f7-3b8d-4e03-9a14-2c8e6f9b7dee",
-  COGUMELOS_ASSADOS: "res-c9e5a1f7-8d3b-4e02-9a13-6c2e8f7b5def",
-  PEIXE_GRELHADO: "res-e5a1c9f7-3d8b-4e01-9a12-8c6e2f9b7de0",
-  CARNE_ASSADA: "res-a1f7e5c9-8b3d-4e00-9a11-2c8e6f5b9df1",
-  ENSOPADO_CARNE: "res-f7e5a1c9-3d8b-4e99-9a10-6c2e8f9b7df2"
+  // Food resources (consumables)
+  SUCO_FRUTAS: "res-suco-frutas-001",
+  COGUMELOS_ASSADOS: "res-cogumelos-assados-001", 
+  PEIXE_GRELHADO: "res-peixe-grelhado-001",
+  CARNE_ASSADA: "res-carne-assada-001",
+  ENSOPADO_CARNE: "res-ensopado-carne-001",
+  
+  // All consumable items with standardized IDs
+  AGUA_FRESCA: "res-agua-fresca-001",
+  COGUMELOS: "res-cogumelos-001",
+  FRUTAS_SILVESTRES: "res-frutas-silvestres-001"
 } as const;
 
 export const EQUIPMENT_IDS = {

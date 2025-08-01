@@ -1,4 +1,3 @@
-
 // Dynamic consumable system utilities - MODERN ONLY
 import type { Resource, Equipment } from "@shared/types";
 import { RESOURCE_IDS } from "@shared/constants/game-ids";
@@ -66,7 +65,7 @@ export function getConsumableEffects(item: any): ConsumableEffects {
   if (item.attributes) {
     const hungerRestore = item.attributes.hunger_restore || 0;
     const thirstRestore = item.attributes.thirst_restore || 0;
-    
+
     // Return if we have actual values from attributes
     if (hungerRestore > 0 || thirstRestore > 0) {
       return {
@@ -164,7 +163,7 @@ export function validateConsumption(item: any, quantity: number = 1): {
   }
 
   const effects = getConsumableEffects(item);
-  
+
   // Validate that the item actually provides some benefit
   if (effects.hungerRestore === 0 && effects.thirstRestore === 0) {
     return { valid: false, error: "Item não fornece benefícios de consumo" };
@@ -254,7 +253,7 @@ export function getModernConsumableData(itemId: string): ConsumableEffects | nul
  */
 export function isModernConsumable(item: any): boolean {
   if (!item) return false;
-  
+
   return item.category === 'consumable' && 
          item.attributes && 
          (item.attributes.hunger_restore > 0 || item.attributes.thirst_restore > 0);
@@ -281,3 +280,46 @@ export function getAllModernConsumableIds(): string[] {
     "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
   ];
 }
+const CONSUMABLE_ITEMS: Record<string, ConsumableEffects> = {
+  // All consumables using standardized IDs from RESOURCE_IDS
+  [RESOURCE_IDS.COGUMELOS]: {
+    hunger: 2,
+    thirst: 0,
+    health: 0
+  },
+  [RESOURCE_IDS.FRUTAS_SILVESTRES]: {
+    hunger: 1,
+    thirst: 2,
+    health: 0
+  },
+  [RESOURCE_IDS.AGUA_FRESCA]: {
+    hunger: 0,
+    thirst: 20,
+    health: 0
+  },
+  [RESOURCE_IDS.COGUMELOS_ASSADOS]: {
+    hunger: 8,
+    thirst: 1,
+    health: 0
+  },
+  [RESOURCE_IDS.CARNE_ASSADA]: {
+    hunger: 25,
+    thirst: 5,
+    health: 2
+  },
+  [RESOURCE_IDS.PEIXE_GRELHADO]: {
+    hunger: 12,
+    thirst: 2,
+    health: 1
+  },
+  [RESOURCE_IDS.ENSOPADO_CARNE]: {
+    hunger: 20,
+    thirst: 8,
+    health: 3
+  },
+  [RESOURCE_IDS.SUCO_FRUTAS]: {
+    hunger: 3,
+    thirst: 12,
+    health: 0
+  }
+};
