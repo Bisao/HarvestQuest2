@@ -102,6 +102,53 @@ app.use((req, res, next) => {
   // Use the centralized error handler
   app.use(errorHandler);
 
+  // UUID Enforcement System
+  import { 
+    uuidEnforcementMiddleware, 
+    validateServerStartupUUIDs,
+    uuidStatsMiddleware 
+  } from './middleware/uuid-enforcement-middleware';
+
+  // Validate UUIDs on server startup
+  app.use(validateServerStartupUUIDs());
+
+  // Apply UUID enforcement to all requests
+  app.use(uuidEnforcementMiddleware({
+    enforceMode: 'convert',
+    logViolations: true,
+    rejectInvalid: false
+  }));
+
+  // Optional: UUID statistics logging
+  if (process.env.NODE_ENV === 'development') {
+    app.use(uuidStatsMiddleware);
+  }
+
+  // Routes
+  import gameRoutes from './routes/game';
+  import healthRoutes from './routes/health';
+  import adminRoutes from './routes/admin';
+  import savesRoutes from './routes/saves';
+  import workshopRoutes from './routes/workshop';
+  import storageRoutes from './routes/storage';
+  import consumptionRoutes from './routes/consumption';
+  import questRoutes from './routes/quest';
+  
+  const limiter = rateLimit(100, 60000);
+
+  // Apply the rate limiting middleware to all requests
+  app.use(limiter);
+
+  // Routes
+  app.use('/api', gameRoutes);
+  app.use('/api/health', healthRoutes);
+  app.use('/api/admin', adminRoutes);
+  app.use('/api/saves', savesRoutes);
+  app.use('/api/workshops', workshopRoutes);
+  app.use('/api/storage', storageRoutes);
+  app.use('/api/consumption', consumptionRoutes);
+  app.use('/api/quests', questRoutes);
+
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
