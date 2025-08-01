@@ -38,6 +38,7 @@ export interface InsertPlayer {
   inventoryWeight?: number;
   maxInventoryWeight?: number;
   autoStorage?: boolean;
+  autoCompleteQuests?: boolean;
   craftedItemsDestination?: 'inventory' | 'storage';
   waterStorage?: number;
   maxWaterStorage?: number;
@@ -56,6 +57,7 @@ export interface ItemAttributes {
   durability: number; // 0-100, items break when reaching 0
   efficiency: number; // 0-100, effectiveness rating
   rarity: RarityLevel; // rarity level
+  baseValue?: number; // Optional base value for calculations
 }
 
 export interface ConsumableEffect {

@@ -114,6 +114,7 @@ export class MemStorage implements IStorage {
   private playerQuests: Map<string, PlayerQuest>;
   private saveFile = 'data.json';
   private isInitialized = false;
+  private hungerThirstService: any = null;
 
   constructor() {
     this.players = new Map();
@@ -206,10 +207,7 @@ export class MemStorage implements IStorage {
     const resourceIds: string[] = [];
 
     for (const resource of ALL_RESOURCES) {
-      const created = await this.createResource({
-        ...resource,
-        value: resource.attributes?.baseValue || 10
-      });
+      const created = await this.createResource(resource);
       resourceIds.push(created.id);
     }
 
@@ -244,7 +242,20 @@ export class MemStorage implements IStorage {
       await this.saveData();
     }, 30000);
 
+    // Initialize hunger/thirst degradation system
+    this.initializeHungerThirstSystem();
+
     console.log("🎮 Game initialized successfully");
+  }
+
+  private async initializeHungerThirstSystem(): Promise<void> {
+    try {
+      const { HungerThirstService } = await import("./services/hunger-thirst-service");
+      this.hungerThirstService = new HungerThirstService(this);
+      this.hungerThirstService.startPassiveDegradation();
+    } catch (error) {
+      console.error('Failed to initialize hunger/thirst system:', error);
+    }
   }
 
   // Player methods
