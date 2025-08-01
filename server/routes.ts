@@ -884,6 +884,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get biome resources - simple route for frontend
+  app.get("/api/biomes/:biomeId/resources", async (req, res) => {
+    try {
+      const { biomeId } = req.params;
+      const biome = await storage.getBiome(biomeId);
+      
+      if (!biome) {
+        return res.status(404).json({ message: "Biome not found" });
+      }
+
+      const resources = await storage.getAllResources();
+      const availableResources = Array.isArray(biome.availableResources) 
+        ? biome.availableResources : [];
+
+      const biomeResources = resources.filter(r => 
+        availableResources.includes(r.id)
+      );
+
+      res.json(biomeResources);
+    } catch (error) {
+      console.error("Error getting biome resources:", error);
+      res.status(500).json({ message: "Failed to get biome resources" });
+    }
+  });
+
   // Get biome details with enhanced information
   app.get("/api/biomes/:id/details", async (req, res) => {
     try {
@@ -1044,10 +1069,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Store reference in app for use in other routes  
   // WebSocket service will be initialized in index.ts
   
-  // Also store in storage for access by services
-  if (storage.setApp) {
-    storage.setApp(app);
-  }
+  // WebSocket service will be initialized in index.ts
   
-  return httpServer; httpServer;
+  return httpServer;
 }

@@ -6,13 +6,13 @@
         "id": "45681017-ff0b-4efc-829e-de0932057f0b",
         "username": "Bison",
         "level": 1,
-        "experience": 55,
-        "hunger": 60,
+        "experience": 58,
+        "hunger": 52,
         "maxHunger": 100,
-        "thirst": 60,
+        "thirst": 52,
         "maxThirst": 100,
         "coins": 100,
-        "inventoryWeight": 59,
+        "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -27,7 +27,7 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754028643751,
+        "lastOnlineTime": 1754029550240,
         "offlineActivityConfig": {
           "enabled": true,
           "maxDuration": 12,
@@ -39,54 +39,59 @@
       }
     ]
   ],
-  "inventoryItems": [
+  "inventoryItems": [],
+  "storageItems": [
     [
-      "a2a0b578-3423-47aa-afc0-14a611805880",
+      "603d920e-3017-49a7-a0d1-322fa3cb93bc",
       {
-        "id": "a2a0b578-3423-47aa-afc0-14a611805880",
+        "id": "603d920e-3017-49a7-a0d1-322fa3cb93bc",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 11
+        "quantity": 12,
+        "itemType": "resource"
       }
     ],
     [
-      "4b25e13d-a610-4e13-ae44-e82c0ef88d70",
+      "e951253e-289e-4ce2-8a65-17cff38bd81c",
       {
-        "id": "4b25e13d-a610-4e13-ae44-e82c0ef88d70",
+        "id": "e951253e-289e-4ce2-8a65-17cff38bd81c",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 14
+        "quantity": 16,
+        "itemType": "resource"
       }
     ],
     [
-      "ad512b57-e8f5-4517-bd7b-f384382316ff",
+      "15bca462-7a9a-4087-8cb9-a5e42db61517",
       {
-        "id": "ad512b57-e8f5-4517-bd7b-f384382316ff",
+        "id": "15bca462-7a9a-4087-8cb9-a5e42db61517",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 9
+        "quantity": 9,
+        "itemType": "resource"
       }
     ],
     [
-      "8c61b8ae-f210-48f1-967e-26298b281a99",
+      "4b216c8a-9322-47db-a5b4-2980b0ff8e7a",
       {
-        "id": "8c61b8ae-f210-48f1-967e-26298b281a99",
+        "id": "4b216c8a-9322-47db-a5b4-2980b0ff8e7a",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 5
+        "quantity": 5,
+        "itemType": "resource"
       }
     ],
     [
-      "005beba3-db0d-4891-a86b-5f549ae61b1a",
+      "1fe47a70-731b-4874-933d-dc7276f161cc",
       {
-        "id": "005beba3-db0d-4891-a86b-5f549ae61b1a",
+        "id": "1fe47a70-731b-4874-933d-dc7276f161cc",
         "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 11
+        "quantity": 11,
+        "itemType": "resource"
       }
     ]
   ],
-  "storageItems": [],
   "expeditions": [
     [
       "71c3c6c0-33e5-4fdf-a4f3-5857f2351550",
@@ -166,6 +171,27 @@
         },
         "startTime": 1754028211416,
         "endTime": 1754028274,
+        "progress": 100
+      }
+    ],
+    [
+      "3bfa03a2-ebc6-4a98-ab97-0b2b5f2bc8fc",
+      {
+        "id": "3bfa03a2-ebc6-4a98-ab97-0b2b5f2bc8fc",
+        "playerId": "45681017-ff0b-4efc-829e-de0932057f0b",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "completed",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 1,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 2
+        },
+        "startTime": 1754029578617,
+        "endTime": 1754029677,
         "progress": 100
       }
     ]
