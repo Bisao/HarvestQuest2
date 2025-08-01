@@ -48,23 +48,44 @@ export function createBiomeData(): InsertBiome[] {
       name: "Floresta",
       emoji: "🌲",
       requiredLevel: 1,
-      // Inclui recursos básicos + madeira + todos os novos recursos de caça/pesca
+      // Inclui todos os recursos básicos, animais, peixes, plantas e materiais processados disponíveis na floresta
       availableResources: [
+        // Recursos básicos coletáveis à mão
         RESOURCE_IDS.FIBRA,
-        RESOURCE_IDS.PEDRA,
         RESOURCE_IDS.PEDRAS_SOLTAS,
         RESOURCE_IDS.GRAVETOS,
+        RESOURCE_IDS.ARGILA,
+        
+        // Recursos que requerem ferramentas
+        RESOURCE_IDS.PEDRA,
         RESOURCE_IDS.AGUA_FRESCA,
         RESOURCE_IDS.BAMBU,
         RESOURCE_IDS.MADEIRA,
+        RESOURCE_IDS.FERRO_FUNDIDO,
+        
+        // Animais terrestres (requerem armas + faca)
         RESOURCE_IDS.COELHO,
         RESOURCE_IDS.VEADO,
         RESOURCE_IDS.JAVALI,
+        
+        // Peixes (requerem vara de pesca + isca)
         RESOURCE_IDS.PEIXE_PEQUENO,
         RESOURCE_IDS.PEIXE_GRANDE,
         RESOURCE_IDS.SALMAO,
+        
+        // Plantas e coletas especiais
         RESOURCE_IDS.COGUMELOS,
         RESOURCE_IDS.FRUTAS_SILVESTRES,
+        
+        // Materiais processados de animais (obtidos automaticamente ao caçar/pescar)
+        RESOURCE_IDS.CARNE,
+        RESOURCE_IDS.COURO,
+        RESOURCE_IDS.OSSOS,
+        RESOURCE_IDS.PELO,
+        
+        // Consumíveis e materiais de crafting
+        RESOURCE_IDS.ISCA_PESCA,
+        RESOURCE_IDS.BARBANTE,
       ],
     },
     {

@@ -71,30 +71,41 @@ export default function ExpeditionSystem({
   const canCollectResource = (resource: Resource) => {
     const resourceName = resource.name;
     
-    // Basic resources (no tools required)
-    if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
+    // Basic resources (no tools required) - coletáveis à mão
+    if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila', 'Barbante'].includes(resourceName)) {
       return true;
     }
     
-    // Tool required resources
+    // Materiais processados de animais - são obtidos automaticamente ao caçar/pescar
+    if (['Carne', 'Couro', 'Ossos', 'Pelo'].includes(resourceName)) {
+      return true; // Estes são materiais secundários, sempre coletáveis se aparecem na lista
+    }
+    
+    // Consumíveis básicos
+    if (['Isca para Pesca'].includes(resourceName)) {
+      return true; // Pode ser coletado/craftado
+    }
+    
+    // Tool required resources - machado
     if (['Madeira', 'Bambu'].includes(resourceName)) {
       return equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
     }
     
+    // Tool required resources - picareta
     if (['Pedra', 'Ferro Fundido', 'Cristais'].includes(resourceName)) {
       return equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
     }
     
+    // Água - balde ou garrafa de bambu
     if (resourceName === 'Água Fresca') {
       const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
       const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
       return hasBucket || hasBambooBottle;
     }
     
-    // Fish resources - need fishing rod equipped AND bait in inventory
+    // Fish resources - need fishing rod equipped (bait check handled by backend)
     if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName)) {
       const hasFishingRod = equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
-      // Note: bait check would need inventory data here, but for UI purposes we assume if rod is equipped, bait requirement is handled by backend
       return hasFishingRod;
     }
     
@@ -106,7 +117,7 @@ export default function ExpeditionSystem({
       return hasWeapon && hasKnife;
     }
     
-    return true; // Default to collectible
+    return true; // Default to collectible for any new resources
   };
 
   const getCollectableResources = () => {
@@ -309,20 +320,20 @@ export default function ExpeditionSystem({
     
     switch (resource.name) {
       case "Fibra":
-        icons.push("🤚");
-        break;
-      case "Pedra":
-      case "Ferro Fundido":
-      case "Cristais":
-        icons.push("⛏️");
-        break;
       case "Pedras Soltas":
       case "Gravetos":
       case "Cogumelos":
       case "Frutas Silvestres":
       case "Conchas":
       case "Argila":
+      case "Barbante":
+      case "Isca para Pesca":
         icons.push("🤚");
+        break;
+      case "Pedra":
+      case "Ferro Fundido":
+      case "Cristais":
+        icons.push("⛏️");
         break;
       case "Madeira":
       case "Bambu":
@@ -332,7 +343,7 @@ export default function ExpeditionSystem({
         icons.push("🪣");
         break;
       case "Coelho":
-        icons.push("🔪");
+        icons.push("🏹", "🔪");
         break;
       case "Veado":
       case "Javali":
@@ -341,7 +352,13 @@ export default function ExpeditionSystem({
       case "Peixe Pequeno":
       case "Peixe Grande":
       case "Salmão":
-        icons.push("🎣");
+        icons.push("🎣", "🪱");
+        break;
+      case "Carne":
+      case "Couro":
+      case "Ossos":
+      case "Pelo":
+        icons.push("🔄"); // Materiais processados automaticamente
         break;
       case "Areia":
         icons.push("🗿");
@@ -367,15 +384,19 @@ export default function ExpeditionSystem({
     }
     
     if (resourceName === 'Água Fresca') {
-      return 'Requer balde';
+      return 'Requer balde ou garrafa';
     }
     
     if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName)) {
-      return 'Requer vara de pesca';
+      return 'Requer vara de pesca + isca';
     }
     
     if (['Coelho', 'Veado', 'Javali'].includes(resourceName)) {
       return 'Requer arma + faca';
+    }
+    
+    if (['Carne', 'Couro', 'Ossos', 'Pelo'].includes(resourceName)) {
+      return 'Material processado automaticamente';
     }
     
     return 'Ferramenta necessária';
