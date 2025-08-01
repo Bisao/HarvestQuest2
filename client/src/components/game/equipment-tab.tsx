@@ -126,6 +126,8 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
       
       const filteredItems = storageData
         .filter(item => {
+          if (item.quantity <= 0) return false;
+          
           // Get the actual resource data
           const resourceData = getItemById(item.resourceId);
           if (!resourceData) {
@@ -134,50 +136,74 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
           }
 
           console.log('Checking resource:', resourceData.name, {
+            id: resourceData.id,
             category: resourceData.category,
             subcategory: resourceData.subcategory,
             type: resourceData.type,
             isConsumable: isConsumable(resourceData)
           });
 
-          // Check if it's a consumable using the utility function
+          // Primary check: Direct consumable identification by ID
+          const consumableIds = {
+            food: [
+              'res-cogumelos-001',
+              'res-frutas-silvestres-001', 
+              'res-cogumelos-assados-001',
+              'res-carne-assada-001',
+              'res-peixe-grelhado-001',
+              'res-ensopado-carne-001'
+            ],
+            drink: [
+              'res-agua-fresca-001',
+              'res-suco-frutas-001'
+            ]
+          };
+
+          if (consumableIds[slotType]?.includes(item.resourceId)) {
+            console.log('✅ Found consumable by ID:', resourceData.name);
+            return true;
+          }
+
+          // Secondary check: Check if it's a consumable using the utility function
           if (!isConsumable(resourceData)) {
-            console.log('Not consumable:', resourceData.name);
+            console.log('❌ Not consumable:', resourceData.name);
             return false;
           }
 
-          // For modern consumables, check category and subcategory
+          // Tertiary check: For modern consumables, check category and subcategory
           if (resourceData.category === 'consumable') {
-            const matches = resourceData.subcategory === slotType && item.quantity > 0;
+            const matches = resourceData.subcategory === slotType;
             console.log('Modern consumable check:', resourceData.name, 'subcategory:', resourceData.subcategory, 'matches:', matches);
             return matches;
           }
 
-          // For legacy consumables, check by type
+          // Legacy check: For legacy consumables, check by type
           if (resourceData.type === 'consumable') {
-            const matches = resourceData.category === slotType && item.quantity > 0;
+            const matches = resourceData.category === slotType;
             console.log('Legacy consumable check:', resourceData.name, 'category:', resourceData.category, 'matches:', matches);
             return matches;
           }
 
-          // Additional check for food/drink items that might have different categorization
-          if (slotType === 'food' && (
-            resourceData.name.toLowerCase().includes('carne') ||
-            resourceData.name.toLowerCase().includes('cogumelos') ||
-            resourceData.name.toLowerCase().includes('fruta') ||
-            resourceData.name.toLowerCase().includes('peixe') ||
-            resourceData.name.toLowerCase().includes('ensopado')
-          )) {
-            console.log('Food item by name match:', resourceData.name);
-            return item.quantity > 0;
+          // Fallback: Name-based matching
+          const itemName = resourceData.name.toLowerCase();
+          if (slotType === 'food') {
+            const isFoodItem = itemName.includes('carne') || 
+                             itemName.includes('cogumelos') || 
+                             itemName.includes('fruta') || 
+                             itemName.includes('peixe') || 
+                             itemName.includes('ensopado');
+            if (isFoodItem) {
+              console.log('🍖 Food item by name match:', resourceData.name);
+              return true;
+            }
           }
 
-          if (slotType === 'drink' && (
-            resourceData.name.toLowerCase().includes('água') ||
-            resourceData.name.toLowerCase().includes('suco')
-          )) {
-            console.log('Drink item by name match:', resourceData.name);
-            return item.quantity > 0;
+          if (slotType === 'drink') {
+            const isDrinkItem = itemName.includes('água') || itemName.includes('suco');
+            if (isDrinkItem) {
+              console.log('🥤 Drink item by name match:', resourceData.name);
+              return true;
+            }
           }
 
           return false;
