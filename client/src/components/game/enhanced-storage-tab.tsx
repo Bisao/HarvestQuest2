@@ -224,7 +224,7 @@ export default function EnhancedStorageTab({
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       toast({
         title: "Água consumida!",

@@ -2,6 +2,8 @@
 // WebSocket Service for Real-time Updates in Coletor Adventures
 import { WebSocketServer, WebSocket } from 'ws';
 import type { Server } from 'http';
+import { WEBSOCKET_CONFIG } from '@shared/config/game-config';
+import { Logger } from '@shared/utils/logger';
 
 interface ConnectedClient {
   ws: WebSocket;
@@ -24,15 +26,15 @@ export class WebSocketService {
       this.handleConnection(ws, request);
     });
 
-    // Start heartbeat to keep connections alive
+    // Start heartbeat to keep connections alive using configuration
     this.heartbeatInterval = setInterval(() => {
       this.heartbeat();
-    }, 30000); // 30 seconds
+    }, WEBSOCKET_CONFIG.HEARTBEAT_INTERVAL);
 
     // Set global reference
     globalWebSocketService = this;
 
-    console.log('🔌 WebSocket server initialized on /ws');
+    Logger.info('WEBSOCKET', 'WebSocket server initialized on /ws');
   }
 
   private handleConnection(ws: WebSocket, request: any) {

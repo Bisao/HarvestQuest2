@@ -56,7 +56,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", player.id] });
       setEquipModalOpen(false);
       toast({
@@ -80,7 +80,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", player.id] });
       toast({
         title: "Item desequipado",

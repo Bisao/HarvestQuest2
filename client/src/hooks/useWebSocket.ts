@@ -1,6 +1,8 @@
 // WebSocket Hook for Real-time Updates in Coletor Adventures
 import { useEffect, useRef, useState } from 'react';
 import { queryClient } from '@/lib/queryClient';
+import { WEBSOCKET_CONFIG } from '@shared/config/game-config';
+import { Logger } from '@shared/utils/logger';
 
 interface WebSocketMessage {
   type: string;
@@ -44,12 +46,12 @@ export function useWebSocket(playerId: string | null) {
           playerId: playerId
         }));
 
-        // Start heartbeat
+        // Start heartbeat using configuration
         heartbeatIntervalRef.current = setInterval(() => {
           if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'ping' }));
           }
-        }, 30000);
+        }, WEBSOCKET_CONFIG.HEARTBEAT_INTERVAL);
       };
 
       ws.onmessage = (event) => {
@@ -66,15 +68,15 @@ export function useWebSocket(playerId: string | null) {
         setIsConnected(false);
         cleanup();
 
-        // Reconnect logic with exponential backoff
+        // Reconnect logic with configured delay
         if (event.code !== 1000 && playerId) {
-          const delay = Math.min(5000 * Math.pow(1.5, (reconnectTimeoutRef.current ? 1 : 0)), 30000);
-          console.log(`🔌 Reconnecting in ${delay}ms...`);
+          Logger.websocketEvent('Disconnected, scheduling reconnect', playerId, { code: event.code, reason: event.reason });
+          console.log(`🔌 Reconnecting in ${WEBSOCKET_CONFIG.RECONNECT_DELAY}ms...`);
           reconnectTimeoutRef.current = setTimeout(() => {
             if (playerId) { // Check if still needed
               connect();
             }
-          }, delay);
+          }, WEBSOCKET_CONFIG.RECONNECT_DELAY);
         }
       };
 

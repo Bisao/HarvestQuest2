@@ -44,7 +44,7 @@ export default function EquipmentSelectorModal({
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
       toast({
         title: "Item equipado",
         description: "Equipamento atualizado com sucesso.",

@@ -90,7 +90,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}/quests`] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
 
       let message = "Quest completada!";
       if (data.newLevel) {

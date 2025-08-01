@@ -22,7 +22,7 @@ export default function InventoryTab({ playerId, resources, currentWeight, maxWe
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
       toast({
         title: "Sucesso!",
         description: "Todos os itens foram armazenados.",

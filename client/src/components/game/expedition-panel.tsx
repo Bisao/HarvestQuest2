@@ -46,7 +46,7 @@ export default function ExpeditionPanel({
 
   // Query player data for real-time hunger/thirst monitoring
   const { data: player } = useQuery<Player>({
-    queryKey: ["/api/player/${playerId}"],
+    queryKey: [`/api/player/${expedition.id.split('-')[0]}`], // Use expedition creator ID
     refetchInterval: 2000, // Refetch every 2 seconds for real-time monitoring
   });
 
@@ -65,7 +65,7 @@ export default function ExpeditionPanel({
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/${playerId}"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${expedition.id.split('-')[0]}`] });
       
       if (isAutoRepeat) {
         // Auto-repeat mode: restart expedition immediately
