@@ -129,24 +129,24 @@ export default function BiomesTab({
           <div
             key={biome.id}
             className={`biome-card rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-shadow ${
-              unlocked
+              isUnlocked(biome)
                 ? "bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200"
                 : "bg-gradient-to-br from-gray-50 to-slate-100 border-2 border-gray-300 opacity-60"
             }`}
           >
             <div className="text-center mb-4">
-              <div className={`text-4xl md:text-6xl mb-2 ${!unlocked ? "grayscale" : ""}`}>
+              <div className={`text-4xl md:text-6xl mb-2 ${!isUnlocked(biome) ? "grayscale" : ""}`}>
                 {biome.emoji}
               </div>
               <h3 className={`text-lg md:text-xl font-bold ${
-                unlocked ? "text-green-800" : "text-gray-600"
+                isUnlocked(biome) ? "text-green-800" : "text-gray-600"
               }`}>
                 {biome.name}
               </h3>
               <p className={`text-xs md:text-sm ${
-                unlocked ? "text-green-600" : "text-red-500"
+                isUnlocked(biome) ? "text-green-600" : "text-red-500"
               }`}>
-                {unlocked 
+                {isUnlocked(biome) 
                   ? `Nível necessário: ${biome.requiredLevel}` 
                   : `🔒 Nível necessário: ${biome.requiredLevel}`
                 }
@@ -154,10 +154,10 @@ export default function BiomesTab({
             </div>
 
             <div className="mb-4">
-              <h4 className={`font-semibold text-sm mb-1 ${unlocked ? "text-gray-700" : "text-gray-500"}`}>
+              <h4 className={`font-semibold text-sm mb-1 ${isUnlocked(biome) ? "text-gray-700" : "text-gray-500"}`}>
                 Recursos:
               </h4>
-              <div className={`max-h-32 overflow-y-auto pr-1 ${unlocked ? "" : "text-gray-500"}`}>
+              <div className={`max-h-32 overflow-y-auto pr-1 ${isUnlocked(biome) ? "" : "text-gray-500"}`}>
                 <div className="grid grid-cols-1 gap-1 text-sm">
                   {biomeResources.map((resource) => {
                     const toolIcons = getToolIcons(resource);
@@ -183,9 +183,9 @@ export default function BiomesTab({
               {/* Explore Biome Button */}
               <button
                 onClick={() => onExpeditionStart(biome)}
-                disabled={!unlocked}
+                disabled={!isUnlocked(biome)}
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-                  unlocked
+                  isUnlocked(biome)
                     ? "bg-blue-600 hover:bg-blue-700 text-white"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
@@ -214,9 +214,9 @@ export default function BiomesTab({
                         window.dispatchEvent(event);
                       }, 500);
                     }}
-                    disabled={!unlocked}
+                    disabled={!isUnlocked(biome)}
                     className={`py-2 px-3 rounded-lg font-medium transition-colors ${
-                      unlocked
+                      isUnlocked(biome)
                         ? "bg-green-600 hover:bg-green-700 text-white"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}

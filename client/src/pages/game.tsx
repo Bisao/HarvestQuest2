@@ -90,13 +90,13 @@ export default function Game() {
       try {
         const response = await fetch(`/api/player/${player.id}/offline-activity`);
         if (!response.ok) return;
-        
+
         const data = await response.json();
-        
+
         if (data.hasOfflineActivity && data.report) {
           setOfflineReport(data.report);
           setShowOfflineReport(true);
-          
+
           // Atualiza os dados do jogador para refletir as mudanças
           queryClient.invalidateQueries({ queryKey: [`/api/player/${playerUsername}`] });
           queryClient.invalidateQueries({ queryKey: ["/api/inventory", player.id] });
@@ -123,16 +123,24 @@ export default function Game() {
 
     // Marca como online ao sair/fechar
     const handleBeforeUnload = () => {
-      markOnline();
+      markOnlineMutation.mutate(player.id);
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       markOnline();
     };
   }, [player?.id]);
+
+  // Setup window function for offline config
+  useEffect(() => {
+    (window as any).openOfflineConfig = () => setShowOfflineConfig(true);
+    return () => {
+      delete (window as any).openOfflineConfig;
+    };
+  }, []);
 
   const { data: biomes = [] } = useQuery<Biome[]>({
     queryKey: ["/api/biomes"],

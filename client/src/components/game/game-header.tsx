@@ -11,23 +11,23 @@ interface GameHeaderProps {
 
 const GameHeader = ({ player: initialPlayer }: GameHeaderProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
-  
+
   // Use polling to get real-time updates
   const { player: polledPlayer } = useGamePolling({
     playerId: initialPlayer?.id || null,
     enabled: !!initialPlayer?.id,
     pollInterval: 1500 // 1.5 seconds for header updates
   });
-  
+
   // Use polled data if available, fallback to initial player data
   const currentPlayer = polledPlayer || initialPlayer;
-  
+
   // Ensure we have valid values for calculations
   const currentHunger = Math.max(0, currentPlayer.hunger || 0);
   const currentThirst = Math.max(0, currentPlayer.thirst || 0);
   const maxHunger = currentPlayer.maxHunger || 100;
   const maxThirst = currentPlayer.maxThirst || 100;
-  
+
   // Calculate values directly to ensure real-time updates
   const experiencePercentage = Math.min(((currentPlayer.experience % 100) / 100) * 100, 100);
   const hungerPercentage = Math.min((currentHunger / maxHunger) * 100, 100);
@@ -113,11 +113,24 @@ const GameHeader = ({ player: initialPlayer }: GameHeaderProps) => {
               >
                 <Settings className="w-3 h-3 md:w-4 md:h-4" />
               </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  // This will need to be passed as a prop or use context
+                  if (window.openOfflineConfig) {
+                    window.openOfflineConfig();
+                  }
+                }}
+                className="text-purple-600 hover:text-purple-900"
+              >
+                💤 Atividade Offline
+              </Button>
             </div>
           </div>
         </div>
       </header>
-      
+
       <PlayerSettings 
         player={currentPlayer}
         isOpen={settingsOpen}
