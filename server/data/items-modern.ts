@@ -11,7 +11,7 @@ import {
   EQUIPMENT_IDS, 
   BIOME_IDS,
   isValidGameId 
-} from '../shared/constants/game-ids';
+} from '../../shared/constants/game-ids';
 
 export interface ModernItem {
   id: string;

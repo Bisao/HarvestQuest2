@@ -22,10 +22,10 @@ import {
 } from "@shared/types";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync } from "fs";
-import { getAllGameItems } from "./data/items-modern";
+import { ALL_MODERN_ITEMS } from "./data/items-modern";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
-import { createModernRecipeData } from "./data/recipes-modern";
+import { ALL_MODERN_RECIPES } from "./data/recipes-modern";
 import { ALL_QUESTS } from "./data/quests";
 
 export interface IStorage {
@@ -204,38 +204,37 @@ export class MemStorage implements IStorage {
 
     // Initialize all resources using modern game items system
     const resourceIds: string[] = [];
-    const allItems = getAllGameItems();
-    const resourceItems = allItems.filter(item => item.category === 'resource' || item.category === 'consumable');
+    const allItems = ALL_MODERN_ITEMS;
+    const resourceItems = allItems.filter(item => item.type === 'resource' || item.type === 'consumable');
 
     for (const resource of resourceItems) {
       // Convert modern item to legacy resource format for storage compatibility
       const legacyResource = {
         id: resource.id,
-        name: resource.displayName,
-        emoji: resource.iconPath,
+        name: resource.name,
+        emoji: resource.id, // Use ID as emoji placeholder
         rarity: resource.rarity,
-        experienceValue: resource.xpReward,
-        category: resource.category === 'consumable' ? 'consumables' as const : 'raw_materials' as const,
-        subcategory: resource.subcategory,
-        type: resource.category,
-        spawnRate: resource.spawnRate,
-        yieldAmount: resource.yieldAmount,
-        requiredTool: resource.requiredTool || undefined,
-        sellPrice: resource.sellPrice,
-        buyPrice: resource.buyPrice,
+        experienceValue: resource.baseValue || 10,
+        category: resource.type === 'consumable' ? 'consumables' as const : 'raw_materials' as const,
+        subcategory: resource.category,
+        type: resource.type,
+        spawnRate: resource.spawnRate || 0.1,
+        yieldAmount: 1,
+        requiredTool: resource.toolRequired || undefined,
+        sellPrice: resource.baseValue,
+        buyPrice: resource.baseValue * 1.5,
         weight: resource.weight,
         stackable: resource.stackable,
-        maxStackSize: resource.maxStackSize,
-        effects: resource.effects,
+        maxStackSize: resource.maxStack || 100,
+        effects: resource.buffs || [],
         tags: resource.tags,
         attributes: { 
-          durability: 100, 
+          durability: resource.durability || 100, 
           efficiency: 100, 
           rarity: resource.rarity,
-          baseValue: resource.sellPrice,
-          ...resource.attributes
+          baseValue: resource.baseValue,
         },
-        value: resource.sellPrice
+        value: resource.baseValue
       };
       const created = await this.createResource(legacyResource);
       resourceIds.push(created.id);
@@ -253,7 +252,7 @@ export class MemStorage implements IStorage {
     }
 
     // Initialize recipes using modular data
-    const recipesData = createModernRecipeData();
+    const recipesData = ALL_MODERN_RECIPES;
     for (const recipe of recipesData) {
       await this.createRecipe(recipe);
     }

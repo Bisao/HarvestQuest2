@@ -7,19 +7,12 @@ import { rateLimit } from "./middleware/auth";
 
 // Import consumption routes
 import { createConsumptionRoutes } from "./routes/consumption";
-import { createModernRecipeData } from "./data/recipes-modern";
+import { ALL_MODERN_RECIPES } from "./data/recipes-modern";
 import { GameService } from "./services/game-service";
 import { validateRecipeIngredients, validateGameDataConsistency } from "@shared/utils/id-validation";
 
 // Import all route modules at the top
-import gameRoutes from './routes/game';
-import healthRoutes from './routes/health';
-import adminRoutes from './routes/admin';
-import savesRoutes from './routes/saves';
-import workshopRoutes from './routes/workshop';
-import storageRoutes from './routes/storage';
-import consumptionRoutes from './routes/consumption';
-import questRoutes from './routes/quest';
+import { registerAdminRoutes } from './routes/admin';
 
 const app = express();
 const port = Number(process.env.PORT) || 5000;
@@ -33,7 +26,7 @@ if (!consistencyCheck.isValid) {
 }
 
 // Validate recipe ingredients
-const recipes = createModernRecipeData();
+const recipes = ALL_MODERN_RECIPES;
 const recipeValidation = validateRecipeIngredients(recipes);
 if (!recipeValidation.isValid) {
   console.error("❌ Recipe validation errors:");
@@ -125,15 +118,9 @@ app.use((req, res, next) => {
   // Apply the rate limiting middleware to all requests
   app.use(limiter);
 
-  // Routes - using imported modules
-  app.use('/api', gameRoutes);
-  app.use('/api/health', healthRoutes);
-  app.use('/api/admin', adminRoutes);
-  app.use('/api/saves', savesRoutes);
-  app.use('/api/workshops', workshopRoutes);
-  app.use('/api/storage', storageRoutes);
-  app.use('/api/consumption', consumptionRoutes);
-  app.use('/api/quests', questRoutes);
+  // Routes - using proper route registration
+  registerRoutes(app);
+  registerAdminRoutes(app);
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

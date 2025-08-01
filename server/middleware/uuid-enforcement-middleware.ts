@@ -7,8 +7,8 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { UUIDEnforcer, validateStartupUUIDs } from '../../shared/utils/uuid-enforcement';
-import { isValidGameIdFormat } from '../../shared/utils/uuid-generator';
+import { UUIDEnforcer, validateStartupUUIDs } from '@shared/utils/uuid-enforcement';
+import { isValidGameIdFormat } from '@shared/utils/uuid-generator';
 
 export interface UUIDValidationConfig {
   enforceMode: 'strict' | 'convert' | 'warn';

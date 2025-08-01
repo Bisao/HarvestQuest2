@@ -6,7 +6,7 @@
  * Inclui receitas para todos os itens expandidos e novos equipamentos.
  */
 
-import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from '../../shared/constants/game-ids';
+import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from '@shared/constants/game-ids';
 
 export interface ModernRecipe {
   id: string;

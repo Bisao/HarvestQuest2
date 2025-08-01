@@ -5,7 +5,7 @@
  * This ensures any old or invalid ID is corrected to match master registry
  */
 
-import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS, BIOME_IDS, QUEST_IDS } from '../constants/game-ids';
+import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS, BIOME_IDS, QUEST_IDS } from '@shared/constants/game-ids';
 
 /**
  * Master ID mapping table - maps legacy/invalid IDs to correct game-ids.ts IDs
@@ -44,7 +44,7 @@ export function autoCorrectId(invalidId: string): string {
     ...Object.values(QUEST_IDS)
   ];
   
-  if (allValidIds.includes(invalidId)) {
+  if (allValidIds.includes(invalidId as any)) {
     return invalidId; // Already valid
   }
   

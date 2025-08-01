@@ -6,9 +6,9 @@
  * Run this script to ensure all IDs are consistent across the entire project.
  */
 
-import { validateGameStartup, updateToMasterIds, getAllMasterIds } from '../shared/utils/id-resolver';
-import { validateAllGameData, isValidGameId } from '../shared/utils/id-validator-strict';
-import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from '../shared/constants/game-ids';
+import { validateGameStartup, updateToMasterIds, getAllMasterIds } from '../shared/utils/id-resolver.js';
+import { validateAllGameData, isValidGameId } from '../shared/utils/id-validator-strict.js';
+import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from '../shared/constants/game-ids.js';
 
 /**
  * Main validation function - runs comprehensive ID checks

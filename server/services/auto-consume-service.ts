@@ -1,6 +1,6 @@
 
 import type { IStorage } from "../storage";
-import { getAllGameItems } from "../data/items-modern";
+import { ALL_MODERN_ITEMS } from "../data/items-modern";
 import { CONSUMPTION_CONFIG } from "@shared/config/consumption-config";
 
 export class AutoConsumeService {
@@ -80,9 +80,9 @@ export class AutoConsumeService {
       if (!player) return;
 
       // Get item data from modern items system
-      const allItems = getAllGameItems();
+      const allItems = ALL_MODERN_ITEMS;
       const itemData = allItems.find(item => item.id === itemId);
-      if (!itemData || itemData.category !== 'consumable') return;
+      if (!itemData || itemData.type !== 'consumable') return;
 
       // Check if we have the item in storage
       const storageItems = await this.storage.getPlayerStorage(playerId);
