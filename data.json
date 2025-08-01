@@ -7,9 +7,9 @@
         "username": "Bison",
         "level": 2,
         "experience": 168,
-        "hunger": 2,
+        "hunger": 92,
         "maxHunger": 100,
-        "thirst": 0,
+        "thirst": 18,
         "maxThirst": 100,
         "coins": 100,
         "inventoryWeight": 157,
@@ -65,15 +65,6 @@
         "playerId": "072c5b5f-a30f-4e92-be9d-a8a4815e51d6",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
         "quantity": 31
-      }
-    ],
-    [
-      "ccdcc4da-ff74-4d22-8715-8091e85b41e5",
-      {
-        "id": "ccdcc4da-ff74-4d22-8715-8091e85b41e5",
-        "playerId": "072c5b5f-a30f-4e92-be9d-a8a4815e51d6",
-        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 26
       }
     ]
   ],
