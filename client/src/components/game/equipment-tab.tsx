@@ -135,12 +135,14 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
             return false;
           }
 
-          console.log('Checking resource:', resourceData.name, {
+          console.log('✅ Found resource data:', {
             id: resourceData.id,
+            name: resourceData.name,
             category: resourceData.category,
             subcategory: resourceData.subcategory,
             type: resourceData.type,
-            isConsumable: isConsumable(resourceData)
+            isConsumable: isConsumable(resourceData),
+            slotType: slotType
           });
 
           // Primary check: Direct consumable identification by ID
@@ -256,7 +258,13 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
 
   const handleEquipItem = (equipmentId: string) => {
     if (selectedSlot) {
-      equipMutation.mutate({ slot: selectedSlot, equipmentId });
+      // For consumables (food/drink), we can equip directly from storage
+      if (selectedSlot === 'food' || selectedSlot === 'drink') {
+        equipMutation.mutate({ slot: selectedSlot, equipmentId });
+      } else {
+        // For regular equipment, need to move to inventory first
+        equipMutation.mutate({ slot: selectedSlot, equipmentId });
+      }
     }
   };
 
@@ -401,7 +409,7 @@ export default function EquipmentTab({ player, equipment }: EquipmentTabProps) {
                       onClick={() => handleEquipItem(eq.id)}
                       disabled={equipMutation.isPending}
                     >
-                      Equipar
+                      {selectedSlot === 'food' || selectedSlot === 'drink' ? 'Equipar Consumível' : 'Equipar'}
                     </Button>
                   </div>
                 ))

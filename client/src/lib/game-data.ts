@@ -7,7 +7,94 @@ export const BASIC_RESOURCES = [
 ];
 
 // Add the missing resources export for equipment-tab.tsx
-export const resources = BASIC_RESOURCES;
+export const resources = [
+  {
+    id: "res-madeira-001",
+    name: "Madeira",
+    emoji: "🪵",
+    type: "basic",
+    category: "material",
+    weight: 500,
+    value: 2,
+    rarity: "common"
+  },
+  // Legacy consumable IDs for compatibility
+  {
+    id: "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+    name: "Água Fresca",
+    emoji: "💧",
+    type: "consumable",
+    category: "consumable",
+    subcategory: "drink",
+    weight: 100,
+    value: 5,
+    rarity: "common",
+    attributes: {
+      hunger_restore: 0,
+      thirst_restore: 10
+    }
+  },
+  {
+    id: "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+    name: "Carne Assada",
+    emoji: "🍖",
+    type: "consumable",
+    category: "consumable",
+    subcategory: "food",
+    weight: 250,
+    value: 15,
+    rarity: "common",
+    attributes: {
+      hunger_restore: 15,
+      thirst_restore: 3
+    }
+  },
+  {
+    id: "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+    name: "Cogumelos",
+    emoji: "🍄",
+    type: "consumable",
+    category: "consumable",
+    subcategory: "food",
+    weight: 80,
+    value: 3,
+    rarity: "common",
+    attributes: {
+      hunger_restore: 2,
+      thirst_restore: 0
+    }
+  },
+  {
+    id: "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+    name: "Frutas Silvestres",
+    emoji: "🫐",
+    type: "consumable",
+    category: "consumable",
+    subcategory: "food",
+    weight: 120,
+    value: 4,
+    rarity: "common",
+    attributes: {
+      hunger_restore: 1,
+      thirst_restore: 2
+    }
+  },
+  {
+    id: "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+    name: "Suco de Frutas",
+    emoji: "🧃",
+    type: "consumable",
+    category: "consumable",
+    subcategory: "drink",
+    weight: 150,
+    value: 8,
+    rarity: "common",
+    attributes: {
+      hunger_restore: 5,
+      thirst_restore: 1
+    }
+  },
+];
 
 export const UNIQUE_RESOURCES = {
   forest: { id: "madeira", name: "Madeira", emoji: "🌳", weight: 5, value: 8 },
