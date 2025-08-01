@@ -180,32 +180,81 @@ export default function ExpeditionModal({
       // First check if there's an active expedition and try to complete it
       try {
         const activeExpeditionResponse = await fetch(`/api/player/${player.id}/expeditions/active`);
+        
         if (activeExpeditionResponse.ok) {
-          const activeExpedition = await activeExpeditionResponse.json();
-          if (activeExpedition && activeExpedition.id) {
-            console.log('Found active expedition, attempting to complete it first');
-            // Try to complete the active expedition
-            const completeResponse = await fetch(`/api/expeditions/${activeExpedition.id}/complete`, {
-              method: 'POST'
-            });
-            if (completeResponse.ok) {
-              console.log('Successfully completed previous expedition');
+          const contentType = activeExpeditionResponse.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const activeExpedition = await activeExpeditionResponse.json();
+            if (activeExpedition && activeExpedition.id) {
+              console.log('Found active expedition, attempting to complete it first');
+              
+              // Try to complete the active expedition
+              const completeResponse = await fetch(`/api/expeditions/${activeExpedition.id}/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+              });
+              
+              if (completeResponse.ok) {
+                const completeContentType = completeResponse.headers.get('content-type');
+                if (completeContentType && completeContentType.includes('application/json')) {
+                  await completeResponse.json();
+                  console.log('Successfully completed previous expedition');
+                  
+                  // Wait a moment for cache invalidation
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                } else {
+                  console.warn('Complete expedition response was not JSON');
+                }
+              } else {
+                console.warn('Failed to complete previous expedition:', completeResponse.status);
+              }
             }
+          } else {
+            console.log('Active expedition response was not JSON, likely no active expedition');
           }
+        } else if (activeExpeditionResponse.status === 404) {
+          console.log('No active expedition found');
+        } else {
+          console.warn('Failed to check for active expedition:', activeExpeditionResponse.status);
         }
       } catch (error) {
-        console.log('No active expedition found or failed to complete:', error);
+        console.log('Error checking/completing active expedition:', error);
       }
 
-      const response = await fetch(`/api/expeditions/start`, {
+      // Now try to start the new expedition
+      const response = await fetch(`/api/expeditions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(expeditionData)
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Failed to start expedition');
+        const contentType = response.headers.get('content-type');
+        let errorMessage = 'Failed to start expedition';
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+          } catch (parseError) {
+            console.error('Failed to parse error response:', parseError);
+          }
+        } else {
+          const errorText = await response.text();
+          // Extract meaningful error message from HTML if needed
+          if (errorText.includes('<!DOCTYPE')) {
+            errorMessage = 'Erro interno do servidor. Tente novamente.';
+          } else {
+            errorMessage = errorText || errorMessage;
+          }
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Resposta inválida do servidor');
       }
 
       return response.json();
@@ -358,7 +407,7 @@ export default function ExpeditionModal({
                 startExpeditionMutation.isPending
               }
             >
-              {startExpeditionMutation.isPending ? "Iniciando..." : "Iniciar Expedição"}
+              {startExpeditionMutation.isPending ? "Processando..." : "Iniciar Expedição"}
             </Button>
           </div>
         </div>

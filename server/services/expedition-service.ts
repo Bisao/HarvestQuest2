@@ -88,12 +88,18 @@ export class ExpeditionService {
       throw new Error("Você não possui as ferramentas ou armas necessárias para coletar os recursos selecionados neste bioma.");
     }
 
-    // Check for existing active expeditions
+    // Check for existing active expeditions and auto-complete them
     const existingExpeditions = await this.storage.getPlayerExpeditions(playerId);
     const activeExpedition = existingExpeditions.find(exp => exp.status === 'in_progress');
     if (activeExpedition) {
-      console.log('Player already has active expedition:', activeExpedition.id);
-      throw new Error("Você já possui uma expedição ativa. Finalize-a antes de iniciar uma nova.");
+      console.log('Player has active expedition, auto-completing:', activeExpedition.id);
+      try {
+        await this.completeExpedition(activeExpedition.id);
+        console.log('Successfully auto-completed previous expedition');
+      } catch (error) {
+        console.error('Failed to auto-complete expedition:', error);
+        throw new Error("Não foi possível finalizar a expedição anterior. Tente novamente.");
+      }
     }
 
     console.log('Creating expedition with valid resources:', validResources);

@@ -526,7 +526,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(expedition);
     } catch (error) {
       console.error('Expedition creation error:', error);
-      res.status(400).json({ message: error instanceof Error ? error.message : "Failed to create expedition" });
+      const errorMessage = error instanceof Error ? error.message : "Failed to create expedition";
+      res.status(400).json({ 
+        message: errorMessage,
+        error: process.env.NODE_ENV === 'development' ? error : undefined 
+      });
     }
   });
 
