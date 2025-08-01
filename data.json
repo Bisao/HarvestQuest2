@@ -7,12 +7,12 @@
         "username": "Bison",
         "level": 2,
         "experience": 149,
-        "hunger": 9,
+        "hunger": 0,
         "maxHunger": 100,
-        "thirst": 22,
+        "thirst": 8,
         "maxThirst": 100,
         "coins": 100,
-        "inventoryWeight": 5,
+        "inventoryWeight": 8,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -31,12 +31,12 @@
   ],
   "inventoryItems": [
     [
-      "87587393-6f58-4178-8a01-36c520c97dc6",
+      "a6dd200e-a9ca-4212-a406-81f900aa8a4b",
       {
-        "id": "87587393-6f58-4178-8a01-36c520c97dc6",
+        "id": "a6dd200e-a9ca-4212-a406-81f900aa8a4b",
         "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
         "resourceId": "res-c9e5a1f7-8d3b-4e02-9a13-6c2e8f7b5def",
-        "quantity": 5
+        "quantity": 8
       }
     ]
   ],
@@ -87,17 +87,7 @@
         "id": "46d8ddad-b751-4ea8-96c5-22053c5915fb",
         "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 14,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "5941681e-06cb-4956-bf15-f0cdede7c012",
-      {
-        "id": "5941681e-06cb-4956-bf15-f0cdede7c012",
-        "playerId": "a0cf3295-5b4b-4516-a511-35494dd5646b",
-        "resourceId": "res-c9e5a1f7-8d3b-4e02-9a13-6c2e8f7b5def",
-        "quantity": 3,
+        "quantity": 10,
         "itemType": "resource"
       }
     ]
