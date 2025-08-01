@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -13,7 +12,7 @@ import LoadingScreen from "@/components/game/loading-screen";
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
 import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem } from "@shared/types";
 import { useQuestStatus } from "@/hooks/use-quest-status";
-import { useWebSocket } from "@/hooks/useWebSocket";
+import { useGamePolling } from '@/hooks/useGamePolling';
 
 export default function Game() {
   const [activeTab, setActiveTab] = useState("biomes");
@@ -23,7 +22,7 @@ export default function Game() {
   // Get player from URL parameter
   const urlParams = new URLSearchParams(window.location.search);
   const playerUsername = urlParams.get('player') || '';
-  
+
   console.log("Game component - location:", location);
   console.log("Game component - playerUsername:", playerUsername);
 
@@ -57,8 +56,11 @@ export default function Game() {
     enabled: !!playerUsername,
   });
 
-  // Initialize WebSocket for real-time updates
-  const { isConnected, connectionError } = useWebSocket(player?.id || null);
+  // Real-time updates via polling (more reliable than WebSocket)
+  const { isConnected: pollingConnected } = useGamePolling({ 
+    playerId: player?.id || null,
+    enabled: !!player?.id 
+  });
 
   const { data: biomes = [] } = useQuery<Biome[]>({
     queryKey: ["/api/biomes"],

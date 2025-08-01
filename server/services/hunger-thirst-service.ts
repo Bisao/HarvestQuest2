@@ -140,17 +140,8 @@ export class HungerThirstService {
             }
           }
 
-          // Broadcast real-time update via WebSocket
-          try {
-            const updatedPlayer = await this.storage.getPlayer(player.id);
-            if (updatedPlayer) {
-              const { broadcastPlayerUpdate } = await import("../websocket-service");
-              broadcastPlayerUpdate(player.id, updatedPlayer);
-              console.log(`📡 Real-time hunger/thirst update sent to player ${player.id}`);
-            }
-          } catch (error) {
-            console.warn('WebSocket broadcast failed:', error);
-          }
+          // Data will be updated automatically via polling - no WebSocket needed
+          console.log(`✅ Hunger/thirst updated for player ${player.id}: hunger=${updatedPlayer.hunger}, thirst=${updatedPlayer.thirst}`);
 
           // Invalidate cache to ensure frontend gets updated data
           try {
@@ -176,6 +167,10 @@ export class HungerThirstService {
     // Increase rate based on player level (higher level = more resource consumption)
     const levelMultiplier = 1 + (player.level - 1) * 0.05; // +5% per level above 1
     hungerRate *= levelMultiplier;
+    thirstRate *= levelMultiplier;
+
+    return { hunger: Math.ceil(hungerRate), thirst: Math.ceil(thirstRate) };
+  }= levelMultiplier;
     thirstRate *= levelMultiplier;
 
     // Equipment can reduce degradation
