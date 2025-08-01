@@ -1,11 +1,11 @@
 // Modern unified item system - combines resources, equipment, and consumables
-import type { InsertGameItem, GameItem } from "@shared/types-new";
+import type { Resource, Equipment } from "@shared/types";
 import { RESOURCE_IDS, EQUIPMENT_IDS } from "@shared/constants/game-ids";
 
 // Helper function to create timestamp
 const now = () => new Date().toISOString();
 
-export function createModernGameItems(): InsertGameItem[] {
+export function createModernGameItems(): (Resource | Equipment)[] {
   return [
     // BASIC RESOURCES - Raw materials
     {
@@ -782,7 +782,7 @@ export function createModernGameItems(): InsertGameItem[] {
 }
 
 // Legacy adapter functions for backward compatibility
-export function adaptToLegacyResource(item: GameItem): any {
+export function adaptToLegacyResource(item: any): any {
   return {
     id: item.id,
     name: item.displayName,
@@ -796,7 +796,7 @@ export function adaptToLegacyResource(item: GameItem): any {
   };
 }
 
-export function adaptToLegacyEquipment(item: GameItem): any {
+export function adaptToLegacyEquipment(item: any): any {
   return {
     id: item.id,
     name: item.displayName,
@@ -810,17 +810,17 @@ export function adaptToLegacyEquipment(item: GameItem): any {
 }
 
 // Export all items with proper timestamps
-export function getAllGameItems(): GameItem[] {
+export function getAllGameItems(): any[] {
   const timestamp = now();
   return createModernGameItems().map(item => ({
     ...item,
     createdAt: timestamp,
     updatedAt: timestamp
-  } as GameItem));
+  }));
 }
 
 // Category filters
-export function getItemsByCategory(category: string): GameItem[] {
+export function getItemsByCategory(category: string): any[] {
   return getAllGameItems().filter(item => item.category === category);
 }
 

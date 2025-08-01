@@ -179,15 +179,17 @@ export default function EnhancedCraftingTab({ recipes, resources, playerLevel, p
         };
       }
 
-      // Fallback if not found
-      console.error(`Ingredient not found: ${ingredient.itemId} - Please check resource IDs consistency`);
+      // Use getResourceData as fallback for missing ingredients
+      const fallbackResource = getResourceData(ingredient.itemId);
+      const available = getStorageQuantity(ingredient.itemId);
+      
       return {
-        resource: null,
-        name: `Item Desconhecido (${ingredient.itemId})`,
-        emoji: "❓",
+        resource: fallbackResource,
+        name: fallbackResource.name,
+        emoji: fallbackResource.emoji,
         quantity: ingredient.quantity,
-        available: 0,
-        hasEnough: false
+        available,
+        hasEnough: available >= ingredient.quantity
       };
     });
   };
