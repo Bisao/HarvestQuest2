@@ -50,7 +50,12 @@ const GameHeader = ({ player }: GameHeaderProps) => {
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
-                      className="bg-orange-500 h-1.5 rounded-full transition-all duration-500"
+                      className={`h-1.5 rounded-full transition-all duration-500 ${
+                        hungerPercentage <= 5 ? 'bg-red-600 animate-pulse' :
+                        hungerPercentage <= 20 ? 'bg-red-400' :
+                        hungerPercentage <= 50 ? 'bg-orange-500' :
+                        'bg-green-500'
+                      }`}
                       style={{ 
                         width: `${hungerPercentage}%` 
                       }}
@@ -66,7 +71,12 @@ const GameHeader = ({ player }: GameHeaderProps) => {
                 <div className="w-full">
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
                     <div 
-                      className="bg-blue-500 h-1.5 rounded-full transition-all duration-500"
+                      className={`h-1.5 rounded-full transition-all duration-500 ${
+                        thirstPercentage <= 5 ? 'bg-red-600 animate-pulse' :
+                        thirstPercentage <= 20 ? 'bg-red-400' :
+                        thirstPercentage <= 50 ? 'bg-blue-400' :
+                        'bg-blue-500'
+                      }`}
                       style={{ 
                         width: `${thirstPercentage}%` 
                       }}

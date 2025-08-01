@@ -13,14 +13,23 @@ export const GAME_CONFIG = {
 
   // Hunger and Thirst system
   HUNGER_THIRST: {
-    HUNGER_DECAY_RATE: 1,      // Points per minute
-    THIRST_DECAY_RATE: 1,      // Points per minute  
-    UPDATE_INTERVAL: 60000,    // 1 minute in milliseconds
+    HUNGER_DECAY_RATE: 1,      // Base points per degradation cycle
+    THIRST_DECAY_RATE: 1,      // Base points per degradation cycle
+    UPDATE_INTERVAL: 40000,    // 40 seconds in milliseconds
     MIN_HUNGER: 0,
     MAX_HUNGER: 100,
     MIN_THIRST: 0,
     MAX_THIRST: 100,
-    CRITICAL_THRESHOLD: 20     // Below this = critical status
+    CRITICAL_THRESHOLD: 20,    // Below this = critical status
+    EMERGENCY_THRESHOLD: 5,    // Below this = emergency status
+    LEVEL_SCALING: 0.05,       // 5% increase per level
+    EQUIPMENT_BONUS: 0.1,      // 10% reduction with equipment
+    HEALTH_PENALTY: {
+      EMERGENCY: 5,            // Health loss when at 0
+      CRITICAL: 2,             // Health loss when <= 5
+      LOW: 1                   // Health loss when <= 10
+    },
+    NOTIFICATION_CHANCE: 0.3   // 30% chance for non-emergency warnings
   },
 
   // Expedition system

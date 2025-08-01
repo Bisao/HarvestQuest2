@@ -51,23 +51,76 @@ export class HungerThirstService {
           continue;
         }
 
-        // Base degradation rates (can be adjusted based on difficulty)
-        const hungerDecrease = Math.min(1, player.hunger); // Lose 1 hunger every 40 seconds, but don't go below 0
-        const thirstDecrease = Math.min(1, player.thirst); // Lose 1 thirst every 40 seconds, but don't go below 0
+        // Dynamic degradation rates based on player status and activities
+        const baseDegradation = this.calculateDynamicDegradation(player);
+        const hungerDecrease = Math.min(baseDegradation.hunger, player.hunger); 
+        const thirstDecrease = Math.min(baseDegradation.thirst, player.thirst);
 
         const newHunger = Math.max(0, player.hunger - hungerDecrease);
         const newThirst = Math.max(0, player.thirst - thirstDecrease);
 
         // Only update if there's actually a change
         if (newHunger !== player.hunger || newThirst !== player.thirst) {
-          await this.storage.updatePlayer(player.id, {
+          // Calculate penalties for low hunger/thirst
+          const penalties = this.calculateStatusPenalties(newHunger, newThirst);
+          
+          const updateData: any = {
             hunger: newHunger,
             thirst: newThirst
-          });
+          };
+
+          // Apply penalties if any
+          if (penalties.healthPenalty > 0) {
+            const newHealth = Math.max(1, player.health - penalties.healthPenalty);
+            updateData.health = newHealth;
+            console.log(`🩺 Player ${player.id} lost ${penalties.healthPenalty} health due to low hunger/thirst`);
+          }
+
+          await this.storage.updatePlayer(player.id, updateData);
 
           // Log degradation for debugging (can be removed in production)
           if (process.env.NODE_ENV === 'development') {
             console.log(`🍖💧 Player ${player.id}: H:${player.hunger}→${newHunger}, T:${player.thirst}→${newThirst}`);
+          }
+
+          // Check for critical status and broadcast warnings
+          const CRITICAL_THRESHOLD = 20;
+          const EMERGENCY_THRESHOLD = 5;
+
+          if (newHunger <= EMERGENCY_THRESHOLD || newThirst <= EMERGENCY_THRESHOLD) {
+            // Broadcast emergency warning
+            try {
+              const { broadcastPlayerNotification } = await import("../websocket-service");
+              const message = newHunger <= EMERGENCY_THRESHOLD 
+                ? "⚠️ EMERGÊNCIA: Sua fome está criticamente baixa! Coma algo imediatamente!"
+                : "⚠️ EMERGÊNCIA: Sua sede está criticamente baixa! Beba água imediatamente!";
+              
+              broadcastPlayerNotification(player.id, {
+                type: 'emergency',
+                message,
+                timestamp: Date.now()
+              });
+            } catch (error) {
+              console.warn('Failed to send emergency notification:', error);
+            }
+          } else if (newHunger <= CRITICAL_THRESHOLD || newThirst <= CRITICAL_THRESHOLD) {
+            // Broadcast critical warning (less frequent)
+            if (Math.random() < 0.3) { // 30% chance to avoid spam
+              try {
+                const { broadcastPlayerNotification } = await import("../websocket-service");
+                const message = newHunger <= CRITICAL_THRESHOLD 
+                  ? "⚠️ Sua fome está baixa. Considere consumir alimentos."
+                  : "⚠️ Sua sede está baixa. Considere beber água.";
+                
+                broadcastPlayerNotification(player.id, {
+                  type: 'warning',
+                  message,
+                  timestamp: Date.now()
+                });
+              } catch (error) {
+                console.warn('Failed to send warning notification:', error);
+              }
+            }
           }
 
           // Broadcast real-time update via WebSocket
@@ -97,6 +150,36 @@ export class HungerThirstService {
   }
 
   /**
+   * Calculate dynamic degradation rates based on player status
+   */
+  private calculateDynamicDegradation(player: any): { hunger: number; thirst: number } {
+    let hungerRate = 1; // Base rate
+    let thirstRate = 1; // Base rate
+
+    // Increase rate based on player level (higher level = more resource consumption)
+    const levelMultiplier = 1 + (player.level - 1) * 0.05; // +5% per level above 1
+    hungerRate *= levelMultiplier;
+    thirstRate *= levelMultiplier;
+
+    // Equipment can reduce degradation
+    if (player.equippedChestplate) {
+      hungerRate *= 0.9; // 10% less hunger loss with armor
+    }
+    if (player.equippedHelmet) {
+      thirstRate *= 0.9; // 10% less thirst loss with helmet
+    }
+
+    // Cap the rates to reasonable values
+    hungerRate = Math.min(2, Math.max(0.5, hungerRate));
+    thirstRate = Math.min(2, Math.max(0.5, thirstRate));
+
+    return {
+      hunger: Math.ceil(hungerRate),
+      thirst: Math.ceil(thirstRate)
+    };
+  }
+
+  /**
    * Manual degradation for a specific player (used during expeditions)
    */
   async degradePlayer(playerId: string, hungerDecrease: number, thirstDecrease: number): Promise<void> {
@@ -120,6 +203,31 @@ export class HungerThirstService {
     } catch (error) {
       console.warn('Cache invalidation failed:', error);
     }
+  }
+
+  /**
+   * Calculate penalties for low hunger/thirst status
+   */
+  private calculateStatusPenalties(hunger: number, thirst: number): {
+    healthPenalty: number;
+    experiencePenalty: number;
+  } {
+    let healthPenalty = 0;
+    let experiencePenalty = 0;
+
+    // Severe penalties for critical status
+    if (hunger <= 0 || thirst <= 0) {
+      healthPenalty = 5; // Lose 5 health when completely starved/dehydrated
+      experiencePenalty = 0.5; // 50% XP penalty
+    } else if (hunger <= 5 || thirst <= 5) {
+      healthPenalty = 2; // Lose 2 health when very low
+      experiencePenalty = 0.25; // 25% XP penalty
+    } else if (hunger <= 10 || thirst <= 10) {
+      healthPenalty = 1; // Lose 1 health when low
+      experiencePenalty = 0.1; // 10% XP penalty
+    }
+
+    return { healthPenalty, experiencePenalty };
   }
 
   /**
