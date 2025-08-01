@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -240,6 +240,9 @@ export default function ExpeditionModal({
             <span>Explorar {biome?.name}</span>
             <Badge variant="outline">{biome?.emoji}</Badge>
           </DialogTitle>
+          <DialogDescription>
+            Selecione os recursos que deseja coletar durante a expedição. Verifique se você possui as ferramentas necessárias.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
