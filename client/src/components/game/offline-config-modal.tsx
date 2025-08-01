@@ -124,10 +124,9 @@ export function OfflineConfigModal({
       if (!hasTool) return false;
     }
     
-    // Verifica requisito de bioma
-    if (resource.requirements.biomes && resource.requirements.biomes.length > 0) {
-      const selectedBiome = config.preferredBiome;
-      if (selectedBiome && !resource.requirements.biomes.includes(selectedBiome)) {
+    // Verifica requisito de bioma apenas se um bioma específico foi selecionado
+    if (resource.requirements.biomes && resource.requirements.biomes.length > 0 && config.preferredBiome) {
+      if (!resource.requirements.biomes.includes(config.preferredBiome)) {
         return false;
       }
     }
@@ -137,7 +136,26 @@ export function OfflineConfigModal({
 
   // Recursos disponíveis para coleta baseado nos requisitos
   const availableResources = (Array.isArray(resources) ? resources : [])
-    .filter((resource: any) => resource.type === 'resource' && canCollectResource(resource))
+    .filter((resource: any) => {
+      // Filtra apenas recursos (não equipamentos)
+      if (resource.type !== 'resource') return false;
+      
+      // Se não tem requisitos, pode coletar
+      if (!resource.requirements) return true;
+      
+      // Verifica se pode coletar baseado nos requisitos
+      if (!canCollectResource(resource)) return false;
+      
+      // Se nenhum bioma foi selecionado, verifica se o recurso está disponível em algum bioma acessível
+      if (!config.preferredBiome && resource.requirements.biomes && resource.requirements.biomes.length > 0) {
+        const hasAccessibleBiome = resource.requirements.biomes.some((biomeId: string) => 
+          accessibleBiomes.some((biome: any) => biome.id === biomeId)
+        );
+        return hasAccessibleBiome;
+      }
+      
+      return true;
+    })
     .sort((a: any, b: any) => (a.requirements?.level || 0) - (b.requirements?.level || 0));
 
   const handleResourceToggle = (resourceId: string, checked: boolean) => {
