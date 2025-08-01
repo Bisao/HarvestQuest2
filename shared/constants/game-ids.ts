@@ -27,6 +27,22 @@ export const RESOURCE_IDS = {
   // Consumables
   ISCA_PESCA: "eq-tool-bait-fishing-001", // Isca movida para recursos
 
+  // Equipment Parts - Sistema de partes para oficinas robustas
+  CABO_MACHADO: "cabo-machado",
+  CABO_PICARETA: "cabo-picareta", 
+  CABO_ESPADA: "cabo-espada",
+  HASTE_FLECHA: "haste-flecha",
+  CABECA_MACHADO: "cabeca-machado",
+  CABECA_PICARETA: "cabeca-picareta",
+  LAMINA_ESPADA: "lamina-espada",
+  PONTA_FLECHA: "ponta-flecha",
+  BARRA_FERRO: "barra-ferro",
+
+  // Raw materials for processing
+  MINERAL_FERRO: "mineral-ferro",
+  CARVAO: "carvao",
+  FIBRA_ALGODAO: "fibra-algodao",
+
   // Animals 
   COELHO: "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
   VEADO: "res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3",
