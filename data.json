@@ -6,12 +6,12 @@
         "id": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "username": "Bison",
         "level": 3,
-        "experience": 265,
-        "hunger": 79,
+        "experience": 328,
+        "hunger": 71,
         "maxHunger": 100,
-        "thirst": 79,
+        "thirst": 71,
         "maxThirst": 100,
-        "coins": 150,
+        "coins": 180,
         "inventoryWeight": 19190,
         "maxInventoryWeight": 50000,
         "autoStorage": true,
@@ -87,7 +87,7 @@
         "id": "41ce281e-4762-44fb-ace6-d274bcb4921b",
         "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 17,
+        "quantity": 5,
         "itemType": "resource"
       }
     ],
@@ -97,7 +97,7 @@
         "id": "0572a577-0b3c-4c2f-86c8-efc0e4148f89",
         "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 15,
+        "quantity": 25,
         "itemType": "resource"
       }
     ],
@@ -107,7 +107,7 @@
         "id": "7b4052a7-1249-4e72-950a-fc07779e0cb5",
         "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 15,
+        "quantity": 11,
         "itemType": "resource"
       }
     ],
@@ -117,7 +117,7 @@
         "id": "5316f8ab-bbbc-4aeb-9c6b-97d9218b4c36",
         "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 18,
+        "quantity": 0,
         "itemType": "resource"
       }
     ],
@@ -127,7 +127,7 @@
         "id": "a119f7a3-17cf-45b2-9137-6a5e6af3de3f",
         "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 16,
+        "quantity": 2,
         "itemType": "resource"
       }
     ],
@@ -138,6 +138,56 @@
         "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "resourceId": "res-4b7e1a9c-5d8f-4e32-9a76-8c2e5f1b9d48",
         "quantity": 2,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "96f7210e-7383-495f-b815-e1e0670a609b",
+      {
+        "id": "96f7210e-7383-495f-b815-e1e0670a609b",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
+        "quantity": 0,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "6d680e2b-253d-430e-8720-e952204593c1",
+      {
+        "id": "6d680e2b-253d-430e-8720-e952204593c1",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "eq-tool-1a2b3c4d-5e6f-7890-abcd-ef1234567890",
+        "quantity": 1,
+        "itemType": "equipment"
+      }
+    ],
+    [
+      "c7f80465-4046-461e-8fbd-0f9b355d27a3",
+      {
+        "id": "c7f80465-4046-461e-8fbd-0f9b355d27a3",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "eq-tool-2b3c4d5e-6f78-9012-bcde-f12345678901",
+        "quantity": 1,
+        "itemType": "equipment"
+      }
+    ],
+    [
+      "d561efa3-10f8-427a-8b87-79a92aaf58b8",
+      {
+        "id": "d561efa3-10f8-427a-8b87-79a92aaf58b8",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-suco-frutas-001",
+        "quantity": 6,
+        "itemType": "resource"
+      }
+    ],
+    [
+      "39cd9188-a680-4786-a857-72323c943d72",
+      {
+        "id": "39cd9188-a680-4786-a857-72323c943d72",
+        "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
+        "resourceId": "res-cogumelos-assados-001",
+        "quantity": 9,
         "itemType": "resource"
       }
     ]
@@ -159,14 +209,14 @@
         ],
         "selectedEquipment": [],
         "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 2,
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 5,
           "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 5,
-          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 3,
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 4,
           "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 4,
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 5
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 1
         },
         "startTime": 1754072627210,
-        "endTime": 1754073463,
+        "endTime": 1754073666,
         "progress": 100
       }
     ]
@@ -196,7 +246,7 @@
         "id": "4ace9ef7-2864-4c7e-a7db-347e261947e3",
         "playerId": "9bba42cf-a235-479b-9bdd-075d7271456e",
         "questId": "5205e5fe-985d-4964-ba95-1799fb31024f",
-        "status": "active",
+        "status": "completed",
         "progress": {
           "collect_res-8bd33b18-a241-4859-ae9f-870fab5673d0": {
             "current": 5,
@@ -210,7 +260,7 @@
           }
         },
         "startedAt": 1754073323,
-        "completedAt": null
+        "completedAt": 1754073509
       }
     ],
     [
@@ -222,9 +272,9 @@
         "status": "active",
         "progress": {
           "craft_res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1": {
-            "current": 0,
+            "current": 3,
             "required": 3,
-            "completed": false
+            "completed": true
           }
         },
         "startedAt": 1754073325,
