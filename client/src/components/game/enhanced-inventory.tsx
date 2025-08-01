@@ -250,6 +250,12 @@ export default function EnhancedInventory({
     }
   };
 
+  const handleItemClick = (item: InventoryItem, itemData: Resource | Equipment) => {
+    console.log("Item clicked - opening modal:", item, itemData);
+    setModalItem(item);
+    setShowItemModal(true);
+  };
+
   const handleEquipItem = (slot: string, equipmentId: string | null) => {
     equipItemMutation.mutate({ slot, equipmentId });
   };
@@ -313,9 +319,7 @@ export default function EnhancedInventory({
             <div
               onClick={() => {
                 if (item && itemData) {
-                  console.log("Opening modal for item:", item, itemData);
-                  setModalItem(item);
-                  setShowItemModal(true);
+                  handleItemClick(item, itemData);
                 } else {
                   handleSlotClick(`inv-${slotIndex}`, "inventory");
                 }

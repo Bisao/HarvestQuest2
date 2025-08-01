@@ -10,6 +10,14 @@ export function createConsumptionRoutes(storage: IStorage): Router {
     try {
       const { playerId } = req.params;
       const { itemId, location, hungerRestore, thirstRestore } = req.body;
+      
+      console.log(`[CONSUMPTION] Player ${playerId} attempting to consume:`, {
+        itemId,
+        location,
+        hungerRestore,
+        thirstRestore,
+        body: req.body
+      });
 
       // Get quantity from request, default to 1
       const quantity = parseInt(req.body.quantity) || 1;

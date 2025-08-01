@@ -38,6 +38,14 @@ export function ItemDetailsModal({
   const [moveQuantity, setMoveQuantity] = useState(1);
   const [consumeQuantity, setConsumeQuantity] = useState(1);
 
+  console.log("[ITEM_MODAL] Modal state:", { 
+    isOpen, 
+    hasItem: !!item, 
+    hasItemData: !!itemData,
+    itemId: item?.id,
+    itemResourceId: item?.resourceId
+  });
+
   // Check if item is consumable
   const itemIsConsumable = itemData ? isConsumable(itemData) : false;
   const consumableEffects = itemData ? getConsumableEffects(itemData) : null;
@@ -129,7 +137,15 @@ export function ItemDetailsModal({
     },
   });
 
-  if (!item || !itemData) return null;
+  if (!item) {
+    console.log("[ITEM_MODAL] No item provided, not rendering modal");
+    return null;
+  }
+
+  if (!itemData) {
+    console.log("[ITEM_MODAL] No item data provided for item:", item);
+    // Still render modal but show error message
+  }
 
   const maxMoveQuantity = item.quantity;
   const maxConsumeQuantity = item.quantity;
@@ -139,14 +155,22 @@ export function ItemDetailsModal({
       <DialogContent className="w-96 max-w-sm">
         <DialogHeader>
           <DialogTitle className="text-center flex items-center justify-center space-x-2">
-            <span className="text-3xl">{itemData.emoji}</span>
-            <span>{itemData.name}</span>
+            <span className="text-3xl">{itemData?.emoji || "❓"}</span>
+            <span>{itemData?.name || "Item Desconhecido"}</span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
+          {!itemData && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-700 text-sm">
+                ⚠️ Dados do item não encontrados. ID do recurso: {item.resourceId}
+              </p>
+            </div>
+          )}
+          
           {/* Item Information */}
-          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+          <div className="bg-gray-50 rounded-lg p-4 space-y-2"></div>
             <div className="flex justify-between">
               <span className="text-gray-600">Quantidade:</span>
               <span className="font-semibold">{item.quantity}</span>
