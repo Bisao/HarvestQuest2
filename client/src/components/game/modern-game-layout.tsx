@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useGameData } from '@/hooks/useGamePolling';
@@ -38,7 +37,7 @@ import ExpeditionPanel from './expedition-panel';
 
 // Import modals
 import ModernExpeditionModal from './modern-expedition-modal';
-import OfflineActivityReport from './offline-activity-report';
+import { OfflineActivityReportDialog } from './offline-activity-report';
 
 import type { Player, Biome, Resource, Equipment, Recipe, ActiveExpedition } from '@shared/types';
 
@@ -129,7 +128,9 @@ export default function ModernGameLayout({
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
   const [offlineReportOpen, setOfflineReportOpen] = useState(false);
-  
+  const [offlineConfigOpen, setOfflineConfigOpen] = useState(false);
+  const [offlineReport, setOfflineReport] = useState<any>(null);
+
   const { toast } = useToast();
 
   // Use game data hook for real-time updates
@@ -158,9 +159,15 @@ export default function ModernGameLayout({
       const lastSeenTime = new Date(player.lastSeen).getTime();
       const currentTime = Date.now();
       const offlineTime = (currentTime - lastSeenTime) / 1000; // in seconds
-      
+
       // Show report if offline for more than 30 minutes
       if (offlineTime > 1800) {
+        // Mocked offline report for testing
+        const mockedReport = {
+            resources: [{ name: 'Wood', quantity: 10 }],
+            equipment: [{ name: 'Axe', quantity: 1 }],
+        };
+        setOfflineReport(mockedReport);
         setOfflineReportOpen(true);
       }
     }
@@ -436,12 +443,14 @@ export default function ModernGameLayout({
         onExpeditionStart={handleExpeditionComplete}
       />
 
-      <OfflineActivityReport
+      <OfflineActivityReportDialog
         isOpen={offlineReportOpen}
         onClose={() => setOfflineReportOpen(false)}
-        player={player}
-        resources={resources}
-        equipment={equipment}
+        report={offlineReport}
+        onConfigureOffline={() => {
+          setOfflineReportOpen(false);
+          setOfflineConfigOpen(true);
+        }}
       />
     </div>
   );
