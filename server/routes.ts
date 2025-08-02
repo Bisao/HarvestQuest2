@@ -877,8 +877,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       await gameService.moveToInventory(playerId, storageItemId, quantity);
 
-      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
-```text
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data```text
       const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
       invalidateStorageCache(playerId);
       invalidateInventoryCache(playerId);
@@ -947,8 +946,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/biomes/:biomeId/resources", async (req, res) => {
     try {
       const { biomeId } = req.params;
-
-      // Handle both formats: with and without "biome-" prefix
       const actualBiomeId = biomeId.startsWith('biome-') ? biomeId : `biome-${biomeId}`;
       const biome = await storage.getBiome(actualBiomeId);
 
