@@ -282,11 +282,8 @@ export default function ModernExpeditionModal({
   // Mutation para iniciar expedição
   const startExpeditionMutation = useMutation({
     mutationFn: async (expeditionData: any) => {
-      const response = await apiRequest('/api/expeditions', {
-        method: 'POST',
-        body: JSON.stringify(expeditionData),
-      });
-      return response;
+      const response = await apiRequest('POST', '/api/expeditions', expeditionData);
+      return response.json();
     },
     onSuccess: (data) => {
       toast({
