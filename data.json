@@ -5,10 +5,10 @@
       {
         "id": "8a28054f-c2c9-4be4-832d-21c10e8172e8",
         "username": "Bison",
-        "level": 1,
-        "experience": 58,
+        "level": 2,
+        "experience": 133,
         "coins": 100,
-        "inventoryWeight": 7445,
+        "inventoryWeight": 16430,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -25,22 +25,22 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 92,
+        "hunger": 65,
         "maxHunger": 100,
-        "thirst": 92,
+        "thirst": 67,
         "maxThirst": 100,
-        "temperature": 0,
-        "fatigue": 8,
-        "morale": 75,
-        "hygiene": 92,
+        "temperature": 23,
+        "fatigue": 33,
+        "morale": 100,
+        "hygiene": 72,
         "diseases": [],
         "immunities": [],
         "resistances": {},
         "skills": {},
-        "skillPoints": 0,
-        "totalSkillPoints": 0,
+        "skillPoints": 1,
+        "totalSkillPoints": 1,
         "skillAchievements": [],
-        "lastOnlineTime": 1754174198190
+        "lastOnlineTime": 1754174590571
       }
     ]
   ],
@@ -51,7 +51,7 @@
         "id": "018bd606-d608-41c3-9ebc-2fce5b708ae3",
         "playerId": "8a28054f-c2c9-4be4-832d-21c10e8172e8",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 7
+        "quantity": 22
       }
     ],
     [
@@ -60,7 +60,7 @@
         "id": "b3c16b93-a860-49ef-b913-cd8e2b27fefe",
         "playerId": "8a28054f-c2c9-4be4-832d-21c10e8172e8",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 10
+        "quantity": 22
       }
     ],
     [
@@ -69,7 +69,7 @@
         "id": "1248ac49-3980-4974-a28e-70c8128e368d",
         "playerId": "8a28054f-c2c9-4be4-832d-21c10e8172e8",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 10
+        "quantity": 22
       }
     ],
     [
@@ -78,7 +78,7 @@
         "id": "d381d1cf-5708-4aa5-b9ed-7f1b37f081ce",
         "playerId": "8a28054f-c2c9-4be4-832d-21c10e8172e8",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 9
+        "quantity": 21
       }
     ],
     [
@@ -87,7 +87,7 @@
         "id": "dc31986f-502f-4f44-a500-2b050635334c",
         "playerId": "8a28054f-c2c9-4be4-832d-21c10e8172e8",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 13
+        "quantity": 25
       }
     ]
   ],
@@ -109,14 +109,41 @@
         ],
         "selectedEquipment": [],
         "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 1,
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 3,
-          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 4,
-          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 3,
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 3
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 4,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 4,
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 1,
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 1,
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 2
         },
         "startTime": 1754174216752,
-        "endTime": 1754174415,
+        "endTime": 1754174547,
+        "progress": 100
+      }
+    ],
+    [
+      "37c6cfbb-9c5b-4244-a791-32b5a8ab5940",
+      {
+        "id": "37c6cfbb-9c5b-4244-a791-32b5a8ab5940",
+        "playerId": "8a28054f-c2c9-4be4-832d-21c10e8172e8",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "completed",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 3,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 4,
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 5,
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 5,
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 2
+        },
+        "startTime": 1754174609149,
+        "endTime": 1754174740,
         "progress": 100
       }
     ]
