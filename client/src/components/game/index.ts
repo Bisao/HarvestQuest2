@@ -13,8 +13,9 @@ export { EnhancedItemModal } from './enhanced-item-modal';
 export { ItemDetailsModal } from './item-details-modal';
 
 // === CRAFTING & WORKSHOPS ===
-export { default as EnhancedCraftingTab } from './enhanced-crafting-tab';
-export { default as WorkshopsTab } from './workshops-tab';
+export { default as UnifiedWorkshops } from './unified-workshops';
+export { default as UnifiedInventory } from './unified-inventory';
+export { default as ModernGameLayout } from './modern-game-layout';
 
 // === EQUIPMENT ===
 export { default as EquipmentTab } from './equipment-tab';

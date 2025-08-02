@@ -1,5 +1,38 @@
 {
-  "players": [],
+  "players": [
+    [
+      "85c038ca-e717-4e89-9d44-f3438c25e5c7",
+      {
+        "id": "85c038ca-e717-4e89-9d44-f3438c25e5c7",
+        "username": "Bison",
+        "level": 1,
+        "experience": 0,
+        "hunger": 100,
+        "maxHunger": 100,
+        "thirst": 100,
+        "maxThirst": 100,
+        "coins": 100,
+        "inventoryWeight": 0,
+        "maxInventoryWeight": 50000,
+        "autoStorage": false,
+        "craftedItemsDestination": "storage",
+        "hungerDegradationMode": "automatic",
+        "waterStorage": 0,
+        "maxWaterStorage": 500,
+        "waterTanks": 0,
+        "equippedHelmet": null,
+        "equippedChestplate": null,
+        "equippedLeggings": null,
+        "equippedBoots": null,
+        "equippedWeapon": null,
+        "equippedTool": null,
+        "equippedFood": null,
+        "equippedDrink": null,
+        "autoCompleteQuests": true,
+        "lastOnlineTime": 1754114801796
+      }
+    ]
+  ],
   "users": [
     [
       "user-1754113561954-gtqjb5qxk",
@@ -15,6 +48,38 @@
   ],
   "inventoryItems": [],
   "storageItems": [],
-  "expeditions": [],
+  "expeditions": [
+    [
+      "7c8c644b-8f16-4461-ba0d-55964a7165a5",
+      {
+        "id": "7c8c644b-8f16-4461-ba0d-55964a7165a5",
+        "playerId": "85c038ca-e717-4e89-9d44-f3438c25e5c7",
+        "biomeId": "biome-61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "in_progress",
+        "selectedResources": [
+          "res-a1b2c3d4-e5f6-4789-abc1-234567890123",
+          "res-b8c9d0e1-f2a3-4456-bcd8-901234567890",
+          "res-c5d6e7f8-a9b0-4123-cde5-678901234567",
+          "res-d6e7f8a9-b0c1-4234-def6-789012345678",
+          "res-a9b0c1d2-e3f4-4567-abc9-012345678901",
+          "res-b0c1d2e3-f4a5-4678-bcd0-123456789012",
+          "res-d2e3f4a5-b6c7-4890-def2-345678901234",
+          "res-f4a5b6c7-d8e9-4012-fab4-567890123456",
+          "res-e9f0a1b2-c3d4-4567-efa9-012345678901",
+          "res-a3b4c5d6-e7f8-4901-abc3-456789012349",
+          "res-c5d6e7f8-a9b0-4123-cde5-678901234571",
+          "res-d0e1f2a3-b4c5-4678-def0-123456789017",
+          "res-d0e1f2a3-b4c5-4678-def0-123456789018",
+          "res-a3b4c5d6-e7f8-4901-abc3-456789012351",
+          "res-f4a5b6c7-d8e9-4012-fab4-567890123462"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {},
+        "startTime": 1754114622612,
+        "endTime": null,
+        "progress": 0
+      }
+    ]
+  ],
   "playerQuests": []
 }
