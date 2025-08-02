@@ -43,9 +43,9 @@ interface WorkshopProcess {
   experienceGained: number;
 }
 
-// SISTEMA ROBUSTO DE OFICINAS - PRODUÇÃO REALISTA POR PARTES
+// SISTEMA ROBUSTO DE OFICINAS - INTEGRADO COM ITENS MODERNOS
 const ROBUST_WORKSHOP_PROCESSES: WorkshopProcess[] = [
-  // ===== BANCADA - MATERIAIS BÁSICOS =====
+  // ===== BANCADA - MATERIAIS E COMPONENTES =====
   {
     id: "proc-barbante-001",
     name: "Barbante",
@@ -60,20 +60,73 @@ const ROBUST_WORKSHOP_PROCESSES: WorkshopProcess[] = [
     experienceGained: 5
   },
   {
-    id: "proc-corda-001",
-    name: "Corda",
+    id: "proc-corda-resistente-001",
+    name: "Corda Resistente",
     emoji: "🪢",
     description: "Trançar barbante em corda resistente",
     category: "bancada",
     requiredLevel: 2,
     input: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 6 },
-    output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 }, // Placeholder - precisa criar RESOURCE_IDS.CORDA
+    output: { resourceId: RESOURCE_IDS.CORDA_RESIS, quantity: 2 },
     processingTime: 25,
     efficiency: 80,
     experienceGained: 12
   },
+  {
+    id: "proc-linho-processado-001",
+    name: "Linho Processado",
+    emoji: "🌾",
+    description: "Processe linho bruto em fibra de qualidade",
+    category: "bancada",
+    requiredLevel: 3,
+    input: { resourceId: RESOURCE_IDS.LINHO, quantity: 3 },
+    output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 5 },
+    processingTime: 20,
+    efficiency: 90,
+    experienceGained: 15
+  },
+  {
+    id: "proc-algodao-processado-001",
+    name: "Algodão Processado",
+    emoji: "☁️",
+    description: "Processe algodão em fibra macia",
+    category: "bancada",
+    requiredLevel: 2,
+    input: { resourceId: RESOURCE_IDS.ALGODAO, quantity: 4 },
+    output: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 6 },
+    processingTime: 18,
+    efficiency: 95,
+    experienceGained: 12
+  },
+  {
+    id: "proc-canamo-processado-001",
+    name: "Cânhamo Processado",
+    emoji: "🌿",
+    description: "Processe cânhamo em corda resistente",
+    category: "bancada",
+    requiredLevel: 3,
+    input: { resourceId: RESOURCE_IDS.CANAMO, quantity: 2 },
+    output: { resourceId: RESOURCE_IDS.CORDA_RESIS, quantity: 3 },
+    processingTime: 30,
+    efficiency: 88,
+    experienceGained: 18
+  },
+  {
+    id: "proc-couro-curtido-001",
+    name: "Couro Curtido",
+    emoji: "🦫",
+    description: "Curta couro bruto em material utilizável",
+    category: "bancada",
+    requiredLevel: 4,
+    input: { resourceId: RESOURCE_IDS.COURO, quantity: 2 },
+    secondary: { resourceId: RESOURCE_IDS.FIBRA, quantity: 3 },
+    output: { resourceId: RESOURCE_IDS.COURO_CURTIDO, quantity: 1 },
+    processingTime: 45,
+    efficiency: 85,
+    experienceGained: 25
+  },
 
-  // ===== MADEIRA - PROCESSAMENTO DE MADEIRA =====
+  // ===== MADEIRA - PROCESSAMENTO E PARTES =====
   {
     id: "proc-madeira-refinada-001",
     name: "Madeira Refinada",
@@ -100,8 +153,61 @@ const ROBUST_WORKSHOP_PROCESSES: WorkshopProcess[] = [
     efficiency: 90,
     experienceGained: 12
   },
+  {
+    id: "proc-carvalho-processado-001",
+    name: "Carvalho Processado",
+    emoji: "🌳",
+    description: "Processe madeira de carvalho premium",
+    category: "madeira",
+    requiredLevel: 5,
+    input: { resourceId: RESOURCE_IDS.MADEIRA_CARVALHO, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 3 },
+    processingTime: 40,
+    efficiency: 85,
+    experienceGained: 30
+  },
+  {
+    id: "proc-cedro-processado-001",
+    name: "Cedro Processado",
+    emoji: "🌲",
+    description: "Processe madeira de cedro aromática",
+    category: "madeira",
+    requiredLevel: 6,
+    input: { resourceId: RESOURCE_IDS.MADEIRA_CEDRO, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 4 },
+    processingTime: 35,
+    efficiency: 90,
+    experienceGained: 35
+  },
+  {
+    id: "proc-cabo-machado-001",
+    name: "Cabo de Machado",
+    emoji: "🪓",
+    description: "Talhe madeira em cabo ergonômico para machado",
+    category: "madeira",
+    requiredLevel: 3,
+    input: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 2 },
+    output: { resourceId: RESOURCE_IDS.CABO_MACHADO, quantity: 1 },
+    processingTime: 35,
+    efficiency: 85,
+    experienceGained: 18
+  },
+  {
+    id: "proc-cabo-espada-001",
+    name: "Cabo de Espada",
+    emoji: "⚔️",
+    description: "Esculpa empunhadura ergonômica para espada",
+    category: "madeira",
+    requiredLevel: 4,
+    input: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+    secondary: { resourceId: RESOURCE_IDS.COURO_CURTIDO, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.CABO_ESPADA, quantity: 1 },
+    processingTime: 40,
+    efficiency: 90,
+    experienceGained: 22
+  },
 
-  // ===== PEDRAS - PROCESSAMENTO DE MINERAIS =====
+  // ===== PEDRAS - PROCESSAMENTO DE MINERAIS E GEMAS =====
   {
     id: "proc-pedras-lapidadas-001",
     name: "Pedras Lapidadas", 
@@ -128,8 +234,34 @@ const ROBUST_WORKSHOP_PROCESSES: WorkshopProcess[] = [
     efficiency: 120,
     experienceGained: 25
   },
+  {
+    id: "proc-quartzo-lapidado-001",
+    name: "Quartzo Lapidado",
+    emoji: "💎",
+    description: "Lapide quartzo bruto em cristal puro",
+    category: "pedras",
+    requiredLevel: 6,
+    input: { resourceId: RESOURCE_IDS.QUARTZO, quantity: 2 },
+    output: { resourceId: RESOURCE_IDS.QUARTZO, quantity: 3 },
+    processingTime: 60,
+    efficiency: 110,
+    experienceGained: 40
+  },
+  {
+    id: "proc-ametista-polida-001",
+    name: "Ametista Polida",
+    emoji: "🔮",
+    description: "Polir ametista bruta revelando seu brilho místico",
+    category: "pedras",
+    requiredLevel: 8,
+    input: { resourceId: RESOURCE_IDS.AMETISTA, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.AMETISTA, quantity: 2 },
+    processingTime: 90,
+    efficiency: 150,
+    experienceGained: 60
+  },
 
-  // ===== FORJA - METAIS =====
+  // ===== FORJA - METAIS E COMPONENTES =====
   {
     id: "proc-ferro-fundido-001",
     name: "Fundição de Ferro",
@@ -144,8 +276,50 @@ const ROBUST_WORKSHOP_PROCESSES: WorkshopProcess[] = [
     efficiency: 70,
     experienceGained: 40
   },
+  {
+    id: "proc-barra-ferro-001",
+    name: "Barra de Ferro",
+    emoji: "🔗",
+    description: "Forje ferro fundido em barras utilizáveis",
+    category: "forja",
+    requiredLevel: 7,
+    input: { resourceId: RESOURCE_IDS.FERRO_FUNDIDO, quantity: 2 },
+    fuel: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.BARRA_FERRO, quantity: 1 },
+    processingTime: 60,
+    efficiency: 85,
+    experienceGained: 35
+  },
+  {
+    id: "proc-cabeca-machado-001",
+    name: "Cabeça de Machado",
+    emoji: "🔨",
+    description: "Forje cabeça cortante para machado",
+    category: "forja",
+    requiredLevel: 8,
+    input: { resourceId: RESOURCE_IDS.BARRA_FERRO, quantity: 2 },
+    fuel: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 2 },
+    output: { resourceId: RESOURCE_IDS.CABECA_MACHADO, quantity: 1 },
+    processingTime: 75,
+    efficiency: 80,
+    experienceGained: 45
+  },
+  {
+    id: "proc-lamina-espada-001",
+    name: "Lâmina de Espada",
+    emoji: "⚔️",
+    description: "Forje lâmina afiada e equilibrada",
+    category: "forja",
+    requiredLevel: 9,
+    input: { resourceId: RESOURCE_IDS.BARRA_FERRO, quantity: 3 },
+    fuel: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 3 },
+    output: { resourceId: RESOURCE_IDS.LAMINA_ESPADA, quantity: 1 },
+    processingTime: 90,
+    efficiency: 75,
+    experienceGained: 55
+  },
 
-  // ===== FOGUEIRA - ALIMENTOS =====
+  // ===== FOGUEIRA - ALIMENTOS E TRATAMENTOS =====
   {
     id: "proc-conservas-001",
     name: "Conservas de Carne",
@@ -187,6 +361,48 @@ const ROBUST_WORKSHOP_PROCESSES: WorkshopProcess[] = [
     processingTime: 45,
     efficiency: 110,
     experienceGained: 25
+  },
+  {
+    id: "proc-coelho-assado-001",
+    name: "Coelho Assado",
+    emoji: "🐰",
+    description: "Asse coelho fresco para refeição nutritiva",
+    category: "fogueira",
+    requiredLevel: 2,
+    input: { resourceId: RESOURCE_IDS.COELHO, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.GRAVETOS, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.CARNE_ASSADA, quantity: 2 },
+    processingTime: 30,
+    efficiency: 100,
+    experienceGained: 15
+  },
+  {
+    id: "proc-truta-grelhada-001",
+    name: "Truta Grelhada",
+    emoji: "🍣",
+    description: "Grelhe truta fresca para prato saboroso",
+    category: "fogueira",
+    requiredLevel: 3,
+    input: { resourceId: RESOURCE_IDS.TRUTA, quantity: 2 },
+    fuel: { resourceId: RESOURCE_IDS.GRAVETOS, quantity: 1 },
+    output: { resourceId: RESOURCE_IDS.PEIXE_GRELHADO, quantity: 3 },
+    processingTime: 25,
+    efficiency: 105,
+    experienceGained: 18
+  },
+  {
+    id: "proc-salmao-defumado-001",
+    name: "Salmão Defumado",
+    emoji: "🐟",
+    description: "Defume salmão para preservação de longo prazo",
+    category: "fogueira",
+    requiredLevel: 6,
+    input: { resourceId: RESOURCE_IDS.SALMAO, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 2 },
+    output: { resourceId: RESOURCE_IDS.PEIXE_GRELHADO, quantity: 4 },
+    processingTime: 60,
+    efficiency: 120,
+    experienceGained: 35
   }
 ];
 
@@ -218,13 +434,16 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
   // Filtros por tipo de item melhorados
   const itemFilters = {
     all: { name: "Todos", emoji: "📋", description: "Todos os processos" },
-    materials: { name: "Materiais", emoji: "🧵", description: "Barbante, corda, couro" },
-    resources: { name: "Recursos", emoji: "🪵", description: "Madeira, pedras processadas" },
-    metals: { name: "Metais", emoji: "🔩", description: "Ferro e ligas metálicas" },
-    food: { name: "Alimentos", emoji: "🍖", description: "Carnes e alimentos processados" }
+    materials: { name: "Materiais", emoji: "🧵", description: "Barbante, corda, couro processado" },
+    resources: { name: "Recursos", emoji: "🪵", description: "Madeira, pedras, materiais básicos" },
+    components: { name: "Componentes", emoji: "🔧", description: "Cabos, cabeças, lâminas" },
+    gems: { name: "Gemas", emoji: "💎", description: "Quartzo, ametista, diamantes" },
+    metals: { name: "Metais", emoji: "🔩", description: "Ferro, barras metálicas" },
+    food: { name: "Alimentos", emoji: "🍖", description: "Carnes, peixes, plantas processadas" },
+    premium: { name: "Premium", emoji: "⭐", description: "Materiais de alta qualidade" }
   };
 
-  // Função para determinar o tipo de item - CORRIGIDA
+  // Função para determinar o tipo de item - ATUALIZADA
   const getItemType = (process: WorkshopProcess): string => {
     const outputId = process?.output?.resourceId;
 
@@ -232,23 +451,45 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
       return "materials"; // Default seguro
     }
 
+    // Componentes e partes
+    if (outputId.includes("cabo-") || outputId.includes("cabeca-") || outputId.includes("lamina-") || 
+        outputId.includes("empunhadura") || outputId.includes("haste-")) {
+      return "components";
+    }
+
+    // Gemas e minerais preciosos
+    if (outputId.includes("quartzo") || outputId.includes("ametista") || outputId.includes("diamante")) {
+      return "gems";
+    }
+
+    // Materiais premium
+    if (outputId.includes("carvalho") || outputId.includes("cedro") || outputId.includes("mogno") ||
+        outputId.includes("resistente") || outputId.includes("curtido")) {
+      return "premium";
+    }
+
     // Materiais básicos
-    if (outputId.toLowerCase().includes("barbante") || outputId.toLowerCase().includes("corda") || outputId.toLowerCase().includes("couro")) {
+    if (outputId.includes("barbante") || outputId.includes("corda") || outputId.includes("couro") ||
+        outputId.includes("linho") || outputId.includes("algodao") || outputId.includes("canamo")) {
       return "materials";
     }
 
     // Recursos processados
-    if (outputId.toLowerCase().includes("madeira") || outputId.toLowerCase().includes("pedra") || outputId.toLowerCase().includes("argila")) {
+    if (outputId.includes("madeira") || outputId.includes("pedra") || outputId.includes("argila") ||
+        outputId.includes("bambu") || outputId.includes("fibra")) {
       return "resources";
     }
 
     // Metais
-    if (outputId.toLowerCase().includes("ferro") || outputId.toLowerCase().includes("metal") || outputId.toLowerCase().includes("barra")) {
+    if (outputId.includes("ferro") || outputId.includes("metal") || outputId.includes("barra") ||
+        outputId.includes("fundido")) {
       return "metals";
     }
 
     // Alimentos
-    if (outputId.toLowerCase().includes("carne") || outputId.toLowerCase().includes("peixe") || outputId.toLowerCase().includes("cogumelo")) {
+    if (outputId.includes("carne") || outputId.includes("peixe") || outputId.includes("cogumelo") ||
+        outputId.includes("assada") || outputId.includes("grelhado") || outputId.includes("truta") ||
+        outputId.includes("salmao") || outputId.includes("coelho") || outputId.includes("frutas")) {
       return "food";
     }
 
@@ -290,19 +531,66 @@ export default function WorkshopsTab({ resources, playerLevel, playerId, isBlock
     if (resource) return resource;
 
     const fallbackNames: Record<string, { name: string; emoji: string }> = {
+      // Recursos Básicos
       [RESOURCE_IDS.GRAVETOS]: { name: "Gravetos", emoji: "🪵" },
       [RESOURCE_IDS.MADEIRA]: { name: "Madeira", emoji: "🪵" },
       [RESOURCE_IDS.PEDRAS_SOLTAS]: { name: "Pedras Pequenas", emoji: "🪨" },
       [RESOURCE_IDS.PEDRA]: { name: "Pedra", emoji: "🪨" },
       [RESOURCE_IDS.FIBRA]: { name: "Fibra", emoji: "🌾" },
+      [RESOURCE_IDS.BAMBU]: { name: "Bambu", emoji: "🎋" },
+      [RESOURCE_IDS.ARGILA]: { name: "Argila", emoji: "🧱" },
+      
+      // Fibras Especializadas
+      [RESOURCE_IDS.LINHO]: { name: "Linho", emoji: "🌾" },
+      [RESOURCE_IDS.ALGODAO]: { name: "Algodão", emoji: "☁️" },
+      [RESOURCE_IDS.CANAMO]: { name: "Cânhamo", emoji: "🌿" },
+      
+      // Madeiras Premium
+      [RESOURCE_IDS.MADEIRA_CARVALHO]: { name: "Madeira de Carvalho", emoji: "🌳" },
+      [RESOURCE_IDS.MADEIRA_CEDRO]: { name: "Madeira de Cedro", emoji: "🌲" },
+      [RESOURCE_IDS.MADEIRA_MOGNO]: { name: "Madeira de Mogno", emoji: "🌴" },
+      
+      // Gemas e Minerais
+      [RESOURCE_IDS.QUARTZO]: { name: "Quartzo", emoji: "💎" },
+      [RESOURCE_IDS.AMETISTA]: { name: "Ametista", emoji: "🔮" },
+      [RESOURCE_IDS.DIAMANTE]: { name: "Diamante", emoji: "💍" },
+      
+      // Materiais Processados
       [RESOURCE_IDS.BARBANTE]: { name: "Barbante", emoji: "🧵" },
+      [RESOURCE_IDS.CORDA_RESIS]: { name: "Corda Resistente", emoji: "🪢" },
+      [RESOURCE_IDS.COURO_CURTIDO]: { name: "Couro Curtido", emoji: "🦫" },
+      
+      // Metais
       [RESOURCE_IDS.FERRO_FUNDIDO]: { name: "Ferro Fundido", emoji: "🔩" },
+      [RESOURCE_IDS.BARRA_FERRO]: { name: "Barra de Ferro", emoji: "🔗" },
+      
+      // Componentes
+      [RESOURCE_IDS.CABO_MACHADO]: { name: "Cabo de Machado", emoji: "🪓" },
+      [RESOURCE_IDS.CABO_ESPADA]: { name: "Cabo de Espada", emoji: "⚔️" },
+      [RESOURCE_IDS.CABECA_MACHADO]: { name: "Cabeça de Machado", emoji: "🔨" },
+      [RESOURCE_IDS.LAMINA_ESPADA]: { name: "Lâmina de Espada", emoji: "⚔️" },
+      
+      // Animais e Carne
       [RESOURCE_IDS.CARNE]: { name: "Carne", emoji: "🥩" },
       [RESOURCE_IDS.CARNE_ASSADA]: { name: "Carne Assada", emoji: "🍖" },
+      [RESOURCE_IDS.COELHO]: { name: "Coelho", emoji: "🐰" },
+      [RESOURCE_IDS.RAPOSA]: { name: "Raposa", emoji: "🦊" },
+      [RESOURCE_IDS.VEADO]: { name: "Veado", emoji: "🦌" },
+      [RESOURCE_IDS.JAVALI]: { name: "Javali", emoji: "🐗" },
+      [RESOURCE_IDS.URSO]: { name: "Urso", emoji: "🐻" },
+      
+      // Peixes
+      [RESOURCE_IDS.PEIXE_PEQUENO]: { name: "Peixe Pequeno", emoji: "🐟" },
+      [RESOURCE_IDS.PEIXE_GRELHADO]: { name: "Peixe Grelhado", emoji: "🍣" },
+      [RESOURCE_IDS.TRUTA]: { name: "Truta", emoji: "🐟" },
+      [RESOURCE_IDS.SALMAO]: { name: "Salmão", emoji: "🍣" },
+      [RESOURCE_IDS.ATUM]: { name: "Atum", emoji: "🐟" },
+      
+      // Plantas e Consumíveis
       [RESOURCE_IDS.COGUMELOS]: { name: "Cogumelos", emoji: "🍄" },
       [RESOURCE_IDS.COGUMELOS_ASSADOS]: { name: "Cogumelos Assados", emoji: "🍄" },
-      [RESOURCE_IDS.PEIXE_PEQUENO]: { name: "Peixe", emoji: "🐟" },
-      [RESOURCE_IDS.PEIXE_GRELHADO]: { name: "Peixe Grelhado", emoji: "🐟" }
+      [RESOURCE_IDS.FRUTAS_SILVESTRES]: { name: "Frutas Silvestres", emoji: "🫐" },
+      [RESOURCE_IDS.ERVAS_MEDICINAIS]: { name: "Ervas Medicinais", emoji: "🌿" }
     };
 
     return {
