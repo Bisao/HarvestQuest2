@@ -1,18 +1,18 @@
 {
   "players": [
     [
-      "83f6200f-54ef-4dc6-bc0f-33e139d3c76a",
+      "3f496967-f2f4-4ae5-9521-ce8c54a8db16",
       {
-        "id": "83f6200f-54ef-4dc6-bc0f-33e139d3c76a",
+        "id": "3f496967-f2f4-4ae5-9521-ce8c54a8db16",
         "username": "Bison",
         "level": 1,
-        "experience": 0,
-        "hunger": 88,
+        "experience": 52,
+        "hunger": 80,
         "maxHunger": 100,
-        "thirst": 88,
+        "thirst": 80,
         "maxThirst": 100,
         "coins": 100,
-        "inventoryWeight": 0,
+        "inventoryWeight": 5625,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -29,12 +29,199 @@
         "equippedFood": null,
         "equippedDrink": null,
         "autoCompleteQuests": true,
-        "lastOnlineTime": 1754170769367
+        "lastOnlineTime": 1754171380356,
+        "skills": {
+          "skill-gathering-001": {
+            "level": 0,
+            "experience": 72,
+            "unlocked": true,
+            "unlockedAt": 1754171386739,
+            "totalUsageCount": 12,
+            "lastUsed": 1754171665911
+          },
+          "skill-mining-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-woodcutting-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-fishing-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-hunting-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-exploration-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-crafting-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": true,
+            "unlockedAt": 1754171386739,
+            "totalUsageCount": 0
+          },
+          "skill-smithing-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-cooking-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-alchemy-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-combat-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": true,
+            "unlockedAt": 1754171386739,
+            "totalUsageCount": 0
+          },
+          "skill-defense-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-survival-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": true,
+            "unlockedAt": 1754171386739,
+            "totalUsageCount": 0
+          },
+          "skill-endurance-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-agility-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          },
+          "skill-luck-001": {
+            "level": 0,
+            "experience": 0,
+            "unlocked": false,
+            "totalUsageCount": 0
+          }
+        },
+        "skillPoints": 0,
+        "totalSkillPoints": 0,
+        "temperature": 0,
+        "fatigue": 0,
+        "morale": 50,
+        "hygiene": 100,
+        "diseases": [],
+        "immunities": [],
+        "resistances": {},
+        "skillAchievements": []
       }
     ]
   ],
-  "inventoryItems": [],
+  "inventoryItems": [
+    [
+      "0f17d556-bd62-458d-80f8-943d9b324104",
+      {
+        "id": "0f17d556-bd62-458d-80f8-943d9b324104",
+        "playerId": "3f496967-f2f4-4ae5-9521-ce8c54a8db16",
+        "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+        "quantity": 11
+      }
+    ],
+    [
+      "1c0e2d37-0ae8-4b2f-803a-cc4bffc695f3",
+      {
+        "id": "1c0e2d37-0ae8-4b2f-803a-cc4bffc695f3",
+        "playerId": "3f496967-f2f4-4ae5-9521-ce8c54a8db16",
+        "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+        "quantity": 6
+      }
+    ],
+    [
+      "cd20593d-f4c1-4bf4-a3ff-7c84d29027e8",
+      {
+        "id": "cd20593d-f4c1-4bf4-a3ff-7c84d29027e8",
+        "playerId": "3f496967-f2f4-4ae5-9521-ce8c54a8db16",
+        "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+        "quantity": 8
+      }
+    ],
+    [
+      "2c7d0462-f811-4eda-821b-bec2c219081f",
+      {
+        "id": "2c7d0462-f811-4eda-821b-bec2c219081f",
+        "playerId": "3f496967-f2f4-4ae5-9521-ce8c54a8db16",
+        "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+        "quantity": 10
+      }
+    ],
+    [
+      "6216b9c3-645d-458e-a911-38cb88ae662b",
+      {
+        "id": "6216b9c3-645d-458e-a911-38cb88ae662b",
+        "playerId": "3f496967-f2f4-4ae5-9521-ce8c54a8db16",
+        "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+        "quantity": 7
+      }
+    ]
+  ],
   "storageItems": [],
-  "expeditions": [],
+  "expeditions": [
+    [
+      "420ebf28-8fc7-4c68-b1e2-72e4fa183997",
+      {
+        "id": "420ebf28-8fc7-4c68-b1e2-72e4fa183997",
+        "playerId": "3f496967-f2f4-4ae5-9521-ce8c54a8db16",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "completed",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 5,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 1,
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 2,
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 3,
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 2
+        },
+        "startTime": 1754171454001,
+        "endTime": 1754171665,
+        "progress": 100
+      }
+    ]
+  ],
   "playerQuests": []
 }
