@@ -3,8 +3,11 @@ import { successResponse, errorResponse } from "../utils/response-helpers";
 import { storage } from "../storage";
 import type { Player } from "@shared/types";
 import { RESOURCE_IDS } from "@shared/constants/game-ids";
+import { RobustWorkshopService } from "../services/robust-workshop-service";
+import { ALL_ROBUST_WORKSHOP_PROCESSES } from "../data/robust-workshop-processes";
 
 const router = Router();
+const robustWorkshopService = new RobustWorkshopService(storage);
 
 // Interface para processos de oficina
 interface WorkshopProcess {
@@ -487,6 +490,137 @@ router.get('/processes/:category', (req, res) => {
   const categoryProcesses = WORKSHOP_PROCESSES.filter(p => p.category === category);
 
   successResponse(res, categoryProcesses, `Processos da categoria ${category} carregados com sucesso`);
+});
+
+// ===== ROUTES DO SISTEMA ROBUSTO =====
+
+// Buscar estados das oficinas do jogador
+router.get('/v3/:playerId/states', async (req, res) => {
+  try {
+    const { playerId } = req.params;
+    
+    const player = await storage.getPlayer(playerId);
+    if (!player) {
+      return res.status(404).json({ message: "Jogador não encontrado" });
+    }
+
+    const workshopTypes = ['bancada', 'madeira', 'pedras', 'forja', 'fogueira'];
+    const states: Record<string, any> = {};
+
+    for (const type of workshopTypes) {
+      let workshop = await robustWorkshopService.getWorkshopState(playerId, type);
+      if (!workshop) {
+        workshop = await robustWorkshopService.initializeWorkshop(playerId, type);
+      } else {
+        await robustWorkshopService.updateWorkshopEnergy(playerId, type);
+        workshop = await robustWorkshopService.getWorkshopState(playerId, type);
+      }
+      states[type] = workshop;
+    }
+
+    res.json(states);
+  } catch (error) {
+    console.error("Erro ao buscar estados das oficinas:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+// Buscar processos disponíveis
+router.get('/v3/processes', async (req, res) => {
+  try {
+    res.json(ALL_ROBUST_WORKSHOP_PROCESSES);
+  } catch (error) {
+    console.error("Erro ao buscar processos:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+// Buscar processos ativos do jogador
+router.get('/v3/:playerId/active', async (req, res) => {
+  try {
+    const { playerId } = req.params;
+    
+    const player = await storage.getPlayer(playerId);
+    if (!player) {
+      return res.status(404).json({ message: "Jogador não encontrado" });
+    }
+
+    // Verificar processos completados
+    const completedResults = await robustWorkshopService.checkProcessCompletion(playerId);
+    
+    // Buscar processos ainda ativos
+    const workshops = await storage.getPlayerData(playerId, 'workshops') || {};
+    const allActiveProcesses = [];
+
+    for (const [workshopType, workshop] of Object.entries(workshops)) {
+      if (workshop && workshop.activeProcesses) {
+        allActiveProcesses.push(...workshop.activeProcesses);
+      }
+    }
+
+    res.json({ 
+      activeProcesses: allActiveProcesses,
+      completedResults 
+    });
+  } catch (error) {
+    console.error("Erro ao buscar processos ativos:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+// Iniciar processo robusto
+router.post('/v3/:playerId/start', async (req, res) => {
+  try {
+    const { playerId } = req.params;
+    const { processId, quantity = 1 } = req.body;
+
+    if (!processId) {
+      return res.status(400).json({ message: "ID do processo é obrigatório" });
+    }
+
+    const result = await robustWorkshopService.startProcess(playerId, processId, quantity);
+    
+    if (result.success) {
+      res.json(result);
+    } else {
+      res.status(400).json({ message: result.message });
+    }
+  } catch (error) {
+    console.error("Erro ao iniciar processo:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+// Realizar manutenção da oficina
+router.post('/v3/:playerId/:workshopType/maintenance', async (req, res) => {
+  try {
+    const { playerId, workshopType } = req.params;
+    
+    const success = await robustWorkshopService.performMaintenance(playerId, workshopType);
+    
+    if (success) {
+      res.json({ success: true, message: "Manutenção realizada com sucesso" });
+    } else {
+      res.status(400).json({ message: "Recursos insuficientes para manutenção" });
+    }
+  } catch (error) {
+    console.error("Erro na manutenção:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+// Verificar requisitos de processo
+router.get('/v3/:playerId/can-start/:processId', async (req, res) => {
+  try {
+    const { playerId, processId } = req.params;
+    const quantity = parseInt(req.query.quantity as string) || 1;
+    
+    const result = await robustWorkshopService.canStartProcess(playerId, processId, quantity);
+    res.json(result);
+  } catch (error) {
+    console.error("Erro ao verificar requisitos:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
 });
 
 export default router;
