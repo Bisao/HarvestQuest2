@@ -394,7 +394,11 @@ export default function EnhancedInventory({
                 <span className="font-bold">{player.coins}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-red-600">🍖</span>
+                <span className="text-red-600">❤️</span>
+                <span className="font-bold">{player.health}/{player.maxHealth}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-orange-600">🍖</span>
                 <span className="font-bold">{player.hunger}/{player.maxHunger}</span>
               </div>
               <div className="flex items-center gap-2">

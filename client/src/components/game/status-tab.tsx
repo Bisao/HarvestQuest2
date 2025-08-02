@@ -38,21 +38,66 @@ export default function StatusTab({ player }: StatusTabProps) {
       showProgress: false
     },
     {
+      title: "Vida",
+      value: player.health,
+      max: player.maxHealth,
+      emoji: "❤️",
+      description: `${player.health}/${player.maxHealth}`,
+      color: getProgressColor(player.health, player.maxHealth, 'health'),
+      showProgress: true
+    },
+    {
       title: "Fome",
       value: player.hunger,
-      max: 100,
+      max: player.maxHunger,
       emoji: "🍖",
-      description: `${player.hunger}/100`,
-      color: getProgressColor(player.hunger, 100, 'warning'),
+      description: `${player.hunger}/${player.maxHunger}`,
+      color: getProgressColor(player.hunger, player.maxHunger, 'warning'),
       showProgress: true
     },
     {
       title: "Sede",
       value: player.thirst,
-      max: 100,
+      max: player.maxThirst,
       emoji: "💧",
-      description: `${player.thirst}/100`,
-      color: getProgressColor(player.thirst, 100, 'warning'),
+      description: `${player.thirst}/${player.maxThirst}`,
+      color: getProgressColor(player.thirst, player.maxThirst, 'warning'),
+      showProgress: true
+    },
+    {
+      title: "Temperatura",
+      value: player.temperature + 50, // Converter para 0-100 scale
+      max: 100,
+      emoji: player.temperature < -25 ? "🥶" : player.temperature > 25 ? "🔥" : "🌡️",
+      description: `${player.temperature > 0 ? '+' : ''}${player.temperature}°`,
+      color: getProgressColor(Math.abs(player.temperature), 50, 'warning'),
+      showProgress: true
+    },
+    {
+      title: "Fadiga",
+      value: 100 - player.fatigue, // Inverter para mostrar energia
+      max: 100,
+      emoji: "😴",
+      description: `${player.fatigue}% cansaço`,
+      color: getProgressColor(100 - player.fatigue, 100, 'energy'),
+      showProgress: true
+    },
+    {
+      title: "Moral",
+      value: player.morale,
+      max: 100,
+      emoji: player.morale >= 80 ? "😄" : player.morale >= 60 ? "😊" : player.morale >= 40 ? "😐" : player.morale >= 20 ? "😟" : "😢",
+      description: `${player.morale}/100`,
+      color: getProgressColor(player.morale, 100, 'warning'),
+      showProgress: true
+    },
+    {
+      title: "Higiene",
+      value: player.hygiene,
+      max: 100,
+      emoji: "🛁",
+      description: `${player.hygiene}/100`,
+      color: getProgressColor(player.hygiene, 100, 'warning'),
       showProgress: true
     },
   ];

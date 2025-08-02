@@ -234,12 +234,12 @@ export default function ModernGameLayout({
                 <div className="flex items-center space-x-2">
                   <div className="flex items-center space-x-1">
                     <span className="text-lg">🍖</span>
-                    <span className="text-sm font-medium text-gray-700">{player?.hunger || 0}/100</span>
+                    <span className="text-sm font-medium text-gray-700">{player?.hunger}/{player?.maxHunger}</span>
                   </div>
                   <div className="w-24 bg-gray-200 rounded-full h-2">
                     <div 
                       className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${player?.hunger || 0}%` }}
+                      style={{ width: `${(player?.hunger / player?.maxHunger) * 100}%` }}
                     />
                   </div>
                 </div>
@@ -248,12 +248,12 @@ export default function ModernGameLayout({
                 <div className="flex items-center space-x-2">
                   <div className="flex items-center space-x-1">
                     <Droplets className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm font-medium text-gray-700">{player?.thirst || 0}/100</span>
+                    <span className="text-sm font-medium text-gray-700">{player?.thirst}/{player?.maxThirst}</span>
                   </div>
                   <div className="w-24 bg-gray-200 rounded-full h-2">
                     <div 
                       className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${player?.thirst || 0}%` }}
+                      style={{ width: `${(player?.thirst / player?.maxThirst) * 100}%` }}
                     />
                   </div>
                 </div>

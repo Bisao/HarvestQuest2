@@ -47,21 +47,21 @@ export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
     return '😢';
   };
 
-  // Enhanced status values with defaults
+  // Enhanced status values from player
   const status = {
-    health: player.health || 100,
-    maxHealth: player.maxHealth || 100,
-    hunger: player.hunger || 100,
-    maxHunger: player.maxHunger || 100,
-    thirst: player.thirst || 100,
-    maxThirst: player.maxThirst || 100,
-    temperature: player.temperature || 0,
-    fatigue: player.fatigue || 0,
-    morale: player.morale || 50,
-    hygiene: player.hygiene || 100,
-    diseases: player.diseases || [],
-    immunities: player.immunities || [],
-    skillPoints: player.skillPoints || 0
+    health: player.health,
+    maxHealth: player.maxHealth,
+    hunger: player.hunger,
+    maxHunger: player.maxHunger,
+    thirst: player.thirst,
+    maxThirst: player.maxThirst,
+    temperature: player.temperature,
+    fatigue: player.fatigue,
+    morale: player.morale,
+    hygiene: player.hygiene,
+    diseases: player.diseases,
+    immunities: player.immunities,
+    skillPoints: player.skillPoints
   };
 
   return (

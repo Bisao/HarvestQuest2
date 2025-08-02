@@ -6,10 +6,6 @@ export interface Player {
   username: string;
   level: number;
   experience: number;
-  hunger: number;
-  maxHunger: number;
-  thirst: number;
-  maxThirst: number;
   coins: number;
   inventoryWeight: number;
   maxInventoryWeight: number;
@@ -29,30 +25,32 @@ export interface Player {
   equippedDrink?: string | null;
   autoCompleteQuests: boolean;
   lastOnlineTime?: number;
-  health?: number;
-  maxHealth?: number;
   onExpedition?: boolean;
   expeditionEndTime?: number;
   offlineActivityConfig?: OfflineActivityConfig;
   autoConsume?: boolean;
   
-  // NEW: Skill System
-  skills: { [skillId: string]: PlayerSkill };
-  skillPoints: number;
-  totalSkillPoints: number;
-  
-  // NEW: Enhanced Status System  
+  // Enhanced Status System (Centralized)
+  health: number; // 1-100
+  maxHealth: number; // default 100
+  hunger: number; // 0-100
+  maxHunger: number; // default 100
+  thirst: number; // 0-100
+  maxThirst: number; // default 100
   temperature: number; // -100 (frozen) to 100 (overheated), default 0
   fatigue: number; // 0 (rested) to 100 (exhausted), default 0
   morale: number; // 0 (depressed) to 100 (euphoric), default 50
   hygiene: number; // 0 (filthy) to 100 (clean), default 100
   
-  // NEW: Disease System
+  // Disease System
   diseases: PlayerDisease[];
   immunities: string[]; // disease IDs player is immune to
   resistances: { [diseaseId: string]: number }; // resistance level 0-100
   
-  // NEW: Skill-related tracking
+  // Skill System
+  skills: { [skillId: string]: PlayerSkill };
+  skillPoints: number;
+  totalSkillPoints: number;
   lastSkillReset?: number; // timestamp of last skill reset
   skillAchievements: string[]; // unlocked achievement IDs
 }
@@ -73,11 +71,6 @@ export interface InsertPlayer {
   username: string;
   level?: number;
   experience?: number;
-  hunger?: number;
-  maxHunger?: number;
-  thirst?: number;
-  maxThirst?: number;
-  health?: number;
   coins?: number;
   inventoryWeight?: number;
   maxInventoryWeight?: number;
@@ -95,6 +88,29 @@ export interface InsertPlayer {
   equippedBoots?: string | null;
   equippedWeapon?: string | null;
   equippedTool?: string | null;
+  
+  // Enhanced Status System
+  health?: number;
+  maxHealth?: number;
+  hunger?: number;
+  maxHunger?: number;
+  thirst?: number;
+  maxThirst?: number;
+  temperature?: number;
+  fatigue?: number;
+  morale?: number;
+  hygiene?: number;
+  
+  // Disease System
+  diseases?: PlayerDisease[];
+  immunities?: string[];
+  resistances?: { [diseaseId: string]: number };
+  
+  // Skill System
+  skills?: { [skillId: string]: PlayerSkill };
+  skillPoints?: number;
+  totalSkillPoints?: number;
+  skillAchievements?: string[];
 }
 
 // Rest of types from original types.ts...

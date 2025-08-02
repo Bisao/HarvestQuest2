@@ -2,12 +2,16 @@
 import type { IStorage } from "../storage";
 import type { HungerDegradationMode } from "@shared/types";
 import { CONSUMPTION_CONFIG } from "@shared/config/consumption-config";
+import { PlayerStatusService } from "./player-status-service";
 
 export class HungerThirstService {
   private degradationTimer: NodeJS.Timeout | null = null;
   private isRunning = false;
+  private statusService: PlayerStatusService;
 
-  constructor(private storage: IStorage) {}
+  constructor(private storage: IStorage) {
+    this.statusService = new PlayerStatusService(storage);
+  }
 
   /**
    * Start passive hunger/thirst degradation for all players
@@ -82,18 +86,17 @@ export class HungerThirstService {
           const penalties = this.calculateStatusPenalties(newHunger, newThirst);
 
           const updateData: any = {
-            hunger: newHunger,
-            thirst: newThirst
+            hunger: finalHunger,
+            thirst: finalThirst
           };
 
           // Apply penalties if any
-          if (penalties.healthPenalty > 0 && player.health !== undefined) {
-            const newHealth = Math.max(1, player.health - penalties.healthPenalty);
-            updateData.health = newHealth;
+          if (penalties.healthPenalty > 0) {
+            updateData.health = player.health - penalties.healthPenalty;
             console.log(`🩺 Player ${player.id} lost ${penalties.healthPenalty} health due to low hunger/thirst`);
           }
 
-          await this.storage.updatePlayer(player.id, updateData);
+          await this.statusService.updatePlayerStatus(player.id, updateData);
 
           // Log degradation with throttling to reduce spam
           if (process.env.NODE_ENV === 'development' && Math.random() < 0.1) {

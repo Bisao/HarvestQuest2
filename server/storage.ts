@@ -325,10 +325,6 @@ export class MemStorage implements IStorage {
       username: insertPlayer.username.trim(),
       level: insertPlayer.level ?? 1,
       experience: insertPlayer.experience ?? 0,
-      hunger: insertPlayer.hunger ?? 100,
-      maxHunger: insertPlayer.maxHunger ?? 100,
-      thirst: insertPlayer.thirst ?? 100,
-      maxThirst: insertPlayer.maxThirst ?? 100,
       coins: insertPlayer.coins ?? 0,
       inventoryWeight: insertPlayer.inventoryWeight ?? 0,
       maxInventoryWeight: insertPlayer.maxInventoryWeight ?? 50000,
@@ -344,8 +340,6 @@ export class MemStorage implements IStorage {
       equippedBoots: insertPlayer.equippedBoots || null,
       equippedWeapon: insertPlayer.equippedWeapon || null,
       equippedTool: insertPlayer.equippedTool || null,
-      equippedFood: null,
-      equippedDrink: null,
       autoCompleteQuests: insertPlayer.autoCompleteQuests ?? true,
     };
 
