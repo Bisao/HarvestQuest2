@@ -31,7 +31,20 @@ export function useGameData({
       if (!playerId) return null;
       const response = await fetch(`/api/player/${playerId}`);
       if (!response.ok) throw new Error('Failed to fetch player data');
-      return response.json();
+      const data = await response.json();
+      
+      // Ensure consistent number formatting
+      if (data) {
+        data.health = Math.round(data.health || 0);
+        data.hunger = Math.round(data.hunger || 0);
+        data.thirst = Math.round(data.thirst || 0);
+        data.temperature = Math.round(data.temperature || 20);
+        data.fatigue = Math.round(data.fatigue || 0);
+        data.morale = Math.round(data.morale || 50);
+        data.hygiene = Math.round(data.hygiene || 100);
+      }
+      
+      return data;
     },
     enabled: enabled && !!playerId,
     refetchInterval: pollInterval,
