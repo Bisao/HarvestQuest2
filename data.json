@@ -25,9 +25,9 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 96,
+        "hunger": 92,
         "maxHunger": 100,
-        "thirst": 96,
+        "thirst": 92,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
@@ -40,7 +40,7 @@
         "skillPoints": 0,
         "totalSkillPoints": 0,
         "skillAchievements": [],
-        "lastOnlineTime": 1754173680785
+        "lastOnlineTime": 1754173947145
       }
     ]
   ],
