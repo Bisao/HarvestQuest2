@@ -125,6 +125,36 @@ const ROBUST_WORKSHOP_PROCESSES: WorkshopProcess[] = [
     efficiency: 85,
     experienceGained: 25
   },
+  {
+    id: "proc-machado-improvisado-001",
+    name: "Machado Improvisado",
+    emoji: "🪓",
+    description: "Monte uma ferramenta básica para cortar madeira",
+    category: "bancada",
+    requiredLevel: 1,
+    input: { resourceId: RESOURCE_IDS.PEDRA, quantity: 2 },
+    secondary: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 3 },
+    output: { resourceId: RESOURCE_IDS.MACHADO_IMPROVISADO, quantity: 1 },
+    processingTime: 25,
+    efficiency: 80,
+    experienceGained: 15
+  },
+  {
+    id: "proc-picareta-improvisada-001",
+    name: "Picareta Improvisada",
+    emoji: "⛏️",
+    description: "Construa uma ferramenta rústica para quebrar pedras",
+    category: "bancada",
+    requiredLevel: 1,
+    input: { resourceId: RESOURCE_IDS.PEDRA, quantity: 3 },
+    secondary: { resourceId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+    fuel: { resourceId: RESOURCE_IDS.BARBANTE, quantity: 2 },
+    output: { resourceId: RESOURCE_IDS.PICARETA_IMPROVISADA, quantity: 1 },
+    processingTime: 30,
+    efficiency: 75,
+    experienceGained: 18
+  },
 
   // ===== MADEIRA - PROCESSAMENTO E PARTES =====
   {
