@@ -748,7 +748,7 @@ export default function EnhancedStorageTab({
 
                     <div className="space-y-4 text-sm text-orange-700">
                       <p className="leading-relaxed">
-                        Você ainda não possui tanques de água desbloqueados. Para começar a armazenar água, você precisa craftar um <strong>Barril Improvisadostrong>.
+                        Você ainda não possui tanques de água desbloqueados. Para começar a armazenar água, você precisa craftar um <strong>Barril Improvisado</strong>.
                       </p>
 
                       <div className="bg-orange-100 rounded-lg p-4">
