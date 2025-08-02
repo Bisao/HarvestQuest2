@@ -13,6 +13,8 @@ export class PlayerStatusService {
     const player = await this.storage.getPlayer(playerId);
     if (!player) throw new Error("Player not found");
 
+    console.log(`🔄 Updating status for player ${playerId}:`, updates);
+
     // Validate and clamp values
     const validatedUpdates: any = {};
 
@@ -51,8 +53,29 @@ export class PlayerStatusService {
       }
     });
 
+    console.log(`✅ Validated updates for player ${playerId}:`, validatedUpdates);
+
     await this.storage.updatePlayer(playerId, validatedUpdates);
-    return await this.storage.getPlayer(playerId) as Player;
+    
+    // Invalidate cache to ensure fresh data
+    try {
+      const { invalidatePlayerCache } = await import("../cache/memory-cache");
+      invalidatePlayerCache(playerId);
+    } catch (error) {
+      console.warn('Cache invalidation failed:', error);
+    }
+    
+    const updatedPlayer = await this.storage.getPlayer(playerId) as Player;
+    console.log(`🎯 Final player status after update:`, {
+      hunger: updatedPlayer.hunger,
+      thirst: updatedPlayer.thirst,
+      fatigue: updatedPlayer.fatigue,
+      morale: updatedPlayer.morale,
+      hygiene: updatedPlayer.hygiene,
+      temperature: updatedPlayer.temperature
+    });
+    
+    return updatedPlayer;
   }
 
   /**

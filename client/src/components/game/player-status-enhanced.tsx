@@ -33,7 +33,7 @@ export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
     maxHunger: player.maxHunger ?? 100,
     thirst: player.thirst ?? 100,
     maxThirst: player.maxThirst ?? 100,
-    temperature: player.temperature ?? 0,
+    temperature: player.temperature ?? 20,
     fatigue: player.fatigue ?? 0,
     morale: player.morale ?? 50,
     hygiene: player.hygiene ?? 100,

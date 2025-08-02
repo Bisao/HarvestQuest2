@@ -526,19 +526,29 @@ export class ExpeditionService {
 
     const statusService = new (await import('./player-status-service')).PlayerStatusService(this.storage);
     
-    // Completion effects (mostly positive)
-    let moraleIncrease = 5; // Success boosts morale
-    let fatigueIncrease = 3; // But you're more tired after work
+    // Completion effects - balance of positive and negative
+    let moraleIncrease = 8; // Success boosts morale significantly
+    let fatigueIncrease = 5; // Additional fatigue from completing work
+    let hungerDecrease = 5; // More hungry after expedition
+    let thirstDecrease = 3; // Slightly more thirsty
+    let hygieneDecrease = 3; // A bit dirtier
     
-    // Bonus morale for successful resource gathering
+    // Bonus effects for successful resource gathering
     const resourceCount = Object.keys(expedition.collectedResources || {}).length;
     if (resourceCount > 2) {
-      moraleIncrease += 2; // Extra satisfaction from good haul
+      moraleIncrease += 3; // Extra satisfaction from good haul
+    }
+    if (resourceCount > 4) {
+      moraleIncrease += 2; // Even better haul
+      fatigueIncrease += 2; // But more tiring
     }
 
     const updates: any = {
-      morale: Math.min(100, player.morale + moraleIncrease),
-      fatigue: Math.min(100, player.fatigue + fatigueIncrease)
+      hunger: Math.max(0, Math.min(player.maxHunger, player.hunger - hungerDecrease)),
+      thirst: Math.max(0, Math.min(player.maxThirst, player.thirst - thirstDecrease)),
+      morale: Math.min(100, (player.morale || 50) + moraleIncrease),
+      fatigue: Math.min(100, (player.fatigue || 0) + fatigueIncrease),
+      hygiene: Math.max(0, Math.min(100, (player.hygiene || 100) - hygieneDecrease))
     };
 
     await statusService.updatePlayerStatus(playerId, updates);
@@ -554,70 +564,78 @@ export class ExpeditionService {
 
     const statusService = new (await import('./player-status-service')).PlayerStatusService(this.storage);
     
-    // Base expedition effects
-    let fatigueIncrease = 5; // Base fatigue from expedition start
-    let moraleChange = 2; // Slight morale boost from adventure
-    let hygieneDecrease = 3; // Getting dirty from expedition
+    // Base expedition effects - increase the impact
+    let hungerDecrease = 8; // Expeditions consume energy
+    let thirstDecrease = 10; // Physical activity increases thirst
+    let fatigueIncrease = 12; // Base fatigue from expedition start
+    let moraleChange = 3; // Adventure boosts morale
+    let hygieneDecrease = 8; // Getting dirty from expedition
     let temperatureChange = 0;
 
     // Biome-specific effects
     switch (biome.name?.toLowerCase()) {
       case 'deserto árido':
-        temperatureChange = 15; // Hot climate
-        fatigueIncrease += 3; // More tiring in desert
-        hygieneDecrease += 2; // Sand and dust
+        temperatureChange = 20; // Hot climate
+        fatigueIncrease += 5; // More tiring in desert
+        hygieneDecrease += 5; // Sand and dust
+        thirstDecrease += 5; // Hot weather increases thirst
         break;
       case 'floresta gelada':
-        temperatureChange = -10; // Cold climate  
-        fatigueIncrease += 2; // Cold is tiring
+        temperatureChange = -15; // Cold climate  
+        fatigueIncrease += 3; // Cold is tiring
+        hungerDecrease += 3; // Body burns more calories to stay warm
         break;
       case 'pântano misterioso':
-        hygieneDecrease += 5; // Very dirty environment
-        moraleChange -= 1; // Unpleasant environment
+        hygieneDecrease += 8; // Very dirty environment
+        moraleChange -= 2; // Unpleasant environment
+        temperatureChange = -5; // Damp and cold
         break;
       case 'montanhas rochosas':
-        fatigueIncrease += 4; // Climbing is exhausting
-        moraleChange += 1; // Beautiful views boost morale
+        fatigueIncrease += 6; // Climbing is exhausting
+        moraleChange += 2; // Beautiful views boost morale
+        hungerDecrease += 2; // Physical exertion
+        break;
+      case 'floresta':
+      case 'floresta temperada':
+        temperatureChange = 5; // Mild temperature increase
+        moraleChange += 1; // Pleasant environment
         break;
     }
 
     // Resource gathering intensity effects
     if (resourceCount > 3) {
-      fatigueIncrease += 2; // More resources = more work
-      hygieneDecrease += 1;
+      fatigueIncrease += 3; // More resources = more work
+      hygieneDecrease += 2;
+      hungerDecrease += 2;
+      thirstDecrease += 2;
     }
 
     // Equipment can reduce negative effects
     if (player.equippedChestplate) {
-      fatigueIncrease = Math.max(1, fatigueIncrease - 1);
-      temperatureChange *= 0.7; // Armor provides some protection
+      fatigueIncrease = Math.max(1, fatigueIncrease - 2);
+      temperatureChange *= 0.6; // Better armor protection
     }
     if (player.equippedHelmet) {
-      hygieneDecrease = Math.max(1, hygieneDecrease - 1);
+      hygieneDecrease = Math.max(1, hygieneDecrease - 2);
+    }
+    if (player.equippedBoots) {
+      fatigueIncrease = Math.max(1, fatigueIncrease - 1);
     }
 
-    // Apply the status changes
-    const updates: any = {};
-    
-    if (fatigueIncrease > 0) {
-      updates.fatigue = Math.min(100, player.fatigue + fatigueIncrease);
-    }
-    
-    if (moraleChange !== 0) {
-      updates.morale = Math.max(0, Math.min(100, player.morale + moraleChange));
-    }
-    
-    if (hygieneDecrease > 0) {
-      updates.hygiene = Math.max(0, player.hygiene - hygieneDecrease);
-    }
+    // Apply the status changes - ensure all core stats are affected
+    const updates: any = {
+      hunger: Math.max(0, Math.min(player.maxHunger, player.hunger - hungerDecrease)),
+      thirst: Math.max(0, Math.min(player.maxThirst, player.thirst - thirstDecrease)),
+      fatigue: Math.min(100, (player.fatigue || 0) + fatigueIncrease),
+      morale: Math.max(0, Math.min(100, (player.morale || 50) + moraleChange)),
+      hygiene: Math.max(0, Math.min(100, (player.hygiene || 100) - hygieneDecrease))
+    };
     
     if (temperatureChange !== 0) {
       updates.temperature = Math.max(-100, Math.min(100, (player.temperature || 20) + temperatureChange));
     }
 
-    if (Object.keys(updates).length > 0) {
-      await statusService.updatePlayerStatus(playerId, updates);
-      console.log(`🏃 Expedition status effects applied to player ${playerId}:`, updates);
-    }
+    await statusService.updatePlayerStatus(playerId, updates);
+    console.log(`🏃 Expedition status effects applied to player ${playerId}:`, updates);
   }
 }

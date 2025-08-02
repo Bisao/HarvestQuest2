@@ -179,9 +179,15 @@ export default function ExpeditionSystem({
         onClose();
       }
       
+      // Force player status refresh after expedition starts
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
+        queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+      }, 1000);
+      
       toast({
         title: "Expedição Iniciada",
-        description: `Explorando ${biome?.name}...`
+        description: `Explorando ${biome?.name}... Status sendo afetados.`
       });
     },
     onError: (error) => {
@@ -211,14 +217,22 @@ export default function ExpeditionSystem({
       setExpeditionProgress(0);
       onExpeditionComplete();
       
-      // Invalidate queries to update UI
-      queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
+      // Force cache invalidation and UI refresh
+      queryClient.removeQueries({ queryKey: [`/api/player/${playerId}`] });
+      queryClient.removeQueries({ queryKey: ["/api/player", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/inventory", playerId] });
+      queryClient.removeQueries({ queryKey: ["/api/storage", playerId] });
+      
+      // Refetch player data immediately
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
+        queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
+        queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+      }, 500);
       
       toast({
         title: "Expedição Concluída",
-        description: "Recursos coletados com sucesso!"
+        description: "Recursos coletados com sucesso! Status atualizados."
       });
     },
     onError: () => {
