@@ -9,7 +9,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import type { Biome, Resource, Equipment, Player } from "@shared/types";
-import { CheckCircle, Clock, Users, X } from "lucide-react";
 
 interface ExpeditionModalProps {
   isOpen: boolean;
@@ -181,7 +180,7 @@ export default function ExpeditionModal({
       // First check if there's an active expedition and try to complete it
       try {
         const activeExpeditionResponse = await fetch(`/api/player/${player.id}/expeditions/active`);
-
+        
         if (activeExpeditionResponse.ok) {
           const contentType = activeExpeditionResponse.headers.get('content-type');
           if (contentType && contentType.includes('application/json')) {
@@ -192,12 +191,12 @@ export default function ExpeditionModal({
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
               });
-
+              
               if (completeResponse.ok) {
                 const completeContentType = completeResponse.headers.get('content-type');
                 if (completeContentType && completeContentType.includes('application/json')) {
                   await completeResponse.json();
-
+                  
                   // Wait a moment for cache invalidation
                   await new Promise(resolve => setTimeout(resolve, 1000));
                 }
@@ -219,7 +218,7 @@ export default function ExpeditionModal({
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
         let errorMessage = 'Failed to start expedition';
-
+        
         if (contentType && contentType.includes('application/json')) {
           try {
             const errorData = await response.json();
@@ -236,7 +235,7 @@ export default function ExpeditionModal({
             errorMessage = errorText || errorMessage;
           }
         }
-
+        
         throw new Error(errorMessage);
       }
 
@@ -299,7 +298,7 @@ export default function ExpeditionModal({
             <Badge variant="outline">{biome?.emoji}</Badge>
           </DialogTitle>
           <DialogDescription>
-            Selecione os recursos que deseja coletar durante a expedição. Total de recursos disponíveis: {collectableResources.length}
+            Selecione os recursos que deseja coletar durante a expedição. Verifique se você possui as ferramentas necessárias.
           </DialogDescription>
         </DialogHeader>
 
@@ -309,108 +308,72 @@ export default function ExpeditionModal({
           {/* Resource selection */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-medium">
-                Recursos Disponíveis para Coleta ({collectableResources.filter(r => r.canCollect).length}/{collectableResources.length} acessíveis):
-              </h4>
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const availableResources = collectableResources.filter(r => r.canCollect);
-                    const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
+              <h4 className="font-medium">Recursos Disponíveis para Coleta:</h4>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const availableResources = collectableResources.filter(r => r.canCollect);
+                  const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
 
-                    if (allAvailableSelected) {
-                      // Desmarcar todos os disponíveis
-                      setSelectedResources(prev => prev.filter(id => !availableResources.some(r => r.id === id)));
-                    } else {
-                      // Marcar todos os disponíveis
-                      const newSelected = [...selectedResources];
-                      availableResources.forEach(resource => {
-                        if (!newSelected.includes(resource.id)) {
-                          newSelected.push(resource.id);
-                        }
-                      });
-                      setSelectedResources(newSelected);
-                    }
-                  }}
-                  className="text-xs"
-                >
-                  {(() => {
-                    const availableResources = collectableResources.filter(r => r.canCollect);
-                    const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
-                    return allAvailableSelected ? "❌ Desmarcar Tudo" : "✅ Marcar Tudo";
-                  })()}
-                </Button>
-                <Badge variant="secondary" className="text-xs">
-                  {selectedResources.length} selecionados
-                </Badge>
-              </div>
-            </div>
-            <ScrollArea className="h-80 border rounded-lg p-3">
-              <div className="space-y-2">
-                {/* Categorize resources for better organization */}
+                  if (allAvailableSelected) {
+                    // Desmarcar todos os disponíveis
+                    setSelectedResources(prev => prev.filter(id => !availableResources.some(r => r.id === id)));
+                  } else {
+                    // Marcar todos os disponíveis
+                    const newSelected = [...selectedResources];
+                    availableResources.forEach(resource => {
+                      if (!newSelected.includes(resource.id)) {
+                        newSelected.push(resource.id);
+                      }
+                    });
+                    setSelectedResources(newSelected);
+                  }
+                }}
+                className="text-xs"
+              >
                 {(() => {
-                  const categories = [
-                    { title: "🌾 Recursos Básicos", items: collectableResources.filter(r => ["Fibra", "Pedra", "Pedras Pequenas", "Gravetos", "Água Fresca", "Bambu", "Madeira", "Argila", "Ferro Fundido", "Couro", "Barbante"].includes(r.name)) },
-                    { title: "🐾 Animais", items: collectableResources.filter(r => ["Coelho", "Veado", "Javali"].includes(r.name)) },
-                    { title: "🐟 Peixes", items: collectableResources.filter(r => ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(r.name)) },
-                    { title: "🌿 Plantas e Comida", items: collectableResources.filter(r => ["Cogumelos", "Frutas Silvestres", "Carne", "Ossos", "Pelo"].includes(r.name)) },
-                    { title: "💎 Recursos Especiais", items: collectableResources.filter(r => !["Fibra", "Pedra", "Pedras Pequenas", "Gravetos", "Água Fresca", "Bambu", "Madeira", "Argila", "Ferro Fundido", "Couro", "Barbante", "Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão", "Cogumelos", "Frutas Silvestres", "Carne", "Ossos", "Pelo"].includes(r.name)) }
-                  ];
-
-                  return categories.map(category => (
-                    category.items.length > 0 && (
-                      <div key={category.title} className="mb-4">
-                        <h5 className="font-semibold text-sm mb-2 text-gray-700 border-b pb-1">
-                          {category.title}
-                        </h5>
-                        <div className="space-y-2">
-                          {category.items.map(resource => (
-                <div
-                  key={resource.id}
-                  className={`p-3 border rounded transition-colors ${
-                    selectedResources.includes(resource.id)
-                      ? 'border-blue-500 bg-blue-50'
-                      : resource.canCollect
-                      ? 'border-gray-200 hover:border-gray-300 cursor-pointer'
-                      : 'border-red-200 bg-red-50 opacity-60 cursor-not-allowed'
-                  }`}
-                  onClick={() => resource.canCollect && toggleResourceSelection(resource.id)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">{resource.emoji}</span>
-                      <span className={`font-medium ${!resource.canCollect ? 'text-gray-500' : ''}`}>
-                        {resource.name}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm">{resource.toolIcon}</span>
-                      {selectedResources.includes(resource.id) && (
-                        <CheckCircle className="h-4 w-4 text-blue-500" />
-                      )}
-                      {!resource.canCollect && (
-                        <X className="h-4 w-4 text-red-500" />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-1">
-                    <span className={`text-xs ${
-                      resource.canCollect ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {resource.requirementText}
-                    </span>
-                  </div>
-                </div>
-              ))}
-                        </div>
-                      </div>
-                    )
-                  ));
+                  const availableResources = collectableResources.filter(r => r.canCollect);
+                  const allAvailableSelected = availableResources.every(r => selectedResources.includes(r.id));
+                  return allAvailableSelected ? "❌ Desmarcar Tudo" : "✅ Marcar Tudo";
                 })()}
+              </Button>
+            </div>
+            <ScrollArea className="h-64 border rounded-lg p-3">
+              <div className="space-y-2">
+                {collectableResources.map((resource) => (
+                  <div
+                    key={resource.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border ${
+                      resource.canCollect 
+                        ? "bg-white hover:bg-gray-50" 
+                        : "bg-gray-100 opacity-60"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        checked={selectedResources.includes(resource.id)}
+                        onCheckedChange={() => toggleResourceSelection(resource.id)}
+                        disabled={!resource.canCollect}
+                      />
+                      <span className="text-lg">{resource.emoji}</span>
+                      <div>
+                        <p className="font-medium">{resource.name}</p>
+                        <p className="text-xs text-gray-600">
+                          XP: {resource.experienceValue} | Valor: {resource.value}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm">{resource.toolIcon}</span>
+                        <span className={`text-xs ${resource.canCollect ? "text-green-600" : "text-red-600"}`}>
+                          {resource.requirementText}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </ScrollArea>
           </div>

@@ -11,7 +11,6 @@ import { CacheManager } from "@shared/utils/cache-manager";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { EnhancedItemModal } from "./enhanced-item-modal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { StorageItem, Resource, Equipment, Player } from "@shared/types";
 import { isConsumable, getConsumableDescription, getConsumableEffects } from "@shared/utils/consumable-utils";
@@ -51,8 +50,6 @@ export default function EnhancedStorageTab({
     item: EnhancedStorageItem | null;
     amount: number;
   }>({ open: false, item: null, amount: 1 });
-  const [showItemModal, setShowItemModal] = useState(false);
-  const [modalItem, setModalItem] = useState<EnhancedStorageItem | null>(null);
 
   // Filter states
   const [searchFilter, setSearchFilter] = useState("");
@@ -62,7 +59,7 @@ export default function EnhancedStorageTab({
 
   // Initialize ItemFinder with current data
   ItemFinder.initialize(resources, equipment);
-
+  
   // Use unified game data hook
   const { storage: storageItems = [], isLoading } = useGameData({ playerId });
 
@@ -115,26 +112,19 @@ export default function EnhancedStorageTab({
       if (searchFilter && !item.itemData.name.toLowerCase().includes(searchFilter.toLowerCase())) {
         return false;
       }
-
+      
       // Type filter
       if (typeFilter !== "all" && item.itemData.type !== typeFilter) {
         return false;
       }
-
+      
       // Rarity filter (only for resources)
       if (rarityFilter !== "all" && item.itemData.type === "resource" && (item.itemData as any).rarity !== rarityFilter) {
         return false;
       }
-
+      
       return true;
     });
-
-  // Handle item click to open enhanced modal
-  const handleItemClick = (item: EnhancedStorageItem) => {
-    console.log("Storage item clicked - opening modal:", item);
-    setModalItem(item);
-    setShowItemModal(true);
-  };
 
   // Withdraw item mutation
   const withdrawMutation = useMutation({
@@ -176,12 +166,12 @@ export default function EnhancedStorageTab({
     mutationFn: async (resourceId: string) => {
       const storageItem = storageItems?.find(item => item.resourceId === resourceId);
       if (!storageItem) throw new Error("Item não encontrado no armazém");
-
+      
       const itemData = getItemById(resourceId);
       if (!itemData) throw new Error("Dados do item não encontrados");
-
+      
       const effects = getConsumableEffects(itemData);
-
+      
       const response = await apiRequest("POST", "/api/player/" + playerId + "/consume", {
         itemId: resourceId,
         quantity: 1,
@@ -197,14 +187,14 @@ export default function EnhancedStorageTab({
       await queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
       await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-
+      
       // Force immediate refetch
       await queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
       await queryClient.refetchQueries({ queryKey: ["/api/storage", playerId] });
-
+      
       const hungerGain = data.hungerRestored || 0;
       const thirstGain = data.thirstRestored || 0;
-
+      
       toast({
         title: "Item consumido!",
         description: hungerGain > 0 || thirstGain > 0 ? 
@@ -259,57 +249,6 @@ export default function EnhancedStorageTab({
       legendary: 'text-orange-600'
     };
     return colors[rarity as keyof typeof colors] || 'text-gray-600';
-  };
-
-  const getRarityConfig = (rarity: string) => {
-    const configs = {
-      common: {
-        gradient: 'from-gray-600 to-gray-700',
-        border: 'border-gray-500',
-        bg: 'bg-gray-600',
-        stars: 1,
-        starColor: 'text-gray-300',
-        shadowColor: '#6b7280',
-        pattern: 'bg-gray-400'
-      },
-      uncommon: {
-        gradient: 'from-green-600 to-green-700',
-        border: 'border-green-500',
-        bg: 'bg-green-600',
-        stars: 2,
-        starColor: 'text-green-300',
-        shadowColor: '#16a34a',
-        pattern: 'bg-green-400'
-      },
-      rare: {
-        gradient: 'from-blue-600 to-blue-700',
-        border: 'border-blue-500',
-        bg: 'bg-blue-600',
-        stars: 3,
-        starColor: 'text-blue-300',
-        shadowColor: '#2563eb',
-        pattern: 'bg-blue-400'
-      },
-      epic: {
-        gradient: 'from-purple-600 to-purple-700',
-        border: 'border-purple-500',
-        bg: 'bg-purple-600',
-        stars: 4,
-        starColor: 'text-purple-300',
-        shadowColor: '#9333ea',
-        pattern: 'bg-purple-400'
-      },
-      legendary: {
-        gradient: 'from-orange-500 via-yellow-500 to-orange-600',
-        border: 'border-orange-400',
-        bg: 'bg-gradient-to-r from-orange-500 to-yellow-500',
-        stars: 5,
-        starColor: 'text-yellow-300',
-        shadowColor: '#f59e0b',
-        pattern: 'bg-gradient-to-br from-orange-400 to-yellow-400'
-      }
-    };
-    return configs[rarity as keyof configs] || configs.common;
   };
 
   if (isLoading) {
@@ -367,7 +306,7 @@ export default function EnhancedStorageTab({
                   </div>
                 )}
               </div>
-
+              
               <button
                 onClick={() => setFiltersExpanded(!filtersExpanded)}
                 className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 transition-colors"
@@ -460,7 +399,7 @@ export default function EnhancedStorageTab({
                   {enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length}
                 </span> itens
               </div>
-
+              
               {filteredStorageData.length > 0 && (
                 <div className="text-sm text-gray-600">
                   Valor total filtrado: <span className="font-semibold text-green-600">
@@ -472,49 +411,108 @@ export default function EnhancedStorageTab({
           )}
 
           {/* Storage Items Grid with ScrollArea */}
-            <ScrollArea className="h-[600px] w-full rounded-md border">
-              <div className="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-12 xl:grid-cols-16 gap-2 p-4">
-                {filteredStorageData.map((item) => {
-                  const rarity = (item.itemData as any).rarity || 'common';
-                  const rarityConfig = getRarityConfig(rarity);
-
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => handleItemClick(item)}
-                      className={`relative aspect-square bg-gradient-to-br ${rarityConfig.gradient} border-2 ${rarityConfig.border} rounded-lg cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center group overflow-hidden`}
-                      style={{
-                        boxShadow: `0 2px 10px ${rarityConfig.shadowColor}40`
-                      }}
-                    >
-                      {/* Rarity Background Pattern */}
-                      <div className={`absolute inset-0 opacity-10 ${rarityConfig.pattern}`}></div>
-
-                      {/* Item Icon */}
-                      <div className="relative z-10 text-center">
-                        <span className="text-2xl sm:text-3xl">{item.itemData.emoji}</span>
-                      </div>
-
-                      {/* Quantity Badge */}
-                      <div className="absolute bottom-1 right-1 bg-gray-900/80 text-white text-xs font-bold rounded px-1 min-w-[16px] text-center">
-                        {item.quantity > 999 ? '999+' : item.quantity}
-                      </div>
-
-                      {/* Rarity Indicator */}
-                      <div className={`absolute top-1 left-1 w-2 h-2 ${rarityConfig.bg} rounded-full opacity-80`}></div>
-
-                      {/* Type Indicator */}
-                      <div className="absolute top-1 right-1 text-xs opacity-70">
-                        {item.itemData.type === 'equipment' ? '⚔️' : '🌿'}
-                      </div>
-
-                      {/* Hover Tooltip */}
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-900/90 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
-                        {item.itemData.name}
+          <ScrollArea className="h-[600px] w-full rounded-md border">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 p-4">
+              {filteredStorageData.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white border border-gray-200 rounded-xl p-3 sm:p-5 hover:shadow-lg transition-all duration-200"
+                >
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                      <span className="text-2xl sm:text-4xl flex-shrink-0">{item.itemData.emoji}</span>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-bold text-gray-800 text-sm sm:text-base truncate">{item.itemData.name}</h4>
+                        <div className="flex items-center space-x-2">
+                          <span className={`text-xs sm:text-sm font-medium ${getTypeColor(item.itemData.type)}`}>
+                            {item.itemData.type === 'equipment' ? 'Equip.' : 'Recurso'}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
+                    <div className="text-right flex-shrink-0">
+                      <div className={`text-xl sm:text-3xl font-bold ${getTypeColor(item.itemData.type)}`}>
+                        {item.quantity}
+                      </div>
+                      <div className="text-xs text-gray-500">unid.</div>
+                    </div>
+                  </div>
+
+                  {/* Item Details */}
+                  <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-gray-600">Peso unit.:</span>
+                      <span className="font-semibold">
+                        {item.itemData.weight >= 1000 ? `${(item.itemData.weight / 1000).toFixed(1)}kg` : `${item.itemData.weight}g`}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-gray-600">Valor unit.:</span>
+                      <span className="font-semibold text-green-600">{item.itemData.value} 💰</span>
+                    </div>
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-gray-600">Peso total:</span>
+                      <span className="font-semibold">
+                        {(() => {
+                          const totalWeight = item.itemData.weight * item.quantity;
+                          return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="space-y-2">
+                    {/* First Row - Main Actions */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setWithdrawDialog({ 
+                          open: true, 
+                          item, 
+                          amount: Math.min(1, item.quantity) 
+                        })}
+                        disabled={isBlocked}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-2 sm:px-3 rounded-lg transition-colors text-xs sm:text-sm"
+                      >
+                        {item.itemData.type === 'equipment' ? '⚔️ Equipar' : '📦 Retirar'}
+                      </button>
+                      <button
+                        disabled={isBlocked}
+                        className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-2 sm:px-3 rounded-lg transition-colors text-xs sm:text-sm"
+                      >
+                        💰 Vender
+                      </button>
+                    </div>
+
+                    {/* Second Row - Consume Button (if consumable) */}
+                    {(isConsumable(item.itemData) || isConsumable({ id: item.resourceId, name: item.itemData?.name || '' })) && (
+                      <div className="space-y-1">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => consumeMutation.mutate(item.resourceId)}
+                          disabled={consumeMutation.isPending || isBlocked}
+                          className="bg-orange-600 hover:bg-orange-700 w-full"
+                        >
+                          {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
+                        </Button>
+                        <p className="text-xs text-gray-600 text-center">
+                          {getConsumableDescription(item.itemData)}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Item Value Display */}
+                  <div className="mt-3 pt-3 border-t border-gray-100 text-center">
+                    <span className="text-sm text-gray-600">
+                      Valor: <span className="font-semibold text-green-600">
+                        {item.totalValue.toLocaleString()} moedas
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                ))}
 
               {/* Empty State */}
               {filteredStorageData.length === 0 && enhancedStorageData.filter(item => item.itemData.name !== "Água Fresca").length === 0 && (
@@ -561,7 +559,7 @@ export default function EnhancedStorageTab({
               <span className="mr-3 text-3xl">💧</span>
               Sistema de Reservatórios
             </h3>
-
+            
             {/* Tank Status Info */}
             <div className="mb-8 text-center">
               <div className="text-lg font-semibold text-gray-700 mb-2">
@@ -572,7 +570,7 @@ export default function EnhancedStorageTab({
                 {(player.waterTanks || 0) > 0 && `Capacidade total: ${player.maxWaterStorage} unidades`}
               </div>
             </div>
-
+            
             <div className="flex flex-col lg:flex-row gap-8 items-center justify-center">
               {/* Multiple Water Tanks */}
               <div className="flex flex-wrap gap-4 items-end justify-center">
@@ -580,7 +578,7 @@ export default function EnhancedStorageTab({
                   const tankCapacity = 50;
                   const tankNumber = index + 1;
                   const isUnlocked = tankNumber <= (player.waterTanks || 0);
-
+                  
                   // Calculate water for this specific tank (sequential filling)
                   let tankWater = 0;
                   if (isUnlocked) {
@@ -588,9 +586,9 @@ export default function EnhancedStorageTab({
                     const remainingWater = Math.max(0, player.waterStorage - waterForPreviousTanks);
                     tankWater = Math.min(remainingWater, tankCapacity);
                   }
-
+                  
                   const fillPercentage = isUnlocked ? (tankWater / tankCapacity) * 100 : 0;
-
+                  
                   return (
                     <div key={index} className="flex flex-col items-center">
                       <div className="text-xs font-semibold text-gray-600 mb-2">
@@ -608,7 +606,7 @@ export default function EnhancedStorageTab({
                               className="absolute bottom-0 w-full bg-gradient-to-t from-blue-600 via-cyan-500 to-blue-400 transition-all duration-1000 ease-in-out rounded-b-lg"
                               style={{ height: `${fillPercentage}%` }}
                             />
-
+                            
                             {/* Water surface animation */}
                             {tankWater > 0 && (
                               <div 
@@ -619,7 +617,7 @@ export default function EnhancedStorageTab({
                                 }}
                               />
                             )}
-
+                            
                             {/* Tank markings */}
                             <div className="absolute inset-0 flex flex-col justify-between py-2">
                               {[100, 50, 0].map((mark) => (
@@ -638,7 +636,7 @@ export default function EnhancedStorageTab({
                           </div>
                         )}
                       </div>
-
+                      
                       {/* Tank Water Amount */}
                       <div className="mt-2 text-center">
                         <div className="text-xs font-bold text-blue-700">
@@ -660,7 +658,7 @@ export default function EnhancedStorageTab({
                         <span className="mr-2">🚰</span>
                         Controles de Água
                       </h4>
-
+                      
                       <div className="space-y-4">
                         {/* Consumption buttons */}
                         <div className="grid grid-cols-2 gap-3">
@@ -672,7 +670,7 @@ export default function EnhancedStorageTab({
                             <span className="text-lg">💧</span>
                             <span className="text-sm">Beber 10</span>
                           </button>
-
+                          
                           <button
                             onClick={() => consumeWaterMutation.mutate(25)}
                             disabled={player.waterStorage < 25 || consumeWaterMutation.isPending || isBlocked}
@@ -682,7 +680,7 @@ export default function EnhancedStorageTab({
                             <span className="text-sm">Beber 25</span>
                           </button>
                         </div>
-
+                        
                         {/* Custom amount */}
                         <div className="pt-2 border-t border-gray-200">
                           <label className="text-sm font-medium text-gray-700 block mb-2">
@@ -713,30 +711,30 @@ export default function EnhancedStorageTab({
                         <span className="mr-2">ℹ️</span>
                         Informações da Água
                       </h4>
-
+                      
                       <div className="space-y-3 text-sm">
                         <div className="flex justify-between items-center">
                           <span className="text-gray-600">Tanques ativos:</span>
                           <span className="font-semibold text-gray-800">{player.waterTanks} tanques</span>
                         </div>
-
+                        
                         <div className="flex justify-between items-center">
                           <span className="text-gray-600">Capacidade total:</span>
                           <span className="font-semibold text-gray-800">{player.maxWaterStorage} unidades</span>
                         </div>
-
+                        
                         <div className="flex justify-between items-center">
                           <span className="text-gray-600">Água disponível:</span>
                           <span className="font-semibold text-blue-600">{player.waterStorage} unidades</span>
                         </div>
-
+                        
                         <div className="flex justify-between items-center">
                           <span className="text-gray-600">Espaço livre:</span>
                           <span className="font-semibold text-green-600">
                             {player.maxWaterStorage - player.waterStorage} unidades
                           </span>
                         </div>
-
+                        
                         <div className="pt-3 border-t border-gray-200">
                           <p className="text-gray-700 text-xs leading-relaxed">
                             <strong>Sistema de enchimento sequencial:</strong> Os tanques enchem um por vez, completamente, antes de passar para o próximo.
@@ -751,12 +749,12 @@ export default function EnhancedStorageTab({
                       <span className="mr-2">🔒</span>
                       Sistema Bloqueado
                     </h4>
-
+                    
                     <div className="space-y-4 text-sm text-orange-700">
                       <p className="leading-relaxed">
                         Você ainda não possui tanques de água desbloqueados. Para começar a armazenar água, você precisa craftar um <strong>Barril Improvisado</strong>.
                       </p>
-
+                      
                       <div className="bg-orange-100 rounded-lg p-4">
                         <h5 className="font-semibold mb-2">🛢️ Barril Improvisado</h5>
                         <p className="text-xs mb-2">Ingredientes necessários:</p>
@@ -769,7 +767,7 @@ export default function EnhancedStorageTab({
                           Cada barril desbloqueie 1 tanque com capacidade de 50 unidades.
                         </p>
                       </div>
-
+                      
                       <p className="text-xs">
                         Vá até a aba <strong>Criação</strong> para craftar seu primeiro barril e começar a armazenar água!
                       </p>
@@ -788,13 +786,13 @@ export default function EnhancedStorageTab({
                 <div className="text-sm text-gray-600 font-medium">Tanques Ativos</div>
                 <div className="text-xs text-gray-500 mt-1">desbloqueados</div>
               </div>
-
+              
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-blue-100">
                 <div className="text-4xl font-bold text-blue-600 mb-2">{player.waterStorage}</div>
                 <div className="text-sm text-gray-600 font-medium">Água Disponível</div>
                 <div className="text-xs text-gray-500 mt-1">unidades armazenadas</div>
               </div>
-
+              
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-cyan-100">
                 <div className="text-4xl font-bold text-cyan-600 mb-2">
                   {player.maxWaterStorage > 0 ? Math.round((player.waterStorage / player.maxWaterStorage) * 100) : 0}%
@@ -802,7 +800,7 @@ export default function EnhancedStorageTab({
                 <div className="text-sm text-gray-600 font-medium">Sistema Preenchido</div>
                 <div className="text-xs text-gray-500 mt-1">capacidade utilizada</div>
               </div>
-
+              
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-green-100">
                 <div className="text-4xl font-bold text-green-600 mb-2">
                   {player.maxWaterStorage - player.waterStorage}
@@ -824,14 +822,14 @@ export default function EnhancedStorageTab({
               <span className="mr-3 text-2xl">📊</span>
               Estatísticas Detalhadas do Armazém
             </h3>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-blue-100">
                 <div className="text-4xl font-bold text-blue-600 mb-2">{storageStats.totalItems}</div>
                 <div className="text-sm text-gray-600 font-medium">Total de Itens</div>
                 <div className="text-xs text-gray-500 mt-1">Unidades armazenadas</div>
               </div>
-
+              
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-green-100">
                 <div className="text-4xl font-bold text-green-600 mb-2">
                   {storageStats.totalValue.toLocaleString()}
@@ -839,13 +837,13 @@ export default function EnhancedStorageTab({
                 <div className="text-sm text-gray-600 font-medium">Valor Total</div>
                 <div className="text-xs text-gray-500 mt-1">💰 moedas</div>
               </div>
-
+              
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-purple-100">
                 <div className="text-4xl font-bold text-purple-600 mb-2">{storageStats.uniqueTypes}</div>
                 <div className="text-sm text-gray-600 font-medium">Tipos Únicos</div>
                 <div className="text-xs text-gray-500 mt-1">Variedade de itens</div>
               </div>
-
+              
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-orange-100">
                 <div className="text-4xl font-bold text-orange-600 mb-2">
                   {storageStats.totalWeight.toFixed(1)}
@@ -862,20 +860,20 @@ export default function EnhancedStorageTab({
               <span className="mr-3 text-2xl">💧</span>
               Estatísticas do Reservatório de Água
             </h3>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-cyan-100">
                 <div className="text-4xl font-bold text-cyan-600 mb-2">{player.waterStorage || 0}</div>
                 <div className="text-sm text-gray-600 font-medium">Água Atual</div>
                 <div className="text-xs text-gray-500 mt-1">unidades disponíveis</div>
               </div>
-
+              
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-blue-100">
                 <div className="text-4xl font-bold text-blue-600 mb-2">{player.maxWaterStorage || 0}</div>
                 <div className="text-sm text-gray-600 font-medium">Capacidade Total</div>
                 <div className="text-xs text-gray-500 mt-1">máximo permitido</div>
               </div>
-
+              
               <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-green-100">
                 <div className="text-4xl font-bold text-green-600 mb-2">
                   {player.maxWaterStorage > 0 ? Math.round((player.waterStorage / player.maxWaterStorage) * 100) : 0}%
@@ -917,7 +915,7 @@ export default function EnhancedStorageTab({
               <span className="mr-3 text-2xl">📋</span>
               Breakdown por Categoria
             </h3>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Resources vs Equipment */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -960,7 +958,7 @@ export default function EnhancedStorageTab({
               <span className="mr-3 text-2xl">⚠️</span>
               Capacidade e Alertas
             </h3>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white rounded-xl p-6 shadow-sm border border-yellow-100">
                 <h4 className="font-semibold text-gray-700 mb-4">Status do Armazém</h4>
@@ -1022,7 +1020,7 @@ export default function EnhancedStorageTab({
                 </span>
               </p>
             </div>
-
+            
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="text-sm font-semibold text-gray-700">
@@ -1032,7 +1030,7 @@ export default function EnhancedStorageTab({
                   {withdrawDialog.amount}
                 </span>
               </div>
-
+              
               <div className="px-3 py-4">
                 <input
                   type="range"
@@ -1048,13 +1046,13 @@ export default function EnhancedStorageTab({
                     background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((withdrawDialog.amount - 1) / ((withdrawDialog.item?.quantity || 1) - 1)) * 100}%, #e5e7eb ${((withdrawDialog.amount - 1) / ((withdrawDialog.item?.quantity || 1) - 1)) * 100}%, #e5e7eb 100%)`
                   }}
                 />
-
+                
                 <div className="flex justify-between text-xs text-gray-500 mt-2">
                   <span>1</span>
                   <span>{withdrawDialog.item?.quantity || 1}</span>
                 </div>
               </div>
-
+              
               {/* Quick select buttons */}
               <div className="flex gap-2 mt-3">
                 <button
@@ -1099,21 +1097,6 @@ export default function EnhancedStorageTab({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Enhanced Item Modal */}
-      <EnhancedItemModal
-        isOpen={showItemModal}
-        onClose={() => {
-          console.log("Closing storage item modal");
-          setShowItemModal(false);
-          setModalItem(null);
-        }}
-        item={modalItem}
-        itemData={modalItem?.itemData || null}
-        playerId={playerId}
-        player={player}
-        location="storage"
-      />
     </div>
   );
 }

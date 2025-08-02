@@ -1,10 +1,10 @@
-
-// Item Details Modal - Enhanced with modern layout matching storage modal
+// Item Details Modal - Shows detailed information about an inventory item
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -27,50 +27,6 @@ interface ItemDetailsModalProps {
   player: Player;
 }
 
-// Rarity configurations with colors and effects
-const RARITY_CONFIG = {
-  common: { 
-    label: 'Comum', 
-    bg: 'bg-gray-100', 
-    border: 'border-gray-300', 
-    text: 'text-gray-700',
-    stars: 1,
-    gradient: 'from-gray-400 to-gray-600'
-  },
-  uncommon: { 
-    label: 'Incomum', 
-    bg: 'bg-green-100', 
-    border: 'border-green-300', 
-    text: 'text-green-700',
-    stars: 2,
-    gradient: 'from-green-400 to-green-600'
-  },
-  rare: { 
-    label: 'Raro', 
-    bg: 'bg-blue-100', 
-    border: 'border-blue-300', 
-    text: 'text-blue-700',
-    stars: 3,
-    gradient: 'from-blue-400 to-blue-600'
-  },
-  epic: { 
-    label: 'Épico', 
-    bg: 'bg-purple-100', 
-    border: 'border-purple-300', 
-    text: 'text-purple-700',
-    stars: 4,
-    gradient: 'from-purple-400 to-purple-600'
-  },
-  legendary: { 
-    label: 'Lendário', 
-    bg: 'bg-orange-100', 
-    border: 'border-orange-300', 
-    text: 'text-orange-700',
-    stars: 5,
-    gradient: 'from-orange-400 to-orange-600'
-  }
-};
-
 export function ItemDetailsModal({ 
   isOpen, 
   onClose, 
@@ -92,16 +48,9 @@ export function ItemDetailsModal({
     itemResourceId: item?.resourceId
   });
 
-  // Get rarity configuration
-  const rarity = (itemData as any)?.rarity || 'common';
-  const rarityConfig = RARITY_CONFIG[rarity as keyof typeof RARITY_CONFIG] || RARITY_CONFIG.common;
-
   // Check if item is consumable
   const itemIsConsumable = itemData ? isConsumable(itemData) : false;
   const consumableEffects = itemData ? getConsumableEffects(itemData) : null;
-
-  // Check if item is equipment
-  const isEquipment = itemData && 'slot' in itemData;
 
   const moveToStorageMutation = useMutation({
     mutationFn: async () => {
@@ -156,10 +105,16 @@ export function ItemDetailsModal({
       return response.json();
     },
     onSuccess: async (data) => {
+      // Force refresh all related queries with correct keys
       await queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       await queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       await queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
 
+      // Force immediate refetch
+      await queryClient.refetchQueries({ queryKey: [`/api/player/${playerId}`] });
+      await queryClient.refetchQueries({ queryKey: ["/api/inventory", playerId] });
+
+      // Reset consume quantity and close modal
       setConsumeQuantity(1);
       onClose();
 
@@ -167,7 +122,7 @@ export function ItemDetailsModal({
       const thirstGain = data.thirstRestored || 0;
 
       toast({
-        title: "Item Consumido!",
+        title: "✅ Item Consumido!",
         description: `${consumeQuantity}x ${itemData?.name}${
           hungerGain > 0 || thirstGain > 0 ? 
           ` • Fome: +${hungerGain} • Sede: +${thirstGain}` : 
@@ -191,18 +146,7 @@ export function ItemDetailsModal({
 
   if (!itemData) {
     console.log("[ITEM_MODAL] No item data provided for item:", item);
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-[480px] max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Item não encontrado</DialogTitle>
-          </DialogHeader>
-          <div className="p-6">
-            <p>Não foi possível carregar os dados deste item.</p>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
+    // Still render modal but show error message
   }
 
   const maxMoveQuantity = item.quantity;
@@ -210,162 +154,88 @@ export function ItemDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[480px] max-w-lg p-0 overflow-hidden">
-        {/* Header with gradient background */}
-        <div className={`bg-gradient-to-r ${rarityConfig.gradient} text-white p-6 relative overflow-hidden`}>
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
+      <DialogContent className="w-96 max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="text-center flex items-center justify-center space-x-2">
+            <span className="text-3xl">{itemData?.emoji || "❓"}</span>
+            <span>{itemData?.name || "Item Desconhecido"}</span>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {!itemData && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-700 text-sm">
+                ⚠️ Dados do item não encontrados. ID do recurso: {item.resourceId}
+              </p>
+            </div>
+          )}
           
-          <DialogHeader className="relative z-10">
-            <div className="flex items-center space-x-4">
-              <div className="text-6xl drop-shadow-lg">
-                {itemData.emoji || "❓"}
+          {/* Item Information */}
+          {itemData && (
+            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Quantidade:</span>
+                <span className="font-semibold">{item.quantity}</span>
               </div>
-              <div className="flex-1">
-                <DialogTitle className="text-2xl font-bold text-white mb-2">
-                  {itemData.name}
-                </DialogTitle>
-                
-                {/* Rarity Badge with Stars */}
-                <div className="flex items-center space-x-2">
-                  <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                    {rarityConfig.label}
-                  </Badge>
-                  <div className="flex text-yellow-300">
-                    {Array.from({ length: rarityConfig.stars }).map((_, i) => (
-                      <span key={i} className="text-lg">★</span>
-                    ))}
-                    {Array.from({ length: 5 - rarityConfig.stars }).map((_, i) => (
-                      <span key={i} className="text-lg opacity-30">☆</span>
-                    ))}
-                  </div>
-                </div>
 
-                {/* Item Type */}
-                <div className="text-sm opacity-90 mt-1">
-                  {isEquipment ? `Equipamento • ${(itemData as Equipment).slot}` : 
-                   `Recurso • ${(itemData as Resource).category}`}
-                </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Peso unitário:</span>
+                <span className="font-semibold">
+                  {itemData.weight >= 1000 ? `${(itemData.weight / 1000).toFixed(1)}kg` : `${itemData.weight}g`}
+                </span>
               </div>
-            </div>
-          </DialogHeader>
-        </div>
 
-        <div className="p-6 space-y-6">
-          {/* Item Description & Stats */}
-          <div className="space-y-4">
-            {/* Basic Info Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className={`p-4 rounded-lg ${rarityConfig.bg} ${rarityConfig.border} border`}>
-                <div className="text-sm text-gray-600 mb-1">Quantidade Possuída</div>
-                <div className="text-2xl font-bold">{item.quantity.toLocaleString()}</div>
+            <div className="flex justify-between">
+                <span className="text-gray-600">Peso total:</span>
+                <span className="font-semibold">
+                  {(() => {
+                    const totalWeight = itemData.weight * item.quantity;
+                    return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
+                  })()}
+                </span>
               </div>
-              
-              <div className={`p-4 rounded-lg ${rarityConfig.bg} ${rarityConfig.border} border`}>
-                <div className="text-sm text-gray-600 mb-1">Valor Total</div>
-                <div className="text-2xl font-bold text-green-600">
-                  {((itemData.sellPrice || itemData.value || 0) * item.quantity).toLocaleString()}
-                  <span className="text-sm font-normal ml-1">moedas</span>
-                </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-600">Valor unitário:</span>
+                <span className="font-semibold">{itemData.sellPrice || itemData.value || 0} moedas</span>
               </div>
-            </div>
 
-            {/* Detailed Stats */}
-            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-              <h3 className="font-semibold text-gray-800 mb-3">Informações Detalhadas</h3>
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Peso unitário:</span>
-                  <span className="font-medium">
-                    {itemData.weight >= 1000 ? 
-                      `${(itemData.weight / 1000).toFixed(2)}kg` : 
-                      `${itemData.weight.toFixed(2)}g`}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Peso total:</span>
-                  <span className="font-medium">
-                    {(() => {
-                      const totalWeight = itemData.weight * item.quantity;
-                      return totalWeight >= 1000 ? 
-                        `${(totalWeight / 1000).toFixed(2)}kg` : 
-                        `${totalWeight.toFixed(2)}g`;
-                    })()}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Valor unitário:</span>
-                  <span className="font-medium text-green-600">
-                    {(itemData.sellPrice || itemData.value || 0).toLocaleString()} moedas
-                  </span>
-                </div>
-
-                {isEquipment && (
-                  <>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Durabilidade:</span>
-                      <span className="font-medium">
-                        {(itemData as Equipment).attributes?.durability || 100}%
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Eficiência:</span>
-                      <span className="font-medium">
-                        {(itemData as Equipment).attributes?.efficiency || 100}%
-                      </span>
-                    </div>
-                  </>
-                )}
+              <div className="flex justify-between">
+                <span className="text-gray-600">Valor total:</span>
+                <span className="font-semibold">{(itemData.sellPrice || itemData.value || 0) * item.quantity} moedas</span>
               </div>
-            </div>
 
-            {/* Consumable Effects */}
-            {itemIsConsumable && consumableEffects && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h3 className="font-semibold text-green-800 mb-3 flex items-center">
-                  <span className="mr-2">🍃</span>
-                  Efeitos de Consumo
-                </h3>
-                <div className="grid grid-cols-2 gap-3 text-sm">
+              {/* Consumable Effects */}
+              {itemIsConsumable && consumableEffects && (
+                <div className="border-t pt-2 mt-2">
+                  <div className="text-sm font-medium text-green-700 mb-1">Efeitos de Consumo:</div>
                   {consumableEffects.hungerRestore > 0 && (
-                    <div className="flex items-center justify-between bg-white rounded p-2">
-                      <span className="text-gray-600 flex items-center">
-                        <span className="mr-2">🍖</span>Restaura Fome
-                      </span>
-                      <span className="font-bold text-green-600">+{consumableEffects.hungerRestore}</span>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Restaura Fome:</span>
+                      <span className="text-green-600">+{consumableEffects.hungerRestore}</span>
                     </div>
                   )}
                   {consumableEffects.thirstRestore > 0 && (
-                    <div className="flex items-center justify-between bg-white rounded p-2">
-                      <span className="text-gray-600 flex items-center">
-                        <span className="mr-2">💧</span>Restaura Sede
-                      </span>
-                      <span className="font-bold text-blue-600">+{consumableEffects.thirstRestore}</span>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Restaura Sede:</span>
+                      <span className="text-blue-600">+{consumableEffects.thirstRestore}</span>
                     </div>
                   )}
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
-          {/* Actions Section */}
-          <div className="space-y-4">
-            <div className="border-t pt-4">
-              <h3 className="font-semibold text-gray-800 mb-4">Ações Disponíveis</h3>
-              
-              {/* Consumable Actions */}
-              {itemIsConsumable && (
-                <div className="space-y-3 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Quantidade para consumir: {consumeQuantity}</span>
-                    <span className="text-xs text-gray-500">Max: {maxConsumeQuantity}</span>
-                  </div>
+          {/* Actions */}
+          <div className="space-y-3">
+            {/* Consume Action */}
+            {itemIsConsumable && (
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label htmlFor="consume-quantity">Consumir: {consumeQuantity}</Label>
                   <Slider
+                    id="consume-quantity"
                     min={1}
                     max={maxConsumeQuantity}
                     step={1}
@@ -373,27 +243,27 @@ export function ItemDetailsModal({
                     onValueChange={(value) => setConsumeQuantity(value[0])}
                     className="w-full"
                   />
-                  
-                  <Button 
-                    onClick={() => consumeMutation.mutate()}
-                    disabled={consumeMutation.isPending}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    {consumeMutation.isPending ? 
-                      "Consumindo..." : 
-                      `🍃 Consumir ${consumeQuantity}x`
-                    }
-                  </Button>
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>1</span>
+                    <span>{maxConsumeQuantity}</span>
+                  </div>
                 </div>
-              )}
+                <Button 
+                  onClick={() => consumeMutation.mutate()}
+                  disabled={consumeMutation.isPending || consumeQuantity > maxConsumeQuantity}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  {consumeMutation.isPending ? "Consumindo..." : `Consumir ${consumeQuantity}x`}
+                </Button>
+              </div>
+            )}
 
-              {/* Move to Storage Actions */}
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Quantidade para mover: {moveQuantity}</span>
-                  <span className="text-xs text-gray-500">Max: {maxMoveQuantity}</span>
-                </div>
+            {/* Move to Storage Action */}
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="move-quantity">Mover para Armazém: {moveQuantity}</Label>
                 <Slider
+                  id="move-quantity"
                   min={1}
                   max={maxMoveQuantity}
                   step={1}
@@ -401,51 +271,53 @@ export function ItemDetailsModal({
                   onValueChange={(value) => setMoveQuantity(value[0])}
                   className="w-full"
                 />
-
-                <Button 
-                  onClick={() => moveToStorageMutation.mutate()}
-                  disabled={moveToStorageMutation.isPending}
-                  variant="outline"
-                  className="w-full"
-                >
-                  {moveToStorageMutation.isPending ? 
-                    "Movendo..." : 
-                    `📦 Mover ${moveQuantity}x para Armazém`
-                  }
-                </Button>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>1</span>
+                  <span>{maxMoveQuantity}</span>
+                </div>
               </div>
-
-              {/* Quick Actions */}
-              <div className="flex space-x-2 mt-3">
-                {itemIsConsumable && (
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      setConsumeQuantity(1);
-                      consumeMutation.mutate();
-                    }}
-                    disabled={consumeMutation.isPending}
-                    className="flex-1"
-                  >
-                    Consumir 1
-                  </Button>
-                )}
-                
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => {
-                    setMoveQuantity(item.quantity);
-                    moveToStorageMutation.mutate();
-                  }}
-                  disabled={moveToStorageMutation.isPending}
-                  className="flex-1"
-                >
-                  Mover Tudo
-                </Button>
-              </div>
+              <Button 
+                onClick={() => moveToStorageMutation.mutate()}
+                disabled={moveToStorageMutation.isPending || moveQuantity > maxMoveQuantity}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                {moveToStorageMutation.isPending ? "Movendo..." : `→ Armazém ${moveQuantity}x`}
+              </Button>
             </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex space-x-2 pt-2 border-t">
+            {itemIsConsumable && (
+              <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                if (item && itemData && isConsumable(itemData)) {
+                  setConsumeQuantity(1);
+                  consumeMutation.mutate();
+                }
+              }}
+              disabled={consumeMutation.isPending || !itemIsConsumable}
+              className="flex-1"
+            >
+              {consumeMutation.isPending ? "..." : "Consumir 1"}
+            </Button>
+            )}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                if (item) {
+                  setMoveQuantity(item.quantity);
+                  moveToStorageMutation.mutate();
+                }
+              }}
+              disabled={moveToStorageMutation.isPending}
+              className="flex-1"
+            >
+              {moveToStorageMutation.isPending ? "..." : "Mover Tudo"}
+            </Button>
           </div>
         </div>
       </DialogContent>

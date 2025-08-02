@@ -2,19 +2,25 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useInventoryManager } from "@/hooks/useInventoryManager";
+import { useGameData } from "@/hooks/useGamePolling";
 import { ItemFinder } from "@shared/utils/item-finder";
 import { CacheManager } from "@shared/utils/cache-manager";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import EquipmentSelectorModal from "./equipment-selector-modal";
-import { EnhancedItemModal } from "./enhanced-item-modal";
-import InventoryToolbar from "./inventory-toolbar";
-import InventoryGrid from "./inventory-grid";
+import { ItemDetailsModal } from "./item-details-modal";
 import { isConsumable, getConsumableDescription, getConsumableEffects } from "@shared/utils/consumable-utils";
 import type { Resource, Equipment, Player } from "@shared/types";
-import type { EnhancedInventoryItem } from "@shared/types/inventory-types";
+
+interface InventoryItem {
+  id: string;
+  resourceId: string;
+  quantity: number;
+}
 
 interface EnhancedInventoryProps {
   playerId: string;
@@ -31,23 +37,33 @@ export default function EnhancedInventory({
   player,
   isBlocked = false
 }: EnhancedInventoryProps) {
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [equipmentModalOpen, setEquipmentModalOpen] = useState(false);
+  const [showItemModal, setShowItemModal] = useState(false);
+  const [modalItem, setModalItem] = useState<InventoryItem | null>(null);
   const [selectedEquipmentSlot, setSelectedEquipmentSlot] = useState<{
     id: string;
     name: string;
     equipped: string | null;
   } | null>(null);
-  const [equipmentModalOpen, setEquipmentModalOpen] = useState(false);
-  const [showItemModal, setShowItemModal] = useState(false);
-  const [modalItem, setModalItem] = useState<EnhancedInventoryItem | null>(null);
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-
   const { toast } = useToast();
 
   // Initialize ItemFinder with current data
   ItemFinder.initialize(resources, equipment);
+  
+  // Use unified game data hook
+  const { inventory: inventoryData = [] } = useGameData({ playerId });
 
-  // Use the new inventory manager hook
-  const inventoryManager = useInventoryManager(playerId, resources, equipment, player);
+  // Use centralized item finder
+  const getResourceById = ItemFinder.getResourceById;
+  const getItemById = ItemFinder.getItemById;
+
+  // Filter out water from inventory since it goes to special compartment
+  const inventory = inventoryData.filter(item => {
+    const resource = getResourceById(item.resourceId);
+    return resource && resource.name !== "Água Fresca";
+  });
 
   // Equipment slots configuration
   const equipmentSlots = [
@@ -95,6 +111,11 @@ export default function EnhancedInventory({
     },
   ];
 
+  // Main inventory: 9x4 grid (36 slots)
+  const inventoryRows = 4;
+  const inventoryCols = 9;
+  const totalSlots = inventoryRows * inventoryCols;
+
   const getEquipmentById = (id: string) => equipment.find(e => e.id === id);
 
   const equipItemMutation = useMutation({
@@ -126,7 +147,7 @@ export default function EnhancedInventory({
     mutationFn: () => apiRequest("POST", `/api/storage/store-all/${playerId}`),
     onSuccess: async () => {
       await CacheManager.updateAfterMutation(playerId);
-      setSelectedItemId(null);
+      setSelectedItem(null);
       toast({
         title: "Sucesso!",
         description: "Todos os itens foram armazenados.",
@@ -143,9 +164,9 @@ export default function EnhancedInventory({
 
   const moveToStorageMutation = useMutation({
     mutationFn: async (itemId: string) => {
-      const item = inventoryManager.rawInventory.find(i => i.id === itemId);
+      const item = inventory.find(i => i.id === itemId);
       if (!item) throw new Error("Item não encontrado");
-
+      
       const response = await apiRequest('POST', `/api/storage/store/${itemId}`, {
         playerId: player.id,
         quantity: item.quantity
@@ -156,7 +177,7 @@ export default function EnhancedInventory({
       queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
       queryClient.invalidateQueries({ queryKey: ["/api/player", playerId] });
-      setSelectedItemId(null);
+      setSelectedItem(null);
       toast({
         title: "Item movido",
         description: "Item transferido para o armazém.",
@@ -172,12 +193,18 @@ export default function EnhancedInventory({
   });
 
   const consumeMutation = useMutation({
-    mutationFn: async (item: EnhancedInventoryItem) => {
-      const effects = getConsumableEffects(item.itemData);
-
+    mutationFn: async (itemId: string) => {
+      const item = inventory.find(i => i.id === itemId);
+      if (!item) throw new Error("Item não encontrado");
+      
+      const itemData = getItemById(item.resourceId);
+      if (!itemData) throw new Error("Dados do item não encontrados");
+      
+      const effects = getConsumableEffects(itemData);
+      
       const response = await apiRequest('POST', `/api/player/${playerId}/consume`, {
-        itemId: item.item.resourceId,
-        inventoryItemId: item.item.id,
+        itemId: item.resourceId,
+        inventoryItemId: item.id,
         quantity: 1,
         location: 'inventory',
         hungerRestore: effects.hungerRestore,
@@ -187,7 +214,7 @@ export default function EnhancedInventory({
     },
     onSuccess: async (data) => {
       await CacheManager.updateAfterMutation(playerId);
-      setSelectedItemId(null);
+      setSelectedItem(null);
       toast({
         title: "Item consumido!",
         description: data.hungerRestored || data.thirstRestored ? 
@@ -199,28 +226,33 @@ export default function EnhancedInventory({
       toast({
         title: "Erro",
         description: error.message || "Não foi possível consumir o item.",
-        variant: "destructive"
+        variant: "destructive"structive"
       });
     }
   });
 
-  const handleEquipmentSlotClick = (slotId: string) => {
-    const slot = equipmentSlots.find(s => s.id === slotId);
-    if (slot) {
-      setSelectedEquipmentSlot({
-        id: slot.id,
-        name: slot.name,
-        equipped: slot.equipped || null
-      });
-      setEquipmentModalOpen(true);
+  const handleSlotClick = (slotId: string, slotType: "inventory" | "equipment") => {
+    if (slotType === "inventory") {
+      const slotIndex = parseInt(slotId.replace('inv-', ''));
+      const item = inventory[slotIndex];
+      setSelectedItem(item || null);
+      setSelectedSlot(slotId);
+    } else if (slotType === "equipment") {
+      // Find the equipment slot data
+      const slot = equipmentSlots.find(s => s.id === slotId);
+      if (slot) {
+        setSelectedEquipmentSlot({
+          id: slot.id,
+          name: slot.name,
+          equipped: slot.equipped
+        });
+        setEquipmentModalOpen(true);
+      }
     }
   };
 
-  const handleItemClick = (item: EnhancedInventoryItem) => {
-    setSelectedItemId(item.item.id);
-  };
-
-  const handleItemDoubleClick = (item: EnhancedInventoryItem) => {
+  const handleItemClick = (item: InventoryItem, itemData: Resource | Equipment) => {
+    console.log("Item clicked - opening modal:", item, itemData);
     setModalItem(item);
     setShowItemModal(true);
   };
@@ -229,7 +261,119 @@ export default function EnhancedInventory({
     equipItemMutation.mutate({ slot, equipmentId });
   };
 
-  const selectedItem = inventoryManager.findItemById(selectedItemId || '');
+  const renderEquipmentSlot = (slot: typeof equipmentSlots[0]) => {
+    const equippedItem = slot.equipped ? getEquipmentById(slot.equipped) : null;
+    
+    return (
+      <TooltipProvider key={slot.id}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              onClick={() => handleSlotClick(slot.id, "equipment")}
+              className={`
+                aspect-square border-2 rounded-lg flex flex-col items-center justify-center
+                cursor-pointer transition-all hover:scale-105 hover:border-blue-400
+                ${equippedItem ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-dashed border-gray-300"}
+              `}
+            >
+              {equippedItem ? (
+                <>
+                  <span className="text-2xl mb-1">{equippedItem.emoji}</span>
+                  <span className="text-xs font-semibold text-center px-1">
+                    {equippedItem.name}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="text-2xl mb-1 opacity-50">{slot.emoji}</span>
+                  <span className="text-xs text-gray-500 text-center">{slot.name}</span>
+                </>
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="text-center">
+              <p className="font-semibold">{slot.name}</p>
+              {equippedItem ? (
+                <div>
+                  <p className="text-sm">{equippedItem.effect}</p>
+                  <p className="text-xs text-gray-500">Peso: {equippedItem.weight}kg</p>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">Slot vazio</p>
+              )}
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
+
+  const renderInventorySlot = (slotIndex: number) => {
+    const item = inventory[slotIndex];
+    const itemData = item ? getItemById(item.resourceId) : null;
+    
+    return (
+      <TooltipProvider key={slotIndex}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              onClick={() => {
+                if (item && itemData) {
+                  handleItemClick(item, itemData);
+                } else {
+                  handleSlotClick(`inv-${slotIndex}`, "inventory");
+                }
+              }}
+              className={`
+                aspect-square border-2 rounded-lg flex flex-col items-center justify-center
+                cursor-pointer transition-all hover:scale-105 relative
+                ${selectedSlot === `inv-${slotIndex}` ? "border-forest bg-green-50 shadow-lg" : "border-gray-300"}
+                ${item ? "bg-white border-solid" : "bg-gray-50 border-dashed"}
+              `}
+            >
+              {itemData && item ? (
+                <>
+                  <span className="text-xl">{itemData.emoji}</span>
+                  <span className="absolute bottom-1 right-1 text-xs font-bold bg-gray-800 text-white rounded px-1">
+                    {item.quantity}
+                  </span>
+                  {'rarity' in itemData && itemData.rarity === "rare" && (
+                    <div className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full"></div>
+                  )}
+                  {'rarity' in itemData && itemData.rarity === "uncommon" && (
+                    <div className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></div>
+                  )}
+                </>
+              ) : (
+                <span className="text-gray-300 text-lg">•</span>
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            {itemData && item ? (
+              <div>
+                <p className="font-semibold">{itemData.name}</p>
+                <p className="text-sm">Quantidade: {item.quantity}</p>
+                <p className="text-sm">Peso: {itemData.weight * item.quantity}kg</p>
+                {'rarity' in itemData && (
+                  <Badge variant={
+                    itemData.rarity === "rare" ? "destructive" : 
+                    itemData.rarity === "uncommon" ? "secondary" : "outline"
+                  } className="text-xs">
+                    {itemData.rarity === "common" ? "Comum" : 
+                     itemData.rarity === "uncommon" ? "Incomum" : "Raro"}
+                  </Badge>
+                )}
+              </div>
+            ) : (
+              <p>Slot vazio</p>
+            )}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -260,6 +404,40 @@ export default function EnhancedInventory({
             </div>
           </CardTitle>
         </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span>Capacidade do Inventário:</span>
+                <span>{player.inventoryWeight}kg / {player.maxInventoryWeight}kg</span>
+              </div>
+              <Progress 
+                value={(player.inventoryWeight / player.maxInventoryWeight) * 100} 
+                className="w-full h-2"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span>Fome:</span>
+                <span>{Math.round((player.hunger / player.maxHunger) * 100)}%</span>
+              </div>
+              <Progress 
+                value={(player.hunger / player.maxHunger) * 100} 
+                className="w-full h-2"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span>Sede:</span>
+                <span>{Math.round((player.thirst / player.maxThirst) * 100)}%</span>
+              </div>
+              <Progress 
+                value={(player.thirst / player.maxThirst) * 100} 
+                className="w-full h-2"
+              />
+            </div>
+          </div>
+        </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -278,21 +456,40 @@ export default function EnhancedInventory({
               <div></div>
               {renderEquipmentSlot(equipmentSlots[0])}
               <div></div>
-
+              
               {/* Row 1: Weapon, Chestplate, Tool */}
               {renderEquipmentSlot(equipmentSlots[4])}
               {renderEquipmentSlot(equipmentSlots[1])}
               {renderEquipmentSlot(equipmentSlots[5])}
-
+              
               {/* Row 2: Leggings */}
               <div></div>
               {renderEquipmentSlot(equipmentSlots[2])}
               <div></div>
-
+              
               {/* Row 3: Boots */}
               <div></div>
               {renderEquipmentSlot(equipmentSlots[3])}
               <div></div>
+            </div>
+            
+            <Separator className="my-4" />
+            
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-2">💡 Equipamentos ativos:</p>
+              <div className="space-y-1">
+                {equipmentSlots.filter(slot => slot.equipped).map(slot => {
+                  const equippedItem = getEquipmentById(slot.equipped!);
+                  return equippedItem ? (
+                    <Badge key={slot.id} variant="outline" className="block">
+                      {equippedItem.emoji} {equippedItem.name}
+                    </Badge>
+                  ) : null;
+                })}
+                {equipmentSlots.filter(slot => slot.equipped).length === 0 && (
+                  <p className="text-xs text-gray-500">Nenhum equipamento ativo</p>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -305,75 +502,107 @@ export default function EnhancedInventory({
                 <span>🎒</span>
                 Inventário Principal
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => storeAllMutation.mutate()}
+                disabled={inventory.length === 0 || isBlocked || storeAllMutation.isPending}
+              >
+                📦 Guardar Tudo
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Inventory Toolbar */}
-            <InventoryToolbar
-              filters={inventoryManager.filters}
-              sorting={inventoryManager.sorting}
-              stats={{
-                totalCount: inventoryManager.totalCount,
-                filteredCount: inventoryManager.filteredCount,
-                hasActiveFilters: inventoryManager.hasActiveFilters
-              }}
-              onFiltersChange={inventoryManager.updateFilters}
-              onSortingChange={inventoryManager.updateSorting}
-              onClearFilters={inventoryManager.clearFilters}
-              onBulkActions={{
-                onStoreAll: () => storeAllMutation.mutate()
-              }}
-            />
-
             {/* Inventory Grid */}
-            <InventoryGrid
-              items={inventoryManager.inventory}
-              constraints={inventoryManager.constraints}
-              selectedItemId={selectedItemId}
-              onItemClick={handleItemClick}
-              onItemDoubleClick={handleItemDoubleClick}
-              isBlocked={isBlocked}
-            />
+            <div className="grid grid-cols-6 md:grid-cols-9 gap-1 md:gap-2 mb-4">
+              {Array.from({ length: totalSlots }, (_, i) => renderInventorySlot(i))}
+            </div>
 
             {/* Item Details Panel */}
             {selectedItem && (
-              <Card className="bg-gray-50 mt-4">
+              <Card className="bg-gray-50">
                 <CardContent className="pt-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{selectedItem.itemData.emoji}</span>
-                      <div>
-                        <h4 className="font-semibold text-lg">{selectedItem.itemData.name}</h4>
-                        <p className="text-sm text-gray-600">
-                          Quantidade: {selectedItem.item.quantity} • Peso total: {selectedItem.totalWeight.toFixed(1)}g
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Valor total: {selectedItem.totalValue} moedas
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      {selectedItem.isConsumable && (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => consumeMutation.mutate(selectedItem)}
-                          disabled={consumeMutation.isPending || isBlocked}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => moveToStorageMutation.mutate(selectedItem.item.id)}
-                        disabled={moveToStorageMutation.isPending || isBlocked}
-                      >
-                        {moveToStorageMutation.isPending ? "Movendo..." : "→ Armazém"}
-                      </Button>
-                    </div>
-                  </div>
+                  {(() => {
+                    const itemData = getItemById(selectedItem.resourceId);
+                    if (itemData) {
+                      const isResource = 'rarity' in itemData;
+                      const isEquipment = 'slot' in itemData;
+                      return (
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="text-3xl">{itemData.emoji}</span>
+                            <div>
+                              <h4 className="font-semibold text-lg">{itemData.name}</h4>
+                              <p className="text-sm text-gray-600">
+                                Quantidade: {selectedItem.quantity} • Peso total: {(() => {
+                                  const totalWeight = itemData.weight * selectedItem.quantity;
+                                  return totalWeight >= 1000 ? `${(totalWeight / 1000).toFixed(1)}kg` : `${totalWeight}g`;
+                                })()}
+                              </p>
+                              {isResource && 'value' in itemData && (
+                                <p className="text-sm text-gray-600">
+                                  Valor unitário: {itemData.value} moedas
+                                </p>
+                              )}
+                              <div className="flex gap-2 mt-2">
+                                {isResource && 'rarity' in itemData && (
+                                  <Badge variant={
+                                    itemData.rarity === "rare" ? "destructive" : 
+                                    itemData.rarity === "uncommon" ? "secondary" : "outline"
+                                  }>
+                                    {itemData.rarity === "common" ? "Comum" : 
+                                     itemData.rarity === "uncommon" ? "Incomum" : "Raro"}
+                                  </Badge>
+                                )}
+                                {isResource && 'type' in itemData && (
+                                  <Badge variant="outline">
+                                    {itemData.type === "basic" ? "Básico" : "Único"}
+                                  </Badge>
+                                )}
+                                {isEquipment && (
+                                  <Badge variant="secondary">
+                                    Equipamento
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            {/* Show consume button for consumable items */}
+                            {itemData && isConsumable(itemData) && (
+                              <div className="space-y-1">
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() => consumeMutation.mutate(selectedItem.resourceId)}
+                                  disabled={consumeMutation.isPending || isBlocked}
+                                  className="bg-green-600 hover:bg-green-700 w-full"
+                                  data-testid="button-consume-item"
+                                >
+                                  {consumeMutation.isPending ? "Consumindo..." : "🍽️ Consumir"}
+                                </Button>
+                                <p className="text-xs text-gray-600 text-center">
+                                  {getConsumableDescription(itemData)}
+                                </p>
+                              </div>
+                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => moveToStorageMutation.mutate(selectedItem.id)}
+                              disabled={moveToStorageMutation.isPending || isBlocked}
+                            >
+                              {moveToStorageMutation.isPending ? "Movendo..." : isBlocked ? "🚫 Bloqueado" : "→ Armazém"}
+                            </Button>
+                            <Button variant="outline" size="sm" disabled>
+                              🗑️ Descartar
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </CardContent>
               </Card>
             )}
@@ -428,18 +657,18 @@ export default function EnhancedInventory({
         />
       )}
 
-      {/* Enhanced Item Modal */}
-      <EnhancedItemModal
+      {/* Item Details Modal */}
+      <ItemDetailsModal
         isOpen={showItemModal}
         onClose={() => {
+          console.log("Closing item modal");
           setShowItemModal(false);
           setModalItem(null);
         }}
-        item={modalItem?.item || null}
-        itemData={modalItem?.itemData || null}
+        item={modalItem}
+        itemData={modalItem ? getItemById(modalItem.resourceId) || null : null}
         playerId={playerId}
         player={player}
-        location="inventory"
       />
     </div>
   );

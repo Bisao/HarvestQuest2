@@ -41,14 +41,13 @@ export default function ExpeditionPanel({
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
-  const biome = biomes?.find(b => b.id === expedition.biomeId) || null;
+  const biome = biomes.find(b => b.id === expedition.biomeId);
   const isCompleted = currentProgress >= 100;
 
   // Query player data for real-time hunger/thirst monitoring
   const { data: player } = useQuery<Player>({
     queryKey: [`/api/player/${expedition.id.split('-')[0]}`], // Use expedition creator ID
     refetchInterval: 2000, // Refetch every 2 seconds for real-time monitoring
-    enabled: !!expedition.id
   });
 
   // Complete expedition mutation  
@@ -67,7 +66,7 @@ export default function ExpeditionPanel({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/player/${expedition.id.split('-')[0]}`] });
-
+      
       if (isAutoRepeat) {
         // Auto-repeat mode: restart expedition immediately
         setTimeout(() => {
@@ -77,7 +76,7 @@ export default function ExpeditionPanel({
           // Update expedition start time for new cycle
           expedition.startTime = Date.now();
         }, 500);
-
+        
         toast({
           title: "Auto-Repetição",
           description: "Nova expedição iniciada automaticamente!",
@@ -117,9 +116,9 @@ export default function ExpeditionPanel({
     intervalRef.current = setInterval(() => {
       const elapsed = Date.now() - expedition.startTime;
       const progressPercent = Math.min((elapsed / expedition.estimatedDuration) * 100, 100);
-
+      
       setCurrentProgress(progressPercent);
-
+      
       // Simulate resource collection in real-time
       if (progressPercent > 0) {
         const newCollected: Record<string, number> = {};
@@ -132,11 +131,11 @@ export default function ExpeditionPanel({
         });
         setCollectedResources(newCollected);
       }
-
+      
       if (progressPercent >= 100) {
         clearInterval(intervalRef.current!);
         intervalRef.current = null;
-
+        
         // Handle auto-repeat - but check if player has sufficient hunger/thirst
         if (isAutoRepeat) {
           if (player && (player.hunger <= 0 || player.thirst <= 0)) {
@@ -196,13 +195,13 @@ export default function ExpeditionPanel({
       if (player.hunger <= 0 || player.thirst <= 0) {
         setIsAutoRepeat(false);
         setAutoRepeatCountdown(0);
-
+        
         // Clear any active countdown
         if (countdownRef.current) {
           clearInterval(countdownRef.current);
           countdownRef.current = null;
         }
-
+        
         toast({
           title: "Auto-Repetição Desativada",
           description: player.hunger <= 0 
@@ -214,54 +213,9 @@ export default function ExpeditionPanel({
     }
   }, [player?.hunger, player?.thirst, isAutoRepeat, toast]);
 
-  // Get resource info for display using enhanced mapping
+  // Get resource info for display
   const getResourceInfo = (resourceId: string) => {
-    // First try to find in provided resources array
-    const found = resources.find(r => r.id === resourceId);
-    if (found) return found;
-
-    // Enhanced fallback mapping using exact IDs from game-ids.ts
-    const resourceMap: Record<string, { name: string; emoji: string }> = {
-      // Basic resources (matching exact game-ids.ts)
-      "res-a1b2c3d4-e5f6-4789-abc1-234567890123": { name: "Fibra", emoji: "🌾" },
-      "res-b2c3d4e5-f6a7-4890-bcd2-345678901234": { name: "Pedra", emoji: "🪨" },
-      "res-c3d4e5f6-a7b8-4901-cde3-456789012345": { name: "Pedras Soltas", emoji: "🪨" },
-      "res-d4e5f6a7-b8c9-4012-def4-567890123456": { name: "Gravetos", emoji: "🪵" },
-      "res-e5f6a7b8-c9d0-4123-efa5-678901234567": { name: "Água Fresca", emoji: "💧" },
-      "res-f6a7b8c9-d0e1-4234-fab6-789012345678": { name: "Bambu", emoji: "🎋" },
-      "res-a7b8c9d0-e1f2-4345-abc7-890123456789": { name: "Madeira", emoji: "🌳" },
-      "res-b8c9d0e1-f2a3-4456-bcd8-901234567890": { name: "Argila", emoji: "🧱" },
-      "res-c9d0e1f2-a3b4-4567-cde9-012345678901": { name: "Ferro Fundido", emoji: "⚙️" },
-      "res-d0e1f2a3-b4c5-4678-def0-123456789012": { name: "Couro", emoji: "🦫" },
-      "res-e1f2a3b4-c5d6-4789-efa1-234567890123": { name: "Carne", emoji: "🥩" },
-      "res-f2a3b4c5-d6e7-4890-fab2-345678901234": { name: "Ossos", emoji: "🦴" },
-      "res-a3b4c5d6-e7f8-4901-abc3-456789012345": { name: "Pelo", emoji: "🧶" },
-      "res-b4c5d6e7-f8a9-4012-bcd4-567890123456": { name: "Barbante", emoji: "🧵" },
-
-      // More resources
-      "res-c5d6e7f8-a9b0-4123-cde5-678901234567": { name: "Linho", emoji: "🌾" },
-      "res-d6e7f8a9-b0c1-4234-def6-789012345678": { name: "Algodão", emoji: "☁️" },
-      "res-e7f8a9b0-c1d2-4345-efa7-890123456789": { name: "Juta", emoji: "🌾" },
-      "res-f8a9b0c1-d2e3-4456-fab8-901234567890": { name: "Sisal", emoji: "🌾" },
-      "res-a9b0c1d2-e3f4-4567-abc9-012345678901": { name: "Cânhamo", emoji: "🌾" },
-    };
-
-    // Check direct mapping
-    if (resourceMap[resourceId]) {
-      return {
-        id: resourceId,
-        name: resourceMap[resourceId].name,
-        emoji: resourceMap[resourceId].emoji
-      };
-    }
-
-    // Pattern-based fallback for unrecognized IDs
-    console.warn(`🔍 Resource not found for ID: ${resourceId}`);
-    return {
-      id: resourceId,
-      name: "Recurso Desconhecido",
-      emoji: "📦"
-    };
+    return resources.find(r => r.id === resourceId);
   };
 
   const timeRemaining = Math.max(0, expedition.estimatedDuration - (Date.now() - expedition.startTime));
@@ -323,7 +277,7 @@ export default function ExpeditionPanel({
           <Progress value={currentProgress} className="h-2" />
         </div>
       )}
-
+      
       {/* Auto-repeat countdown when completed and auto-repeat is on */}
       {!isExpanded && isCompleted && autoRepeatCountdown > 0 && (
         <div className="px-3 pb-2">
@@ -349,7 +303,7 @@ export default function ExpeditionPanel({
           </div>
         </div>
       )}
-
+      
       {/* Finalize button when completed and minimized */}
       {!isExpanded && isCompleted && !autoRepeatCountdown && (
         <div className="px-3 pb-2">
@@ -405,7 +359,7 @@ export default function ExpeditionPanel({
                 <p className="text-sm font-medium text-green-600 mb-2">
                   ✅ Expedição Concluída!
                 </p>
-
+                
                 {/* Final results */}
                 <div className="bg-green-50 rounded-lg p-2 mb-3">
                   <h5 className="text-xs font-medium mb-1">Recursos Coletados:</h5>

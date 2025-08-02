@@ -86,18 +86,19 @@ export default function BiomesTab({
 
                 {/* Resources available */}
                 <div>
-                  <h4 className="font-medium text-sm mb-2">
-                    Recursos Disponíveis ({biomeResources.length}):
-                  </h4>
-                  <div className="max-h-32 overflow-y-auto border rounded-lg p-2 bg-gray-50">
-                    <div className="grid grid-cols-2 gap-1">
-                      {biomeResources.map((resource) => (
-                        <div key={resource.id} className="flex items-center space-x-1 text-xs">
-                          <span>{resource.emoji}</span>
-                          <span className="truncate" title={resource.name}>{resource.name}</span>
-                        </div>
-                      ))}
-                    </div>
+                  <h4 className="font-medium text-sm mb-2">Recursos Disponíveis:</h4>
+                  <div className="grid grid-cols-3 gap-2">
+                    {biomeResources.slice(0, 6).map((resource) => (
+                      <div key={resource.id} className="flex items-center space-x-1 text-xs">
+                        <span>{resource.emoji}</span>
+                        <span className="truncate">{resource.name}</span>
+                      </div>
+                    ))}
+                    {biomeResources.length > 6 && (
+                      <div className="text-xs text-gray-500 col-span-3">
+                        +{biomeResources.length - 6} outros recursos...
+                      </div>
+                    )}
                   </div>
                 </div>
 

@@ -90,7 +90,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}/quests`] });
-      queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
 
       let message = "Quest completada!";
       if (data.newLevel) {
@@ -235,22 +235,12 @@ export default function QuestsTab({ player }: QuestsTabProps) {
   const activeQuests = quests.filter(q => q.status === 'active');
   const completedQuests = quests.filter(q => q.status === 'completed');
 
-  // Group available quests by category
-  const availableByCategory = availableQuests.reduce((acc, quest) => {
-    if (!acc[quest.category || 'geral']) {
-      acc[quest.category || 'geral'] = [];
-    }
-    acc[quest.category || 'geral'].push(quest);
-    return acc;
-  }, {} as Record<string, Quest[]>);
-
   const questCategories = {
     available: {
       label: "Missões Disponíveis",
       emoji: "✨",
       quests: availableQuests,
-      color: "",
-      subcategories: availableByCategory
+      color: ""
     },
     active: {
       label: "Missões Ativas",
@@ -266,150 +256,129 @@ export default function QuestsTab({ player }: QuestsTabProps) {
     }
   };
 
-  const categoryLabels = {
-    iniciante: { label: "🌱 Iniciante", color: "bg-green-100 text-green-800" },
-    aventureiro: { label: "⚔️ Aventureiro", color: "bg-blue-100 text-blue-800" },
-    especialista: { label: "🏆 Especialista", color: "bg-purple-100 text-purple-800" },
-    lendario: { label: "👑 Lendário", color: "bg-yellow-100 text-yellow-800" }
-  };
-
   if (isLoading) {
     return <div className="flex justify-center p-8">Carregando quests...</div>;
   }
 
-  const renderQuestCard = (quest: Quest, isActive = false) => {
-    const canActivate = quest.status === 'available' && player.level >= quest.requiredLevel;
-    const categoryInfo = categoryLabels[quest.category as keyof typeof categoryLabels];
-    
-    return (
-      <Card key={quest.id} className={`${isActive ? questCategories.active.color : questCategories[quest.status as keyof typeof questCategories]?.color} ${quest.canComplete ? 'ring-2 ring-yellow-400 ring-opacity-60' : ''} ${!canActivate && quest.status === 'available' ? 'opacity-60' : ''}`}>
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{quest.emoji}</span>
-              <div>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  {quest.name}
-                  {quest.canComplete && (
-                    <span className="text-yellow-500 animate-pulse text-xl">!</span>
-                  )}
-                </CardTitle>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <Badge variant={getStatusColor(quest.status)}>
-                    {getStatusText(quest.status)}
-                  </Badge>
-                  {categoryInfo && (
-                    <Badge variant="outline" className={categoryInfo.color}>
-                      {categoryInfo.label}
-                    </Badge>
-                  )}
+  const renderQuestCard = (quest: Quest, isActive = false) => (
+    <Card key={quest.id} className={`${isActive ? questCategories.active.color : questCategories[quest.status as keyof typeof questCategories]?.color} ${quest.canComplete ? 'ring-2 ring-yellow-400 ring-opacity-60' : ''}`}>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">{quest.emoji}</span>
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2">
+                {quest.name}
+                {quest.canComplete && (
+                  <span className="text-yellow-500 animate-pulse text-xl">!</span>
+                )}
+              </CardTitle>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant={getStatusColor(quest.status)}>
+                  {getStatusText(quest.status)}
+                </Badge>
+                {quest.status === 'available' && (
                   <Badge variant="outline">
                     Nível {quest.requiredLevel}
                   </Badge>
-                  {quest.status === 'available' && !canActivate && (
-                    <Badge variant="destructive" className="bg-red-100 text-red-800">
-                      🔒 Bloqueada
-                    </Badge>
-                  )}
-                  {quest.canComplete && (
-                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 animate-pulse">
-                      ✨ Pronta!
-                    </Badge>
-                  )}
-                </div>
+                )}
+                {quest.canComplete && (
+                  <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 animate-pulse">
+                    ✨ Pronta!
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <CardDescription>{quest.description}</CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <CardDescription>{quest.description}</CardDescription>
 
-          <div className="space-y-2">
-            <h4 className="font-semibold text-sm">Objetivos:</h4>
-            {quest.objectives.map((objective, idx) => {
-              if (quest.status === 'active') {
-                const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId || objective.target);
-                const objectiveProgress = quest.progress[progressKey];
+        <div className="space-y-2">
+          <h4 className="font-semibold text-sm">Objetivos:</h4>
+          {quest.objectives.map((objective, idx) => {
+            if (quest.status === 'active') {
+              const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId || objective.target);
+              const objectiveProgress = quest.progress[progressKey];
 
-                return (
-                  <div key={idx} className="text-sm">
-                    <div className="flex justify-between items-center">
-                      <span className={objectiveProgress?.completed ? "text-green-600 font-medium" : "text-muted-foreground"}>
-                        {objectiveProgress?.completed ? "✅" : "•"} {objective.description}
-                      </span>
-                      {objectiveProgress && (
-                        <span className={`text-xs font-medium ${objectiveProgress.completed ? 'text-green-600' : 'text-muted-foreground'}`}>
-                          {objectiveProgress.current}/{objectiveProgress.required}
-                        </span>
-                      )}
-                    </div>
+              return (
+                <div key={idx} className="text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className={objectiveProgress?.completed ? "text-green-600 font-medium" : "text-muted-foreground"}>
+                      {objectiveProgress?.completed ? "✅" : "•"} {objective.description}
+                    </span>
                     {objectiveProgress && (
-                      <Progress 
-                        value={(objectiveProgress.current / objectiveProgress.required) * 100} 
-                        className={`h-2 mt-1 ${objectiveProgress.completed ? 'bg-green-100' : ''}`}
-                      />
+                      <span className={`text-xs font-medium ${objectiveProgress.completed ? 'text-green-600' : 'text-muted-foreground'}`}>
+                        {objectiveProgress.current}/{objectiveProgress.required}
+                      </span>
                     )}
                   </div>
-                );
-              } else {
-                return (
-                  <div key={idx} className="text-sm text-muted-foreground">
-                    • {objective.description}
-                  </div>
-                );
-              }
-            })}
-          </div>
+                  {objectiveProgress && (
+                    <Progress 
+                      value={(objectiveProgress.current / objectiveProgress.required) * 100} 
+                      className={`h-2 mt-1 ${objectiveProgress.completed ? 'bg-green-100' : ''}`}
+                    />
+                  )}
+                </div>
+              );
+            } else {
+              return (
+                <div key={idx} className="text-sm text-muted-foreground">
+                  • {objective.description}
+                </div>
+              );
+            }
+          })}
+        </div>
 
-          <div className="space-y-2">
-            <h4 className="font-semibold text-sm">Recompensas:</h4>
-            <p className="text-sm text-muted-foreground">
-              {formatRewards(quest.rewards)}
-            </p>
-          </div>
+        <div className="space-y-2">
+          <h4 className="font-semibold text-sm">Recompensas:</h4>
+          <p className="text-sm text-muted-foreground">
+            {formatRewards(quest.rewards)}
+          </p>
+        </div>
 
-          {quest.status === 'available' && (
-            <Button 
-              onClick={() => startQuestMutation.mutate(quest.id)}
-              disabled={startQuestMutation.isPending || player.level < quest.requiredLevel}
-              className="w-full"
-              variant={player.level < quest.requiredLevel ? "secondary" : "default"}
+        {quest.status === 'available' && (
+          <Button 
+            onClick={() => startQuestMutation.mutate(quest.id)}
+            disabled={startQuestMutation.isPending || player.level < quest.requiredLevel}
+            className="w-full"
+          >
+            {startQuestMutation.isPending ? "Iniciando..." : 
+             player.level < quest.requiredLevel ? `Requer Nível ${quest.requiredLevel}` :
+             "Iniciar Quest"}
+          </Button>
+        )}
+
+        {quest.status === 'active' && canCompleteQuest(quest) && (
+          <Button 
+            onClick={() => completeQuestMutation.mutate(quest.id)}
+            disabled={completeQuestMutation.isPending}
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white animate-pulse"
+          >
+            {completeQuestMutation.isPending ? "Completando..." : "🏆 Resgatar Recompensas"}
+          </Button>
+        )}
+
+        {quest.status === 'completed' && (
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="flex-1 justify-center">
+              ✅ Completa
+            </Badge>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => repeatQuestMutation.mutate(quest.id)}
+              disabled={repeatQuestMutation.isPending}
             >
-              {startQuestMutation.isPending ? "Iniciando..." : 
-               player.level < quest.requiredLevel ? `🔒 Requer Nível ${quest.requiredLevel}` :
-               "🚀 Iniciar Quest"}
+              {repeatQuestMutation.isPending ? "Reiniciando..." : "🔄 Repetir"}
             </Button>
-          )}
-
-          {quest.status === 'active' && canCompleteQuest(quest) && (
-            <Button 
-              onClick={() => completeQuestMutation.mutate(quest.id)}
-              disabled={completeQuestMutation.isPending}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white animate-pulse"
-            >
-              {completeQuestMutation.isPending ? "Completando..." : "🏆 Resgatar Recompensas"}
-            </Button>
-          )}
-
-          {quest.status === 'completed' && (
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="flex-1 justify-center">
-                ✅ Completa
-              </Badge>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => repeatQuestMutation.mutate(quest.id)}
-                disabled={repeatQuestMutation.isPending}
-              >
-                {repeatQuestMutation.isPending ? "Reiniciando..." : "🔄 Repetir"}
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
-  };
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -435,14 +404,12 @@ export default function QuestsTab({ player }: QuestsTabProps) {
         <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200">
           {Object.entries(questCategories).map(([categoryKey, category]) => {
             const isActive = activeCategory === categoryKey;
-            const completableCount = categoryKey === 'active' ? 
-              category.quests.filter(q => q.canComplete).length : 0;
             
             return (
               <button
                 key={categoryKey}
                 onClick={() => setActiveCategory(categoryKey)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all relative ${
+                className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all ${
                   isActive 
                     ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px" 
                     : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
@@ -451,11 +418,6 @@ export default function QuestsTab({ player }: QuestsTabProps) {
                 <span className="text-lg">{category.emoji}</span>
                 <span>{category.label}</span>
                 <span className="text-sm text-gray-500">({category.quests.length})</span>
-                {completableCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse font-bold">
-                    {completableCount}
-                  </span>
-                )}
               </button>
             );
           })}
@@ -468,34 +430,7 @@ export default function QuestsTab({ player }: QuestsTabProps) {
 
             return (
               <div key={categoryKey}>
-                {categoryKey === 'available' ? (
-                  // Group available quests by difficulty category
-                  <div className="space-y-8">
-                    {Object.entries(category.subcategories || {}).map(([subCat, subQuests]) => {
-                      const categoryInfo = categoryLabels[subCat as keyof typeof categoryLabels];
-                      const availableCount = subQuests.filter(q => player.level >= q.requiredLevel).length;
-                      const totalCount = subQuests.length;
-                      
-                      return (
-                        <div key={subCat} className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-bold flex items-center gap-2">
-                              {categoryInfo ? categoryInfo.label : `📋 ${subCat}`}
-                              <Badge variant="outline" className="ml-2">
-                                {availableCount}/{totalCount} disponíveis
-                              </Badge>
-                            </h3>
-                          </div>
-                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {subQuests
-                              .sort((a, b) => a.requiredLevel - b.requiredLevel)
-                              .map((quest) => renderQuestCard(quest))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : categoryKey === 'completed' ? (
+                {categoryKey === 'completed' ? (
                   <ScrollArea className="h-96">
                     <div className="space-y-4">
                       {category.quests.map((quest) => renderQuestCard(quest))}

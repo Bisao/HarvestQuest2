@@ -4,11 +4,12 @@ import { useLocation } from "wouter";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab-new";
 import QuestsTab from "@/components/game/quests-tab";
-import ModernGameLayout from "@/components/game/modern-game-layout";
+import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
+import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
+import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
 import LoadingScreen from "@/components/game/loading-screen";
 import { OfflineActivityReportDialog } from "@/components/game/offline-activity-report";
 import { OfflineConfigModal } from "@/components/game/offline-config-modal";
-import { Settings, Home, Zap, AlertTriangle } from "lucide-react";
 
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
 import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem, OfflineActivityReport } from "@shared/types";
@@ -23,7 +24,6 @@ export default function Game() {
   const [offlineReport, setOfflineReport] = useState<OfflineActivityReport | null>(null);
   const [showOfflineReport, setShowOfflineReport] = useState(false);
   const [showOfflineConfig, setShowOfflineConfig] = useState(false);
-    const [authWarning, setAuthWarning] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -36,14 +36,6 @@ export default function Game() {
     setLocation('/');
     return null;
   }
-
-    // Check authentication status
-    useEffect(() => {
-        const token = localStorage.getItem("auth_token");
-        if (!token) {
-            setAuthWarning(true);
-        }
-    }, []);
 
   // ID Validation on game startup
   useEffect(() => {
@@ -229,27 +221,6 @@ export default function Game() {
     );
   }
 
-    // Show auth warning if not authenticated
-    if (authWarning) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
-                <div className="text-center bg-white p-8 rounded-lg shadow-lg">
-                    <AlertTriangle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold mb-4">Sessão Expirada</h2>
-                    <p className="text-gray-600 mb-4">
-                        Sua sessão de login expirou. Por favor, faça login novamente para continuar jogando.
-                    </p>
-                    <button
-                        onClick={() => setLocation('/')}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
-                    >
-                        Voltar ao Menu Principal
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
   // Handle expedition start from BiomesTab
   const handleExpeditionStart = (expeditionData: any) => {
     const newExpedition: ActiveExpedition = {
@@ -271,18 +242,124 @@ export default function Game() {
     }
   };
 
-  // Use the new modern layout
+  const tabs = [
+    { id: "biomes", label: "Biomas", emoji: "🌍" },
+    { id: "inventory", label: "Inventário", emoji: "🎒" },
+    { id: "storage", label: "Armazém", emoji: "🏠" },
+    { id: "crafting", label: "Crafting", emoji: "🔨" },
+    { id: "quests", label: "Missões", emoji: "📜" },
+  ];
+
   return (
-    <ModernGameLayout
-      player={player}
-      biomes={biomes}
-      resources={resources}
-      equipment={equipment}
-      recipes={recipes}
-      activeExpedition={activeExpedition}
-      setActiveExpedition={setActiveExpedition}
-      authWarning={authWarning}
-      isBlocked={false}
-    />
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      {/* Game Header */}
+      <GameHeader player={player} />
+
+      <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 max-w-7xl">
+        {/* Tab Navigation */}
+        <div className="bg-white rounded-lg shadow-lg mb-4 sm:mb-6">
+          <div className="flex border-b overflow-x-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-shrink-0 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap relative ${
+                  activeTab === tab.id
+                    ? "bg-blue-50 text-blue-700 border-b-2 border-blue-500"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <span className="mr-1 sm:mr-2">{tab.emoji}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.slice(0, 3)}</span>
+                 {tab.id === "quests" && hasCompletableQuests && (
+                    <span className="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center animate-pulse">
+                      !
+                    </span>
+                  )}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-3 sm:p-6">
+            {activeTab === "biomes" && (
+              <BiomesTab
+                biomes={biomes}
+                resources={resources}
+                equipment={equipment}
+                player={player}
+                onExpeditionStart={handleExpeditionStart}
+              />
+            )}
+            {activeTab === "inventory" && (
+              <EnhancedInventoryWithTabs
+                playerId={player.id}
+                player={player}
+                resources={resources}
+                equipment={equipment}
+                isBlocked={false}
+              />
+            )}
+            {activeTab === "quests" && (
+              <QuestsTab
+                player={player}
+              />
+            )}
+
+            {activeTab === "storage" && (
+              <EnhancedStorageTab
+                playerId={player.id}
+                equipment={equipment}
+                resources={resources}
+                player={player}
+              />
+            )}
+            {activeTab === "crafting" && (
+              <EnhancedCraftingTab
+                recipes={recipes}
+                playerId={player.id}
+                resources={resources}
+                playerLevel={player.level}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Active Expedition Panel */}
+        {activeExpedition && (
+          <ExpeditionPanel
+            expedition={activeExpedition}
+            biomes={biomes}
+            resources={resources}
+            onExpeditionComplete={handleExpeditionComplete}
+          />
+        )}
+      </main>
+
+      {/* Offline Activity Report Modal */}
+      {offlineReport && (
+        <OfflineActivityReportDialog
+          isOpen={showOfflineReport}
+          onClose={() => {
+            setShowOfflineReport(false);
+            setOfflineReport(null);
+          }}
+          report={offlineReport}
+          onConfigureOffline={() => {
+            setShowOfflineReport(false);
+            setShowOfflineConfig(true);
+          }}
+        />
+      )}
+
+      {/* Offline Configuration Modal */}
+      <OfflineConfigModal
+        isOpen={showOfflineConfig}
+        onClose={() => setShowOfflineConfig(false)}
+        playerId={player?.id || ''}
+        currentConfig={player?.offlineActivityConfig}
+      />
+    </div>
   );
 }
