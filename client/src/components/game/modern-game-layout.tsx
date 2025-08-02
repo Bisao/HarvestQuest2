@@ -138,7 +138,7 @@ export default function ModernGameLayout({
     inventory = [], 
     storage = [], 
     isLoading 
-  } = useGameData({ playerId: player.id });
+  } = useGameData({ playerId: player?.id });
 
   // Handle expedition start from biomes tab
   const handleExpeditionStart = (biome: Biome) => {
@@ -177,7 +177,7 @@ export default function ModernGameLayout({
   const currentTab = GAME_TABS.find(tab => tab.id === activeTab);
   const TabIcon = currentTab?.icon || Heart;
 
-  if (isLoading) {
+  if (isLoading || !player) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="text-center">
@@ -209,18 +209,20 @@ export default function ModernGameLayout({
               {/* Player Info */}
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">{player.name.charAt(0)}</span>
+                  <span className="text-white font-bold text-lg">
+                    {player?.name?.charAt(0) || '?'}
+                  </span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-800">{player.name}</h1>
+                  <h1 className="text-xl font-bold text-gray-800">{player?.name || 'Carregando...'}</h1>
                   <div className="flex items-center space-x-4 text-sm text-gray-600">
                     <div className="flex items-center space-x-1">
                       <Star className="w-4 h-4 text-yellow-500" />
-                      <span>Nível {player.level}</span>
+                      <span>Nível {player?.level || 0}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Coins className="w-4 h-4 text-yellow-600" />
-                      <span>{player.coins}</span>
+                      <span>{player?.coins || 0}</span>
                     </div>
                   </div>
                 </div>
@@ -232,12 +234,12 @@ export default function ModernGameLayout({
                 <div className="flex items-center space-x-2">
                   <div className="flex items-center space-x-1">
                     <span className="text-lg">🍖</span>
-                    <span className="text-sm font-medium text-gray-700">{player.hunger}/100</span>
+                    <span className="text-sm font-medium text-gray-700">{player?.hunger || 0}/100</span>
                   </div>
                   <div className="w-24 bg-gray-200 rounded-full h-2">
                     <div 
                       className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${player.hunger}%` }}
+                      style={{ width: `${player?.hunger || 0}%` }}
                     />
                   </div>
                 </div>
@@ -246,12 +248,12 @@ export default function ModernGameLayout({
                 <div className="flex items-center space-x-2">
                   <div className="flex items-center space-x-1">
                     <Droplets className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm font-medium text-gray-700">{player.thirst}/100</span>
+                    <span className="text-sm font-medium text-gray-700">{player?.thirst || 0}/100</span>
                   </div>
                   <div className="w-24 bg-gray-200 rounded-full h-2">
                     <div 
                       className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${player.thirst}%` }}
+                      style={{ width: `${player?.thirst || 0}%` }}
                     />
                   </div>
                 </div>
@@ -261,25 +263,25 @@ export default function ModernGameLayout({
                   <div className="flex items-center space-x-1">
                     <Shield className="w-4 h-4 text-gray-500" />
                     <span className="text-xs text-gray-600">
-                      {player.equippedArmor ? '✓' : '○'}
+                      {player?.equippedArmor ? '✓' : '○'}
                     </span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Sword className="w-4 h-4 text-gray-500" />
                     <span className="text-xs text-gray-600">
-                      {player.equippedWeapon ? '✓' : '○'}
+                      {player?.equippedWeapon ? '✓' : '○'}
                     </span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Hammer className="w-4 h-4 text-gray-500" />
                     <span className="text-xs text-gray-600">
-                      {player.equippedTool ? '✓' : '○'}
+                      {player?.equippedTool ? '✓' : '○'}
                     </span>
                   </div>
                 </div>
 
                 {/* Activity Status */}
-                {player.autoStorage && (
+                {player?.autoStorage && (
                   <Badge variant="outline" className="flex items-center space-x-1">
                     <Moon className="w-3 h-3" />
                     <span>Atividade Offline</span>
