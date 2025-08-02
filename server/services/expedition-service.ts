@@ -3,15 +3,18 @@ import type { IStorage } from "../storage";
 import type { Player, Expedition, Resource, Equipment } from "@shared/types";
 import { GameService } from "./game-service";
 import { QuestService } from "./quest-service";
-import { EQUIPMENT_IDS, RESOURCE_IDS } from "@shared/constants/game-ids";
+import { SkillService } from "./skill-service";
+import { EQUIPMENT_IDS, RESOURCE_IDS, SKILL_IDS } from "@shared/constants/game-ids";
 
 export class ExpeditionService {
   private gameService: GameService;
   private questService: QuestService;
+  private skillService: SkillService;
 
   constructor(private storage: IStorage) {
     this.gameService = new GameService(storage);
     this.questService = new QuestService(storage);
+    this.skillService = new SkillService(storage);
   }
 
   // EXPEDITION LIFECYCLE METHODS
@@ -145,6 +148,62 @@ export class ExpeditionService {
     return updatedExpedition;
   }
 
+  // Award skill experience based on expedition rewards
+  private async awardSkillExperienceForExpedition(playerId: string, rewards: Record<string, number>): Promise<void> {
+    const resources = await this.storage.getAllResources();
+    
+    for (const [resourceId, quantity] of Object.entries(rewards)) {
+      const resource = resources.find(r => r.id === resourceId);
+      if (!resource) continue;
+
+      // Determine skill based on resource type and category
+      let skillId: string | null = null;
+      let context = 'exploration';
+
+      // Map resource categories to skills
+      const categoryMatch = resource.category as string;
+      
+      if (this.isFish(resource.name)) {
+        skillId = SKILL_IDS.PESCA;
+        context = 'fishing';
+      } else if (this.isAnimal(resource.name)) {
+        skillId = SKILL_IDS.CACA;
+        context = 'hunting';
+      } else if (resource.name.includes('Cogumelo')) {
+        skillId = SKILL_IDS.COLETA;
+        context = 'gathering';
+      } else if (resource.name.includes('Pedra') || resource.name.includes('Ferro') || resource.name.includes('Cristais')) {
+        skillId = SKILL_IDS.MINERACAO;
+        context = 'mining';
+      } else if (resource.name.includes('Madeira')) {
+        skillId = SKILL_IDS.LENHADOR;
+        context = 'woodcutting';
+      } else {
+        // Default to gathering for basic resources
+        skillId = SKILL_IDS.COLETA;
+        context = 'gathering';
+      }
+
+      if (skillId) {
+        // Award 2-5 experience per item based on rarity
+        let expPerItem = 2;
+        switch (resource.rarity) {
+          case 'uncommon': expPerItem = 3; break;
+          case 'rare': expPerItem = 4; break;
+          case 'epic': expPerItem = 5; break;
+          case 'legendary': expPerItem = 6; break;
+        }
+
+        const totalExp = expPerItem * quantity;
+        await this.skillService.addSkillExperience(playerId, skillId, totalExp);
+        console.log(`🎯 EXPEDITION: Player ${playerId} gained ${totalExp} ${skillId} experience from ${quantity}x ${resource.name}`);
+      }
+    }
+
+    // Always award exploration experience
+    await this.skillService.addSkillExperience(playerId, SKILL_IDS.EXPLORACAO, 10);
+  }
+
   async completeExpedition(expeditionId: string): Promise<Expedition> {
     const expedition = await this.storage.getExpedition(expeditionId);
     if (!expedition) throw new Error("Expedition not found");
@@ -162,13 +221,20 @@ export class ExpeditionService {
     const resources = await this.storage.getAllResources();
     const expGain = this.gameService.calculateExperienceGain(rewards, resources);
     
-    // Update player stats
+    // Update player stats with level up check
+    const oldLevel = player.level;
     const levelData = this.gameService.calculateLevelUp(player.experience, expGain);
     await this.storage.updatePlayer(expedition.playerId, {
       experience: levelData.newExp,
       level: levelData.newLevel,
       coins: player.coins // Coin system removed as requested
     });
+
+    // Handle skill points if player leveled up
+    await this.gameService.handlePlayerLevelUp(expedition.playerId, oldLevel, levelData.newLevel);
+
+    // Award skill experience based on expedition activities
+    await this.awardSkillExperienceForExpedition(expedition.playerId, rewards);
 
     // Update quest progress for expedition completion
     await this.questService.updateQuestProgress(expedition.playerId, 'expedition', {

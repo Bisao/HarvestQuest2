@@ -1,10 +1,15 @@
 // Game service for business logic
 import type { IStorage } from "../storage";
 import type { Player, Resource, Equipment, InventoryItem, StorageItem } from "@shared/types";
-import { EQUIPMENT_IDS } from "@shared/constants/game-ids";
+import { EQUIPMENT_IDS, SKILL_IDS } from "@shared/constants/game-ids";
+import { SkillService } from "./skill-service";
 
 export class GameService {
-  constructor(private storage: IStorage) {}
+  private skillService: SkillService;
+
+  constructor(private storage: IStorage) {
+    this.skillService = new SkillService(storage);
+  }
 
   // Calculate total inventory weight in grams
   async calculateInventoryWeight(playerId: string): Promise<number> {
@@ -242,11 +247,14 @@ export class GameService {
       });
     }
 
-    // Update player weight
+    // Update player weight and record skill usage
     const player = await this.storage.getPlayer(playerId);
     if (player) {
       const newWeight = await this.calculateInventoryWeight(playerId);
       await this.storage.updatePlayer(playerId, { inventoryWeight: newWeight });
+      
+      // Award skill experience for resource management
+      await this.skillService.recordSkillUsage(playerId, SKILL_IDS.COLETA, 'gathering');
     }
   }
 
@@ -295,6 +303,15 @@ export class GameService {
     }
 
     return { newLevel: level, newExp: totalExp };
+  }
+
+  // Handle player level up with skill points
+  async handlePlayerLevelUp(playerId: string, oldLevel: number, newLevel: number): Promise<void> {
+    if (newLevel > oldLevel) {
+      const levelsGained = newLevel - oldLevel;
+      await this.skillService.handlePlayerLevelUp(playerId, newLevel);
+      console.log(`🎯 LEVEL-UP: Player ${playerId} reached level ${newLevel}, gained ${levelsGained} skill point(s)`);
+    }
   }
 
   async collectResource(playerId: string, resourceId: string, amount: number): Promise<void> {

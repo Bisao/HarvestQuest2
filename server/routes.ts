@@ -16,6 +16,7 @@ import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
 import { registerAdminRoutes } from "./routes/admin";
 import { registerStorageRoutes } from "./routes/storage-routes";
 import { createConsumptionRoutes } from "./routes/consumption";
+import { createSkillRoutes } from "./routes/skill-routes";
 import savesRouter from "./routes/saves";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -42,6 +43,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register consumption routes
   app.use('/api', createConsumptionRoutes(storage));
+
+  // Register skill routes
+  app.use('/api/skills', createSkillRoutes(storage));
 
   // Register saves routes  
   app.use('/api/saves', savesRouter);

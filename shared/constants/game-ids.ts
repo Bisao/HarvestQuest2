@@ -120,6 +120,45 @@ export const RECIPE_IDS = {
   BARRIL_IMPROVISADO: "rec-barril-improvisado-001"
 } as const;
 
+export const SKILL_IDS = {
+  // Coleta e Exploração
+  COLETA: "skill-gathering-001",
+  MINERACAO: "skill-mining-001", 
+  LENHADOR: "skill-woodcutting-001",
+  PESCA: "skill-fishing-001",
+  CACA: "skill-hunting-001",
+  EXPLORACAO: "skill-exploration-001",
+  
+  // Criação e Artesanato
+  ARTESANATO: "skill-crafting-001",
+  FERRARIA: "skill-smithing-001",
+  CULINARIA: "skill-cooking-001",
+  ALQUIMIA: "skill-alchemy-001",
+  
+  // Combate e Sobrevivência
+  COMBATE: "skill-combat-001",
+  DEFESA: "skill-defense-001",
+  SOBREVIVENCIA: "skill-survival-001",
+  
+  // Especialização e Magia
+  RESISTENCIA: "skill-endurance-001",
+  AGILIDADE: "skill-agility-001",
+  SORTE: "skill-luck-001"
+} as const;
+
+export const DISEASE_IDS = {
+  RESFRIADO: "disease-cold-001",
+  FEBRE: "disease-fever-001", 
+  INFECCAO: "disease-infection-001",
+  INTOXICACAO: "disease-poisoning-001",
+  DESIDRATACAO: "disease-dehydration-001",
+  DESNUTRICAO: "disease-malnutrition-001",
+  FADIGA: "disease-fatigue-001",
+  STRESS: "disease-stress-001",
+  FERIMENTO: "disease-wound-001",
+  QUEIMADURA: "disease-burn-001"
+} as const;
+
 // Helper functions for type safety
 export function isResourceId(id: string): boolean {
   return id.startsWith('res-');

@@ -7,6 +7,8 @@ import QuestsTab from "@/components/game/quests-tab";
 import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
 import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 import EnhancedCraftingTab from "@/components/game/enhanced-crafting-tab";
+import { SkillTree } from "@/components/game/skill-tree";
+import { PlayerStatusEnhanced } from "@/components/game/player-status-enhanced";
 import LoadingScreen from "@/components/game/loading-screen";
 import { OfflineActivityReportDialog } from "@/components/game/offline-activity-report";
 import { OfflineConfigModal } from "@/components/game/offline-config-modal";
@@ -247,6 +249,8 @@ export default function Game() {
     { id: "inventory", label: "Inventário", emoji: "🎒" },
     { id: "storage", label: "Armazém", emoji: "🏠" },
     { id: "crafting", label: "Crafting", emoji: "🔨" },
+    { id: "skills", label: "Skills", emoji: "🎯" },
+    { id: "status", label: "Status", emoji: "❤️" },
     { id: "quests", label: "Missões", emoji: "📜" },
   ];
 
@@ -322,6 +326,12 @@ export default function Game() {
                 resources={resources}
                 playerLevel={player.level}
               />
+            )}
+            {activeTab === "skills" && (
+              <SkillTree player={player} />
+            )}
+            {activeTab === "status" && (
+              <PlayerStatusEnhanced player={player} />
             )}
           </div>
         </div>

@@ -4,6 +4,7 @@
 // === CORE TYPES ===
 export * from './types';
 export * from './inventory-types';
+export * from './skill-types';
 
 // === TYPE GUARDS & UTILITIES ===
 export type { 
