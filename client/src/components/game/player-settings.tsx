@@ -26,6 +26,11 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
   const [isNavigatingToMenu, setIsNavigatingToMenu] = useState(false);
   const [autoConsume, setAutoConsume] = useState(player?.autoConsume ?? false);
 
+  // Early return if player is not available
+  if (!player) {
+    return null;
+  }
+
   const saveGame = useSaveGame();
 
   const updateSettingsMutation = useMutation({

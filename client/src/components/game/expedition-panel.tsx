@@ -67,7 +67,7 @@ export default function ExpeditionPanel({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/player/${expedition.id.split('-')[0]}`] });
-      
+
       if (isAutoRepeat) {
         // Auto-repeat mode: restart expedition immediately
         setTimeout(() => {
@@ -77,7 +77,7 @@ export default function ExpeditionPanel({
           // Update expedition start time for new cycle
           expedition.startTime = Date.now();
         }, 500);
-        
+
         toast({
           title: "Auto-Repetição",
           description: "Nova expedição iniciada automaticamente!",
@@ -117,9 +117,9 @@ export default function ExpeditionPanel({
     intervalRef.current = setInterval(() => {
       const elapsed = Date.now() - expedition.startTime;
       const progressPercent = Math.min((elapsed / expedition.estimatedDuration) * 100, 100);
-      
+
       setCurrentProgress(progressPercent);
-      
+
       // Simulate resource collection in real-time
       if (progressPercent > 0) {
         const newCollected: Record<string, number> = {};
@@ -132,11 +132,11 @@ export default function ExpeditionPanel({
         });
         setCollectedResources(newCollected);
       }
-      
+
       if (progressPercent >= 100) {
         clearInterval(intervalRef.current!);
         intervalRef.current = null;
-        
+
         // Handle auto-repeat - but check if player has sufficient hunger/thirst
         if (isAutoRepeat) {
           if (player && (player.hunger <= 0 || player.thirst <= 0)) {
@@ -196,13 +196,13 @@ export default function ExpeditionPanel({
       if (player.hunger <= 0 || player.thirst <= 0) {
         setIsAutoRepeat(false);
         setAutoRepeatCountdown(0);
-        
+
         // Clear any active countdown
         if (countdownRef.current) {
           clearInterval(countdownRef.current);
           countdownRef.current = null;
         }
-        
+
         toast({
           title: "Auto-Repetição Desativada",
           description: player.hunger <= 0 
@@ -237,7 +237,7 @@ export default function ExpeditionPanel({
       "res-f2a3b4c5-d6e7-4890-fab2-345678901234": { name: "Ossos", emoji: "🦴" },
       "res-a3b4c5d6-e7f8-4901-abc3-456789012345": { name: "Pelo", emoji: "🧶" },
       "res-b4c5d6e7-f8a9-4012-bcd4-567890123456": { name: "Barbante", emoji: "🧵" },
-      
+
       // More resources
       "res-c5d6e7f8-a9b0-4123-cde5-678901234567": { name: "Linho", emoji: "🌾" },
       "res-d6e7f8a9-b0c1-4234-def6-789012345678": { name: "Algodão", emoji: "☁️" },
@@ -323,7 +323,7 @@ export default function ExpeditionPanel({
           <Progress value={currentProgress} className="h-2" />
         </div>
       )}
-      
+
       {/* Auto-repeat countdown when completed and auto-repeat is on */}
       {!isExpanded && isCompleted && autoRepeatCountdown > 0 && (
         <div className="px-3 pb-2">
@@ -349,7 +349,7 @@ export default function ExpeditionPanel({
           </div>
         </div>
       )}
-      
+
       {/* Finalize button when completed and minimized */}
       {!isExpanded && isCompleted && !autoRepeatCountdown && (
         <div className="px-3 pb-2">
@@ -405,7 +405,7 @@ export default function ExpeditionPanel({
                 <p className="text-sm font-medium text-green-600 mb-2">
                   ✅ Expedição Concluída!
                 </p>
-                
+
                 {/* Final results */}
                 <div className="bg-green-50 rounded-lg p-2 mb-3">
                   <h5 className="text-xs font-medium mb-1">Recursos Coletados:</h5>
