@@ -239,40 +239,12 @@ export class ExpeditionService {
   
   // Check if a resource is an animal or fish
   private isAnimal(resourceName: string): boolean {
-    const animals = [
-      // Small animals
-      "Coelho", "Lebre", "Raposa", "Esquilo", "Castor", "Lontra",
-      // Medium animals  
-      "Veado", "Cervo", "Javali", "Porco Selvagem", "Cabra da Montanha", "Ovelha Selvagem",
-      // Large animals
-      "Urso", "Alce", "Rena", "Bisão", "Boi Selvagem",
-      // Birds
-      "Pato", "Ganso", "Cisne", "Galinha d'Angola", "Perdiz", "Codorna", "Faisão", 
-      "Pombo", "Rolinha", "Coruja", "Falcão", "Águia",
-      // Fish
-      "Peixe Pequeno", "Peixe Grande", "Salmão", "Truta", "Carpa", "Bagre", "Lúcio", 
-      "Perca", "Dourado", "Pintado", "Surubim", "Traíra", "Tambaqui", "Pirarucu",
-      "Atum", "Sardinha", "Anchova", "Bacalhau", "Linguado", "Robalo", "Dourada Marinha",
-      "Pregado", "Mero", "Garoupa",
-      // Seafood
-      "Camarão", "Lagosta", "Caranguejo", "Siri", "Lula", "Polvo"
-    ];
-    return animals.includes(resourceName);
+    return ["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
   }
   
   // Check if a resource is a fish
   private isFish(resourceName: string): boolean {
-    const fish = [
-      // Freshwater fish
-      "Peixe Pequeno", "Peixe Grande", "Salmão", "Truta", "Carpa", "Bagre", "Lúcio", 
-      "Perca", "Dourado", "Pintado", "Surubim", "Traíra", "Tambaqui", "Pirarucu",
-      // Saltwater fish
-      "Atum", "Sardinha", "Anchova", "Bacalhau", "Linguado", "Robalo", "Dourada Marinha",
-      "Pregado", "Mero", "Garoupa",
-      // Seafood that requires fishing
-      "Camarão", "Lagosta", "Caranguejo", "Siri", "Lula", "Polvo"
-    ];
-    return fish.includes(resourceName);
+    return ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
   }
   
   // Consume bait from player inventory when fishing
@@ -308,184 +280,36 @@ export class ExpeditionService {
     
     // Different animals give different quantities
     switch (animalName) {
-      // Small animals
       case "Coelho":
         if (carneResource) parts[carneResource.id] = 1;
         if (couroResource) parts[couroResource.id] = 1;
         if (ossosResource) parts[ossosResource.id] = 2;
         if (peloResource) parts[peloResource.id] = 2;
         break;
-      case "Lebre":
-        if (carneResource) parts[carneResource.id] = 1;
-        if (couroResource) parts[couroResource.id] = 1;
-        if (ossosResource) parts[ossosResource.id] = 2;
-        if (peloResource) parts[peloResource.id] = 2;
-        break;
-      case "Raposa":
-        if (carneResource) parts[carneResource.id] = 2;
-        if (couroResource) parts[couroResource.id] = 2;
-        if (ossosResource) parts[ossosResource.id] = 3;
-        if (peloResource) parts[peloResource.id] = 4; // High fur yield
-        break;
-      case "Esquilo":
-        if (carneResource) parts[carneResource.id] = 1;
-        if (ossosResource) parts[ossosResource.id] = 1;
-        if (peloResource) parts[peloResource.id] = 1;
-        break;
-      case "Castor":
-        if (carneResource) parts[carneResource.id] = 2;
-        if (couroResource) parts[couroResource.id] = 3;
-        if (ossosResource) parts[ossosResource.id] = 4;
-        if (peloResource) parts[peloResource.id] = 2;
-        break;
-      case "Lontra":
-        if (carneResource) parts[carneResource.id] = 2;
-        if (couroResource) parts[couroResource.id] = 2;
-        if (ossosResource) parts[ossosResource.id] = 3;
-        if (peloResource) parts[peloResource.id] = 3;
-        break;
         
-      // Medium animals
       case "Veado":
         if (carneResource) parts[carneResource.id] = 3;
         if (couroResource) parts[couroResource.id] = 2;
         if (ossosResource) parts[ossosResource.id] = 4;
         if (peloResource) parts[peloResource.id] = 1;
         break;
-      case "Cervo":
-        if (carneResource) parts[carneResource.id] = 4;
-        if (couroResource) parts[couroResource.id] = 3;
-        if (ossosResource) parts[ossosResource.id] = 5;
-        if (peloResource) parts[peloResource.id] = 2;
-        break;
+        
       case "Javali":
         if (carneResource) parts[carneResource.id] = 4;
         if (couroResource) parts[couroResource.id] = 3;
         if (ossosResource) parts[ossosResource.id] = 6;
         if (peloResource) parts[peloResource.id] = 1;
         break;
-      case "Porco Selvagem":
-        if (carneResource) parts[carneResource.id] = 4;
-        if (couroResource) parts[couroResource.id] = 3;
-        if (ossosResource) parts[ossosResource.id] = 6;
-        if (peloResource) parts[peloResource.id] = 1;
-        break;
-      case "Cabra da Montanha":
-        if (carneResource) parts[carneResource.id] = 3;
-        if (couroResource) parts[couroResource.id] = 2;
-        if (ossosResource) parts[ossosResource.id] = 4;
-        if (peloResource) parts[peloResource.id] = 2;
-        break;
-      case "Ovelha Selvagem":
-        if (carneResource) parts[carneResource.id] = 3;
-        if (couroResource) parts[couroResource.id] = 2;
-        if (ossosResource) parts[ossosResource.id] = 4;
-        if (peloResource) parts[peloResource.id] = 5; // High wool yield
-        break;
         
-      // Large animals
-      case "Urso":
-        if (carneResource) parts[carneResource.id] = 8;
-        if (couroResource) parts[couroResource.id] = 6;
-        if (ossosResource) parts[ossosResource.id] = 10;
-        if (peloResource) parts[peloResource.id] = 4;
-        break;
-      case "Alce":
-        if (carneResource) parts[carneResource.id] = 6;
-        if (couroResource) parts[couroResource.id] = 4;
-        if (ossosResource) parts[ossosResource.id] = 8;
-        if (peloResource) parts[peloResource.id] = 2;
-        break;
-      case "Rena":
-        if (carneResource) parts[carneResource.id] = 5;
-        if (couroResource) parts[couroResource.id] = 4;
-        if (ossosResource) parts[ossosResource.id] = 7;
-        if (peloResource) parts[peloResource.id] = 3;
-        break;
-      case "Bisão":
-        if (carneResource) parts[carneResource.id] = 10;
-        if (couroResource) parts[couroResource.id] = 8;
-        if (ossosResource) parts[ossosResource.id] = 12;
-        if (peloResource) parts[peloResource.id] = 6;
-        break;
-      case "Boi Selvagem":
-        if (carneResource) parts[carneResource.id] = 8;
-        if (couroResource) parts[couroResource.id] = 6;
-        if (ossosResource) parts[ossosResource.id] = 10;
-        if (peloResource) parts[peloResource.id] = 3;
-        break;
-        
-      // Birds (mostly meat and bones, some feathers as "pelo")
-      case "Pato": case "Ganso": case "Galinha d'Angola":
-        if (carneResource) parts[carneResource.id] = 2;
-        if (ossosResource) parts[ossosResource.id] = 2;
-        if (peloResource) parts[peloResource.id] = 2; // Feathers
-        break;
-      case "Cisne":
-        if (carneResource) parts[carneResource.id] = 3;
-        if (ossosResource) parts[ossosResource.id] = 3;
-        if (peloResource) parts[peloResource.id] = 4; // Premium feathers
-        break;
-      case "Perdiz": case "Codorna": case "Pombo": case "Rolinha":
-        if (carneResource) parts[carneResource.id] = 1;
-        if (ossosResource) parts[ossosResource.id] = 1;
-        if (peloResource) parts[peloResource.id] = 1;
-        break;
-      case "Faisão":
-        if (carneResource) parts[carneResource.id] = 2;
-        if (ossosResource) parts[ossosResource.id] = 2;
-        if (peloResource) parts[peloResource.id] = 3; // Colorful feathers
-        break;
-      case "Coruja": case "Falcão": case "Águia":
-        if (carneResource) parts[carneResource.id] = 2;
-        if (ossosResource) parts[ossosResource.id] = 3;
-        if (peloResource) parts[peloResource.id] = 3; // Rare feathers
-        break;
-        
-      // Small freshwater fish
-      case "Peixe Pequeno": case "Sardinha": case "Anchova":
+      // Fish processing - fish give meat and bones
+      case "Peixe Pequeno":
         if (carneResource) parts[carneResource.id] = 1;
         if (ossosResource) parts[ossosResource.id] = 1;
         break;
         
-      // Medium freshwater fish
-      case "Peixe Grande": case "Truta": case "Carpa": case "Bagre": case "Perca": case "Linguado":
+      case "Peixe Grande":
         if (carneResource) parts[carneResource.id] = 2;
         if (ossosResource) parts[ossosResource.id] = 2;
-        break;
-        
-      // Large freshwater fish
-      case "Salmão": case "Lúcio": case "Dourado": case "Pintado": case "Traira": case "Robalo": case "Dourada Marinha": case "Bacalhau":
-        if (carneResource) parts[carneResource.id] = 3;
-        if (ossosResource) parts[ossosResource.id] = 3;
-        break;
-        
-      // Very large fish
-      case "Surubim": case "Tambaqui": case "Pregado": case "Garoupa": case "Mero":
-        if (carneResource) parts[carneResource.id] = 4;
-        if (ossosResource) parts[ossosResource.id] = 4;
-        break;
-        
-      // Giant fish
-      case "Pirarucu": case "Atum":
-        if (carneResource) parts[carneResource.id] = 6;
-        if (ossosResource) parts[ossosResource.id] = 6;
-        break;
-        
-      // Seafood
-      case "Camarão": case "Siri":
-        if (carneResource) parts[carneResource.id] = 1;
-        break;
-      case "Caranguejo":
-        if (carneResource) parts[carneResource.id] = 1;
-        if (ossosResource) parts[ossosResource.id] = 1; // Shell
-        break;
-      case "Lagosta":
-        if (carneResource) parts[carneResource.id] = 2;
-        if (ossosResource) parts[ossosResource.id] = 1; // Shell
-        break;
-      case "Lula": case "Polvo":
-        if (carneResource) parts[carneResource.id] = 2;
         break;
         
       case "Salmão":
@@ -501,7 +325,7 @@ export class ExpeditionService {
   private addPickaxeBonus(rewards: Record<string, number>, playerEquipment: Equipment[], allResources: Resource[]): void {
     const hasPickaxe = playerEquipment.some(eq => eq.toolType === "pickaxe");
     const stoneResource = allResources.find(r => r.name === "Pedra");
-    const looseStoneResource = allResources.find(r => r.name === "Pedras Pequenas");
+    const looseStoneResource = allResources.find(r => r.name === "Pedras Soltas");
     
     if (hasPickaxe && stoneResource && looseStoneResource && rewards[stoneResource.id]) {
       // Add loose stones equal to the amount of stone mined

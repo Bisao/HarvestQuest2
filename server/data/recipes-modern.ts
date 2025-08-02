@@ -1,608 +1,422 @@
+// Central recipe system - ALL IDs must reference shared/constants/game-ids.ts
+import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from "@shared/constants/game-ids";
+import type { InsertRecipe } from "@shared/types";
 
-/**
- * RECEITAS MODERNAS - SISTEMA COMPLETO ATUALIZADO
- * 
- * Sistema completo de receitas com todos os novos materiais e componentes.
- * Inclui receitas para todos os itens expandidos e novos equipamentos.
- */
-
-import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from '@shared/constants/game-ids';
-
-export interface ModernRecipe {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
+export function createModernRecipeData(): InsertRecipe[] {
+  console.log('🔧 RECIPE-LOADING: Using corrected IDs from game-ids.ts master file');
   
-  // Ingredientes necessários
-  ingredients: Array<{
-    itemId: string;
-    quantity: number;
-    optional?: boolean;
-  }>;
-  
-  // Produtos gerados
-  outputs: Array<{
-    itemId: string;
-    quantity: number;
-    probability?: number;
-  }>;
-  
-  // Requisitos
-  requiredLevel?: number;
-  requiredWorkshop?: 'basic' | 'advanced' | 'forge' | 'loom' | 'tannery';
-  requiredTool?: string;
-  
-  // Custos e benefícios
-  craftingTime: number; // em segundos
-  experienceGained: number;
-  energyCost?: number;
-  
-  // Metadados
-  tags: string[];
-  unlockConditions?: string[];
-}
+  return [
+    // MATERIAIS BÁSICOS
+    {
+      id: RECIPE_IDS.BARBANTE,
+      name: "Barbante",
+      emoji: "🧵",
+      category: "basic_materials",
+      subcategory: "processed_fiber",
+      difficulty: "trivial",
+      requiredLevel: 1,
+      ingredients: [
+        { itemId: RESOURCE_IDS.FIBRA, quantity: 5, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 5,
+      experienceGained: 10,
+      successRate: 100
+    },
 
-/**
- * RECEITAS DE MATERIAIS BÁSICOS
- */
-export const BASIC_MATERIAL_RECIPES: ModernRecipe[] = [
-  {
-    id: RECIPE_IDS.BARBANTE,
-    name: "Barbante",
-    description: "Transforma fibras em barbante útil.",
-    category: "basic_materials",
-    ingredients: [
-      { itemId: RESOURCE_IDS.FIBRA, quantity: 3 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.BARBANTE, quantity: 1 }
-    ],
-    craftingTime: 5,
-    experienceGained: 2,
-    tags: ["basic", "string", "utility"],
-    requiredWorkshop: "basic"
-  },
-  {
-    id: RECIPE_IDS.CORDA_RESISTENTE,
-    name: "Corda Resistente",
-    description: "Combina barbante e fibras especiais para criar corda forte.",
-    category: "advanced_materials",
-    ingredients: [
-      { itemId: RESOURCE_IDS.BARBANTE, quantity: 4 },
-      { itemId: RESOURCE_IDS.CANAMO, quantity: 2 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.CORDA_RESISTENTE, quantity: 1 }
-    ],
-    requiredLevel: 3,
-    craftingTime: 15,
-    experienceGained: 8,
-    tags: ["rope", "strong", "utility"],
-    requiredWorkshop: "advanced"
-  },
-  {
-    id: RECIPE_IDS.COURO_CURTIDO,
-    name: "Couro Curtido",
-    description: "Processa couro bruto em material utilizável.",
-    category: "leather_working",
-    ingredients: [
-      { itemId: RESOURCE_IDS.COURO, quantity: 1 },
-      { itemId: RESOURCE_IDS.AGUA_FRESCA, quantity: 2 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.COURO_CURTIDO, quantity: 1 }
-    ],
-    requiredLevel: 2,
-    craftingTime: 30,
-    experienceGained: 10,
-    tags: ["leather", "processing", "armor"],
-    requiredWorkshop: "tannery"
-  }
-];
+    // FERRAMENTAS
+    {
+      id: RECIPE_IDS.MACHADO, 
+      name: "Machado",
+      emoji: "🪓",
+      category: "tools",
+      subcategory: "cutting_tools",
+      difficulty: "easy",
+      requiredLevel: 1,
+      ingredients: [
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.MACHADO, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 30,
+      experienceGained: 25,
+      successRate: 95
+    },
 
-/**
- * RECEITAS DE COMPONENTES DE EQUIPAMENTOS
- */
-export const COMPONENT_RECIPES: ModernRecipe[] = [
-  // Cabos e Hastes
-  {
-    id: RECIPE_IDS.CABO_MACHADO,
-    name: "Cabo de Machado",
-    description: "Esculpe madeira em cabo ergonômico para machado.",
-    category: "weapon_components",
-    ingredients: [
-      { itemId: RESOURCE_IDS.MADEIRA, quantity: 2 },
-      { itemId: RESOURCE_IDS.BARBANTE, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.CABO_MACHADO, quantity: 1 }
-    ],
-    requiredLevel: 1,
-    craftingTime: 10,
-    experienceGained: 5,
-    tags: ["component", "handle", "axe"],
-    requiredWorkshop: "basic"
-  },
-  {
-    id: RECIPE_IDS.CABO_ESPADA,
-    name: "Cabo de Espada",
-    description: "Cria empunhadura especializada para espadas.",
-    category: "weapon_components",
-    ingredients: [
-      { itemId: RESOURCE_IDS.MADEIRA_CARVALHO, quantity: 1 },
-      { itemId: RESOURCE_IDS.COURO_CURTIDO, quantity: 1 },
-      { itemId: RESOURCE_IDS.BARBANTE, quantity: 2 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.CABO_ESPADA, quantity: 1 }
-    ],
-    requiredLevel: 3,
-    craftingTime: 20,
-    experienceGained: 12,
-    tags: ["component", "handle", "sword"],
-    requiredWorkshop: "advanced"
-  },
-  {
-    id: RECIPE_IDS.CABO_PICARETA,
-    name: "Cabo de Picareta",
-    description: "Cabo reforçado para suportar o peso de cabeças de picareta.",
-    category: "tool_components",
-    ingredients: [
-      { itemId: RESOURCE_IDS.MADEIRA, quantity: 2 },
-      { itemId: RESOURCE_IDS.CORDA_RESISTENTE, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.CABO_PICARETA, quantity: 1 }
-    ],
-    requiredLevel: 2,
-    craftingTime: 15,
-    experienceGained: 8,
-    tags: ["component", "handle", "pickaxe"],
-    requiredWorkshop: "basic"
-  },
+    {
+      id: RECIPE_IDS.PICARETA,
+      name: "Picareta", 
+      emoji: "⛏️",
+      category: "tools",
+      subcategory: "mining_tools",
+      difficulty: "easy",
+      requiredLevel: 1,
+      ingredients: [
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.PICARETA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 35,
+      experienceGained: 30,
+      successRate: 95
+    },
 
-  // Cabeças e Lâminas
-  {
-    id: RECIPE_IDS.CABECA_MACHADO,
-    name: "Cabeça de Machado",
-    description: "Forja lâmina de ferro em cabeça de machado eficiente.",
-    category: "weapon_components",
-    ingredients: [
-      { itemId: RESOURCE_IDS.BARRA_FERRO, quantity: 2 },
-      { itemId: RESOURCE_IDS.CARVAO, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.CABECA_MACHADO, quantity: 1 }
-    ],
-    requiredLevel: 3,
-    craftingTime: 25,
-    experienceGained: 15,
-    tags: ["component", "blade", "axe"],
-    requiredWorkshop: "forge"
-  },
-  {
-    id: RECIPE_IDS.LAMINA_ESPADA,
-    name: "Lâmina de Espada",
-    description: "Forja lâmina afiada e equilibrada para espadas.",
-    category: "weapon_components",
-    ingredients: [
-      { itemId: RESOURCE_IDS.BARRA_FERRO, quantity: 3 },
-      { itemId: RESOURCE_IDS.CARVAO, quantity: 2 },
-      { itemId: RESOURCE_IDS.PEDRA_AMOLAR, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.LAMINA_ESPADA, quantity: 1 }
-    ],
-    requiredLevel: 4,
-    craftingTime: 40,
-    experienceGained: 25,
-    tags: ["component", "blade", "sword"],
-    requiredWorkshop: "forge"
-  },
-  {
-    id: RECIPE_IDS.CABECA_PICARETA,
-    name: "Cabeça de Picareta",
-    description: "Forja cabeça resistente para mineração.",
-    category: "tool_components",
-    ingredients: [
-      { itemId: RESOURCE_IDS.BARRA_FERRO, quantity: 2 },
-      { itemId: RESOURCE_IDS.CARVAO, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.CABECA_PICARETA, quantity: 1 }
-    ],
-    requiredLevel: 3,
-    craftingTime: 30,
-    experienceGained: 18,
-    tags: ["component", "head", "pickaxe"],
-    requiredWorkshop: "forge"
-  }
-];
+    {
+      id: RECIPE_IDS.FACA,
+      name: "Faca",
+      emoji: "🗡️", 
+      category: "weapons",
+      subcategory: "melee_weapons",
+      difficulty: "easy",
+      requiredLevel: 1,
+      ingredients: [
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.FACA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 25,
+      experienceGained: 20,
+      successRate: 95
+    },
 
-/**
- * RECEITAS DE FERRAMENTAS IMPROVISADAS
- */
-export const IMPROVISED_TOOLS_RECIPES: ModernRecipe[] = [
-  {
-    id: RECIPE_IDS.MACHADO_IMPROVISADO,
-    name: "Machado Improvisado",
-    description: "Crie uma ferramenta básica para cortar madeira usando materiais simples.",
-    category: "bancada",
-    ingredients: [
-      { itemId: RESOURCE_IDS.PEDRA, quantity: 2 },
-      { itemId: RESOURCE_IDS.MADEIRA, quantity: 1 },
-      { itemId: RESOURCE_IDS.BARBANTE, quantity: 3 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.MACHADO_IMPROVISADO, quantity: 1 }
-    ],
-    requiredLevel: 1,
-    craftingTime: 25,
-    experienceGained: 15,
-    tags: ["tool", "improvised", "basic"],
-    requiredWorkshop: "basic"
-  },
-  {
-    id: RECIPE_IDS.PICARETA_IMPROVISADA,
-    name: "Picareta Improvisada", 
-    description: "Construa uma ferramenta rústica para quebrar pedras e minerar.",
-    category: "bancada",
-    ingredients: [
-      { itemId: RESOURCE_IDS.PEDRA, quantity: 3 },
-      { itemId: RESOURCE_IDS.MADEIRA, quantity: 1 },
-      { itemId: RESOURCE_IDS.BARBANTE, quantity: 2 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.PICARETA_IMPROVISADA, quantity: 1 }
-    ],
-    requiredLevel: 1,
-    craftingTime: 30,
-    experienceGained: 18,
-    tags: ["tool", "improvised", "mining"],
-    requiredWorkshop: "basic"
-  }
-];
+    {
+      id: RECIPE_IDS.VARA_PESCA,
+      name: "Vara de Pesca",
+      emoji: "🎣",
+      category: "tools",
+      subcategory: "fishing_tools", 
+      difficulty: "medium",
+      requiredLevel: 3,
+      ingredients: [
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 3, consumed: true },
+        { itemId: RESOURCE_IDS.FIBRA, quantity: 2, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.VARA_PESCA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 45,
+      experienceGained: 40,
+      successRate: 85
+    },
 
-/**
- * RECEITAS DE EQUIPAMENTOS COMPLETOS
- */
-export const EQUIPMENT_RECIPES: ModernRecipe[] = [
-  // Ferramentas Básicas
-  {
-    id: RECIPE_IDS.MACHADO,
-    name: "Machado",
-    description: "Combina cabo e cabeça para criar machado funcional.",
-    category: "tools",
-    ingredients: [
-      { itemId: RESOURCE_IDS.CABO_MACHADO, quantity: 1 },
-      { itemId: RESOURCE_IDS.CABECA_MACHADO, quantity: 1 },
-      { itemId: RESOURCE_IDS.CORDA_RESISTENTE, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: EQUIPMENT_IDS.MACHADO, quantity: 1 }
-    ],
-    requiredLevel: 2,
-    craftingTime: 35,
-    experienceGained: 20,
-    tags: ["tool", "axe", "chopping"],
-    requiredWorkshop: "advanced"
-  },
-  {
-    id: RECIPE_IDS.PICARETA,
-    name: "Picareta",
-    description: "Ferramenta essencial para mineração eficiente.",
-    category: "tools",
-    ingredients: [
-      { itemId: RESOURCE_IDS.CABO_PICARETA, quantity: 1 },
-      { itemId: RESOURCE_IDS.CABECA_PICARETA, quantity: 1 },
-      { itemId: RESOURCE_IDS.BARBANTE, quantity: 2 }
-    ],
-    outputs: [
-      { itemId: EQUIPMENT_IDS.PICARETA, quantity: 1 }
-    ],
-    requiredLevel: 2,
-    craftingTime: 30,
-    experienceGained: 18,
-    tags: ["tool", "pickaxe", "mining"],
-    requiredWorkshop: "advanced"
-  },
-  {
-    id: RECIPE_IDS.ESPADA_FERRO,
-    name: "Espada de Ferro",
-    description: "Arma de ferro balanceada para combate.",
-    category: "weapons",
-    ingredients: [
-      { itemId: RESOURCE_IDS.CABO_ESPADA, quantity: 1 },
-      { itemId: RESOURCE_IDS.LAMINA_ESPADA, quantity: 1 },
-      { itemId: RESOURCE_IDS.EMPUNHADURA_COURO, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: EQUIPMENT_IDS.ESPADA_FERRO, quantity: 1 }
-    ],
-    requiredLevel: 4,
-    craftingTime: 50,
-    experienceGained: 35,
-    tags: ["weapon", "sword", "combat"],
-    requiredWorkshop: "forge"
-  },
+    {
+      id: RECIPE_IDS.FOICE,
+      name: "Foice",
+      emoji: "🔪",
+      category: "tools",
+      subcategory: "harvesting_tools",
+      difficulty: "medium", 
+      requiredLevel: 2,
+      ingredients: [
+        { itemId: RESOURCE_IDS.PEDRA, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.FOICE, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 40,
+      experienceGained: 35,
+      successRate: 90
+    },
 
-  // Ferramentas Avançadas
-  {
-    id: RECIPE_IDS.MACHADO_FERRO,
-    name: "Machado de Ferro",
-    description: "Machado aprimorado com lâmina de ferro refinado.",
-    category: "advanced_tools",
-    ingredients: [
-      { itemId: RESOURCE_IDS.CABO_MACHADO, quantity: 1 },
-      { itemId: RESOURCE_IDS.BARRA_FERRO, quantity: 3 },
-      { itemId: RESOURCE_IDS.COURO_CURTIDO, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: EQUIPMENT_IDS.MACHADO_FERRO, quantity: 1 }
-    ],
-    requiredLevel: 4,
-    craftingTime: 45,
-    experienceGained: 30,
-    tags: ["tool", "advanced", "iron"],
-    requiredWorkshop: "forge"
-  },
-  {
-    id: RECIPE_IDS.PICARETA_FERRO,
-    name: "Picareta de Ferro",
-    description: "Picareta reforçada para mineração de materiais duros.",
-    category: "advanced_tools",
-    ingredients: [
-      { itemId: RESOURCE_IDS.CABO_PICARETA, quantity: 1 },
-      { itemId: RESOURCE_IDS.BARRA_FERRO, quantity: 4 },
-      { itemId: RESOURCE_IDS.CORDA_RESISTENTE, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: EQUIPMENT_IDS.PICARETA_FERRO, quantity: 1 }
-    ],
-    requiredLevel: 4,
-    craftingTime: 40,
-    experienceGained: 28,
-    tags: ["tool", "advanced", "mining"],
-    requiredWorkshop: "forge"
-  }
-];
+    // ARMAS
+    {
+      id: "rec-arco-flecha-001",
+      name: "Arco e Flecha",
+      emoji: "🏹",
+      category: "weapons",
+      subcategory: "ranged_weapons",
+      difficulty: "hard",
+      requiredLevel: 5,
+      ingredients: [
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.ARCO_FLECHA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 60,
+      experienceGained: 60,
+      successRate: 70
+    },
 
-/**
- * RECEITAS DE MATERIAIS PROCESSADOS
- */
-export const PROCESSED_MATERIAL_RECIPES: ModernRecipe[] = [
-  {
-    id: RECIPE_IDS.BARRA_FERRO,
-    name: "Barra de Ferro",
-    description: "Refina ferro bruto em barras utilizáveis.",
-    category: "metallurgy",
-    ingredients: [
-      { itemId: RESOURCE_IDS.FERRO_FUNDIDO, quantity: 2 },
-      { itemId: RESOURCE_IDS.CARVAO, quantity: 3 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.BARRA_FERRO, quantity: 1 }
-    ],
-    requiredLevel: 3,
-    craftingTime: 60,
-    experienceGained: 25,
-    tags: ["metal", "processing", "smithing"],
-    requiredWorkshop: "forge"
-  },
-  {
-    id: RECIPE_IDS.TECIDO_LINHO,
-    name: "Tecido de Linho",
-    description: "Tece fibras de linho em tecido resistente.",
-    category: "textiles",
-    ingredients: [
-      { itemId: RESOURCE_IDS.LINHO, quantity: 4 },
-      { itemId: RESOURCE_IDS.BARBANTE, quantity: 2 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.TECIDO_LINHO, quantity: 1 }
-    ],
-    requiredLevel: 2,
-    craftingTime: 25,
-    experienceGained: 12,
-    tags: ["textile", "fabric", "clothing"],
-    requiredWorkshop: "loom"
-  },
-  {
-    id: RECIPE_IDS.COURO_REFINADO,
-    name: "Couro Refinado",
-    description: "Processa couro curtido em material premium.",
-    category: "leather_working",
-    ingredients: [
-      { itemId: RESOURCE_IDS.COURO_CURTIDO, quantity: 2 },
-      { itemId: RESOURCE_IDS.OLEO_LINHAÇA, quantity: 1 },
-      { itemId: RESOURCE_IDS.CERA_ABELHA, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.COURO_REFINADO, quantity: 1 }
-    ],
-    requiredLevel: 4,
-    craftingTime: 45,
-    experienceGained: 22,
-    tags: ["leather", "premium", "armor"],
-    requiredWorkshop: "tannery"
-  }
-];
+    {
+      id: "rec-lanca-001", 
+      name: "Lança",
+      emoji: "🗡️",
+      category: "weapons",
+      subcategory: "melee_weapons",
+      difficulty: "medium",
+      requiredLevel: 4,
+      ingredients: [
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 4, consumed: true },
+        { itemId: RESOURCE_IDS.PEDRAS_SOLTAS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.LANCA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 50,
+      experienceGained: 50,
+      successRate: 80
+    },
 
-/**
- * RECEITAS DE CONSUMÍVEIS
- */
-export const CONSUMABLE_RECIPES: ModernRecipe[] = [
-  {
-    id: RECIPE_IDS.CARNE_ASSADA,
-    name: "Carne Assada",
-    description: "Assa carne crua para melhorar sabor e conservação.",
-    category: "cooking",
-    ingredients: [
-      { itemId: RESOURCE_IDS.CARNE, quantity: 1 },
-      { itemId: RESOURCE_IDS.GRAVETOS, quantity: 2 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.CARNE_ASSADA, quantity: 1 }
-    ],
-    craftingTime: 15,
-    experienceGained: 5,
-    tags: ["food", "cooked", "preservation"],
-    requiredWorkshop: "basic"
-  },
-  {
-    id: RECIPE_IDS.PEIXE_GRELHADO,
-    name: "Peixe Grelhado",
-    description: "Grelha peixe fresco para refeição nutritiva.",
-    category: "cooking",
-    ingredients: [
-      { itemId: RESOURCE_IDS.PEIXE_PEQUENO, quantity: 1 },
-      { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.PEIXE_GRELHADO, quantity: 1 }
-    ],
-    craftingTime: 10,
-    experienceGained: 4,
-    tags: ["food", "fish", "healthy"],
-    requiredWorkshop: "basic"
-  },
-  {
-    id: RECIPE_IDS.ENSOPADO_CARNE,
-    name: "Ensopado de Carne",
-    description: "Combina carne e vegetais em refeição substancial.",
-    category: "cooking",
-    ingredients: [
-      { itemId: RESOURCE_IDS.CARNE_ASSADA, quantity: 1 },
-      { itemId: RESOURCE_IDS.COGUMELOS, quantity: 2 },
-      { itemId: RESOURCE_IDS.AGUA_FRESCA, quantity: 1 }
-    ],
-    outputs: [
-      { itemId: RESOURCE_IDS.ENSOPADO_CARNE, quantity: 1 }
-    ],
-    requiredLevel: 2,
-    craftingTime: 25,
-    experienceGained: 12,
-    tags: ["food", "stew", "hearty"],
-    requiredWorkshop: "advanced"
-  }
-];
+    // CONTAINERS/UTENSILS
+    {
+      id: "rec-balde-madeira-001",
+      name: "Balde de Madeira",
+      emoji: "🪣",
+      category: "containers",
+      subcategory: "storage_containers",
+      difficulty: "medium",
+      requiredLevel: 2,
+      ingredients: [
+        { itemId: RESOURCE_IDS.MADEIRA, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 2, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.BALDE_MADEIRA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 40,
+      experienceGained: 35,
+      successRate: 90
+    },
 
-/**
- * RECEITAS DE CONTAINERS E UTENSÍLIOS
- */
-export const CONTAINER_RECIPES: ModernRecipe[] = [
-  {
-    id: RECIPE_IDS.MOCHILA,
-    name: "Mochila",
-    description: "Container básico para carregar itens.",
-    category: "storage",
-    ingredients: [
-      { itemId: RESOURCE_IDS.COURO_CURTIDO, quantity: 3 },
-      { itemId: RESOURCE_IDS.BARBANTE, quantity: 4 },
-      { itemId: RESOURCE_IDS.FIVELA_METAL, quantity: 2 }
-    ],
-    outputs: [
-      { itemId: EQUIPMENT_IDS.MOCHILA, quantity: 1 }
-    ],
-    requiredLevel: 2,
-    craftingTime: 35,
-    experienceGained: 15,
-    tags: ["storage", "container", "utility"],
-    requiredWorkshop: "advanced"
-  },
-  {
-    id: RECIPE_IDS.BAU_MADEIRA,
-    name: "Baú de Madeira",
-    description: "Container grande para armazenamento permanente.",
-    category: "storage",
-    ingredients: [
-      { itemId: RESOURCE_IDS.MADEIRA, quantity: 8 },
-      { itemId: RESOURCE_IDS.DOBRADIÇA_FERRO, quantity: 2 },
-      { itemId: RESOURCE_IDS.PREGO_FERRO, quantity: 6 }
-    ],
-    outputs: [
-      { itemId: EQUIPMENT_IDS.BAU_MADEIRA, quantity: 1 }
-    ],
-    requiredLevel: 3,
-    craftingTime: 50,
-    experienceGained: 25,
-    tags: ["storage", "furniture", "large"],
-    requiredWorkshop: "advanced"
-  }
-];
+    {
+      id: "rec-garrafa-bambu-001",
+      name: "Garrafa de Bambu",
+      emoji: "🧴",
+      category: "containers",
+      subcategory: "liquid_containers",
+      difficulty: "medium",
+      requiredLevel: 3,
+      ingredients: [
+        { itemId: RESOURCE_IDS.BAMBU, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.GARRAFA_BAMBU, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 35,
+      experienceGained: 30,
+      successRate: 90
+    },
 
-/**
- * CONSOLIDAÇÃO DE TODAS AS RECEITAS
- */
-export const ALL_MODERN_RECIPES: ModernRecipe[] = [
-  ...BASIC_MATERIAL_RECIPES,
-  ...COMPONENT_RECIPES,
-  ...IMPROVISED_TOOLS_RECIPES,
-  ...EQUIPMENT_RECIPES,
-  ...PROCESSED_MATERIAL_RECIPES,
-  ...CONSUMABLE_RECIPES,
-  ...CONTAINER_RECIPES
-];
+    {
+      id: RECIPE_IDS.MOCHILA,
+      name: "Mochila",
+      emoji: "🎒",
+      category: "containers",
+      subcategory: "storage_equipment",
+      difficulty: "hard",
+      requiredLevel: 5,
+      ingredients: [
+        { itemId: RESOURCE_IDS.COURO, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 5, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.MOCHILA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 60,
+      experienceGained: 50,
+      successRate: 80
+    },
 
-/**
- * FUNÇÕES DE UTILIDADE
- */
-export function getRecipeById(id: string): ModernRecipe | undefined {
-  return ALL_MODERN_RECIPES.find(recipe => recipe.id === id);
-}
+    {
+      id: RECIPE_IDS.CORDA,
+      name: "Corda",
+      emoji: "🪢",
+      category: "basic_materials",
+      subcategory: "cordage",
+      difficulty: "easy",
+      requiredLevel: 2,
+      ingredients: [
+        { itemId: RESOURCE_IDS.BARBANTE, quantity: 3, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.CORDA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 20,
+      experienceGained: 15,
+      successRate: 100
+    },
 
-export function getRecipesByCategory(category: string): ModernRecipe[] {
-  return ALL_MODERN_RECIPES.filter(recipe => recipe.category === category);
-}
+    // CONSUMABLES
+    {
+      id: RECIPE_IDS.COGUMELOS_ASSADOS,
+      name: "Cogumelos Assados",
+      emoji: "🍄",
+      category: "consumables",
+      subcategory: "cooked_food",
+      difficulty: "trivial",
+      requiredLevel: 1,
+      ingredients: [
+        { itemId: RESOURCE_IDS.COGUMELOS, quantity: 3, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.COGUMELOS_ASSADOS, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 15,
+      experienceGained: 15,
+      successRate: 100
+    },
 
-export function getRecipesForItem(itemId: string): ModernRecipe[] {
-  return ALL_MODERN_RECIPES.filter(recipe => 
-    recipe.outputs.some(output => output.itemId === itemId)
-  );
-}
+    {
+      id: RECIPE_IDS.CARNE_ASSADA,
+      name: "Carne Assada",
+      emoji: "🥩",
+      category: "consumables", 
+      subcategory: "cooked_food",
+      difficulty: "trivial",
+      requiredLevel: 1,
+      ingredients: [
+        { itemId: RESOURCE_IDS.CARNE, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.CARNE_ASSADA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 20,
+      experienceGained: 20,
+      successRate: 100
+    },
 
-export function getRecipesUsingIngredient(itemId: string): ModernRecipe[] {
-  return ALL_MODERN_RECIPES.filter(recipe =>
-    recipe.ingredients.some(ingredient => ingredient.itemId === itemId)
-  );
-}
+    {
+      id: RECIPE_IDS.PEIXE_GRELHADO,
+      name: "Peixe Grelhado",
+      emoji: "🐟",
+      category: "consumables",
+      subcategory: "cooked_food",
+      difficulty: "trivial",
+      requiredLevel: 2,
+      ingredients: [
+        { itemId: RESOURCE_IDS.PEIXE_PEQUENO, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.PEIXE_GRELHADO, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 15,
+      experienceGained: 15,
+      successRate: 100
+    },
 
-export function validateAllRecipeIds(): boolean {
-  let isValid = true;
-  
-  for (const recipe of ALL_MODERN_RECIPES) {
-    // Validar ID da receita
-    if (!RECIPE_IDS[Object.keys(RECIPE_IDS).find(key => RECIPE_IDS[key as keyof typeof RECIPE_IDS] === recipe.id) as keyof typeof RECIPE_IDS]) {
-      console.error(`❌ Invalid recipe ID: ${recipe.id}`);
-      isValid = false;
+    {
+      id: RECIPE_IDS.ENSOPADO_CARNE,
+      name: "Ensopado de Carne",
+      emoji: "🍲",
+      category: "consumables",
+      subcategory: "cooked_food",
+      difficulty: "medium",
+      requiredLevel: 4,
+      ingredients: [
+        { itemId: RESOURCE_IDS.CARNE, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.COGUMELOS, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.AGUA_FRESCA, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.GRAVETOS, quantity: 2, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.ENSOPADO_CARNE, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 45,
+      experienceGained: 40,
+      successRate: 90
+    },
+
+    // SUCO DE FRUTAS
+    {
+      id: RECIPE_IDS.SUCO_FRUTAS,
+      name: "Suco de Frutas",
+      emoji: "🧃",
+      category: "consumables",
+      subcategory: "cooked_food",
+      difficulty: "trivial",
+      requiredLevel: 1,
+      ingredients: [
+        { itemId: RESOURCE_IDS.FRUTAS_SILVESTRES, quantity: 3, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.SUCO_FRUTAS, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 10,
+      experienceGained: 10,
+      successRate: 100
+    },
+
+    // PANELAS E UTENSÍLIOS DE COZINHA
+    {
+      id: RECIPE_IDS.PANELA_BARRO,
+      name: "Panela de Barro",
+      emoji: "🏺",
+      category: "tools",
+      subcategory: "cooking_tools",
+      difficulty: "medium",
+      requiredLevel: 3,
+      ingredients: [
+        { itemId: RESOURCE_IDS.ARGILA, quantity: 2, consumed: true },
+        { itemId: RESOURCE_IDS.AGUA_FRESCA, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.PANELA_BARRO, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 50,
+      experienceGained: 35,
+      successRate: 85
+    },
+
+    {
+      id: RECIPE_IDS.PANELA,
+      name: "Panela",
+      emoji: "🍲",
+      category: "tools",
+      subcategory: "cooking_tools",
+      difficulty: "hard",
+      requiredLevel: 6,
+      ingredients: [
+        { itemId: RESOURCE_IDS.FERRO_FUNDIDO, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.MADEIRA, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: EQUIPMENT_IDS.PANELA, quantity: 1, chance: 100 }
+      ],
+      craftingTime: 80,
+      experienceGained: 60,
+      successRate: 80
+    },
+
+    // ISCA PARA PESCA
+    {
+      id: RECIPE_IDS.ISCA_PESCA,
+      name: "Isca para Pesca",
+      emoji: "🪱",
+      category: "consumables",
+      subcategory: "bait",
+      difficulty: "trivial",
+      requiredLevel: 2,
+      ingredients: [
+        { itemId: RESOURCE_IDS.COGUMELOS, quantity: 1, consumed: true },
+        { itemId: RESOURCE_IDS.FRUTAS_SILVESTRES, quantity: 1, consumed: true }
+      ],
+      outputs: [
+        { itemId: RESOURCE_IDS.ISCA_PESCA, quantity: 3, chance: 100 }
+      ],
+      craftingTime: 10,
+      experienceGained: 8,
+      successRate: 100
     }
-    
-    // Validar IDs dos ingredientes
-    for (const ingredient of recipe.ingredients) {
-      if (!Object.values(RESOURCE_IDS).includes(ingredient.itemId as any) && 
-          !Object.values(EQUIPMENT_IDS).includes(ingredient.itemId as any)) {
-        console.error(`❌ Invalid ingredient ID in recipe ${recipe.id}: ${ingredient.itemId}`);
-        isValid = false;
-      }
-    }
-    
-    // Validar IDs dos produtos
-    for (const output of recipe.outputs) {
-      if (!Object.values(RESOURCE_IDS).includes(output.itemId as any) && 
-          !Object.values(EQUIPMENT_IDS).includes(output.itemId as any)) {
-        console.error(`❌ Invalid output ID in recipe ${recipe.id}: ${output.itemId}`);
-        isValid = false;
-      }
-    }
-  }
-  
-  if (isValid) {
-    console.log('✅ All recipe IDs are valid');
-  }
-  
-  return isValid;
+  ];
 }
-
-// Validação automática
-validateAllRecipeIds();

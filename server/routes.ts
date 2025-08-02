@@ -17,8 +17,6 @@ import { registerAdminRoutes } from "./routes/admin";
 import { registerStorageRoutes } from "./routes/storage-routes";
 import { createConsumptionRoutes } from "./routes/consumption";
 import savesRouter from "./routes/saves";
-import workshopRouter from "./routes/workshop-routes";
-import itemRoutes from './routes/items-routes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -47,9 +45,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register saves routes  
   app.use('/api/saves', savesRouter);
-
-  // Register workshop routes
-  app.use('/api/v2/workshop', workshopRouter);
 
   // Create new player
   app.post("/api/player", async (req, res) => {
@@ -293,29 +288,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all biomes
+  // Get all biomes with caching
   app.get("/api/biomes", async (req, res) => {
     try {
-      const biomes = await storage.getAllBiomes();
+      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
+      const biomes = await cacheGetOrSet(
+        CACHE_KEYS.ALL_BIOMES,
+        () => storage.getAllBiomes(),
+        CACHE_TTL.STATIC_DATA
+      );
       res.json(biomes);
     } catch (error) {
-      console.error("Get biomes error:", error);
       res.status(500).json({ message: "Failed to get biomes" });
-    }
-  });
-
-  // Get specific biome by ID
-  app.get("/api/biomes/:biomeId", async (req, res) => {
-    try {
-      const { biomeId } = req.params;
-      const biome = await storage.getBiome(biomeId);
-      if (!biome) {
-        return res.status(404).json({ message: "Biome not found" });
-      }
-      res.json(biome);
-    } catch (error) {
-      console.error("Get biome error:", error);
-      res.status(500).json({ message: "Failed to get biome" });
     }
   });
 
@@ -880,13 +864,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (isEquipment) {
         return res.status(400).json({ 
-message: "Equipamentos, ferramentas e armas só podem ser equipados, não retirados para o inventário." 
+          message: "Equipamentos, ferramentas e armas só podem ser equipados, não retirados para o inventário." 
         });
       }
 
       await gameService.moveToInventory(playerId, storageItemId, quantity);
 
-      // CRITICAL: Invalidate cache to ensure frontend sees updated data```text
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
       const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
       invalidateStorageCache(playerId);
       invalidateInventoryCache(playerId);
@@ -951,12 +935,11 @@ message: "Equipamentos, ferramentas e armas só podem ser equipados, não retira
     }
   });
 
-  // Get biome resources - enhanced for expedition system
+  // Get biome resources - simple route for frontend
   app.get("/api/biomes/:biomeId/resources", async (req, res) => {
     try {
       const { biomeId } = req.params;
-      const actualBiomeId = biomeId.startsWith('biome-') ? biomeId : `biome-${biomeId}`;
-      const biome = await storage.getBiome(actualBiomeId);
+      const biome = await storage.getBiome(biomeId);
 
       if (!biome) {
         return res.status(404).json({ message: "Biome not found" });
@@ -968,13 +951,7 @@ message: "Equipamentos, ferramentas e armas só podem ser equipados, não retira
 
       const biomeResources = resources.filter(r => 
         availableResources.includes(r.id)
-      ).map(resource => ({
-        ...resource,
-        // Ensure proper emoji display for expedition system
-        emoji: resource.emoji && !resource.emoji.startsWith('res-') 
-          ? resource.emoji 
-          : getResourceEmoji(resource.name)
-      }));
+      );
 
       res.json(biomeResources);
     } catch (error) {
@@ -982,44 +959,6 @@ message: "Equipamentos, ferramentas e armas só podem ser equipados, não retira
       res.status(500).json({ message: "Failed to get biome resources" });
     }
   });
-
-  // Helper function for resource emojis
-  function getResourceEmoji(resourceName: string): string {
-    const emojiMap: Record<string, string> = {
-      "Fibra": "🌾",
-      "Pedra": "🪨", 
-      "Pedras Soltas": "🪨",
-      "Pedras Pequenas": "🪨",
-      "Gravetos": "🪵",
-      "Água Fresca": "💧",
-      "Bambu": "🎋",
-      "Madeira": "🌳",
-      "Argila": "🧱",
-      "Ferro Fundido": "⚙️",
-      "Couro": "🦫",
-      "Carne": "🥩",
-      "Ossos": "🦴",
-      "Pelo": "🧶",
-      "Barbante": "🧵",
-      "Linho": "🌾",
-      "Algodão": "☁️",
-      "Juta": "🌾",
-      "Sisal": "🌾",
-      "Cânhamo": "🌾",
-      "Coelho": "🐰",
-      "Veado": "🦌", 
-      "Javali": "🐗",
-      "Peixe Pequeno": "🐟",
-      "Peixe Grande": "🐠",
-      "Salmão": "🍣",
-      "Cogumelos": "🍄",
-      "Frutas Silvestres": "🫐",
-      "Areia": "⏳",
-      "Cristais": "💎",
-      "Conchas": "🐚"
-    };
-    return emojiMap[resourceName] || "📦";
-  }
 
   // Get biome details with enhanced information
   app.get("/api/biomes/:id/details", async (req, res) => {
@@ -1250,23 +1189,15 @@ message: "Equipamentos, ferramentas e armas só podem ser equipados, não retira
 
       // Add crafted items to storage
       if (recipe.outputs && Array.isArray(recipe.outputs)) {
-        console.log(`🔧 CRAFT: Adding ${recipe.outputs.length} outputs to storage for recipe ${recipe.name}`);
-
         for (const output of recipe.outputs) {
           const totalAmount = output.quantity * quantity;
-          console.log(`🔧 CRAFT: Processing output - itemId: ${output.itemId}, amount: ${totalAmount}`);
-
-          // Refresh storage items to get current state
-          const currentStorageItems = await storage.getPlayerStorage(playerId);
-          const existingItem = currentStorageItems.find(item => item.resourceId === output.itemId);
+          const existingItem = storageItems.find(item => item.resourceId === output.itemId);
 
           if (existingItem) {
-            console.log(`🔧 CRAFT: Updating existing item ${output.itemId} from ${existingItem.quantity} to ${existingItem.quantity + totalAmount}`);
             await storage.updateStorageItem(existingItem.id, {
               quantity: existingItem.quantity + totalAmount
             });
           } else {
-            console.log(`🔧 CRAFT: Adding new item ${output.itemId} with quantity ${totalAmount}`);
             await storage.addStorageItem({
               playerId,
               resourceId: output.itemId,
@@ -1276,11 +1207,6 @@ message: "Equipamentos, ferramentas e armas só podem ser equipados, não retira
           }
         }
       }
-
-      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
-      const { invalidateStorageCache, invalidatePlayerCache } = await import("./cache/memory-cache");
-      invalidateStorageCache(playerId);
-      invalidatePlayerCache(playerId);
 
       res.json({
         success: true,
@@ -1296,9 +1222,6 @@ message: "Equipamentos, ferramentas e armas só podem ser equipados, não retira
       });
     }
   });
-
-  // Register item routes
-  app.use('/api/items', itemRoutes);
 
   const httpServer = createServer(app);
 

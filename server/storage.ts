@@ -22,23 +22,11 @@ import {
 } from "@shared/types";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync } from "fs";
-import { ALL_MODERN_ITEMS } from "./data/items-modern";
+import { getAllGameItems } from "./data/items-modern";
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
-import { ALL_MODERN_RECIPES } from "./data/recipes-modern";
+import { createModernRecipeData } from "./data/recipes-modern";
 import { ALL_QUESTS } from "./data/quests";
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  passwordHash: string;
-  createdAt: string;
-  isAdmin?: boolean;
-  googleId?: string;
-  name?: string;
-  picture?: string;
-}
 
 export interface IStorage {
   // Player methods
@@ -48,15 +36,6 @@ export interface IStorage {
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: string, updates: Partial<Player>): Promise<Player>;
   deletePlayer(id: string): Promise<void>;
-
-  // User operations
-  getUserById(id: string): Promise<User | null>;
-  getUserByUsername(username: string): Promise<User | null>;
-  getUserByEmail(email: string): Promise<User | null>;
-  createUser(user: User): Promise<User>;
-  updateUser(id: string, updates: Partial<User>): Promise<User>;
-  deleteUser(id: string): Promise<void>;
-  listUsers(): Promise<User[]>;
 
   // Resource methods
   getAllResources(): Promise<Resource[]>;
@@ -115,7 +94,6 @@ export interface IStorage {
 
 interface StorageData {
   players: Array<[string, Player]>;
-  users: Array<[string, User]>;
   inventoryItems: Array<[string, InventoryItem]>;
   storageItems: Array<[string, StorageItem]>;
   expeditions: Array<[string, Expedition]>;
@@ -124,7 +102,6 @@ interface StorageData {
 
 export class MemStorage implements IStorage {
   private players: Map<string, Player>;
-  private users: Map<string, User>;
   private resources: Map<string, Resource>;
   private biomes: Map<string, Biome>;
   private inventoryItems: Map<string, InventoryItem>;
@@ -140,7 +117,6 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.players = new Map();
-    this.users = new Map();
     this.resources = new Map();
     this.biomes = new Map();
     this.inventoryItems = new Map();
@@ -158,7 +134,6 @@ export class MemStorage implements IStorage {
     try {
       const data: StorageData = {
         players: Array.from(this.players.entries()),
-        users: Array.from(this.users.entries()),
         inventoryItems: Array.from(this.inventoryItems.entries()),
         storageItems: Array.from(this.storageItems.entries()),
         expeditions: Array.from(this.expeditions.entries()),
@@ -182,13 +157,6 @@ export class MemStorage implements IStorage {
         if (data.players) {
           for (const [id, player] of data.players) {
             this.players.set(id, player);
-          }
-        }
-
-        // Load user data
-        if (data.users) {
-          for (const [id, user] of data.users) {
-            this.users.set(id, user);
           }
         }
 
@@ -236,72 +204,41 @@ export class MemStorage implements IStorage {
 
     // Initialize all resources using modern game items system
     const resourceIds: string[] = [];
-    const allItems = ALL_MODERN_ITEMS;
-    const resourceItems = allItems.filter(item => item.type === 'resource' || item.type === 'consumable');
+    const allItems = getAllGameItems();
+    const resourceItems = allItems.filter(item => item.category === 'resource' || item.category === 'consumable');
 
     for (const resource of resourceItems) {
       // Convert modern item to legacy resource format for storage compatibility
       const legacyResource = {
         id: resource.id,
-        name: resource.name,
-        emoji: getResourceEmojiByName(resource.name), // Use actual emoji
+        name: resource.displayName,
+        emoji: resource.iconPath,
         rarity: resource.rarity,
-        experienceValue: resource.baseValue || 10,
-        category: resource.type === 'consumable' ? 'consumables' as const : 'raw_materials' as const,
-        subcategory: resource.category,
-        type: resource.type,
-        spawnRate: resource.spawnRate || 0.1,
-        yieldAmount: 1,
-        requiredTool: Array.isArray(resource.toolRequired) ? resource.toolRequired[0] : resource.toolRequired,
-        sellPrice: resource.baseValue,
-        buyPrice: resource.baseValue * 1.5,
+        experienceValue: resource.xpReward,
+        category: resource.category === 'consumable' ? 'consumables' as const : 'raw_materials' as const,
+        subcategory: resource.subcategory,
+        type: resource.category,
+        spawnRate: resource.spawnRate,
+        yieldAmount: resource.yieldAmount,
+        requiredTool: resource.requiredTool || undefined,
+        sellPrice: resource.sellPrice,
+        buyPrice: resource.buyPrice,
         weight: resource.weight,
         stackable: resource.stackable,
-        maxStackSize: resource.maxStack || 100,
-        effects: resource.buffs ? resource.buffs.map(buff => buff.type) : [],
+        maxStackSize: resource.maxStackSize,
+        effects: resource.effects,
         tags: resource.tags,
         attributes: { 
-          durability: resource.durability || 100, 
+          durability: 100, 
           efficiency: 100, 
           rarity: resource.rarity,
-          baseValue: resource.baseValue,
+          baseValue: resource.sellPrice,
+          ...resource.attributes
         },
-        value: resource.baseValue
+        value: resource.sellPrice
       };
       const created = await this.createResource(legacyResource);
       resourceIds.push(created.id);
-    }
-
-    // Helper function for resource emojis
-    function getResourceEmojiByName(resourceName: string): string {
-      const emojiMap: Record<string, string> = {
-        "Fibra": "🌾",
-        "Pedra": "🪨", 
-        "Pedras Pequenas": "🪨",
-        "Gravetos": "🪵",
-        "Água Fresca": "💧",
-        "Bambu": "🎋",
-        "Madeira": "🌳",
-        "Argila": "🧱",
-        "Ferro Fundido": "⚙️",
-        "Couro": "🦫",
-        "Carne": "🥩",
-        "Ossos": "🦴",
-        "Pelo": "🧶",
-        "Barbante": "🧵",
-        "Coelho": "🐰",
-        "Veado": "🦌", 
-        "Javali": "🐗",
-        "Peixe Pequeno": "🐟",
-        "Peixe Grande": "🐠",
-        "Salmão": "🍣",
-        "Cogumelos": "🍄",
-        "Frutas Silvestres": "🫐",
-        "Areia": "⏳",
-        "Cristais": "💎",
-        "Conchas": "🐚"
-      };
-      return emojiMap[resourceName] || "📦";
     }
 
     // Initialize biomes using modular data
@@ -316,12 +253,9 @@ export class MemStorage implements IStorage {
     }
 
     // Initialize recipes using modular data
-    const recipesData = ALL_MODERN_RECIPES;
+    const recipesData = createModernRecipeData();
     for (const recipe of recipesData) {
-      await this.createRecipe({
-        ...recipe,
-        emoji: "⚙️" // Default emoji for recipes
-      });
+      await this.createRecipe(recipe);
     }
 
     // Initialize quests using modular data
@@ -466,56 +400,6 @@ export class MemStorage implements IStorage {
 
     // Auto-save after deleting player
     await this.saveData();
-  }
-
-  // User operations
-  async getUserById(id: string): Promise<User | null> {
-    return this.users.get(id) || null;
-  }
-
-  async getUserByUsername(username: string): Promise<User | null> {
-    for (const user of this.users.values()) {
-      if (user.username === username) {
-        return user;
-      }
-    }
-    return null;
-  }
-
-  async getUserByEmail(email: string): Promise<User | null> {
-    for (const user of this.users.values()) {
-      if (user.email === email) {
-        return user;
-      }
-    }
-    return null;
-  }
-
-  async createUser(user: User): Promise<User> {
-    this.users.set(user.id, user);
-    await this.saveData();
-    return user;
-  }
-
-  async updateUser(id: string, updates: Partial<User>): Promise<User> {
-    const user = this.users.get(id);
-    if (!user) {
-      throw new Error(`User with id ${id} not found`);
-    }
-
-    const updatedUser = { ...user, ...updates };
-    this.users.set(id, updatedUser);
-    await this.saveData();
-    return updatedUser;
-  }
-
-  async deleteUser(id: string): Promise<void> {
-    this.users.delete(id);
-    await this.saveData();
-  }
-
-  async listUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
   }
 
   // Resource methods

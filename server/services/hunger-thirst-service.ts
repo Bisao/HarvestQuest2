@@ -1,5 +1,6 @@
 // Hunger and Thirst Degradation Service for Coletor Adventures
 import type { IStorage } from "../storage";
+import type { HungerDegradationMode } from "@shared/types";
 import { CONSUMPTION_CONFIG } from "@shared/config/consumption-config";
 
 export class HungerThirstService {
@@ -21,10 +22,10 @@ export class HungerThirstService {
     this.isRunning = true;
     console.log('🍖💧 Starting passive hunger/thirst degradation system');
 
-    // Degrade every 8 minutes (480,000ms)
+    // Degrade every 2 minutes (120,000ms)
     this.degradationTimer = setInterval(async () => {
       await this.degradeAllPlayers();
-    }, 480000); // 8 minutes
+    }, 120000); // 2 minutes
   }
 
   /**
@@ -52,9 +53,10 @@ export class HungerThirstService {
           continue;
         }
 
-        // Fixed degradation: 1 point every 8 minutes
-        const hungerDecrease = Math.min(1, player.hunger); 
-        const thirstDecrease = Math.min(1, player.thirst);
+        // Calculate degradation based on player's selected mode
+        const baseDegradation = this.calculateDegradationByMode(player);
+        const hungerDecrease = Math.min(baseDegradation.hunger, player.hunger); 
+        const thirstDecrease = Math.min(baseDegradation.thirst, player.thirst);
 
         const newHunger = Math.max(0, player.hunger - hungerDecrease);
         const newThirst = Math.max(0, player.thirst - thirstDecrease);
@@ -143,9 +145,111 @@ export class HungerThirstService {
     }
   }
 
+  /**
+   * Calculate degradation rates based on player's selected mode
+   */
+  private calculateDegradationByMode(player: any): { hunger: number; thirst: number } {
+    const mode: HungerDegradationMode = player.hungerDegradationMode || 'automatic';
+    
+    // Disabled mode - no degradation
+    if (mode === 'disabled') {
+      return { hunger: 0, thirst: 0 };
+    }
+    
+    let hungerRate = 1; // Base rate
+    let thirstRate = 1; // Base rate
+    
+    // Apply mode-specific multipliers
+    switch (mode) {
+      case 'slow':
+        hungerRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.SLOW;
+        thirstRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.SLOW;
+        break;
+      case 'normal':
+        hungerRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.NORMAL;
+        thirstRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.NORMAL;
+        break;
+      case 'fast':
+        hungerRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.FAST;
+        thirstRate *= CONSUMPTION_CONFIG.DEGRADATION.MULTIPLIERS.FAST;
+        break;
+      case 'automatic':
+      default:
+        // Use dynamic calculation for automatic mode
+        return this.calculateDynamicDegradation(player);
+    }
+    
+    return {
+      hunger: Math.ceil(hungerRate),
+      thirst: Math.ceil(thirstRate)
+    };
+  }
 
+  /**
+   * Calculate dynamic degradation rates based on player status (for automatic mode)
+   */
+  private calculateDynamicDegradation(player: any): { hunger: number; thirst: number } {
+    let hungerRate = 1; // Base rate
+    let thirstRate = 1; // Base rate
 
+    // Increase rate based on player level (higher level = more resource consumption)
+    const levelMultiplier = 1 + (player.level - 1) * 0.05; // +5% per level above 1
+    hungerRate *= levelMultiplier;
+    thirstRate *= levelMultiplier;
 
+    hungerRate *= levelMultiplier;
+    thirstRate *= levelMultiplier;
+
+    // Equipment can reduce degradation
+    if (player.equippedChestplate) {
+      hungerRate *= 0.9; // 10% less hunger loss with armor
+    }
+    if (player.equippedHelmet) {
+      thirstRate *= 0.9; // 10% less thirst loss with helmet
+    }
+
+    // Apply temporary effects (if player has active buffs/debuffs)
+    if (player.temporaryEffects) {
+      for (const effect of player.temporaryEffects) {
+        if (effect.expiresAt > Date.now()) {
+          switch (effect.type) {
+            case 'well_fed':
+              hungerRate *= 0.5; // 50% slower hunger loss
+              break;
+            case 'hydrated':
+              thirstRate *= 0.5; // 50% slower thirst loss
+              break;
+            case 'exhausted':
+              hungerRate *= 1.5; // 50% faster hunger loss
+              thirstRate *= 1.5; // 50% faster thirst loss
+              break;
+            case 'fasting':
+              hungerRate *= 2; // Double hunger loss
+              break;
+          }
+        }
+      }
+    }
+
+    // Environmental factors
+    const currentTime = new Date();
+    const hour = currentTime.getHours();
+
+    // Night time increases degradation slightly
+    if (hour >= 22 || hour <= 6) {
+      hungerRate *= 1.1;
+      thirstRate *= 1.1;
+    }
+
+    // Cap the rates to reasonable values
+    hungerRate = Math.min(3, Math.max(0.25, hungerRate));
+    thirstRate = Math.min(3, Math.max(0.25, thirstRate));
+
+    return {
+      hunger: Math.ceil(hungerRate),
+      thirst: Math.ceil(thirstRate)
+    };
+  }
 
   /**
    * Manual degradation for a specific player - REMOVED to prevent conflicts with configured degradation mode
@@ -188,7 +292,7 @@ export class HungerThirstService {
   getStatus(): { isRunning: boolean; intervalMs: number } {
     return {
       isRunning: this.isRunning,
-      intervalMs: 480000 // 8 minutes (480 seconds)
+      intervalMs: 120000 // 2 minutes (120 seconds)
     };
   }
 }

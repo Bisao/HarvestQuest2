@@ -7,15 +7,9 @@ import { rateLimit } from "./middleware/auth";
 
 // Import consumption routes
 import { createConsumptionRoutes } from "./routes/consumption";
-import { ALL_MODERN_RECIPES } from "./data/recipes-modern";
+import { createModernRecipeData } from "./data/recipes-modern";
 import { GameService } from "./services/game-service";
 import { validateRecipeIngredients, validateGameDataConsistency } from "@shared/utils/id-validation";
-
-// Import routes
-import { createAuthRoutes } from "./routes/auth";
-import gameRoutes from "./routes/game";
-import { createSaveRoutes } from "./routes/saves";
-import { registerAdminRoutes } from "./routes/admin";
 
 const app = express();
 const port = Number(process.env.PORT) || 5000;
@@ -29,7 +23,7 @@ if (!consistencyCheck.isValid) {
 }
 
 // Validate recipe ingredients
-const recipes = ALL_MODERN_RECIPES;
+const recipes = createModernRecipeData();
 const recipeValidation = validateRecipeIngredients(recipes);
 if (!recipeValidation.isValid) {
   console.error("❌ Recipe validation errors:");
@@ -54,8 +48,8 @@ app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 // Request logging
 app.use(requestLogger);
 
-// Rate limiting only for API routes (not for Vite assets)
-app.use('/api', rateLimit(200, 60000)); // 200 requests per minute for API
+// Rate limiting for API routes
+app.use('/api', rateLimit(100, 60000)); // 100 requests per minute
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -107,19 +101,6 @@ app.use((req, res, next) => {
 
   // Use the centralized error handler
   app.use(errorHandler);
-
-  // UUID Enforcement System - moved imports to top level
-  app.use((req, res, next) => {
-    // Skip UUID enforcement for now to avoid blocking startup
-    next();
-  });
-
-  // Register routes (remove duplicates)
-  app.use("/api/auth", createAuthRoutes(storage));
-  app.use("/api/game", gameRoutes);
-  app.use("/api/saves", createSaveRoutes());
-  registerRoutes(app);
-  registerAdminRoutes(app);
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

@@ -1,72 +1,55 @@
 
 /**
- * REFACTORED INVENTORY TYPES
- * Clean, unified types with better separation of concerns
+ * UNIFIED INVENTORY TYPES
+ * Single source of truth for all inventory-related types
  */
 
 import type { Resource, Equipment } from '@shared/types';
 
-// Core inventory item interface
-export interface InventoryItem {
+// Base item interface for consistency
+export interface BaseInventoryItem {
   id: string;
+  resourceId: string; // Always use resourceId for consistency
+  quantity: number;
+  itemType?: 'resource' | 'equipment';
+}
+
+// Unified inventory item (replaces all variants)
+export interface InventoryItem extends BaseInventoryItem {
+  itemType: 'resource' | 'equipment';
+}
+
+// Unified storage item (replaces all variants)
+export interface StorageItem extends BaseInventoryItem {
   playerId: string;
+  itemType: 'resource' | 'equipment';
+}
+
+// Enhanced item with data
+export interface EnhancedItem<T extends Resource | Equipment = Resource | Equipment> {
+  id: string;
   resourceId: string;
   quantity: number;
   itemType: 'resource' | 'equipment';
-  createdAt?: number;
-  lastModified?: number;
-}
-
-// Storage item interface
-export interface StorageItem extends InventoryItem {
-  storageSlot?: number;
-}
-
-// Enhanced item with computed properties
-export interface EnhancedInventoryItem {
-  item: InventoryItem;
-  itemData: Resource | Equipment;
-  type: 'resource' | 'equipment';
-  totalWeight: number;
+  itemData: T & { type: 'resource' | 'equipment' };
   totalValue: number;
-  isConsumable: boolean;
-  isEquipment: boolean;
-  canStack: boolean;
-  maxStackSize: number;
+  totalWeight: number;
 }
 
-// Inventory operation results
-export interface InventoryOperationResult {
-  success: boolean;
-  message: string;
-  data?: any;
-  error?: string;
-}
-
-// Inventory constraints
-export interface InventoryConstraints {
-  maxWeight: number;
-  maxSlots: number;
-  currentWeight: number;
-  currentSlots: number;
-}
-
-// Item movement operations
-export interface ItemMoveOperation {
+// Standard item reference for all systems
+export interface ItemReference {
   itemId: string;
-  sourceLocation: 'inventory' | 'storage' | 'equipment';
-  targetLocation: 'inventory' | 'storage' | 'equipment';
-  quantity: number;
-  slotId?: string;
+  type: 'resource' | 'equipment';
+  quantity?: number;
 }
 
-// Inventory statistics
-export interface InventoryStats {
-  totalItems: number;
-  totalWeight: number;
-  totalValue: number;
-  uniqueItems: number;
-  consumableItems: number;
-  equipmentItems: number;
-  resourceItems: number;
+// Unified item operations interface
+export interface ItemOperations {
+  getById: (id: string) => (Resource | Equipment) | null;
+  getWithType: (id: string) => { item: Resource | Equipment; type: 'resource' | 'equipment' } | null;
+  isResource: (id: string) => boolean;
+  isEquipment: (id: string) => boolean;
 }
+
+// Export all legacy interfaces for backward compatibility
+export type { Resource, Equipment } from '@shared/types';
