@@ -15,13 +15,11 @@ import {
   Zap
 } from 'lucide-react';
 import type { Player, Biome, Resource, Equipment, Recipe } from '@shared/types';
-import GameHeader from './game-header';
 import UnifiedInventory from './unified-inventory';
 import UnifiedWorkshops from './unified-workshops';
 import EnhancedBiomesTab from './enhanced-biomes-tab';
 import QuestsTab from './quests-tab';
 import StatusTab from './status-tab';
-import PlayerSettings from './player-settings';
 import CampTab from './camp-tab';
 import ExpeditionPanel, { type ActiveExpedition } from './expedition-panel';
 
@@ -82,7 +80,7 @@ export default function ModernGameLayout({
             onExpeditionStart={setActiveExpedition}
           />
         );
-      
+
       case 'inventory':
         return (
           <UnifiedInventory
@@ -93,7 +91,7 @@ export default function ModernGameLayout({
             isBlocked={isBlocked}
           />
         );
-      
+
       case 'camp':
         return (
           <CampTab
@@ -102,7 +100,7 @@ export default function ModernGameLayout({
             equipment={equipment}
           />
         );
-      
+
       case 'workshops':
         return (
           <UnifiedWorkshops
@@ -111,14 +109,14 @@ export default function ModernGameLayout({
             isBlocked={isBlocked}
           />
         );
-      
+
       case 'quests':
         return (
           <QuestsTab
             player={player}
           />
         );
-      
+
       case 'status':
         return (
           <StatusTab
@@ -128,7 +126,7 @@ export default function ModernGameLayout({
             isBlocked={isBlocked}
           />
         );
-      
+
       default:
         return (
           <Card>
@@ -143,8 +141,7 @@ export default function ModernGameLayout({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Header */}
-      <GameHeader player={player} />
+      
 
       {/* Auth Warning */}
       {authWarning && (
@@ -286,11 +283,7 @@ export default function ModernGameLayout({
 
       {/* Settings Modal */}
       {showSettings && (
-        <PlayerSettings
-          playerId={player.id}
-          isOpen={showSettings}
-          onClose={() => setShowSettings(false)}
-        />
+        null
       )}
     </div>
   );
