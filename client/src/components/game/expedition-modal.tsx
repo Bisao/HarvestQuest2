@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import type { Biome, Resource, Equipment, Player } from "@shared/types";
+import { CheckCircle, Clock, Users, X } from "lucide-react";
 
 interface ExpeditionModalProps {
   isOpen: boolean;
@@ -180,7 +181,7 @@ export default function ExpeditionModal({
       // First check if there's an active expedition and try to complete it
       try {
         const activeExpeditionResponse = await fetch(`/api/player/${player.id}/expeditions/active`);
-        
+
         if (activeExpeditionResponse.ok) {
           const contentType = activeExpeditionResponse.headers.get('content-type');
           if (contentType && contentType.includes('application/json')) {
@@ -191,12 +192,12 @@ export default function ExpeditionModal({
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
               });
-              
+
               if (completeResponse.ok) {
                 const completeContentType = completeResponse.headers.get('content-type');
                 if (completeContentType && completeContentType.includes('application/json')) {
                   await completeResponse.json();
-                  
+
                   // Wait a moment for cache invalidation
                   await new Promise(resolve => setTimeout(resolve, 1000));
                 }
@@ -218,7 +219,7 @@ export default function ExpeditionModal({
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
         let errorMessage = 'Failed to start expedition';
-        
+
         if (contentType && contentType.includes('application/json')) {
           try {
             const errorData = await response.json();
@@ -235,7 +236,7 @@ export default function ExpeditionModal({
             errorMessage = errorText || errorMessage;
           }
         }
-        
+
         throw new Error(errorMessage);
       }
 
@@ -365,49 +366,46 @@ export default function ExpeditionModal({
                           {category.title}
                         </h5>
                         <div className="space-y-2">
-                          {category.items.map((resource) => (
-                            <div
-                              key={resource.id}
-                              className={`flex items-center justify-between p-3 rounded-lg border ${
-                                resource.canCollect 
-                                  ? "bg-white hover:bg-gray-50 border-gray-200" 
-                                  : "bg-gray-100 opacity-60 border-gray-300"
-                              }`}
-                            >
-                              <div className="flex items-center space-x-3">
-                                <Checkbox
-                                  checked={selectedResources.includes(resource.id)}
-                                  onCheckedChange={() => toggleResourceSelection(resource.id)}
-                                  disabled={!resource.canCollect}
-                                />
-                                <span className="text-xl">{resource.emoji}</span>
-                                <div>
-                                  <p className="font-medium">{resource.name}</p>
-                                  <p className="text-xs text-gray-600">
-                                    XP: {resource.experienceValue} | Valor: {resource.value}
-                                    {resource.rarity && (
-                                      <span className={`ml-2 px-1 py-0.5 rounded text-xs ${
-                                        resource.rarity === 'rare' ? 'bg-purple-100 text-purple-700' :
-                                        resource.rarity === 'uncommon' ? 'bg-blue-100 text-blue-700' :
-                                        'bg-gray-100 text-gray-700'
-                                      }`}>
-                                        {resource.rarity === 'rare' ? 'Raro' : 
-                                         resource.rarity === 'uncommon' ? 'Incomum' : 'Comum'}
-                                      </span>
-                                    )}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-sm">{resource.toolIcon}</span>
-                                  <span className={`text-xs font-medium ${resource.canCollect ? "text-green-600" : "text-red-600"}`}>
-                                    {resource.requirementText}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
+                          {category.items.map(resource => (
+                <div
+                  key={resource.id}
+                  className={`p-3 border rounded transition-colors ${
+                    selectedResources.includes(resource.id)
+                      ? 'border-blue-500 bg-blue-50'
+                      : resource.canCollect
+                      ? 'border-gray-200 hover:border-gray-300 cursor-pointer'
+                      : 'border-red-200 bg-red-50 opacity-60 cursor-not-allowed'
+                  }`}
+                  onClick={() => resource.canCollect && toggleResourceSelection(resource.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">{resource.emoji}</span>
+                      <span className={`font-medium ${!resource.canCollect ? 'text-gray-500' : ''}`}>
+                        {resource.name}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm">{resource.toolIcon}</span>
+                      {selectedResources.includes(resource.id) && (
+                        <CheckCircle className="h-4 w-4 text-blue-500" />
+                      )}
+                      {!resource.canCollect && (
+                        <X className="h-4 w-4 text-red-500" />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-1">
+                    <span className={`text-xs ${
+                      resource.canCollect ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {resource.requirementText}
+                    </span>
+                  </div>
+                </div>
+              ))}
                         </div>
                       </div>
                     )
