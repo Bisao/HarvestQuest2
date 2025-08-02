@@ -13,6 +13,7 @@ import { validateRecipeIngredients, validateGameDataConsistency } from "@shared/
 
 // Import all route modules at the top
 import { registerAdminRoutes } from './routes/admin';
+import { createAuthRoutes } from "./routes/auth";
 
 const app = express();
 const port = Number(process.env.PORT) || 5000;
@@ -121,6 +122,9 @@ app.use((req, res, next) => {
   // Routes - using proper route registration
   registerRoutes(app);
   registerAdminRoutes(app);
+    // Register authentication routes
+    const { storage:authStorage } = await import("./storage");
+  app.use('/api/auth', createAuthRoutes(authStorage));
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

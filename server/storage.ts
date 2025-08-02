@@ -28,6 +28,15 @@ import { createBiomeData } from "./data/biomes";
 import { ALL_MODERN_RECIPES } from "./data/recipes-modern";
 import { ALL_QUESTS } from "./data/quests";
 
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  passwordHash: string;
+  createdAt: string;
+  isAdmin?: boolean;
+}
+
 export interface IStorage {
   // Player methods
   getPlayer(id: string): Promise<Player | undefined>;
@@ -36,6 +45,15 @@ export interface IStorage {
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: string, updates: Partial<Player>): Promise<Player>;
   deletePlayer(id: string): Promise<void>;
+
+  // User operations
+  getUserById(id: string): Promise<User | null>;
+  getUserByUsername(username: string): Promise<User | null>;
+  getUserByEmail(email: string): Promise<User | null>;
+  createUser(user: User): Promise<User>;
+  updateUser(id: string, updates: Partial<User>): Promise<User>;
+  deleteUser(id: string): Promise<void>;
+  listUsers(): Promise<User[]>;
 
   // Resource methods
   getAllResources(): Promise<Resource[]>;
@@ -94,6 +112,7 @@ export interface IStorage {
 
 interface StorageData {
   players: Array<[string, Player]>;
+  users: Array<[string, User]>;
   inventoryItems: Array<[string, InventoryItem]>;
   storageItems: Array<[string, StorageItem]>;
   expeditions: Array<[string, Expedition]>;
@@ -102,6 +121,7 @@ interface StorageData {
 
 export class MemStorage implements IStorage {
   private players: Map<string, Player>;
+  private users: Map<string, User>;
   private resources: Map<string, Resource>;
   private biomes: Map<string, Biome>;
   private inventoryItems: Map<string, InventoryItem>;
@@ -117,6 +137,7 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.players = new Map();
+    this.users = new Map();
     this.resources = new Map();
     this.biomes = new Map();
     this.inventoryItems = new Map();
@@ -134,6 +155,7 @@ export class MemStorage implements IStorage {
     try {
       const data: StorageData = {
         players: Array.from(this.players.entries()),
+        users: Array.from(this.users.entries()),
         inventoryItems: Array.from(this.inventoryItems.entries()),
         storageItems: Array.from(this.storageItems.entries()),
         expeditions: Array.from(this.expeditions.entries()),
@@ -157,6 +179,13 @@ export class MemStorage implements IStorage {
         if (data.players) {
           for (const [id, player] of data.players) {
             this.players.set(id, player);
+          }
+        }
+
+        // Load user data
+        if (data.users) {
+          for (const [id, user] of data.users) {
+            this.users.set(id, user);
           }
         }
 
@@ -434,6 +463,56 @@ export class MemStorage implements IStorage {
 
     // Auto-save after deleting player
     await this.saveData();
+  }
+
+  // User operations
+  async getUserById(id: string): Promise<User | null> {
+    return this.users.get(id) || null;
+  }
+
+  async getUserByUsername(username: string): Promise<User | null> {
+    for (const user of this.users.values()) {
+      if (user.username === username) {
+        return user;
+      }
+    }
+    return null;
+  }
+
+  async getUserByEmail(email: string): Promise<User | null> {
+    for (const user of this.users.values()) {
+      if (user.email === email) {
+        return user;
+      }
+    }
+    return null;
+  }
+
+  async createUser(user: User): Promise<User> {
+    this.users.set(user.id, user);
+    await this.saveData();
+    return user;
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User> {
+    const user = this.users.get(id);
+    if (!user) {
+      throw new Error(`User with id ${id} not found`);
+    }
+
+    const updatedUser = { ...user, ...updates };
+    this.users.set(id, updatedUser);
+    await this.saveData();
+    return updatedUser;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    this.users.delete(id);
+    await this.saveData();
+  }
+
+  async listUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
   }
 
   // Resource methods

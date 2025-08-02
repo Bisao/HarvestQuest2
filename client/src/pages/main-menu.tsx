@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Play, Wifi, WifiOff, Users, Clock, Star } from "lucide-react";
+import { Trash2, Play, Wifi, WifiOff, Users, Clock, Star, Eye, EyeOff, LogOut, Settings, UserPlus, LogIn } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +18,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  createdAt: string;
+  isAdmin?: boolean;
+}
 
 interface SaveGame {
   id: string;
@@ -26,6 +41,12 @@ interface SaveGame {
   experience: number;
   lastPlayed: number;
   offlineExpeditionActive?: boolean;
+}
+
+interface AuthState {
+  isAuthenticated: boolean;
+  user: User | null;
+  token: string | null;
 }
 
 interface PlayerCardProps {
@@ -165,6 +186,308 @@ function CreatePlayerForm({ newPlayerName, isCreating, isOnline, onNameChange, o
   );
 }
 
+interface AuthFormProps {
+  isOnline: boolean;
+  onAuthSuccess: (auth: AuthState) => void;
+}
+
+function AuthForm({ isOnline, onAuthSuccess }: AuthFormProps) {
+  const [activeTab, setActiveTab] = useState("login");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loginData, setLoginData] = useState({ username: "", password: "" });
+  const [registerData, setRegisterData] = useState({ 
+    username: "", 
+    email: "", 
+    password: "", 
+    confirmPassword: "" 
+  });
+  const { toast } = useToast();
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: { username: string; password: string }) => {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || "Erro ao fazer login");
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      const authState: AuthState = {
+        isAuthenticated: true,
+        user: data.user,
+        token: data.token
+      };
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      onAuthSuccess(authState);
+      toast({
+        title: "Login realizado!",
+        description: `Bem-vindo de volta, ${data.user.username}!`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro no login",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: async (data: { username: string; email: string; password: string }) => {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || "Erro ao registrar usuário");
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      const authState: AuthState = {
+        isAuthenticated: true,
+        user: data.user,
+        token: data.token
+      };
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      onAuthSuccess(authState);
+      toast({
+        title: "Conta criada!",
+        description: `Bem-vindo, ${data.user.username}!`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro no registro",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isOnline) {
+      toast({
+        title: "Sem conexão",
+        description: "Verifique sua conexão com a internet",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (loginData.username && loginData.password) {
+      loginMutation.mutate(loginData);
+    }
+  };
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isOnline) {
+      toast({
+        title: "Sem conexão",
+        description: "Verifique sua conexão com a internet",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (registerData.password !== registerData.confirmPassword) {
+      toast({
+        title: "Erro",
+        description: "As senhas não coincidem",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (registerData.username && registerData.email && registerData.password) {
+      registerMutation.mutate({
+        username: registerData.username,
+        email: registerData.email,
+        password: registerData.password
+      });
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto">
+      <Card className="border-2 shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-gray-800">
+            🎮 Coletor Adventures
+          </CardTitle>
+          <CardDescription>
+            Entre ou crie sua conta para começar a aventura
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login" className="flex items-center gap-2">
+                <LogIn className="w-4 h-4" />
+                Login
+              </TabsTrigger>
+              <TabsTrigger value="register" className="flex items-center gap-2">
+                <UserPlus className="w-4 h-4" />
+                Registro
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="login" className="space-y-4 mt-6">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login-username">Usuário</Label>
+                  <Input
+                    id="login-username"
+                    type="text"
+                    placeholder="Digite seu usuário"
+                    value={loginData.username}
+                    onChange={(e) => setLoginData(prev => ({ ...prev, username: e.target.value }))}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="login-password">Senha</Label>
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Digite sua senha"
+                      value={loginData.password}
+                      onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  disabled={loginMutation.isPending || !isOnline}
+                >
+                  {loginMutation.isPending ? "Entrando..." : "Entrar"}
+                </Button>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="register" className="space-y-4 mt-6">
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="register-username">Usuário</Label>
+                  <Input
+                    id="register-username"
+                    type="text"
+                    placeholder="Escolha um usuário"
+                    value={registerData.username}
+                    onChange={(e) => setRegisterData(prev => ({ ...prev, username: e.target.value }))}
+                    required
+                    minLength={3}
+                    maxLength={20}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="register-email">Email</Label>
+                  <Input
+                    id="register-email"
+                    type="email"
+                    placeholder="Digite seu email"
+                    value={registerData.email}
+                    onChange={(e) => setRegisterData(prev => ({ ...prev, email: e.target.value }))}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="register-password">Senha</Label>
+                  <div className="relative">
+                    <Input
+                      id="register-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Crie uma senha"
+                      value={registerData.password}
+                      onChange={(e) => setRegisterData(prev => ({ ...prev, password: e.target.value }))}
+                      required
+                      minLength={6}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="register-confirm-password">Confirmar Senha</Label>
+                  <div className="relative">
+                    <Input
+                      id="register-confirm-password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirme sua senha"
+                      value={registerData.confirmPassword}
+                      onChange={(e) => setRegisterData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      required
+                      minLength={6}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  disabled={registerMutation.isPending || !isOnline}
+                >
+                  {registerMutation.isPending ? "Criando conta..." : "Criar Conta"}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 interface DeleteConfirmationDialogProps {
   playerToDelete: { id: string; username: string } | null;
   onConfirm: () => void;
@@ -198,6 +521,15 @@ export default function MainMenu() {
   const [isCreating, setIsCreating] = useState(false);
   const [isOnline, setIsOnline] = useState(() => navigator.onLine);
   const [playerToDelete, setPlayerToDelete] = useState<{ id: string; username: string } | null>(null);
+  const [authState, setAuthState] = useState<AuthState>(() => {
+    const token = localStorage.getItem("auth_token");
+    const user = localStorage.getItem("user");
+    return {
+      isAuthenticated: !!token,
+      user: user ? JSON.parse(user) : null,
+      token
+    };
+  });
   
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
@@ -217,25 +549,56 @@ export default function MainMenu() {
     };
   }, []);
 
-  // Fetch saved games
+  // Verify token on mount
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        try {
+          const response = await fetch("/api/auth/verify", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (!response.ok) {
+            handleLogout();
+          }
+        } catch {
+          handleLogout();
+        }
+      }
+    };
+    
+    if (authState.isAuthenticated) {
+      verifyToken();
+    }
+  }, []);
+
+  // Fetch saved games - only if authenticated
   const { data: savedGames = [], isLoading: isLoadingSaves } = useQuery({
     queryKey: ["/api/saves"],
     queryFn: async () => {
-      const response = await fetch("/api/saves");
+      const token = localStorage.getItem("auth_token");
+      const response = await fetch("/api/saves", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch saves");
       }
       return response.json();
     },
     retry: 1,
+    enabled: authState.isAuthenticated
   });
 
   // Create player mutation
   const createPlayerMutation = useMutation({
     mutationFn: async (username: string) => {
+      const token = localStorage.getItem("auth_token");
       const response = await fetch("/api/saves", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ username }),
       });
       
@@ -268,8 +631,10 @@ export default function MainMenu() {
   // Delete player mutation
   const deletePlayerMutation = useMutation({
     mutationFn: async (playerId: string) => {
+      const token = localStorage.getItem("auth_token");
       const response = await fetch(`/api/saves/${playerId}`, {
         method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
       
       if (!response.ok) {
@@ -320,6 +685,51 @@ export default function MainMenu() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user");
+    setAuthState({ isAuthenticated: false, user: null, token: null });
+    queryClient.invalidateQueries({ queryKey: ["/api/saves"] });
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso",
+    });
+  };
+
+  const handleAuthSuccess = (auth: AuthState) => {
+    setAuthState(auth);
+    queryClient.invalidateQueries({ queryKey: ["/api/saves"] });
+  };
+
+  // Show auth form if not authenticated
+  if (!authState.isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-lg">
+          {/* Connection Status */}
+          <div className="flex justify-center mb-6">
+            {isOnline ? (
+              <Badge className="bg-green-100 text-green-700 border-green-200">
+                <Wifi className="w-4 h-4 mr-2" />
+                Conectado
+              </Badge>
+            ) : (
+              <Badge variant="destructive" className="bg-red-100 text-red-700 border-red-200">
+                <WifiOff className="w-4 h-4 mr-2" />
+                Desconectado - Verifique sua conexão
+              </Badge>
+            )}
+          </div>
+          
+          <AuthForm 
+            isOnline={isOnline} 
+            onAuthSuccess={handleAuthSuccess} 
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (isLoadingSaves) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -334,11 +744,37 @@ export default function MainMenu() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
+        {/* Header with User Info */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-gray-800 tracking-tight">
-            🎮 Coletor Adventures
-          </h1>
+          <div className="flex justify-between items-center">
+            <div></div>
+            <h1 className="text-4xl font-bold text-gray-800 tracking-tight">
+              🎮 Coletor Adventures
+            </h1>
+            <div className="flex items-center gap-4">
+              {authState.user && (
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="px-3 py-1">
+                    <Users className="w-4 h-4 mr-1" />
+                    {authState.user.username}
+                    {authState.user.isAdmin && (
+                      <Settings className="w-3 h-3 ml-1" />
+                    )}
+                  </Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLogout}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <LogOut className="w-4 h-4 mr-1" />
+                    Sair
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+          
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Continue sua aventura onde parou ou crie um novo personagem para explorar 
             um mundo cheio de recursos, crafting e expedições emocionantes!
@@ -400,7 +836,8 @@ export default function MainMenu() {
         <div className="text-center text-sm text-gray-500 border-t pt-8">
           <p>
             Coletor Adventures - Versão 2.0 | 
-            {savedGames.length} jogador{savedGames.length !== 1 ? 'es' : ''} salvo{savedGames.length !== 1 ? 's' : ''}
+            {savedGames.length} jogador{savedGames.length !== 1 ? 'es' : ''} salvo{savedGames.length !== 1 ? 's' : ''} | 
+            Logado como: {authState.user?.username}
           </p>
         </div>
       </div>
