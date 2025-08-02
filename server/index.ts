@@ -54,8 +54,8 @@ app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 // Request logging
 app.use(requestLogger);
 
-// Rate limiting for API routes
-app.use('/api', rateLimit(100, 60000)); // 100 requests per minute
+// Rate limiting only for API routes (not for Vite assets)
+app.use('/api', rateLimit(200, 60000)); // 200 requests per minute for API
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -114,22 +114,12 @@ app.use((req, res, next) => {
     next();
   });
 
-  // Routes - moved imports to top level and fixed missing routes
-
-  const limiter = rateLimit(100, 60000);
-
-  // Apply the rate limiting middleware to all requests
-  app.use(limiter);
-
-  // Register routes
+  // Register routes (remove duplicates)
   app.use("/api/auth", createAuthRoutes(storage));
   app.use("/api/game", gameRoutes);
   app.use("/api/saves", createSaveRoutes());
   registerRoutes(app);
   registerAdminRoutes(app);
-    // Register authentication routes
-    const { storage:authStorage } = await import("./storage");
-  app.use('/api/auth', createAuthRoutes(authStorage));
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
