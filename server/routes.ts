@@ -18,6 +18,9 @@ import { registerStorageRoutes } from "./routes/storage-routes";
 import { createConsumptionRoutes } from "./routes/consumption";
 import savesRouter from "./routes/saves";
 import workshopRouter from "./routes/workshop-routes";
+import questRoutes from './routes/quest-routes';
+import storageRoutes from './routes/storage-routes';
+import itemRoutes from './routes/items-routes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -875,6 +878,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await gameService.moveToInventory(playerId, storageItemId, quantity);
 
       // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+```text
       const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
       invalidateStorageCache(playerId);
       invalidateInventoryCache(playerId);
@@ -943,7 +947,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/biomes/:biomeId/resources", async (req, res) => {
     try {
       const { biomeId } = req.params;
-      
+
       // Handle both formats: with and without "biome-" prefix
       const actualBiomeId = biomeId.startsWith('biome-') ? biomeId : `biome-${biomeId}`;
       const biome = await storage.getBiome(actualBiomeId);
@@ -1286,6 +1290,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  app.use('/api/workshop', workshopRouter);
+  app.use('/api/quests', questRoutes);
+  app.use('/api/storage', storageRoutes);
+  app.use('/api/items', itemRoutes);
 
   const httpServer = createServer(app);
 

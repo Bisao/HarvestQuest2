@@ -16,6 +16,7 @@ import {
 export interface ModernItem {
   id: string;
   name: string;
+  emoji: string;
   description: string;
   type: 'resource' | 'equipment' | 'consumable' | 'material' | 'component';
   category: string;
@@ -66,6 +67,7 @@ export const BASIC_RESOURCES: ModernItem[] = [
   {
     id: RESOURCE_IDS.FIBRA,
     name: "Fibra",
+    emoji: "🌾",
     description: "Fibras naturais coletadas de plantas selvagens. Material básico para artesanato.",
     type: "resource",
     category: "basic_materials",
@@ -84,6 +86,7 @@ export const BASIC_RESOURCES: ModernItem[] = [
   {
     id: RESOURCE_IDS.PEDRA,
     name: "Pedra",
+    emoji: "🪨",
     description: "Pedras comuns encontradas no solo. Úteis para construção e ferramentas básicas.",
     type: "resource",
     category: "basic_materials",
@@ -102,6 +105,7 @@ export const BASIC_RESOURCES: ModernItem[] = [
   {
     id: RESOURCE_IDS.MADEIRA,
     name: "Madeira",
+    emoji: "🪵",
     description: "Madeira comum de árvores. Material versátil para construção e crafting.",
     type: "resource",
     category: "basic_materials",
@@ -121,6 +125,7 @@ export const BASIC_RESOURCES: ModernItem[] = [
   {
     id: RESOURCE_IDS.BAMBU,
     name: "Bambu",
+    emoji: "🎋",
     description: "Bambu resistente e flexível. Excelente para construções leves e ferramentas.",
     type: "resource",
     category: "basic_materials",
@@ -139,6 +144,7 @@ export const BASIC_RESOURCES: ModernItem[] = [
   {
     id: RESOURCE_IDS.ARGILA,
     name: "Argila",
+    emoji: "🧱",
     description: "Argila maleável encontrada próxima a corpos d'água. Ideal para cerâmica.",
     type: "resource",
     category: "basic_materials",
@@ -157,6 +163,7 @@ export const BASIC_RESOURCES: ModernItem[] = [
   {
     id: RESOURCE_IDS.FERRO_FUNDIDO,
     name: "Ferro Fundido",
+    emoji: "🔩",
     description: "Ferro bruto extraído de minérios. Base para ferramentas e armas avançadas.",
     type: "resource",
     category: "metals",
@@ -183,6 +190,7 @@ export const EXPANDED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.LINHO,
     name: "Linho",
+    emoji: "🌾",
     description: "Fibra de linho de alta qualidade. Excelente para tecidos resistentes.",
     type: "resource",
     category: "fibers",
@@ -200,6 +208,7 @@ export const EXPANDED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.ALGODAO,
     name: "Algodão",
+    emoji: "☁️",
     description: "Fibra macia de algodão. Ideal para roupas confortáveis.",
     type: "resource",
     category: "fibers",
@@ -217,6 +226,7 @@ export const EXPANDED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.CANAMO,
     name: "Cânhamo",
+    emoji: "🌿",
     description: "Fibra resistente de cânhamo. Perfeita para cordas e tecidos duráveis.",
     type: "resource",
     category: "fibers",
@@ -236,6 +246,7 @@ export const EXPANDED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.MADEIRA_CARVALHO,
     name: "Madeira de Carvalho",
+    emoji: "🌳",
     description: "Madeira nobre e resistente. Ideal para construções permanentes.",
     type: "resource",
     category: "premium_woods",
@@ -255,6 +266,7 @@ export const EXPANDED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.MADEIRA_CEDRO,
     name: "Madeira de Cedro",
+    emoji: "🌲",
     description: "Madeira aromática e resistente a insetos. Excelente para armazenamento.",
     type: "resource",
     category: "premium_woods",
@@ -273,6 +285,7 @@ export const EXPANDED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.MADEIRA_MOGNO,
     name: "Madeira de Mogno",
+    emoji: "🌴",
     description: "Madeira exótica de altíssima qualidade. Rara e valiosa.",
     type: "resource",
     category: "exotic_woods",
@@ -294,6 +307,7 @@ export const EXPANDED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.QUARTZO,
     name: "Quartzo",
+    emoji: "💎",
     description: "Cristal de quartzo puro. Usado em equipamentos mágicos e decoração.",
     type: "resource",
     category: "gems",
@@ -312,6 +326,7 @@ export const EXPANDED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.AMETISTA,
     name: "Ametista",
+    emoji: "🔮",
     description: "Gema roxa rara. Possui propriedades místicas especiais.",
     type: "resource",
     category: "gems",
@@ -330,6 +345,7 @@ export const EXPANDED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.DIAMANTE,
     name: "Diamante",
+    emoji: "💍",
     description: "A gema mais dura e valiosa conhecida. Extremamente rara.",
     type: "resource",
     category: "gems",
@@ -356,6 +372,7 @@ export const ANIMALS_AND_FISH: ModernItem[] = [
   {
     id: RESOURCE_IDS.COELHO,
     name: "Coelho",
+    emoji: "🐰",
     description: "Coelho selvagem. Fonte de carne e pelo macio.",
     type: "resource",
     category: "small_animals",
@@ -377,6 +394,7 @@ export const ANIMALS_AND_FISH: ModernItem[] = [
   {
     id: RESOURCE_IDS.RAPOSA,
     name: "Raposa",
+    emoji: "🦊",
     description: "Raposa astuta. Pelo valioso e carne saborosa.",
     type: "resource",
     category: "small_animals",
@@ -400,6 +418,7 @@ export const ANIMALS_AND_FISH: ModernItem[] = [
   {
     id: RESOURCE_IDS.VEADO,
     name: "Veado",
+    emoji: "🦌",
     description: "Veado gracioso. Excelente fonte de carne e couro.",
     type: "resource",
     category: "medium_animals",
@@ -421,6 +440,7 @@ export const ANIMALS_AND_FISH: ModernItem[] = [
   {
     id: RESOURCE_IDS.JAVALI,
     name: "Javali",
+    emoji: "🐗",
     description: "Javali feroz. Carne abundante e couro resistente.",
     type: "resource",
     category: "medium_animals",
@@ -445,6 +465,7 @@ export const ANIMALS_AND_FISH: ModernItem[] = [
   {
     id: RESOURCE_IDS.URSO,
     name: "Urso",
+    emoji: "🐻",
     description: "Urso poderoso. Perigoso, mas fornece muito couro e carne.",
     type: "resource",
     category: "large_animals",
@@ -469,6 +490,7 @@ export const ANIMALS_AND_FISH: ModernItem[] = [
   {
     id: RESOURCE_IDS.TRUTA,
     name: "Truta",
+    emoji: "🐟",
     description: "Peixe de água doce saboroso. Rica em nutrientes.",
     type: "resource",
     category: "freshwater_fish",
@@ -491,6 +513,7 @@ export const ANIMALS_AND_FISH: ModernItem[] = [
   {
     id: RESOURCE_IDS.SALMAO,
     name: "Salmão",
+    emoji: "🍣",
     description: "Peixe grande e nutritivo. Excelente para pratos elaborados.",
     type: "resource",
     category: "freshwater_fish",
@@ -515,6 +538,7 @@ export const ANIMALS_AND_FISH: ModernItem[] = [
   {
     id: RESOURCE_IDS.ATUM,
     name: "Atum",
+    emoji: "🐟",
     description: "Peixe marinho grande e saboroso. Muito nutritivo.",
     type: "resource",
     category: "saltwater_fish",
@@ -543,6 +567,7 @@ export const PLANTS_AND_CONSUMABLES: ModernItem[] = [
   {
     id: RESOURCE_IDS.COGUMELOS,
     name: "Cogumelos Selvagens",
+    emoji: "🍄",
     description: "Cogumelos comestíveis encontrados na floresta. Nutritivos mas simples.",
     type: "consumable",
     category: "wild_plants",
@@ -563,6 +588,7 @@ export const PLANTS_AND_CONSUMABLES: ModernItem[] = [
   {
     id: RESOURCE_IDS.FRUTAS_SILVESTRES,
     name: "Frutas Silvestres",
+    emoji: "🫐",
     description: "Mistura de frutas selvagens. Doces e refrescantes.",
     type: "consumable",
     category: "wild_plants",
@@ -584,6 +610,7 @@ export const PLANTS_AND_CONSUMABLES: ModernItem[] = [
   {
     id: RESOURCE_IDS.ERVAS_MEDICINAIS,
     name: "Ervas Medicinais",
+    emoji: "🌿",
     description: "Plantas com propriedades curativas. Úteis para medicina natural.",
     type: "consumable",
     category: "medicinal",
@@ -615,6 +642,7 @@ export const EQUIPMENT_COMPONENTS: ModernItem[] = [
   {
     id: RESOURCE_IDS.CABO_MACHADO,
     name: "Cabo de Machado",
+    emoji: "🪓",
     description: "Cabo de madeira resistente, ideal para machados.",
     type: "component",
     category: "handles",
@@ -630,6 +658,7 @@ export const EQUIPMENT_COMPONENTS: ModernItem[] = [
   {
     id: RESOURCE_IDS.CABO_ESPADA,
     name: "Cabo de Espada",
+    emoji: "⚔️",
     description: "Empunhadura ergonômica para espadas. Proporciona melhor controle.",
     type: "component",
     category: "handles",
@@ -647,6 +676,7 @@ export const EQUIPMENT_COMPONENTS: ModernItem[] = [
   {
     id: RESOURCE_IDS.CABECA_MACHADO,
     name: "Cabeça de Machado",
+    emoji: "🔨",
     description: "Lâmina afiada de metal para machados. Durável e eficiente.",
     type: "component",
     category: "heads",
@@ -662,6 +692,7 @@ export const EQUIPMENT_COMPONENTS: ModernItem[] = [
   {
     id: RESOURCE_IDS.LAMINA_ESPADA,
     name: "Lâmina de Espada",
+    emoji: "⚔️",
     description: "Lâmina forjada para espadas. Afiada e equilibrada.",
     type: "component",
     category: "blades",
@@ -683,6 +714,7 @@ export const PROCESSED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.BARBANTE,
     name: "Barbante",
+    emoji: "🧵",
     description: "Cordão simples feito de fibras entrelaçadas. Útil para amarrações básicas.",
     type: "material",
     category: "processed",
@@ -698,6 +730,7 @@ export const PROCESSED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.CORDA_RESISTENTE,
     name: "Corda Resistente",
+    emoji: "🪢",
     description: "Corda de alta qualidade. Muito mais forte que barbante comum.",
     type: "material",
     category: "processed",
@@ -713,6 +746,7 @@ export const PROCESSED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.COURO_CURTIDO,
     name: "Couro Curtido",
+    emoji: "🦫",
     description: "Couro processado e tratado. Pronto para uso em equipamentos.",
     type: "material",
     category: "processed",
@@ -728,6 +762,7 @@ export const PROCESSED_MATERIALS: ModernItem[] = [
   {
     id: RESOURCE_IDS.BARRA_FERRO,
     name: "Barra de Ferro",
+    emoji: "🔗",
     description: "Ferro refinado em forma de barra. Pronto para forjaria.",
     type: "material",
     category: "metals",

@@ -30,21 +30,21 @@ export const RESOURCE_DISPLAY_MAP: Record<string, { name: string; emoji: string 
   [RESOURCE_IDS.OSSOS]: { name: "Ossos", emoji: "🦴" },
   [RESOURCE_IDS.PELO]: { name: "Pelo", emoji: "🧶" },
   [RESOURCE_IDS.BARBANTE]: { name: "Barbante", emoji: "🧵" },
-  
+
   // Extended resources
   [RESOURCE_IDS.LINHO]: { name: "Linho", emoji: "🌾" },
   [RESOURCE_IDS.ALGODAO]: { name: "Algodão", emoji: "☁️" },
   [RESOURCE_IDS.JUTA]: { name: "Juta", emoji: "🌾" },
   [RESOURCE_IDS.SISAL]: { name: "Sisal", emoji: "🌾" },
   [RESOURCE_IDS.CANAMO]: { name: "Cânhamo", emoji: "🌾" },
-  
+
   // Wood types
   [RESOURCE_IDS.MADEIRA_CARVALHO]: { name: "Madeira de Carvalho", emoji: "🌳" },
   [RESOURCE_IDS.MADEIRA_PINHO]: { name: "Madeira de Pinho", emoji: "🌲" },
   [RESOURCE_IDS.MADEIRA_CEDRO]: { name: "Madeira de Cedro", emoji: "🌲" },
   [RESOURCE_IDS.MADEIRA_EUCALIPTO]: { name: "Madeira de Eucalipto", emoji: "🌿" },
   [RESOURCE_IDS.MADEIRA_MOGNO]: { name: "Madeira de Mogno", emoji: "🌳" },
-  
+
   // Stones and minerals
   [RESOURCE_IDS.PEDRA_CALCARIA]: { name: "Pedra Calcária", emoji: "⚪" },
   [RESOURCE_IDS.PEDRA_GRANITO]: { name: "Granito", emoji: "⚫" },
@@ -56,7 +56,7 @@ export const RESOURCE_DISPLAY_MAP: Record<string, { name: string; emoji: string 
   [RESOURCE_IDS.ESMERALDA]: { name: "Esmeralda", emoji: "💚" },
   [RESOURCE_IDS.RUBI]: { name: "Rubi", emoji: "❤️" },
   [RESOURCE_IDS.DIAMANTE]: { name: "Diamante", emoji: "💎" },
-  
+
   // Metals
   [RESOURCE_IDS.MINERAL_FERRO]: { name: "Minério de Ferro", emoji: "🔩" },
   [RESOURCE_IDS.MINERAL_COBRE]: { name: "Minério de Cobre", emoji: "🟫" },
@@ -69,7 +69,7 @@ export const RESOURCE_DISPLAY_MAP: Record<string, { name: string; emoji: string 
 /**
  * Resolve a resource ID to display information
  */
-export function resolveResourceInfo(resourceId: string, fallbackResources?: any[]): ResourceInfo {
+export async function resolveResourceInfo(resourceId: string, fallbackResources?: any[]): Promise<ResourceInfo> {
   // First try direct mapping
   if (RESOURCE_DISPLAY_MAP[resourceId]) {
     return {
@@ -91,6 +91,23 @@ export function resolveResourceInfo(resourceId: string, fallbackResources?: any[
     }
   }
 
+  // Buscar nos itens modernos do servidor (se disponível)
+  try {
+    const modernItemResponse = await fetch(`/api/items/${resourceId}`);
+    if (modernItemResponse.ok) {
+      const modernItem = await modernItemResponse.json();
+      if (modernItem && modernItem.emoji) {
+        return {
+          id: modernItem.id,
+          name: modernItem.name,
+          emoji: modernItem.emoji
+        };
+      }
+    }
+  } catch (error) {
+    // Fallback silencioso
+  }
+
   // Pattern-based fallback for unrecognized IDs
   console.warn(`🔍 Resource not found for ID: ${resourceId}`);
   return {
@@ -103,6 +120,6 @@ export function resolveResourceInfo(resourceId: string, fallbackResources?: any[
 /**
  * Bulk resolve multiple resource IDs
  */
-export function resolveMultipleResources(resourceIds: string[], fallbackResources?: any[]): ResourceInfo[] {
-  return resourceIds.map(id => resolveResourceInfo(id, fallbackResources));
+export async function resolveMultipleResources(resourceIds: string[], fallbackResources?: any[]): Promise<ResourceInfo[]> {
+  return Promise.all(resourceIds.map(id => resolveResourceInfo(id, fallbackResources)));
 }
