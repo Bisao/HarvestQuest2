@@ -778,6 +778,50 @@ export const PROCESSED_MATERIALS: ModernItem[] = [
 ];
 
 /**
+ * FERRAMENTAS IMPROVISADAS
+ */
+export const IMPROVISED_TOOLS: ModernItem[] = [
+  {
+    id: RESOURCE_IDS.MACHADO_IMPROVISADO,
+    name: "Machado Improvisado",
+    emoji: "🪓",
+    description: "Ferramenta simples feita com pedra e madeira. Básica mas funcional para cortar madeira.",
+    type: "equipment",
+    category: "improvised_tools",
+    weight: 1.2,
+    stackable: false,
+    durability: 50,
+    rarity: "common",
+    baseValue: 15,
+    tags: ["tool", "improvised", "axe"],
+    craftable: true,
+    obtainableMethods: ["crafting"],
+    equipmentSlot: "tool",
+    toolEfficiency: 60,
+    attackPower: 8
+  },
+  {
+    id: RESOURCE_IDS.PICARETA_IMPROVISADA,
+    name: "Picareta Improvisada",
+    emoji: "⛏️",
+    description: "Ferramenta rústica para mineração. Feita com materiais básicos mas eficaz para pedra.",
+    type: "equipment",
+    category: "improvised_tools",
+    weight: 1.5,
+    stackable: false,
+    durability: 45,
+    rarity: "common",
+    baseValue: 18,
+    tags: ["tool", "improvised", "pickaxe"],
+    craftable: true,
+    obtainableMethods: ["crafting"],
+    equipmentSlot: "tool",
+    toolEfficiency: 55,
+    attackPower: 6
+  }
+];
+
+/**
  * CONSOLIDAÇÃO DE TODOS OS ITENS
  */
 export const ALL_MODERN_ITEMS: ModernItem[] = [
@@ -786,7 +830,8 @@ export const ALL_MODERN_ITEMS: ModernItem[] = [
   ...ANIMALS_AND_FISH,
   ...PLANTS_AND_CONSUMABLES,
   ...EQUIPMENT_COMPONENTS,
-  ...PROCESSED_MATERIALS
+  ...PROCESSED_MATERIALS,
+  ...IMPROVISED_TOOLS
 ];
 
 /**

@@ -294,7 +294,7 @@ export const RESOURCE_IDS = {
   PEDRA_FILOSOFAL: "res-d4e5f6a7-b8c9-4012-def4-567890123464",
   MITHRIL: "res-e5f6a7b8-c9d0-4123-efa5-678901234575",
   ADAMANTIUM: "res-f6a7b8c9-d0e1-4234-fab6-789012345676",
-  
+
   // Materiais Processados
   BARBANTE: "res-f0f1f2f3-a4b5-4c6d-def0-123456789abc",
   CORDA: "res-f1f2f3f4-b5c6-4d7e-ef01-23456789abcd",
@@ -322,6 +322,10 @@ export const RESOURCE_IDS = {
   CABO_ESPADA: "res-b1b2b3b4-9596-4d78-abc0-123456789abc",
   CABECA_MACHADO: "res-b2b3b4b5-a697-4589-bc01-23456789abcd",
   LAMINA_ESPADA: "res-b3b4b5b6-9798-469a-cd02-3456789abcde",
+
+    // Ferramentas improvisadas
+  MACHADO_IMPROVISADO: "res-f1f2f3f4-a5b6-4c7d-ef89-012345678901",
+  PICARETA_IMPROVISADA: "res-f2f3f4f5-b6c7-4d8e-f901-123456789012",
 
   // Metais Refinados
   BARRA_FERRO: "res-a0a1a2a3-9485-476d-8abc-0123456789ab",
@@ -656,6 +660,10 @@ export const RECIPE_IDS = {
   ENSOPADO_VEGETAIS: "rec-d2e3f4a5-b6c7-4890-def2-345678901237",
   SOPA_COGUMELOS: "rec-e3f4a5b6-c7d8-4901-efa3-456789012348",
   PAO_SELVAGEM: "rec-f4a5b6c7-d8e9-4012-fab4-567890123459",
+
+    // Ferramentas improvisadas
+  MACHADO_IMPROVISADO: "rec-machado-improvisado-001",
+  PICARETA_IMPROVISADA: "rec-picareta-improvisado-001",
 
   // === RECEITAS ESPECIAIS ===
   TOCHA: "rec-a5b6c7d8-e9f0-4123-abc5-678901234570",

@@ -174,6 +174,13 @@ export function createResourcesWithIds(): InsertResource[] {
     { id: RESOURCE_IDS.PEIXE_GRELHADO, name: "Peixe Grelhado", emoji: "🐟", weight: 2, sellPrice: 12, buyPrice: 24, type: "basic", rarity: "common", experienceValue: 4 },
     { id: RESOURCE_IDS.CARNE_ASSADA, name: "Carne Assada", emoji: "🍖", weight: 2, sellPrice: 15, buyPrice: 30, type: "basic", rarity: "common", experienceValue: 5 },
     { id: RESOURCE_IDS.ENSOPADO_CARNE, name: "Ensopado de Carne", emoji: "🍲", weight: 3, sellPrice: 25, buyPrice: 50, type: "basic", rarity: "uncommon", experienceValue: 8 },
+
+    // Couro Curtido
+    { id: RESOURCE_IDS.COURO_CURTIDO, name: "Couro Curtido", emoji: "🦫", weight: 1, sellPrice: 25, buyPrice: 50, type: "processed", rarity: "uncommon", experienceValue: 10 },
+
+    // Ferramentas Improvisadas
+    { id: RESOURCE_IDS.MACHADO_IMPROVISADO, name: "Machado Improvisado", emoji: "🪓", weight: 1.2, sellPrice: 15, buyPrice: 30, type: "equipment", rarity: "common", experienceValue: 8 },
+    { id: RESOURCE_IDS.PICARETA_IMPROVISADA, name: "Picareta Improvisada", emoji: "⛏️", weight: 1.5, sellPrice: 18, buyPrice: 36, type: "equipment", rarity: "common", experienceValue: 10 },
   ];
 }
 

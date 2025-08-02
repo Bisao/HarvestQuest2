@@ -221,6 +221,50 @@ export const COMPONENT_RECIPES: ModernRecipe[] = [
 ];
 
 /**
+ * RECEITAS DE FERRAMENTAS IMPROVISADAS
+ */
+export const IMPROVISED_TOOLS_RECIPES: ModernRecipe[] = [
+  {
+    id: RECIPE_IDS.MACHADO_IMPROVISADO,
+    name: "Machado Improvisado",
+    description: "Crie uma ferramenta básica para cortar madeira usando materiais simples.",
+    category: "improvised_tools",
+    ingredients: [
+      { itemId: RESOURCE_IDS.PEDRA, quantity: 2 },
+      { itemId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+      { itemId: RESOURCE_IDS.BARBANTE, quantity: 3 }
+    ],
+    outputs: [
+      { itemId: RESOURCE_IDS.MACHADO_IMPROVISADO, quantity: 1 }
+    ],
+    requiredLevel: 1,
+    craftingTime: 25,
+    experienceGained: 15,
+    tags: ["tool", "improvised", "basic"],
+    requiredWorkshop: "basic"
+  },
+  {
+    id: RECIPE_IDS.PICARETA_IMPROVISADA,
+    name: "Picareta Improvisada", 
+    description: "Construa uma ferramenta rústica para quebrar pedras e minerar.",
+    category: "improvised_tools",
+    ingredients: [
+      { itemId: RESOURCE_IDS.PEDRA, quantity: 3 },
+      { itemId: RESOURCE_IDS.MADEIRA, quantity: 1 },
+      { itemId: RESOURCE_IDS.BARBANTE, quantity: 2 }
+    ],
+    outputs: [
+      { itemId: RESOURCE_IDS.PICARETA_IMPROVISADA, quantity: 1 }
+    ],
+    requiredLevel: 1,
+    craftingTime: 30,
+    experienceGained: 18,
+    tags: ["tool", "improvised", "mining"],
+    requiredWorkshop: "basic"
+  }
+];
+
+/**
  * RECEITAS DE EQUIPAMENTOS COMPLETOS
  */
 export const EQUIPMENT_RECIPES: ModernRecipe[] = [
@@ -494,6 +538,7 @@ export const CONTAINER_RECIPES: ModernRecipe[] = [
 export const ALL_MODERN_RECIPES: ModernRecipe[] = [
   ...BASIC_MATERIAL_RECIPES,
   ...COMPONENT_RECIPES,
+  ...IMPROVISED_TOOLS_RECIPES,
   ...EQUIPMENT_RECIPES,
   ...PROCESSED_MATERIAL_RECIPES,
   ...CONSUMABLE_RECIPES,
