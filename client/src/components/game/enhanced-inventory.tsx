@@ -313,6 +313,17 @@ export default function EnhancedInventory({
     const item = inventory[slotIndex];
     const itemData = item ? getItemById(item.resourceId) : null;
     
+    const getRarityColor = (rarity: string) => {
+      const colors = {
+        common: 'bg-gray-500',
+        uncommon: 'bg-green-500', 
+        rare: 'bg-blue-500',
+        epic: 'bg-purple-500',
+        legendary: 'bg-orange-500'
+      };
+      return colors[rarity as keyof typeof colors] || 'bg-gray-500';
+    };
+    
     return (
       <TooltipProvider key={slotIndex}>
         <Tooltip>
@@ -326,24 +337,36 @@ export default function EnhancedInventory({
                 }
               }}
               className={`
-                aspect-square border-2 rounded-lg flex flex-col items-center justify-center
-                cursor-pointer transition-all hover:scale-105 relative
-                ${selectedSlot === `inv-${slotIndex}` ? "border-forest bg-green-50 shadow-lg" : "border-gray-300"}
-                ${item ? "bg-white border-solid" : "bg-gray-50 border-dashed"}
+                aspect-square border-2 rounded-lg flex items-center justify-center relative
+                cursor-pointer transition-all hover:scale-105 group
+                ${selectedSlot === `inv-${slotIndex}` ? "border-blue-400 bg-blue-50 shadow-lg" : "border-gray-300"}
+                ${item ? "bg-white border-solid hover:border-blue-300" : "bg-gray-50 border-dashed hover:border-gray-400"}
               `}
             >
               {itemData && item ? (
                 <>
-                  <span className="text-xl">{itemData.emoji}</span>
-                  <span className="absolute bottom-1 right-1 text-xs font-bold bg-gray-800 text-white rounded px-1">
-                    {item.quantity}
+                  {/* Item Icon */}
+                  <span className="text-2xl">{itemData.emoji}</span>
+                  
+                  {/* Quantity Badge */}
+                  <span className="absolute bottom-1 right-1 text-xs font-bold bg-gray-900/90 text-white rounded px-1 min-w-[16px] text-center">
+                    {item.quantity > 999 ? '999+' : item.quantity}
                   </span>
-                  {'rarity' in itemData && itemData.rarity === "rare" && (
-                    <div className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full"></div>
+                  
+                  {/* Rarity Indicator */}
+                  {'rarity' in itemData && (
+                    <div className={`absolute top-1 left-1 w-2 h-2 rounded-full ${getRarityColor(itemData.rarity)}`}></div>
                   )}
-                  {'rarity' in itemData && itemData.rarity === "uncommon" && (
-                    <div className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></div>
-                  )}
+                  
+                  {/* Type Indicator */}
+                  <div className="absolute top-1 right-1 text-xs opacity-70">
+                    {'slot' in itemData ? '⚔️' : '🌿'}
+                  </div>
+                  
+                  {/* Hover Tooltip */}
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-900/90 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                    {itemData.name}
+                  </div>
                 </>
               ) : (
                 <span className="text-gray-300 text-lg">•</span>
@@ -355,7 +378,7 @@ export default function EnhancedInventory({
               <div>
                 <p className="font-semibold">{itemData.name}</p>
                 <p className="text-sm">Quantidade: {item.quantity}</p>
-                <p className="text-sm">Peso: {itemData.weight * item.quantity}kg</p>
+                <p className="text-sm">Peso: {(itemData.weight * item.quantity).toFixed(2)}g</p>
                 {'rarity' in itemData && (
                   <Badge variant={
                     itemData.rarity === "rare" ? "destructive" : 
