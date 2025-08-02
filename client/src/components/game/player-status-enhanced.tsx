@@ -14,7 +14,7 @@ interface PlayerStatusEnhancedProps {
 }
 
 export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
-  if (!player) {
+  if (!player || typeof player !== 'object') {
     return (
       <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200">
         <div className="text-center text-gray-500">
@@ -86,9 +86,9 @@ export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
     fatigue: safePlayer.fatigue,
     morale: safePlayer.morale,
     hygiene: safePlayer.hygiene,
-    diseases: safePlayer.diseases,
-    immunities: safePlayer.immunities,
-    skillPoints: safePlayer.skillPoints
+    diseases: Array.isArray(safePlayer.diseases) ? safePlayer.diseases : [],
+    immunities: Array.isArray(safePlayer.immunities) ? safePlayer.immunities : [],
+    skillPoints: safePlayer.skillPoints || 0
   };
 
   return (
@@ -219,7 +219,7 @@ export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
           </div>
 
           {/* Skill Points Display */}
-          {status.skillPoints > 0 && (
+          {status.skillPoints && status.skillPoints > 0 && (
             <>
               <Separator />
               <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg">
@@ -237,7 +237,7 @@ export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
       </Card>
 
       {/* Diseases and Status Effects */}
-      {status.diseases.length > 0 && (
+      {Array.isArray(status.diseases) && status.diseases.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -277,7 +277,7 @@ export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
       )}
 
       {/* Immunities */}
-      {status.immunities.length > 0 && (
+      {Array.isArray(status.immunities) && status.immunities.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
