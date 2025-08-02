@@ -15,6 +15,7 @@ import { validateRecipeIngredients, validateGameDataConsistency } from "@shared/
 import { createAuthRoutes } from "./routes/auth";
 import gameRoutes from "./routes/game";
 import { createSaveRoutes } from "./routes/saves";
+import { registerAdminRoutes } from "./routes/admin";
 
 const app = express();
 const port = Number(process.env.PORT) || 5000;
