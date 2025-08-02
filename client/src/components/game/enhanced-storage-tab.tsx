@@ -11,6 +11,7 @@ import { CacheManager } from "@shared/utils/cache-manager";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { EnhancedItemModal } from "./enhanced-item-modal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { StorageItem, Resource, Equipment, Player } from "@shared/types";
 import { isConsumable, getConsumableDescription, getConsumableEffects } from "@shared/utils/consumable-utils";
@@ -50,6 +51,8 @@ export default function EnhancedStorageTab({
     item: EnhancedStorageItem | null;
     amount: number;
   }>({ open: false, item: null, amount: 1 });
+  const [showItemModal, setShowItemModal] = useState(false);
+  const [modalItem, setModalItem] = useState<EnhancedStorageItem | null>(null);
 
   // Filter states
   const [searchFilter, setSearchFilter] = useState("");
@@ -125,6 +128,13 @@ export default function EnhancedStorageTab({
 
       return true;
     });
+
+  // Handle item click to open enhanced modal
+  const handleItemClick = (item: EnhancedStorageItem) => {
+    console.log("Storage item clicked - opening modal:", item);
+    setModalItem(item);
+    setShowItemModal(true);
+  };
 
   // Withdraw item mutation
   const withdrawMutation = useMutation({
@@ -471,11 +481,7 @@ export default function EnhancedStorageTab({
                   return (
                     <div
                       key={item.id}
-                      onClick={() => setWithdrawDialog({ 
-                        open: true, 
-                        item, 
-                        amount: Math.min(1, item.quantity) 
-                      })}
+                      onClick={() => handleItemClick(item)}
                       className={`relative aspect-square bg-gradient-to-br ${rarityConfig.gradient} border-2 ${rarityConfig.border} rounded-lg cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center group overflow-hidden`}
                       style={{
                         boxShadow: `0 2px 10px ${rarityConfig.shadowColor}40`
@@ -1093,6 +1099,21 @@ export default function EnhancedStorageTab({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Enhanced Item Modal */}
+      <EnhancedItemModal
+        isOpen={showItemModal}
+        onClose={() => {
+          console.log("Closing storage item modal");
+          setShowItemModal(false);
+          setModalItem(null);
+        }}
+        item={modalItem}
+        itemData={modalItem?.itemData || null}
+        playerId={playerId}
+        player={player}
+        location="storage"
+      />
     </div>
   );
 }

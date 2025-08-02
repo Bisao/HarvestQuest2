@@ -12,7 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import EquipmentSelectorModal from "./equipment-selector-modal";
-import { ItemDetailsModal } from "./item-details-modal";
+import { EnhancedItemModal } from "./enhanced-item-modal";
 import { isConsumable, getConsumableDescription, getConsumableEffects } from "@shared/utils/consumable-utils";
 import type { Resource, Equipment, Player } from "@shared/types";
 
@@ -680,8 +680,8 @@ export default function EnhancedInventory({
         />
       )}
 
-      {/* Item Details Modal */}
-      <ItemDetailsModal
+      {/* Enhanced Item Modal */}
+      <EnhancedItemModal
         isOpen={showItemModal}
         onClose={() => {
           console.log("Closing item modal");
@@ -692,6 +692,7 @@ export default function EnhancedInventory({
         itemData={modalItem ? getItemById(modalItem.resourceId) || null : null}
         playerId={playerId}
         player={player}
+        location="inventory"
       />
     </div>
   );
