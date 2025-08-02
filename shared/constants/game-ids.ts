@@ -662,8 +662,8 @@ export const RECIPE_IDS = {
   PAO_SELVAGEM: "rec-f4a5b6c7-d8e9-4012-fab4-567890123459",
 
     // Ferramentas improvisadas
-  MACHADO_IMPROVISADO: "rec-machado-improvisado-001",
-  PICARETA_IMPROVISADA: "rec-picareta-improvisado-001",
+  MACHADO_IMPROVISADO: "rec-f1f2f3f4-a5b6-4c7d-ef89-012345678901",
+  PICARETA_IMPROVISADA: "rec-f2f3f4f5-b6c7-4d8e-f901-123456789012",
 
   // === RECEITAS ESPECIAIS ===
   TOCHA: "rec-a5b6c7d8-e9f0-4123-abc5-678901234570",

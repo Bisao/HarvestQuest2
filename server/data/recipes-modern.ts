@@ -228,7 +228,7 @@ export const IMPROVISED_TOOLS_RECIPES: ModernRecipe[] = [
     id: RECIPE_IDS.MACHADO_IMPROVISADO,
     name: "Machado Improvisado",
     description: "Crie uma ferramenta básica para cortar madeira usando materiais simples.",
-    category: "improvised_tools",
+    category: "bancada",
     ingredients: [
       { itemId: RESOURCE_IDS.PEDRA, quantity: 2 },
       { itemId: RESOURCE_IDS.MADEIRA, quantity: 1 },
@@ -247,7 +247,7 @@ export const IMPROVISED_TOOLS_RECIPES: ModernRecipe[] = [
     id: RECIPE_IDS.PICARETA_IMPROVISADA,
     name: "Picareta Improvisada", 
     description: "Construa uma ferramenta rústica para quebrar pedras e minerar.",
-    category: "improvised_tools",
+    category: "bancada",
     ingredients: [
       { itemId: RESOURCE_IDS.PEDRA, quantity: 3 },
       { itemId: RESOURCE_IDS.MADEIRA, quantity: 1 },
