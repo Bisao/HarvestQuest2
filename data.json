@@ -1,10 +1,10 @@
 {
   "players": [
     [
-      "7b1f66ad-beec-4540-89d4-17b6e3c1ad93",
+      "877950f0-c856-47df-b5bf-259bdc0c160f",
       {
-        "id": "7b1f66ad-beec-4540-89d4-17b6e3c1ad93",
-        "username": "Bison",
+        "id": "877950f0-c856-47df-b5bf-259bdc0c160f",
+        "username": "Opa",
         "level": 1,
         "experience": 0,
         "coins": 100,
@@ -23,9 +23,24 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": true,
-        "lastOnlineTime": 1754173440630,
-        "hunger": null,
-        "thirst": null
+        "health": 100,
+        "maxHealth": 100,
+        "hunger": 96,
+        "maxHunger": 100,
+        "thirst": 96,
+        "maxThirst": 100,
+        "temperature": 0,
+        "fatigue": 0,
+        "morale": 50,
+        "hygiene": 100,
+        "diseases": [],
+        "immunities": [],
+        "resistances": {},
+        "skills": {},
+        "skillPoints": 0,
+        "totalSkillPoints": 0,
+        "skillAchievements": [],
+        "lastOnlineTime": 1754173680785
       }
     ]
   ],
