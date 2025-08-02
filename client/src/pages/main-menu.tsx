@@ -86,7 +86,7 @@ export default function MainMenu() {
         title: "Jogador criado!",
         description: `${data.username} está pronto para aventura!`,
       });
-      
+
       // Refresh saves list
       queryClient.invalidateQueries({ queryKey: ["/api/saves"] });
       setLocation(`/game?player=${encodeURIComponent(data.username)}`);
@@ -133,7 +133,7 @@ export default function MainMenu() {
   const handleCreatePlayer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPlayerName.trim()) return;
-    
+
     setIsCreating(true);
     try {
       await createPlayerMutation.mutateAsync(newPlayerName.trim());
@@ -164,13 +164,13 @@ export default function MainMenu() {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return "Agora mesmo";
     if (diffInHours < 24) return `${diffInHours}h atrás`;
-    
+
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) return `${diffInDays}d atrás`;
-    
+
     return date.toLocaleDateString('pt-BR');
   };
 

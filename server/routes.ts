@@ -293,18 +293,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all biomes with caching
+  // Get all biomes
   app.get("/api/biomes", async (req, res) => {
     try {
-      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
-      const biomes = await cacheGetOrSet(
-        CACHE_KEYS.ALL_BIOMES,
-        () => storage.getAllBiomes(),
-        CACHE_TTL.STATIC_DATA
-      );
+      const biomes = await storage.getAllBiomes();
       res.json(biomes);
     } catch (error) {
+      console.error("Get biomes error:", error);
       res.status(500).json({ message: "Failed to get biomes" });
+    }
+  });
+
+  // Get specific biome by ID
+  app.get("/api/biomes/:biomeId", async (req, res) => {
+    try {
+      const { biomeId } = req.params;
+      const biome = await storage.getBiome(biomeId);
+      if (!biome) {
+        return res.status(404).json({ message: "Biome not found" });
+      }
+      res.json(biome);
+    } catch (error) {
+      console.error("Get biome error:", error);
+      res.status(500).json({ message: "Failed to get biome" });
     }
   });
 
@@ -869,7 +880,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (isEquipment) {
         return res.status(400).json({ 
-          message: "Equipamentos, ferramentas e armas só podem ser equipados, não retirados para o inventário." 
+message: "Equipamentos, ferramentas e armas só podem ser equipados, não retirados para o inventário." 
         });
       }
 
