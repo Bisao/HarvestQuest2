@@ -22,6 +22,7 @@ import EnhancedBiomesTab from './enhanced-biomes-tab';
 import QuestsTab from './quests-tab';
 import StatusTab from './status-tab';
 import PlayerSettings from './player-settings';
+import CampTab from './camp-tab';
 import ExpeditionPanel, { type ActiveExpedition } from './expedition-panel';
 
 interface ModernGameLayoutProps {
@@ -39,6 +40,7 @@ interface ModernGameLayoutProps {
 const GAME_TABS = [
   { id: 'exploration', name: 'Exploração', icon: Map, component: 'biomes' },
   { id: 'inventory', name: 'Inventário', icon: Package, component: 'inventory' },
+  { id: 'camp', name: 'Acampamento', icon: Home, component: 'camp' },
   { id: 'workshops', name: 'Oficinas', icon: Hammer, component: 'workshops' },
   { id: 'quests', name: 'Missões', icon: Scroll, component: 'quests' },
   { id: 'status', name: 'Status', icon: Zap, component: 'status' }
@@ -89,6 +91,15 @@ export default function ModernGameLayout({
             equipment={equipment}
             player={player}
             isBlocked={isBlocked}
+          />
+        );
+      
+      case 'camp':
+        return (
+          <CampTab
+            player={player}
+            resources={resources}
+            equipment={equipment}
           />
         );
       

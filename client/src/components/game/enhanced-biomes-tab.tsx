@@ -22,7 +22,7 @@ import {
   Sun
 } from 'lucide-react';
 import type { Biome, Resource, Equipment, Player } from '@shared/types';
-import ExpeditionModal from './expedition-modal';
+import ModernExpeditionModal from './modern-expedition-modal';
 
 interface EnhancedBiomesTabProps {
   biomes: Biome[];
@@ -427,8 +427,8 @@ export default function EnhancedBiomesTab({
         </CardContent>
       </Card>
 
-      {/* Modal de expedição */}
-      <ExpeditionModal
+      {/* Modal de expedição moderno */}
+      <ModernExpeditionModal
         isOpen={expeditionModalOpen}
         onClose={() => {
           setExpeditionModalOpen(false);

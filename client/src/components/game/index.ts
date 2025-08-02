@@ -16,6 +16,7 @@ export { ItemDetailsModal } from './item-details-modal';
 export { default as UnifiedWorkshops } from './unified-workshops';
 export { default as UnifiedInventory } from './unified-inventory';
 export { default as ModernGameLayout } from './modern-game-layout';
+export { default as CampTab } from './camp-tab';
 
 // === EQUIPMENT ===
 export { default as EquipmentTab } from './equipment-tab';
@@ -25,6 +26,7 @@ export { default as EquipmentSelectorModal } from './equipment-selector-modal';
 export { default as ExpeditionSystem } from './expedition-system';
 export { default as ExpeditionPanel } from './expedition-panel';
 export { default as ExpeditionModal } from './expedition-modal';
+export { default as ModernExpeditionModal } from './modern-expedition-modal';
 export { default as BiomesTabNew } from './biomes-tab-new';
 export { default as EnhancedBiomesTab } from './enhanced-biomes-tab';
 

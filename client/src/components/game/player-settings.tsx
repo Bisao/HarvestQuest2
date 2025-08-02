@@ -21,11 +21,10 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
-  const [autoStorage, setAutoStorage] = useState(player.autoStorage);
-  const [autoCompleteQuests, setAutoCompleteQuests] = useState(player.autoCompleteQuests ?? true);
-
+  const [autoStorage, setAutoStorage] = useState(player?.autoStorage ?? true);
+  const [autoCompleteQuests, setAutoCompleteQuests] = useState(player?.autoCompleteQuests ?? true);
   const [isNavigatingToMenu, setIsNavigatingToMenu] = useState(false);
-  const [autoConsume, setAutoConsume] = useState(player.autoConsume ?? false);
+  const [autoConsume, setAutoConsume] = useState(player?.autoConsume ?? false);
 
   const saveGame = useSaveGame();
 
