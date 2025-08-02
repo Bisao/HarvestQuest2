@@ -11,9 +11,10 @@ import { ALL_MODERN_RECIPES } from "./data/recipes-modern";
 import { GameService } from "./services/game-service";
 import { validateRecipeIngredients, validateGameDataConsistency } from "@shared/utils/id-validation";
 
-// Import all route modules at the top
-import { registerAdminRoutes } from './routes/admin';
+// Import routes
 import { createAuthRoutes } from "./routes/auth";
+import gameRoutes from "./routes/game";
+import { createSaveRoutes } from "./routes/saves";
 
 const app = express();
 const port = Number(process.env.PORT) || 5000;
@@ -119,7 +120,10 @@ app.use((req, res, next) => {
   // Apply the rate limiting middleware to all requests
   app.use(limiter);
 
-  // Routes - using proper route registration
+  // Register routes
+  app.use("/api/auth", createAuthRoutes(storage));
+  app.use("/api/game", gameRoutes);
+  app.use("/api/saves", createSaveRoutes());
   registerRoutes(app);
   registerAdminRoutes(app);
     // Register authentication routes

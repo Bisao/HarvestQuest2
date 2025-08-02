@@ -34,11 +34,13 @@ export const optionalAuth = (req: AuthenticatedRequest, res: Response, next: Nex
   const token = authHeader && authHeader.split(' ')[1];
 
   if (token) {
-    jwt.verify(token, JWT_SECRET, (err, decoded: any) => {
-      if (!err) {
-        req.user = decoded;
-      }
-    });
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      req.user = decoded;
+    } catch (err) {
+      // Token inválido, mas como é opcional, continuamos sem user
+      console.log("Optional auth: invalid token, continuing without user");
+    }
   }
 
   next();

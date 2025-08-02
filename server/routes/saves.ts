@@ -2,74 +2,128 @@
 import { Router } from "express";
 import { storage } from "../storage";
 import { authenticateToken, optionalAuth, type AuthenticatedRequest } from "../middleware/jwt-auth";
+import { z } from "zod";
 
-const router = Router();
-
-// Get all save slots (existing players)
-router.get("/", optionalAuth, async (req: AuthenticatedRequest, res) => {
-  try {
-    const allPlayers = await storage.getAllPlayers();
-
-    // Transform players to save slot format
-    const saveSlots = allPlayers.map(player => ({
-      id: player.id,
-      username: player.username,
-      level: player.level,
-      experience: player.experience,
-      lastPlayed: Date.now() // Current timestamp for now
-    }));
-
-    res.json(saveSlots);
-  } catch (error) {
-    console.error("Error fetching saves:", error);
-    res.status(500).json({ message: "Falha ao buscar jogos salvos" });
-  }
+const createPlayerSchema = z.object({
+  username: z.string().min(2).max(20).regex(/^[a-zA-Z0-9_]+$/, "Nome deve conter apenas letras, números e underscores"),
 });
 
-// Delete a save slot (player)
-router.delete("/:playerId", authenticateToken, async (req: AuthenticatedRequest, res) => {
-  try {
-    const { playerId } = req.params;
-
-    await storage.deletePlayer(playerId);
-
-    res.json({ message: "Jogo deletado com sucesso" });
-  } catch (error) {
-    console.error("Error deleting save:", error);
-    res.status(500).json({ message: "Falha ao deletar o jogo" });
-  }
-});
-
-// Get saved games
-router.get('/saves', optionalAuth, async (req: AuthenticatedRequest, res) => {
-  try {
-    const saves = await storage.getAllPlayers();
-
-    const saveData = await Promise.all(saves.map(async (player) => {
-      // Check if player has an active expedition
-      let offlineExpeditionActive = false;
-      try {
-        const expeditions = await storage.getPlayerExpeditions(player.id);
-        offlineExpeditionActive = expeditions.some(exp => exp.status === "in_progress");
-      } catch (error) {
-        console.log('Error checking expeditions for player:', player.id);
-      }
-
-      return {
+export function createSaveRoutes() {
+  const router = Router();
+  // Get all players (saves)
+  router.get("/", optionalAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const players = await storage.getAllPlayers();
+      const saves = players.map(player => ({
         id: player.id,
         username: player.username,
         level: player.level,
-        experience: player.experience,
-        lastPlayed: player.lastOnlineTime || Date.now(),
-        offlineExpeditionActive
-      };
-    }));
+        lastLogin: new Date().toISOString() // Mock last login for now
+      }));
 
-    res.json(saveData);
-  } catch (error) {
-    console.error('Error fetching saves:', error);
-    res.status(500).json({ message: 'Failed to fetch saves' });
-  }
-});
+      res.json(saves);
+    } catch (error) {
+      console.error("Get saves error:", error);
+      res.status(500).json({ 
+        error: "Erro ao carregar jogadores",
+        message: error instanceof Error ? error.message : "Erro interno" 
+      });
+    }
+  });
 
-export default router;
+  // Create new player
+  router.post("/", optionalAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { username } = createPlayerSchema.parse(req.body);
+
+      // Check if username already exists
+      const existingPlayer = await storage.getPlayerByUsername(username);
+      if (existingPlayer) {
+        return res.status(400).json({ 
+          error: "Nome de usuário já existe",
+          message: "Escolha um nome diferente" 
+        });
+      }
+
+      const newPlayer = await storage.createPlayer({
+        username: username.trim(),
+        level: 1,
+        experience: 0,
+        hunger: 100,
+        maxHunger: 100,
+        thirst: 100,
+        maxThirst: 100,
+        coins: 100,
+        inventoryWeight: 0,
+        maxInventoryWeight: 50000,
+        autoStorage: false,
+        craftedItemsDestination: "storage",
+        waterStorage: 0,
+        maxWaterStorage: 500,
+        waterTanks: 0,
+        equippedHelmet: null,
+        equippedChestplate: null,
+        equippedLeggings: null,
+        equippedBoots: null,
+        equippedWeapon: null,
+        equippedTool: null,
+        autoCompleteQuests: true
+      });
+
+      console.log(`👤 New player created: ${newPlayer.username} (${newPlayer.id})`);
+      res.status(201).json({
+        id: newPlayer.id,
+        username: newPlayer.username,
+        level: newPlayer.level,
+        lastLogin: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Create player error:", error);
+
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Dados inválidos",
+          message: error.errors[0]?.message || "Nome inválido",
+          details: error.errors 
+        });
+      }
+
+      res.status(500).json({ 
+        error: "Erro ao criar jogador",
+        message: error instanceof Error ? error.message : "Erro interno do servidor" 
+      });
+    }
+  });
+
+  // Delete player
+  router.delete("/:playerId", optionalAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { playerId } = req.params;
+
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ 
+          error: "Jogador não encontrado",
+          message: "O jogador que você está tentando excluir não existe" 
+        });
+      }
+
+      await storage.deletePlayer(playerId);
+
+      res.json({ 
+        message: "Jogador excluído com sucesso",
+        deletedPlayer: player.username 
+      });
+    } catch (error) {
+      console.error("Delete player error:", error);
+      res.status(500).json({ 
+        error: "Erro ao excluir jogador",
+        message: error instanceof Error ? error.message : "Erro interno do servidor" 
+      });
+    }
+  });
+
+  return router;
+}
+
+export default createSaveRoutes();
