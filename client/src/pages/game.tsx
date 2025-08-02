@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 import GameHeader from "@/components/game/game-header";
 import BiomesTab from "@/components/game/biomes-tab-new";
 import QuestsTab from "@/components/game/quests-tab";
-import EnhancedInventoryWithTabs from "@/components/game/enhanced-inventory-with-tabs";
+import EnhancedInventory from "@/components/game/enhanced-inventory";
 import EnhancedStorageTab from "@/components/game/enhanced-storage-tab";
 // import RecreatedCraftingTab from "@/components/game/recreated-crafting-tab"; // REMOVIDO - MIGRADO PARA OFICINAS
 import WorkshopsTab from "@/components/game/workshops-tab";
@@ -294,7 +294,7 @@ export default function Game() {
               />
             )}
             {activeTab === "inventory" && (
-              <EnhancedInventoryWithTabs
+              <EnhancedInventory
                 playerId={player.id}
                 player={player}
                 resources={resources}

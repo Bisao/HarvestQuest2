@@ -226,7 +226,7 @@ export default function EnhancedInventory({
       toast({
         title: "Erro",
         description: error.message || "Não foi possível consumir o item.",
-        variant: "destructive"structive"
+        variant: "destructive"
       });
     }
   });
@@ -244,7 +244,7 @@ export default function EnhancedInventory({
         setSelectedEquipmentSlot({
           id: slot.id,
           name: slot.name,
-          equipped: slot.equipped
+          equipped: slot.equipped || null
         });
         setEquipmentModalOpen(true);
       }
@@ -296,7 +296,7 @@ export default function EnhancedInventory({
               <p className="font-semibold">{slot.name}</p>
               {equippedItem ? (
                 <div>
-                  <p className="text-sm">{equippedItem.effect}</p>
+                  <p className="text-sm">{equippedItem.effects?.[0] || 'Sem efeito'}</p>
                   <p className="text-xs text-gray-500">Peso: {equippedItem.weight >= 1000 ? `${(equippedItem.weight / 1000).toFixed(2)}kg` : `${equippedItem.weight.toFixed(2)}g`}</p>
                 </div>
               ) : (
