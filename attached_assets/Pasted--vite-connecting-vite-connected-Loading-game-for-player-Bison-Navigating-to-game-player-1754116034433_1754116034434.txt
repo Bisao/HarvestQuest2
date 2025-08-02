@@ -1,0 +1,50 @@
+[vite] connecting...
+[vite] connected.
+Loading game for player: Bison
+Navigating to: /game?player=Bison
+🔍 CLIENT-UUID-VALIDATION: Validating UUIDs for player Bison...
+✅ Valid UUID: res-b4c5d6e7-f8a9-4012-bcd4-567890123456
+✅ Valid UUID: res-a7b8c9d0-e1f2-4345-abc7-890123456789
+✅ Valid UUID: eq-b2c3d4e5-f6a7-4890-bcd2-345678901234
+✅ CLIENT-UUID-VALIDATION: All game IDs are valid UUIDs
+Cannot read properties of undefined (reading 'find')
+at getResourceInfo (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/src/components/game/expedition-panel.tsx:182:29)
+at https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/src/components/game/expedition-panel.tsx:427:28
+at Array.map (<anonymous>)
+at ExpeditionPanel (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/src/components/game/expedition-panel.tsx:426:405)
+at renderWithHooks (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:11548:26)
+at updateFunctionComponent (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:14582:28)
+at beginWork (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:15924:22)
+at HTMLUnknownElement.callCallback2 (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:3674:22)
+at Object.invokeGuardedCallbackDev (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:3699:24)
+at invokeGuardedCallback (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:3733:39)
+Cannot read properties of undefined (reading 'find')
+at getResourceInfo (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/src/components/game/expedition-panel.tsx:182:29)
+at https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/src/components/game/expedition-panel.tsx:427:28
+at Array.map (<anonymous>)
+at ExpeditionPanel (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/src/components/game/expedition-panel.tsx:426:405)
+at renderWithHooks (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:11548:26)
+at updateFunctionComponent (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:14582:28)
+at beginWork (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:15924:22)
+at HTMLUnknownElement.callCallback2 (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:3674:22)
+at Object.invokeGuardedCallbackDev (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:3699:24)
+at invokeGuardedCallback (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=a963377b:3733:39)
+The above error occurred in the <ExpeditionPanel> component:
+
+    at ExpeditionPanel (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/src/components/game/expedition-panel.tsx:27:3)
+    at div
+    at div
+    at div
+    at div
+    at ModernGameLayout (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/src/components/game/modern-game-layout.tsx:50:3)
+    at Game (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/src/pages/game.tsx:29:37)
+    at Route (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=a963377b:323:16)
+    at Switch (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=a963377b:379:17)
+    at Router
+    at Provider (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=a963377b:38:15)
+    at TooltipProvider (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=a963377b:63:5)
+    at QueryClientProvider (https://de617694-f989-4aa3-866e-4be583d7028e-00-1i06sivhd833a.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=a963377b:2805:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
