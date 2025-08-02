@@ -28,6 +28,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
+- **August 2, 2025**: HUNGER/THIRST DEGRADATION SIMPLIFIED
+  - **FIXED DEGRADATION RATE**: Changed from configurable modes to fixed 1 point every 8 minutes
+  - **REMOVED CONFIGURATION OPTIONS**: Eliminated hunger degradation mode selection from player settings
+  - **SIMPLIFIED CODEBASE**: Removed complex mode-based calculations and dynamic degradation methods
+  - **CONSISTENT EXPERIENCE**: All players now have the same predictable hunger/thirst degradation rate
 - **August 1, 2025**: WORKSHOP SYSTEM REORGANIZATION COMPLETED
   - **BANCADA SYSTEM**: Renamed "Fibras" category to "Bancada" for item creation
   - **SPECIALIZED CATEGORIES**: Organized workshops into specialized functions:
