@@ -295,56 +295,11 @@ export const RESOURCE_IDS = {
   MITHRIL: "res-e5f6a7b8-c9d0-4123-efa5-678901234575",
   ADAMANTIUM: "res-f6a7b8c9-d0e1-4234-fab6-789012345676",
 
-  // Materiais Processados
-  BARBANTE: "res-f0f1f2f3-a4b5-4c6d-def0-123456789abc",
-  CORDA: "res-f1f2f3f4-b5c6-4d7e-ef01-23456789abcd",
+  // === MISSING ITEMS FROM REFACTORING ===
   CORDA_RESIS: "res-f2f3f4f5-c6d7-4e8f-f012-3456789abcde",
-  COURO: "res-f3f4f5f6-d7e8-4f90-0123-456789abcdef",
-  COURO_CURTIDO: "res-f4f5f6f7-e8f9-4012-1234-56789abcdef0",
-
-  // Fibras Especializadas
-  LINHO: "res-e0e1e2e3-d4c5-4b6a-cde0-123456789abc",
-  ALGODAO: "res-e1e2e3e4-c5d6-4a7b-de01-23456789abcd",
-  CANAMO: "res-e2e3e4e5-d6c7-4b8a-ef02-3456789abcde",
-
-  // Madeiras Premium
-  MADEIRA_CARVALHO: "res-d0d1d2d3-c4b5-4a6d-bcd0-123456789abc",
-  MADEIRA_CEDRO: "res-d1d2d3d4-b5c6-4d7a-cd01-23456789abcd",
-  MADEIRA_MOGNO: "res-d2d3d4d5-c6b7-4a8d-de02-3456789abcde",
-
-  // Gemas e Minerais Preciosos
-  QUARTZO: "res-c0c1c2c3-b4a5-496d-abc0-123456789abc",
-  AMETISTA: "res-c1c2c3c4-a5b6-4d79-bc01-23456789abcd",
-  DIAMANTE: "res-c2c3c4c5-b6a7-498d-cd02-3456789abcde",
-
-  // Componentes de Equipamentos
-  CABO_MACHADO: "res-b0b1b2b3-a495-486d-9abc-0123456789ab",
-  CABO_ESPADA: "res-b1b2b3b4-9596-4d78-abc0-123456789abc",
-  CABECA_MACHADO: "res-b2b3b4b5-a697-4589-bc01-23456789abcd",
-  LAMINA_ESPADA: "res-b3b4b5b6-9798-469a-cd02-3456789abcde",
-
-    // Ferramentas improvisadas
   MACHADO_IMPROVISADO: "res-f1f2f3f4-a5b6-4c7d-ef89-012345678901",
   PICARETA_IMPROVISADA: "res-f2f3f4f5-b6c7-4d8e-f901-123456789012",
 
-  // Metais Refinados
-  BARRA_FERRO: "res-a0a1a2a3-9485-476d-8abc-0123456789ab",
-
-  // Animais Terrestres
-  COELHO: "res-90919293-8475-466d-7abc-0123456789ab",
-  RAPOSA: "res-91929394-7586-4d78-abc0-123456789abc",
-  VEADO: "res-92939495-8697-4589-bc01-23456789abcd",
-  JAVALI: "res-93949596-7798-469a-cd02-3456789abcde",
-  URSO: "res-94959697-8899-47ab-de03-456789abcdef",
-
-  // Peixes
-  TRUTA: "res-80818283-7475-456d-6abc-0123456789ab",
-  SALMAO: "res-81828384-6586-4d67-abc0-123456789abc",
-  ATUM: "res-82838485-7697-4578-bc01-23456789abcd",
-
-  // Plantas e Consumíveis
-  FRUTAS_SILVESTRES: "res-70717273-6465-446d-5abc-0123456789ab",
-  ERVAS_MEDICINAIS: "res-71727374-5576-4d56-abc0-123456789abc",
 } as const;
 
 export const EQUIPMENT_IDS = {
