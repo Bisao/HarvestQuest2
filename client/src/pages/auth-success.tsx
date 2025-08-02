@@ -1,9 +1,9 @@
 
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 
-export function AuthSuccess() {
-  const navigate = useNavigate();
+export default function AuthSuccess() {
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     // Pegar o token da URL
@@ -15,12 +15,12 @@ export function AuthSuccess() {
       localStorage.setItem('auth_token', token);
       
       // Redirecionar para o menu principal
-      navigate('/', { replace: true });
+      setLocation('/', { replace: true });
     } else {
       // Se não há token, redirecionar para login
-      navigate('/', { replace: true });
+      setLocation('/', { replace: true });
     }
-  }, [navigate]);
+  }, [setLocation]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
