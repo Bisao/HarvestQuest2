@@ -29,22 +29,22 @@
         "equippedFood": null,
         "equippedDrink": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754094132113
+        "lastOnlineTime": 1754094679553
       }
     ],
     [
-      "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+      "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
       {
-        "id": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "username": "Bison",
-        "level": 7,
-        "experience": 1205,
-        "hunger": 94,
+        "level": 4,
+        "experience": 549,
+        "hunger": 100,
         "maxHunger": 100,
-        "thirst": 94,
+        "thirst": 100,
         "maxThirst": 100,
         "coins": 100,
-        "inventoryWeight": 9.700000000000001,
+        "inventoryWeight": 9.549999999999999,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -60,118 +60,118 @@
         "equippedTool": null,
         "equippedFood": null,
         "equippedDrink": null,
-        "autoCompleteQuests": true,
-        "lastOnlineTime": 1754094496852
+        "autoCompleteQuests": false,
+        "lastOnlineTime": 1754094690386
       }
     ]
   ],
   "inventoryItems": [
     [
-      "c55c376d-9c71-41f7-9437-f25db547d200",
+      "9314eec4-337e-40d1-8033-871d68509442",
       {
-        "id": "c55c376d-9c71-41f7-9437-f25db547d200",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "9314eec4-337e-40d1-8033-871d68509442",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-a1b2c3d4-e5f6-4789-abc1-234567890123",
         "quantity": 5
       }
     ],
     [
-      "b6deb9e9-79ba-47f9-8bb7-de04f9bfcc82",
+      "056f5cee-2359-47ef-838d-ecaf8bcca0ef",
       {
-        "id": "b6deb9e9-79ba-47f9-8bb7-de04f9bfcc82",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "056f5cee-2359-47ef-838d-ecaf8bcca0ef",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-b8c9d0e1-f2a3-4456-bcd8-901234567890",
-        "quantity": 1
-      }
-    ],
-    [
-      "c1b165cb-9821-43de-91e7-b67efe8adf02",
-      {
-        "id": "c1b165cb-9821-43de-91e7-b67efe8adf02",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-c5d6e7f8-a9b0-4123-cde5-678901234567",
-        "quantity": 1
-      }
-    ],
-    [
-      "050a2fee-74d8-4af6-acb4-61d779efa485",
-      {
-        "id": "050a2fee-74d8-4af6-acb4-61d779efa485",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-d6e7f8a9-b0c1-4234-def6-789012345678",
         "quantity": 2
       }
     ],
     [
-      "b388a119-40a4-4d74-8476-c2b1a88410e8",
+      "a7af8ae8-62e3-4cc5-8478-00257410f4bd",
       {
-        "id": "b388a119-40a4-4d74-8476-c2b1a88410e8",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "a7af8ae8-62e3-4cc5-8478-00257410f4bd",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
+        "resourceId": "res-c5d6e7f8-a9b0-4123-cde5-678901234567",
+        "quantity": 5
+      }
+    ],
+    [
+      "828bcf0a-c2ad-4297-a8d6-c5070017a633",
+      {
+        "id": "828bcf0a-c2ad-4297-a8d6-c5070017a633",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
+        "resourceId": "res-d6e7f8a9-b0c1-4234-def6-789012345678",
+        "quantity": 1
+      }
+    ],
+    [
+      "6334b0d2-8720-43df-baa3-304c845e8723",
+      {
+        "id": "6334b0d2-8720-43df-baa3-304c845e8723",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-a9b0c1d2-e3f4-4567-abc9-012345678901",
         "quantity": 2
       }
     ],
     [
-      "f467c723-ba38-421c-a302-41cb4184e208",
+      "a12ace40-e75a-49ed-8e2a-1688760e4776",
       {
-        "id": "f467c723-ba38-421c-a302-41cb4184e208",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "a12ace40-e75a-49ed-8e2a-1688760e4776",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-b0c1d2e3-f4a5-4678-bcd0-123456789012",
-        "quantity": 5
+        "quantity": 3
       }
     ],
     [
-      "20df17b7-d075-4414-a769-a7a32cd5012a",
+      "e727ab08-342c-42d9-8b6f-9fb9c5630101",
       {
-        "id": "20df17b7-d075-4414-a769-a7a32cd5012a",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "e727ab08-342c-42d9-8b6f-9fb9c5630101",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-d2e3f4a5-b6c7-4890-def2-345678901234",
-        "quantity": 1
-      }
-    ],
-    [
-      "be6dbfae-8ee8-4052-809b-9ec0bccf9a9a",
-      {
-        "id": "be6dbfae-8ee8-4052-809b-9ec0bccf9a9a",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-f4a5b6c7-d8e9-4012-fab4-567890123456",
         "quantity": 2
       }
     ],
     [
-      "66d6179f-b85f-4150-9a58-b5b04593f826",
+      "b7a0bc93-738e-4edd-b238-77150abf8d2a",
       {
-        "id": "66d6179f-b85f-4150-9a58-b5b04593f826",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "b7a0bc93-738e-4edd-b238-77150abf8d2a",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
+        "resourceId": "res-f4a5b6c7-d8e9-4012-fab4-567890123456",
+        "quantity": 1
+      }
+    ],
+    [
+      "164cbe74-79d1-4a0b-9ae7-f03d280bc69f",
+      {
+        "id": "164cbe74-79d1-4a0b-9ae7-f03d280bc69f",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-e9f0a1b2-c3d4-4567-efa9-012345678901",
         "quantity": 4
       }
     ],
     [
-      "427866a2-052b-473a-9905-87288bf69cb8",
+      "c6571a4c-2824-4f24-b12a-c62277d51e30",
       {
-        "id": "427866a2-052b-473a-9905-87288bf69cb8",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "c6571a4c-2824-4f24-b12a-c62277d51e30",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-d0e1f2a3-b4c5-4678-def0-123456789018",
         "quantity": 5
       }
     ],
     [
-      "22b4da2c-7dec-453b-b21e-9d95aa5da44b",
+      "0952cd2d-5e46-4dea-8147-38b9de875fd6",
       {
-        "id": "22b4da2c-7dec-453b-b21e-9d95aa5da44b",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "0952cd2d-5e46-4dea-8147-38b9de875fd6",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-a3b4c5d6-e7f8-4901-abc3-456789012351",
-        "quantity": 5
+        "quantity": 4
       }
     ],
     [
-      "1d6f8ce5-eed2-4df1-a1ea-aac8fe625a71",
+      "5f14ac89-bfe5-4b43-af70-ce673397eab2",
       {
-        "id": "1d6f8ce5-eed2-4df1-a1ea-aac8fe625a71",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "5f14ac89-bfe5-4b43-af70-ce673397eab2",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-f4a5b6c7-d8e9-4012-fab4-567890123462",
-        "quantity": 1
+        "quantity": 3
       }
     ]
   ],
@@ -223,126 +223,6 @@
         "playerId": "20450208-5d52-4282-a228-59142a347d21",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
         "quantity": 21,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "993f1b8a-d984-42b1-bdb5-6e16aeefe2b1",
-      {
-        "id": "993f1b8a-d984-42b1-bdb5-6e16aeefe2b1",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-a1b2c3d4-e5f6-4789-abc1-234567890123",
-        "quantity": 2,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "b57f9aa2-3d22-4488-a757-8d0f8026ab25",
-      {
-        "id": "b57f9aa2-3d22-4488-a757-8d0f8026ab25",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-b8c9d0e1-f2a3-4456-bcd8-901234567890",
-        "quantity": 4,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "76973679-68dc-4a5c-a6bf-46d63dd86040",
-      {
-        "id": "76973679-68dc-4a5c-a6bf-46d63dd86040",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-c5d6e7f8-a9b0-4123-cde5-678901234567",
-        "quantity": 4,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "83fc623b-2824-475d-a7f4-167c70019cf2",
-      {
-        "id": "83fc623b-2824-475d-a7f4-167c70019cf2",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-d6e7f8a9-b0c1-4234-def6-789012345678",
-        "quantity": 4,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "9d0114b8-f3b9-4880-bb2d-bc5b95af7a02",
-      {
-        "id": "9d0114b8-f3b9-4880-bb2d-bc5b95af7a02",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-a9b0c1d2-e3f4-4567-abc9-012345678901",
-        "quantity": 2,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "4ac7f642-b0a2-459a-8be4-ab8130c99cde",
-      {
-        "id": "4ac7f642-b0a2-459a-8be4-ab8130c99cde",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-b0c1d2e3-f4a5-4678-bcd0-123456789012",
-        "quantity": 3,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "59935368-e64d-405b-ba7d-d0c3e90e79ed",
-      {
-        "id": "59935368-e64d-405b-ba7d-d0c3e90e79ed",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-d2e3f4a5-b6c7-4890-def2-345678901234",
-        "quantity": 2,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "cc6b635d-de0d-4ba5-bd6b-8e3e42347509",
-      {
-        "id": "cc6b635d-de0d-4ba5-bd6b-8e3e42347509",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-f4a5b6c7-d8e9-4012-fab4-567890123456",
-        "quantity": 1,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "d5ebed4c-2989-4f17-a2d6-b7cb3e9fe330",
-      {
-        "id": "d5ebed4c-2989-4f17-a2d6-b7cb3e9fe330",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-e9f0a1b2-c3d4-4567-efa9-012345678901",
-        "quantity": 5,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "738e625f-3c00-4f1c-a280-3b919b7b2be9",
-      {
-        "id": "738e625f-3c00-4f1c-a280-3b919b7b2be9",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-d0e1f2a3-b4c5-4678-def0-123456789018",
-        "quantity": 5,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "a7c1605c-b204-448f-bd60-7f5851358e83",
-      {
-        "id": "a7c1605c-b204-448f-bd60-7f5851358e83",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-a3b4c5d6-e7f8-4901-abc3-456789012351",
-        "quantity": 5,
-        "itemType": "resource"
-      }
-    ],
-    [
-      "a86681c4-0136-407e-ab53-47840a14e347",
-      {
-        "id": "a86681c4-0136-407e-ab53-47840a14e347",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
-        "resourceId": "res-f4a5b6c7-d8e9-4012-fab4-567890123462",
-        "quantity": 4,
         "itemType": "resource"
       }
     ]
@@ -401,10 +281,10 @@
       }
     ],
     [
-      "8d93dc68-0666-4293-8ca6-717d1cae72c0",
+      "b14d3aa3-cf69-4318-af5a-61959bed9f41",
       {
-        "id": "8d93dc68-0666-4293-8ca6-717d1cae72c0",
-        "playerId": "fbf3cb29-a458-40a5-8d60-c5d61d73847a",
+        "id": "b14d3aa3-cf69-4318-af5a-61959bed9f41",
+        "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "biomeId": "biome-61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
         "status": "completed",
         "selectedResources": [
@@ -427,20 +307,20 @@
         "selectedEquipment": [],
         "collectedResources": {
           "res-a1b2c3d4-e5f6-4789-abc1-234567890123": 5,
-          "res-b8c9d0e1-f2a3-4456-bcd8-901234567890": 1,
-          "res-c5d6e7f8-a9b0-4123-cde5-678901234567": 1,
-          "res-d6e7f8a9-b0c1-4234-def6-789012345678": 2,
+          "res-b8c9d0e1-f2a3-4456-bcd8-901234567890": 2,
+          "res-c5d6e7f8-a9b0-4123-cde5-678901234567": 5,
+          "res-d6e7f8a9-b0c1-4234-def6-789012345678": 1,
           "res-a9b0c1d2-e3f4-4567-abc9-012345678901": 2,
-          "res-b0c1d2e3-f4a5-4678-bcd0-123456789012": 5,
-          "res-d2e3f4a5-b6c7-4890-def2-345678901234": 1,
-          "res-f4a5b6c7-d8e9-4012-fab4-567890123456": 2,
+          "res-b0c1d2e3-f4a5-4678-bcd0-123456789012": 3,
+          "res-d2e3f4a5-b6c7-4890-def2-345678901234": 2,
+          "res-f4a5b6c7-d8e9-4012-fab4-567890123456": 1,
           "res-e9f0a1b2-c3d4-4567-efa9-012345678901": 4,
           "res-d0e1f2a3-b4c5-4678-def0-123456789018": 5,
-          "res-a3b4c5d6-e7f8-4901-abc3-456789012351": 5,
-          "res-f4a5b6c7-d8e9-4012-fab4-567890123462": 1
+          "res-a3b4c5d6-e7f8-4901-abc3-456789012351": 4,
+          "res-f4a5b6c7-d8e9-4012-fab4-567890123462": 3
         },
-        "startTime": 1754094144124,
-        "endTime": 1754094276,
+        "startTime": 1754094703646,
+        "endTime": 1754094769,
         "progress": 100
       }
     ]
