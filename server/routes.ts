@@ -18,7 +18,6 @@ import { registerStorageRoutes } from "./routes/storage-routes";
 import { createConsumptionRoutes } from "./routes/consumption";
 import savesRouter from "./routes/saves";
 import workshopRouter from "./routes/workshop-routes";
-import questRoutes from './routes/quest-routes';
 import storageRoutes from './routes/storage-routes';
 import itemRoutes from './routes/items-routes';
 
@@ -1289,7 +1288,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.use('/api/workshop', workshopRouter);
-  app.use('/api/quests', questRoutes);
   app.use('/api/storage', storageRoutes);
   app.use('/api/items', itemRoutes);
 
