@@ -35,6 +35,9 @@ interface User {
   passwordHash: string;
   createdAt: string;
   isAdmin?: boolean;
+  googleId?: string;
+  name?: string;
+  picture?: string;
 }
 
 export interface IStorage {

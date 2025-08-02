@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 import type { IStorage } from "../storage";
+import { GoogleAuthService } from "../services/google-auth-service";
 
 const router = express.Router();
 
@@ -29,6 +30,9 @@ interface User {
   passwordHash: string;
   createdAt: string;
   isAdmin?: boolean;
+  googleId?: string;
+  name?: string;
+  picture?: string;
 }
 
 export function createAuthRoutes(storage: IStorage) {
@@ -155,6 +159,86 @@ export function createAuthRoutes(storage: IStorage) {
 
     } catch (error) {
       res.status(401).json({ error: "Token inválido" });
+    }
+  });
+
+  // Google OAuth routes
+  const googleAuthService = new GoogleAuthService();
+
+  // Iniciar login com Google
+  router.get("/google", async (req, res) => {
+    try {
+      const authUrl = googleAuthService.getAuthUrl();
+      res.redirect(authUrl);
+    } catch (error) {
+      console.error("Google auth URL error:", error);
+      res.status(500).json({ error: "Erro ao gerar URL de autenticação" });
+    }
+  });
+
+  // Callback do Google OAuth
+  router.get("/google/callback", async (req, res) => {
+    try {
+      const { code } = req.query;
+      
+      if (!code) {
+        return res.status(400).json({ error: "Código de autorização não fornecido" });
+      }
+
+      // Trocar código por tokens
+      const tokens = await googleAuthService.getTokens(code as string);
+      
+      if (!tokens.access_token) {
+        return res.status(400).json({ error: "Token de acesso não recebido" });
+      }
+
+      // Obter informações do usuário
+      const userInfo = await googleAuthService.getUserInfo(tokens.access_token);
+      
+      if (!userInfo.email || !userInfo.name) {
+        return res.status(400).json({ error: "Informações do usuário incompletas" });
+      }
+
+      // Verificar se usuário já existe
+      let user = await storage.getUserByEmail(userInfo.email);
+      
+      if (!user) {
+        // Criar novo usuário
+        const userId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const username = userInfo.email.split('@')[0] + Math.random().toString(36).substr(2, 4);
+        
+        user = {
+          id: userId,
+          username,
+          email: userInfo.email,
+          passwordHash: '', // Usuários do Google não precisam de senha
+          createdAt: new Date().toISOString(),
+          isAdmin: false,
+          googleId: userInfo.id,
+          name: userInfo.name,
+          picture: userInfo.picture
+        };
+
+        await storage.createUser(user);
+      }
+
+      // Gerar token JWT
+      const token = jwt.sign(
+        { userId: user.id, username: user.username },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      // Redirecionar para frontend com token
+      const frontendUrl = process.env.NODE_ENV === 'development' 
+        ? `http://localhost:5000/auth-success?token=${token}` 
+        : `/auth-success?token=${token}`;
+      
+      res.redirect(frontendUrl);
+
+    } catch (error) {
+      console.error("Google callback error:", error);
+      res.status(500).json({ error: "Erro na autenticação com Google" });
     }
   });
 
