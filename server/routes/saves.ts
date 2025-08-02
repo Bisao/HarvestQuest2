@@ -1,11 +1,12 @@
 // Routes for save game management
 import { Router } from "express";
 import { storage } from "../storage";
+import { authenticateToken, optionalAuth, type AuthenticatedRequest } from "../middleware/jwt-auth";
 
 const router = Router();
 
 // Get all save slots (existing players)
-router.get("/", async (req, res) => {
+router.get("/", optionalAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const allPlayers = await storage.getAllPlayers();
 
@@ -26,7 +27,7 @@ router.get("/", async (req, res) => {
 });
 
 // Delete a save slot (player)
-router.delete("/:playerId", async (req, res) => {
+router.delete("/:playerId", authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
     const { playerId } = req.params;
 
@@ -40,7 +41,7 @@ router.delete("/:playerId", async (req, res) => {
 });
 
 // Get saved games
-router.get('/saves', async (req, res) => {
+router.get('/saves', optionalAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const saves = await storage.getAllPlayers();
 

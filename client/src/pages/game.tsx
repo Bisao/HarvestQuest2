@@ -11,6 +11,7 @@ import WorkshopsTab from "@/components/game/workshops-tab";
 import LoadingScreen from "@/components/game/loading-screen";
 import { OfflineActivityReportDialog } from "@/components/game/offline-activity-report";
 import { OfflineConfigModal } from "@/components/game/offline-config-modal";
+import { Settings, Home, Zap, AlertTriangle } from "lucide-react";
 
 import ExpeditionPanel, { type ActiveExpedition } from "@/components/game/expedition-panel";
 import type { Player, Biome, Resource, Equipment, Recipe, InventoryItem, OfflineActivityReport } from "@shared/types";
@@ -25,6 +26,7 @@ export default function Game() {
   const [offlineReport, setOfflineReport] = useState<OfflineActivityReport | null>(null);
   const [showOfflineReport, setShowOfflineReport] = useState(false);
   const [showOfflineConfig, setShowOfflineConfig] = useState(false);
+    const [authWarning, setAuthWarning] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -37,6 +39,14 @@ export default function Game() {
     setLocation('/');
     return null;
   }
+
+    // Check authentication status
+    useEffect(() => {
+        const token = localStorage.getItem("auth_token");
+        if (!token) {
+            setAuthWarning(true);
+        }
+    }, []);
 
   // ID Validation on game startup
   useEffect(() => {
@@ -221,6 +231,27 @@ export default function Game() {
       </div>
     );
   }
+
+    // Show auth warning if not authenticated
+    if (authWarning) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+                <div className="text-center bg-white p-8 rounded-lg shadow-lg">
+                    <AlertTriangle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold mb-4">Sessão Expirada</h2>
+                    <p className="text-gray-600 mb-4">
+                        Sua sessão de login expirou. Por favor, faça login novamente para continuar jogando.
+                    </p>
+                    <button
+                        onClick={() => setLocation('/')}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+                    >
+                        Voltar ao Menu Principal
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
   // Handle expedition start from BiomesTab
   const handleExpeditionStart = (expeditionData: any) => {

@@ -1,14 +1,15 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useSaveGame } from "@/hooks/use-save-game";
 import type { Player } from "@shared/types";
 import { Settings, Archive, Home } from "lucide-react";
 import LoadingScreen from "./loading-screen";
+import { getAuthHeaders } from "@/lib/queryClient";
 
 interface PlayerSettingsProps {
   player: Player;
@@ -32,7 +33,7 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
     mutationFn: async (settings: { autoStorage?: boolean; autoCompleteQuests?: boolean; autoConsume?: boolean }) => {
       const response = await fetch(`/api/player/${player.id}/settings`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify(settings),
       });
       if (!response.ok) {

@@ -1,21 +1,26 @@
-
 import { useMutation } from "@tanstack/react-query";
+import type { Player } from "@shared/types";
+import { getAuthHeaders } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export function useSaveGame() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (playerId: string) => {
-      const response = await fetch(`/api/player/${playerId}/save`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+    mutationFn: async (player: Player) => {
+      const response = await fetch(`/api/player/${player.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(player),
       });
-      
+
       if (!response.ok) {
         throw new Error("Failed to save game");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {

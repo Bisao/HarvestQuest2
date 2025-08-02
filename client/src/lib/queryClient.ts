@@ -17,7 +17,7 @@ export async function apiRequest(
     'Pragma': 'no-cache',
     'Expires': '0'
   };
-  
+
   if (data) {
     headers['Content-Type'] = 'application/json';
   }
@@ -55,6 +55,12 @@ export const getQueryFn: <T>(options: {
     await throwIfResNotOk(res);
     return await res.json();
   };
+
+// Helper function to get auth headers
+export const getAuthHeaders = () => {
+  const token = localStorage.getItem("auth_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 export const queryClient = new QueryClient({
   defaultOptions: {
