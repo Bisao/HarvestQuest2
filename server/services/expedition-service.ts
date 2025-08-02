@@ -117,7 +117,9 @@ export class ExpeditionService {
 
     console.log('Expedition created:', expedition);
 
-    // No longer deduct hunger/thirst on expedition start - handled by configured degradation mode
+    // Apply expedition status effects
+    await this.applyExpeditionStatusEffects(playerId, biome, validResources.length);
+
     return expedition;
   }
 
@@ -240,6 +242,9 @@ export class ExpeditionService {
     await this.questService.updateQuestProgress(expedition.playerId, 'expedition', {
       biomeId: expedition.biomeId
     });
+
+    // Apply completion status effects
+    await this.applyExpeditionCompletionEffects(expedition.playerId, expedition);
 
     // Mark expedition as completed with timestamp in seconds
     return await this.storage.updateExpedition(expeditionId, {
@@ -510,5 +515,109 @@ export class ExpeditionService {
       status: "cancelled",
       endTime: Math.floor(Date.now() / 1000)
     });
+  }
+
+  /**
+   * Apply status effects when completing an expedition
+   */
+  private async applyExpeditionCompletionEffects(playerId: string, expedition: any): Promise<void> {
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) return;
+
+    const statusService = new (await import('./player-status-service')).PlayerStatusService(this.storage);
+    
+    // Completion effects (mostly positive)
+    let moraleIncrease = 5; // Success boosts morale
+    let fatigueIncrease = 3; // But you're more tired after work
+    
+    // Bonus morale for successful resource gathering
+    const resourceCount = Object.keys(expedition.collectedResources || {}).length;
+    if (resourceCount > 2) {
+      moraleIncrease += 2; // Extra satisfaction from good haul
+    }
+
+    const updates: any = {
+      morale: Math.min(100, player.morale + moraleIncrease),
+      fatigue: Math.min(100, player.fatigue + fatigueIncrease)
+    };
+
+    await statusService.updatePlayerStatus(playerId, updates);
+    console.log(`✅ Expedition completion effects applied to player ${playerId}:`, updates);
+  }
+
+  /**
+   * Apply status effects when starting an expedition
+   */
+  private async applyExpeditionStatusEffects(playerId: string, biome: any, resourceCount: number): Promise<void> {
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) return;
+
+    const statusService = new (await import('./player-status-service')).PlayerStatusService(this.storage);
+    
+    // Base expedition effects
+    let fatigueIncrease = 5; // Base fatigue from expedition start
+    let moraleChange = 2; // Slight morale boost from adventure
+    let hygieneDecrease = 3; // Getting dirty from expedition
+    let temperatureChange = 0;
+
+    // Biome-specific effects
+    switch (biome.name?.toLowerCase()) {
+      case 'deserto árido':
+        temperatureChange = 15; // Hot climate
+        fatigueIncrease += 3; // More tiring in desert
+        hygieneDecrease += 2; // Sand and dust
+        break;
+      case 'floresta gelada':
+        temperatureChange = -10; // Cold climate  
+        fatigueIncrease += 2; // Cold is tiring
+        break;
+      case 'pântano misterioso':
+        hygieneDecrease += 5; // Very dirty environment
+        moraleChange -= 1; // Unpleasant environment
+        break;
+      case 'montanhas rochosas':
+        fatigueIncrease += 4; // Climbing is exhausting
+        moraleChange += 1; // Beautiful views boost morale
+        break;
+    }
+
+    // Resource gathering intensity effects
+    if (resourceCount > 3) {
+      fatigueIncrease += 2; // More resources = more work
+      hygieneDecrease += 1;
+    }
+
+    // Equipment can reduce negative effects
+    if (player.equippedChestplate) {
+      fatigueIncrease = Math.max(1, fatigueIncrease - 1);
+      temperatureChange *= 0.7; // Armor provides some protection
+    }
+    if (player.equippedHelmet) {
+      hygieneDecrease = Math.max(1, hygieneDecrease - 1);
+    }
+
+    // Apply the status changes
+    const updates: any = {};
+    
+    if (fatigueIncrease > 0) {
+      updates.fatigue = Math.min(100, player.fatigue + fatigueIncrease);
+    }
+    
+    if (moraleChange !== 0) {
+      updates.morale = Math.max(0, Math.min(100, player.morale + moraleChange));
+    }
+    
+    if (hygieneDecrease > 0) {
+      updates.hygiene = Math.max(0, player.hygiene - hygieneDecrease);
+    }
+    
+    if (temperatureChange !== 0) {
+      updates.temperature = Math.max(-100, Math.min(100, (player.temperature || 20) + temperatureChange));
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await statusService.updatePlayerStatus(playerId, updates);
+      console.log(`🏃 Expedition status effects applied to player ${playerId}:`, updates);
+    }
   }
 }

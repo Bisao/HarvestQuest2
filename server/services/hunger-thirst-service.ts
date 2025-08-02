@@ -97,6 +97,10 @@ export class HungerThirstService {
             thirst: Math.max(0, Math.min(player.maxThirst || 100, finalThirst))
           };
 
+          // Apply other status degradations
+          const statusDegradation = this.calculateStatusDegradation(player);
+          Object.assign(updateData, statusDegradation);
+
           // Apply penalties if any
           if (penalties.healthPenalty > 0) {
             updateData.health = Math.max(1, (player.health || 100) - penalties.healthPenalty);
@@ -295,6 +299,41 @@ export class HungerThirstService {
    * OFFLINE DEGRADATION REMOVED - Only configured degradation mode is used
    * The normal passive degradation system handles all degradation consistently
    */
+
+  /**
+   * Calculate degradation for other status values
+   */
+  private calculateStatusDegradation(player: any): any {
+    const updates: any = {};
+
+    // Fatigue naturally decreases when not on expedition (rest)
+    if (!player.onExpedition && player.fatigue > 0) {
+      const fatigueRecovery = Math.min(2, player.fatigue); // Recover 2 fatigue per cycle when resting
+      updates.fatigue = Math.max(0, player.fatigue - fatigueRecovery);
+    }
+
+    // Hygiene naturally decreases over time
+    if (player.hygiene > 0) {
+      const hygieneDecrease = 1; // Lose 1 hygiene per cycle
+      updates.hygiene = Math.max(0, player.hygiene - hygieneDecrease);
+    }
+
+    // Temperature moves toward neutral (20°C) slowly
+    const currentTemp = player.temperature || 20;
+    if (currentTemp !== 20) {
+      const tempChange = currentTemp > 20 ? -1 : 1; // Move 1 degree toward 20
+      updates.temperature = Math.max(-100, Math.min(100, currentTemp + tempChange));
+    }
+
+    // Morale slowly decreases if low hunger/thirst, slowly increases if well-fed
+    if (player.hunger < 30 || player.thirst < 30) {
+      updates.morale = Math.max(0, player.morale - 1); // Lose morale when hungry/thirsty
+    } else if (player.hunger > 80 && player.thirst > 80 && player.morale < 100) {
+      updates.morale = Math.min(100, player.morale + 1); // Gain morale when well-fed
+    }
+
+    return updates;
+  }
 
   /**
    * Get current status of the degradation system

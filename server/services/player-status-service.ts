@@ -185,6 +185,13 @@ export class PlayerStatusService {
     if (player.hunger <= 20) warnings.push("Fome crítica!");
     if (player.thirst <= 20) warnings.push("Sede crítica!");
     if (player.fatigue >= 80) warnings.push("Extremamente cansado!");
+    if (player.hygiene <= 20) warnings.push("Higiene crítica!");
+    if (player.morale <= 20) warnings.push("Moral muito baixo!");
+    
+    // Temperature warnings
+    const temp = player.temperature || 20;
+    if (temp <= -20) warnings.push("Temperatura perigosamente baixa!");
+    else if (temp >= 50) warnings.push("Temperatura perigosamente alta!");
 
     // Add recommendations
     if (player.hunger < 50) recommendations.push("Consuma alimentos para recuperar energia");
@@ -192,15 +199,21 @@ export class PlayerStatusService {
     if (player.fatigue > 60) recommendations.push("Descanse para reduzir o cansaço");
     if (player.hygiene < 40) recommendations.push("Melhore sua higiene para evitar doenças");
     if (player.morale < 40) recommendations.push("Faça atividades prazerosas para melhorar o humor");
+    
+    // Temperature recommendations
+    if (temp < 10) recommendations.push("Procure abrigo ou roupas quentes");
+    else if (temp > 35) recommendations.push("Procure sombra e beba mais água");
 
-    // Calculate overall status
+    // Calculate overall status (including new status values)
     const statusAverage = (
       (player.health / player.maxHealth) +
       (player.hunger / player.maxHunger) +
       (player.thirst / player.maxThirst) +
       ((100 - player.fatigue) / 100) +
-      (player.morale / 100)
-    ) / 5;
+      (player.morale / 100) +
+      (player.hygiene / 100) +
+      (Math.max(0, 50 - Math.abs((player.temperature || 20) - 20)) / 50) // Temperature comfort (20°C = perfect)
+    ) / 7;
 
     let overall: 'excellent' | 'good' | 'fair' | 'poor' | 'critical';
     if (statusAverage >= 0.9) overall = 'excellent';
@@ -210,5 +223,42 @@ export class PlayerStatusService {
     else overall = 'critical';
 
     return { overall, warnings, recommendations };
+  }
+
+  /**
+   * Check for disease risk based on status values
+   */
+  async checkDiseaseRisk(playerId: string): Promise<void> {
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) return;
+
+    const diseaseRisks: string[] = [];
+
+    // Hygiene-based disease risk
+    if (player.hygiene < 20) {
+      diseaseRisks.push("infection"); // High infection risk
+    }
+
+    // Temperature-based disease risk
+    const temp = player.temperature || 20;
+    if (temp < -10) {
+      diseaseRisks.push("hypothermia");
+    } else if (temp > 45) {
+      diseaseRisks.push("heat_exhaustion");
+    }
+
+    // Combined status disease risk
+    if (player.fatigue > 80 && player.morale < 30 && player.hygiene < 30) {
+      diseaseRisks.push("depression"); // Combination of factors
+    }
+
+    // Apply disease risks (simplified - you could expand this with actual disease system)
+    for (const risk of diseaseRisks) {
+      const chance = Math.random();
+      if (chance < 0.1) { // 10% chance per cycle
+        console.log(`🦠 Player ${playerId} is at risk for ${risk} disease`);
+        // Here you would apply the actual disease
+      }
+    }
   }
 }
