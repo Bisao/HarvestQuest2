@@ -41,13 +41,14 @@ export default function ExpeditionPanel({
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
-  const biome = biomes.find(b => b.id === expedition.biomeId);
+  const biome = biomes?.find(b => b.id === expedition.biomeId) || null;
   const isCompleted = currentProgress >= 100;
 
   // Query player data for real-time hunger/thirst monitoring
   const { data: player } = useQuery<Player>({
     queryKey: [`/api/player/${expedition.id.split('-')[0]}`], // Use expedition creator ID
     refetchInterval: 2000, // Refetch every 2 seconds for real-time monitoring
+    enabled: !!expedition.id
   });
 
   // Complete expedition mutation  

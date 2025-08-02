@@ -26,6 +26,7 @@ export { default as ExpeditionSystem } from './expedition-system';
 export { default as ExpeditionPanel } from './expedition-panel';
 export { default as ExpeditionModal } from './expedition-modal';
 export { default as BiomesTabNew } from './biomes-tab-new';
+export { default as EnhancedBiomesTab } from './enhanced-biomes-tab';
 
 // === QUESTS & PROGRESSION ===
 export { default as QuestsTab } from './quests-tab';

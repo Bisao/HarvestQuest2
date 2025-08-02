@@ -28,6 +28,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
+- **August 2, 2025**: SISTEMA DE BIOMAS ROBUSTO IMPLEMENTADO ✅
+  - **NOVA ARQUITETURA DE BIOMAS**: Interface modernizada com categorização inteligente de recursos e estatísticas avançadas
+  - **CATEGORIZAÇÃO INTELIGENTE**: Sistema de 10 categorias especializadas (básicos, madeiras, pedras, fibras, animais, peixes, plantas, raros, processados, especiais)
+  - **INTERFACE AVANÇADA**: Cards modernos com preview de recursos, estatísticas de diversidade e recomendações personalizadas
+  - **SISTEMA DE BUSCA**: Filtragem inteligente por nome, descrição e categorias com visualização em grade ou lista
+  - **ESTATÍSTICAS DETALHADAS**: Métricas de progresso, diversidade de recursos e complexidade de biomas
+  - **EXPERIÊNCIA VISUAL**: Temas específicos por bioma com ícones, cores e layouts otimizados
+  - **RESPONSIVIDADE TOTAL**: Interface adaptativa para desktop e mobile com componentes shadcn/ui
 - **August 2, 2025**: REFATORAÇÃO COMPLETA DA UI CONCLUÍDA ✅
   - **NOVA ARQUITETURA UNIFICADA**: Implementado sistema UI moderno com componentes unificados eliminando duplicações
   - **COMPONENTES CONSOLIDADOS**: Removidos 3 componentes duplicados de oficinas/crafting, criado sistema unificado

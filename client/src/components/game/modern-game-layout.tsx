@@ -18,7 +18,7 @@ import type { Player, Biome, Resource, Equipment, Recipe } from '@shared/types';
 import GameHeader from './game-header';
 import UnifiedInventory from './unified-inventory';
 import UnifiedWorkshops from './unified-workshops';
-import BiomesTabNew from './biomes-tab-new';
+import EnhancedBiomesTab from './enhanced-biomes-tab';
 import QuestsTab from './quests-tab';
 import StatusTab from './status-tab';
 import PlayerSettings from './player-settings';
@@ -72,7 +72,7 @@ export default function ModernGameLayout({
     switch (activeTab) {
       case 'exploration':
         return (
-          <BiomesTabNew
+          <EnhancedBiomesTab
             biomes={biomes}
             resources={resources}
             equipment={equipment}
