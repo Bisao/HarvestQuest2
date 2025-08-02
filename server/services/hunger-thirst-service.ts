@@ -52,6 +52,12 @@ export class HungerThirstService {
       const players = await this.storage.getAllPlayers();
 
       for (const player of players) {
+        // Ensure player has valid status values
+        if (!player.hunger && player.hunger !== 0) player.hunger = 100;
+        if (!player.thirst && player.thirst !== 0) player.thirst = 100;
+        if (!player.maxHunger) player.maxHunger = 100;
+        if (!player.maxThirst) player.maxThirst = 100;
+
         // Skip if player has very low hunger/thirst to avoid going negative
         if (player.hunger <= 2 && player.thirst <= 2) {
           continue;
@@ -59,8 +65,8 @@ export class HungerThirstService {
 
         // Calculate degradation based on player's selected mode
         const baseDegradation = this.calculateDegradationByMode(player);
-        const hungerDecrease = Math.min(baseDegradation.hunger, player.hunger); 
-        const thirstDecrease = Math.min(baseDegradation.thirst, player.thirst);
+        const hungerDecrease = Math.min(baseDegradation.hunger || 1, player.hunger); 
+        const thirstDecrease = Math.min(baseDegradation.thirst || 1, player.thirst);
 
         const newHunger = Math.max(0, player.hunger - hungerDecrease);
         const newThirst = Math.max(0, player.thirst - thirstDecrease);
@@ -80,19 +86,20 @@ export class HungerThirstService {
         const finalHunger = Math.min(player.maxHunger, newHunger + naturalHungerRegen);
         const finalThirst = Math.min(player.maxThirst, newThirst + naturalThirstRegen);
 
-        // Only update if there's actually a change
-        if (finalHunger !== player.hunger || finalThirst !== player.thirst) {
+        // Only update if there's actually a change and values are valid
+        if ((finalHunger !== player.hunger || finalThirst !== player.thirst) && 
+            !isNaN(finalHunger) && !isNaN(finalThirst)) {
           // Calculate penalties for low hunger/thirst
           const penalties = this.calculateStatusPenalties(newHunger, newThirst);
 
           const updateData: any = {
-            hunger: finalHunger,
-            thirst: finalThirst
+            hunger: Math.max(0, Math.min(player.maxHunger || 100, finalHunger)),
+            thirst: Math.max(0, Math.min(player.maxThirst || 100, finalThirst))
           };
 
           // Apply penalties if any
           if (penalties.healthPenalty > 0) {
-            updateData.health = player.health - penalties.healthPenalty;
+            updateData.health = Math.max(1, (player.health || 100) - penalties.healthPenalty);
             console.log(`🩺 Player ${player.id} lost ${penalties.healthPenalty} health due to low hunger/thirst`);
           }
 

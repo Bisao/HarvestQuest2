@@ -341,6 +341,29 @@ export class MemStorage implements IStorage {
       equippedWeapon: insertPlayer.equippedWeapon || null,
       equippedTool: insertPlayer.equippedTool || null,
       autoCompleteQuests: insertPlayer.autoCompleteQuests ?? true,
+      
+      // Enhanced Status System - Initialize with default values
+      health: insertPlayer.health ?? 100,
+      maxHealth: insertPlayer.maxHealth ?? 100,
+      hunger: insertPlayer.hunger ?? 100,
+      maxHunger: insertPlayer.maxHunger ?? 100,
+      thirst: insertPlayer.thirst ?? 100,
+      maxThirst: insertPlayer.maxThirst ?? 100,
+      temperature: insertPlayer.temperature ?? 0,
+      fatigue: insertPlayer.fatigue ?? 0,
+      morale: insertPlayer.morale ?? 50,
+      hygiene: insertPlayer.hygiene ?? 100,
+      
+      // Disease System
+      diseases: insertPlayer.diseases ?? [],
+      immunities: insertPlayer.immunities ?? [],
+      resistances: insertPlayer.resistances ?? {},
+      
+      // Skill System
+      skills: insertPlayer.skills ?? {},
+      skillPoints: insertPlayer.skillPoints ?? 0,
+      totalSkillPoints: insertPlayer.totalSkillPoints ?? 0,
+      skillAchievements: insertPlayer.skillAchievements ?? [],
     };
 
     this.players.set(id, player);

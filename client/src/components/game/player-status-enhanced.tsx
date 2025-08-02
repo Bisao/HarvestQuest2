@@ -14,6 +14,33 @@ interface PlayerStatusEnhancedProps {
 }
 
 export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
+  if (!player) {
+    return (
+      <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200">
+        <div className="text-center text-gray-500">
+          Carregando status do jogador...
+        </div>
+      </div>
+    );
+  }
+
+  // Ensure player has all required status properties with defaults
+  const safePlayer = {
+    ...player,
+    health: player.health ?? 100,
+    maxHealth: player.maxHealth ?? 100,
+    hunger: player.hunger ?? 100,
+    maxHunger: player.maxHunger ?? 100,
+    thirst: player.thirst ?? 100,
+    maxThirst: player.maxThirst ?? 100,
+    temperature: player.temperature ?? 0,
+    fatigue: player.fatigue ?? 0,
+    morale: player.morale ?? 50,
+    hygiene: player.hygiene ?? 100,
+    diseases: player.diseases ?? [],
+    immunities: player.immunities ?? [],
+    resistances: player.resistances ?? {},
+  };
   const { toast } = useToast();
 
   // Calculate status colors based on values
@@ -23,7 +50,7 @@ export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
       if (value < -25 || value > 25) return 'text-orange-500';
       return 'text-green-500';
     }
-    
+
     if (value >= 80) return 'text-green-500';
     if (value >= 50) return 'text-yellow-500';
     if (value >= 25) return 'text-orange-500';
@@ -49,19 +76,19 @@ export function PlayerStatusEnhanced({ player }: PlayerStatusEnhancedProps) {
 
   // Enhanced status values from player
   const status = {
-    health: player.health,
-    maxHealth: player.maxHealth,
-    hunger: player.hunger,
-    maxHunger: player.maxHunger,
-    thirst: player.thirst,
-    maxThirst: player.maxThirst,
-    temperature: player.temperature,
-    fatigue: player.fatigue,
-    morale: player.morale,
-    hygiene: player.hygiene,
-    diseases: player.diseases,
-    immunities: player.immunities,
-    skillPoints: player.skillPoints
+    health: safePlayer.health,
+    maxHealth: safePlayer.maxHealth,
+    hunger: safePlayer.hunger,
+    maxHunger: safePlayer.maxHunger,
+    thirst: safePlayer.thirst,
+    maxThirst: safePlayer.maxThirst,
+    temperature: safePlayer.temperature,
+    fatigue: safePlayer.fatigue,
+    morale: safePlayer.morale,
+    hygiene: safePlayer.hygiene,
+    diseases: safePlayer.diseases,
+    immunities: safePlayer.immunities,
+    skillPoints: safePlayer.skillPoints
   };
 
   return (
