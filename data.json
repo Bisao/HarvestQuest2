@@ -29,7 +29,7 @@
         "equippedFood": null,
         "equippedDrink": null,
         "autoCompleteQuests": false,
-        "lastOnlineTime": 1754094679553
+        "lastOnlineTime": 1754095029674
       }
     ],
     [
@@ -37,14 +37,14 @@
       {
         "id": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "username": "Bison",
-        "level": 4,
-        "experience": 549,
+        "level": 10,
+        "experience": 2311,
         "hunger": 100,
         "maxHunger": 100,
         "thirst": 100,
         "maxThirst": 100,
         "coins": 100,
-        "inventoryWeight": 9.549999999999999,
+        "inventoryWeight": 42.2,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -72,7 +72,7 @@
         "id": "9314eec4-337e-40d1-8033-871d68509442",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-a1b2c3d4-e5f6-4789-abc1-234567890123",
-        "quantity": 5
+        "quantity": 12
       }
     ],
     [
@@ -81,7 +81,7 @@
         "id": "056f5cee-2359-47ef-838d-ecaf8bcca0ef",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-b8c9d0e1-f2a3-4456-bcd8-901234567890",
-        "quantity": 2
+        "quantity": 12
       }
     ],
     [
@@ -90,7 +90,7 @@
         "id": "a7af8ae8-62e3-4cc5-8478-00257410f4bd",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-c5d6e7f8-a9b0-4123-cde5-678901234567",
-        "quantity": 5
+        "quantity": 18
       }
     ],
     [
@@ -99,7 +99,7 @@
         "id": "828bcf0a-c2ad-4297-a8d6-c5070017a633",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-d6e7f8a9-b0c1-4234-def6-789012345678",
-        "quantity": 1
+        "quantity": 10
       }
     ],
     [
@@ -108,7 +108,7 @@
         "id": "6334b0d2-8720-43df-baa3-304c845e8723",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-a9b0c1d2-e3f4-4567-abc9-012345678901",
-        "quantity": 2
+        "quantity": 6
       }
     ],
     [
@@ -117,7 +117,7 @@
         "id": "a12ace40-e75a-49ed-8e2a-1688760e4776",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-b0c1d2e3-f4a5-4678-bcd0-123456789012",
-        "quantity": 3
+        "quantity": 15
       }
     ],
     [
@@ -126,7 +126,7 @@
         "id": "e727ab08-342c-42d9-8b6f-9fb9c5630101",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-d2e3f4a5-b6c7-4890-def2-345678901234",
-        "quantity": 2
+        "quantity": 5
       }
     ],
     [
@@ -135,7 +135,7 @@
         "id": "b7a0bc93-738e-4edd-b238-77150abf8d2a",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-f4a5b6c7-d8e9-4012-fab4-567890123456",
-        "quantity": 1
+        "quantity": 11
       }
     ],
     [
@@ -144,7 +144,7 @@
         "id": "164cbe74-79d1-4a0b-9ae7-f03d280bc69f",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-e9f0a1b2-c3d4-4567-efa9-012345678901",
-        "quantity": 4
+        "quantity": 11
       }
     ],
     [
@@ -153,7 +153,7 @@
         "id": "c6571a4c-2824-4f24-b12a-c62277d51e30",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-d0e1f2a3-b4c5-4678-def0-123456789018",
-        "quantity": 5
+        "quantity": 16
       }
     ],
     [
@@ -162,7 +162,7 @@
         "id": "0952cd2d-5e46-4dea-8147-38b9de875fd6",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-a3b4c5d6-e7f8-4901-abc3-456789012351",
-        "quantity": 4
+        "quantity": 15
       }
     ],
     [
@@ -171,7 +171,7 @@
         "id": "5f14ac89-bfe5-4b43-af70-ce673397eab2",
         "playerId": "1e4e0ced-532a-4e1a-aa21-329f2efb8e2d",
         "resourceId": "res-f4a5b6c7-d8e9-4012-fab4-567890123462",
-        "quantity": 3
+        "quantity": 11
       }
     ]
   ],
@@ -306,21 +306,21 @@
         ],
         "selectedEquipment": [],
         "collectedResources": {
-          "res-a1b2c3d4-e5f6-4789-abc1-234567890123": 5,
-          "res-b8c9d0e1-f2a3-4456-bcd8-901234567890": 2,
-          "res-c5d6e7f8-a9b0-4123-cde5-678901234567": 5,
-          "res-d6e7f8a9-b0c1-4234-def6-789012345678": 1,
+          "res-a1b2c3d4-e5f6-4789-abc1-234567890123": 4,
+          "res-b8c9d0e1-f2a3-4456-bcd8-901234567890": 3,
+          "res-c5d6e7f8-a9b0-4123-cde5-678901234567": 3,
+          "res-d6e7f8a9-b0c1-4234-def6-789012345678": 5,
           "res-a9b0c1d2-e3f4-4567-abc9-012345678901": 2,
-          "res-b0c1d2e3-f4a5-4678-bcd0-123456789012": 3,
-          "res-d2e3f4a5-b6c7-4890-def2-345678901234": 2,
-          "res-f4a5b6c7-d8e9-4012-fab4-567890123456": 1,
+          "res-b0c1d2e3-f4a5-4678-bcd0-123456789012": 4,
+          "res-d2e3f4a5-b6c7-4890-def2-345678901234": 1,
+          "res-f4a5b6c7-d8e9-4012-fab4-567890123456": 3,
           "res-e9f0a1b2-c3d4-4567-efa9-012345678901": 4,
-          "res-d0e1f2a3-b4c5-4678-def0-123456789018": 5,
-          "res-a3b4c5d6-e7f8-4901-abc3-456789012351": 4,
-          "res-f4a5b6c7-d8e9-4012-fab4-567890123462": 3
+          "res-d0e1f2a3-b4c5-4678-def0-123456789018": 3,
+          "res-a3b4c5d6-e7f8-4901-abc3-456789012351": 5,
+          "res-f4a5b6c7-d8e9-4012-fab4-567890123462": 2
         },
         "startTime": 1754094703646,
-        "endTime": 1754094769,
+        "endTime": 1754094968,
         "progress": 100
       }
     ]
