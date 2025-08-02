@@ -1,27 +1,46 @@
+
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { useGameData } from '@/hooks/useGamePolling';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  Map, 
-  Package, 
-  Hammer, 
-  Scroll,
+  Backpack,
+  Package,
+  TreePine,
+  Compass,
   Settings,
   Home,
-  AlertTriangle,
+  Hammer,
+  MapPin,
+  Star,
+  Heart,
+  Droplets,
+  Coins,
+  Moon,
+  Shield,
+  Sword,
   Zap
 } from 'lucide-react';
-import type { Player, Biome, Resource, Equipment, Recipe } from '@shared/types';
-import UnifiedInventory from './unified-inventory';
-import UnifiedWorkshops from './unified-workshops';
+
+// Import all tab components
+import EnhancedInventory from './enhanced-inventory';
+import EnhancedStorageTab from './enhanced-storage-tab';
 import EnhancedBiomesTab from './enhanced-biomes-tab';
-import QuestsTab from './quests-tab';
-import StatusTab from './status-tab';
+import UnifiedWorkshops from './unified-workshops';
 import CampTab from './camp-tab';
-import ExpeditionPanel, { type ActiveExpedition } from './expedition-panel';
+import StatusTab from './status-tab';
+import QuestsTab from './quests-tab';
+import PlayerSettings from './player-settings';
+import ExpeditionPanel from './expedition-panel';
+
+// Import modals
+import ModernExpeditionModal from './modern-expedition-modal';
+import OfflineActivityReport from './offline-activity-report';
+
+import type { Player, Biome, Resource, Equipment, Recipe, ActiveExpedition } from '@shared/types';
 
 interface ModernGameLayoutProps {
   player: Player;
@@ -35,13 +54,64 @@ interface ModernGameLayoutProps {
   isBlocked?: boolean;
 }
 
+// Tab configuration with icons and colors
 const GAME_TABS = [
-  { id: 'exploration', name: 'Exploração', icon: Map, component: 'biomes' },
-  { id: 'inventory', name: 'Inventário', icon: Package, component: 'inventory' },
-  { id: 'camp', name: 'Acampamento', icon: Home, component: 'camp' },
-  { id: 'workshops', name: 'Oficinas', icon: Hammer, component: 'workshops' },
-  { id: 'quests', name: 'Missões', icon: Scroll, component: 'quests' },
-  { id: 'status', name: 'Status', icon: Zap, component: 'status' }
+  { 
+    id: 'status', 
+    label: 'Status', 
+    icon: Heart, 
+    color: 'text-red-600',
+    description: 'Estatísticas do jogador'
+  },
+  { 
+    id: 'inventory', 
+    label: 'Inventário', 
+    icon: Backpack, 
+    color: 'text-blue-600',
+    description: 'Itens carregados'
+  },
+  { 
+    id: 'storage', 
+    label: 'Armazém', 
+    icon: Package, 
+    color: 'text-green-600',
+    description: 'Itens armazenados'
+  },
+  { 
+    id: 'biomes', 
+    label: 'Expedições', 
+    icon: TreePine, 
+    color: 'text-emerald-600',
+    description: 'Explorar biomas'
+  },
+  { 
+    id: 'workshops', 
+    label: 'Oficinas', 
+    icon: Hammer, 
+    color: 'text-orange-600',
+    description: 'Processar materiais'
+  },
+  { 
+    id: 'camp', 
+    label: 'Acampamento', 
+    icon: Home, 
+    color: 'text-purple-600',
+    description: 'Base e melhorias'
+  },
+  { 
+    id: 'quests', 
+    label: 'Missões', 
+    icon: Star, 
+    color: 'text-yellow-600',
+    description: 'Objetivos e recompensas'
+  },
+  { 
+    id: 'settings', 
+    label: 'Configurações', 
+    icon: Settings, 
+    color: 'text-gray-600',
+    description: 'Opções do jogo'
+  }
 ];
 
 export default function ModernGameLayout({
@@ -55,236 +125,324 @@ export default function ModernGameLayout({
   authWarning = false,
   isBlocked = false
 }: ModernGameLayoutProps) {
-  const [activeTab, setActiveTab] = useState('exploration');
-  const [showSettings, setShowSettings] = useState(false);
+  const [activeTab, setActiveTab] = useState('status');
+  const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
+  const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
+  const [offlineReportOpen, setOfflineReportOpen] = useState(false);
+  
+  const { toast } = useToast();
 
-  // Auto-hide auth warning after 10 seconds
-  useEffect(() => {
-    if (authWarning) {
-      const timer = setTimeout(() => {
-        // You can add logic here to hide the warning
-      }, 10000);
-      return () => clearTimeout(timer);
-    }
-  }, [authWarning]);
+  // Use game data hook for real-time updates
+  const { 
+    inventory = [], 
+    storage = [], 
+    isLoading 
+  } = useGameData({ playerId: player.id });
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'exploration':
-        return (
-          <EnhancedBiomesTab
-            biomes={biomes}
-            resources={resources}
-            equipment={equipment}
-            player={player}
-            onExpeditionStart={setActiveExpedition}
-          />
-        );
-
-      case 'inventory':
-        return (
-          <UnifiedInventory
-            playerId={player.id}
-            resources={resources}
-            equipment={equipment}
-            player={player}
-            isBlocked={isBlocked}
-          />
-        );
-
-      case 'camp':
-        return (
-          <CampTab
-            player={player}
-            resources={resources}
-            equipment={equipment}
-          />
-        );
-
-      case 'workshops':
-        return (
-          <UnifiedWorkshops
-            player={player}
-            resources={resources}
-            isBlocked={isBlocked}
-          />
-        );
-
-      case 'quests':
-        return (
-          <QuestsTab
-            player={player}
-          />
-        );
-
-      case 'status':
-        return (
-          <StatusTab
-            player={player}
-            resources={resources}
-            equipment={equipment}
-            isBlocked={isBlocked}
-          />
-        );
-
-      default:
-        return (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <AlertTriangle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-600">Aba não encontrada</h3>
-            </CardContent>
-          </Card>
-        );
-    }
+  // Handle expedition start from biomes tab
+  const handleExpeditionStart = (biome: Biome) => {
+    setSelectedBiome(biome);
+    setExpeditionModalOpen(true);
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      
+  // Handle expedition modal completion
+  const handleExpeditionComplete = (expeditionData: any) => {
+    setActiveExpedition(expeditionData);
+    setExpeditionModalOpen(false);
+    setSelectedBiome(null);
+  };
 
+  // Show offline activity report if player has significant offline time
+  useEffect(() => {
+    if (player && player.lastSeen) {
+      const lastSeenTime = new Date(player.lastSeen).getTime();
+      const currentTime = Date.now();
+      const offlineTime = (currentTime - lastSeenTime) / 1000; // in seconds
+      
+      // Show report if offline for more than 30 minutes
+      if (offlineTime > 1800) {
+        setOfflineReportOpen(true);
+      }
+    }
+  }, [player]);
+
+  // Get current tab info
+  const currentTab = GAME_TABS.find(tab => tab.id === activeTab);
+  const TabIcon = currentTab?.icon || Heart;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🎮</div>
+          <div className="text-xl font-semibold text-gray-700 mb-2">Carregando Coletor Adventures...</div>
+          <div className="text-gray-500">Preparando sua aventura</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
       {/* Auth Warning */}
       {authWarning && (
         <Alert className="mx-4 mt-4 border-yellow-200 bg-yellow-50">
-          <AlertTriangle className="h-4 w-4 text-yellow-600" />
           <AlertDescription className="text-yellow-800">
-            Você não está autenticado. Algumas funcionalidades podem não funcionar corretamente.
-            <Button 
-              variant="link" 
-              className="ml-2 p-0 h-auto text-yellow-800 underline"
-              onClick={() => window.location.href = '/'}
-            >
-              Fazer login
-            </Button>
+            ⚠️ Sessão temporária ativa. Considere fazer login para salvar seu progresso.
           </AlertDescription>
         </Alert>
       )}
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main Game Area */}
-          <div className="lg:col-span-3 space-y-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="flex items-center justify-between">
-                <TabsList className="grid w-full max-w-2xl grid-cols-5">
-                  {GAME_TABS.map((tab) => (
-                    <TabsTrigger 
-                      key={tab.id} 
-                      value={tab.id}
-                      className="flex items-center space-x-1"
-                    >
-                      <tab.icon className="w-4 h-4" />
-                      <span className="hidden sm:inline">{tab.name}</span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowSettings(true)}
-                  className="flex items-center space-x-1"
-                >
-                  <Settings className="w-4 h-4" />
-                  <span className="hidden sm:inline">Configurações</span>
-                </Button>
+      {/* Main Content Container */}
+      <div className="flex flex-col h-screen">
+        {/* Player Status Bar */}
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              {/* Player Info */}
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">{player.name.charAt(0)}</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-800">{player.name}</h1>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-500" />
+                      <span>Nível {player.level}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Coins className="w-4 h-4 text-yellow-600" />
+                      <span>{player.coins}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {GAME_TABS.map((tab) => (
-                <TabsContent key={tab.id} value={tab.id} className="mt-6">
-                  {renderTabContent()}
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Expedition Panel */}
-            {activeExpedition && (
-              <ExpeditionPanel
-                expedition={activeExpedition}
-                onExpeditionComplete={() => setActiveExpedition(null)}
-                playerId={player.id}
-              />
-            )}
-
-            {/* Quick Stats */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-3 flex items-center space-x-2">
-                  <Zap className="w-4 h-4" />
-                  <span>Status Rápido</span>
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Nível:</span>
-                    <Badge variant="outline">{player.level}</Badge>
+              {/* Status Indicators */}
+              <div className="flex items-center space-x-6">
+                {/* Hunger */}
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
+                    <span className="text-lg">🍖</span>
+                    <span className="text-sm font-medium text-gray-700">{player.hunger}/100</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Experiência:</span>
-                    <span>{player.experience % 100}/100</span>
+                  <div className="w-24 bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-orange-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${player.hunger}%` }}
+                    />
                   </div>
-                  <div className="flex justify-between">
-                    <span>Fome:</span>
-                    <span className={player.hunger <= 20 ? 'text-red-600' : 'text-green-600'}>
-                      {player.hunger}/{player.maxHunger}
+                </div>
+
+                {/* Thirst */}
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
+                    <Droplets className="w-4 h-4 text-blue-500" />
+                    <span className="text-sm font-medium text-gray-700">{player.thirst}/100</span>
+                  </div>
+                  <div className="w-24 bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${player.thirst}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Equipment Indicators */}
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
+                    <Shield className="w-4 h-4 text-gray-500" />
+                    <span className="text-xs text-gray-600">
+                      {player.equippedArmor ? '✓' : '○'}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Sede:</span>
-                    <span className={player.thirst <= 20 ? 'text-red-600' : 'text-green-600'}>
-                      {player.thirst}/{player.maxThirst}
+                  <div className="flex items-center space-x-1">
+                    <Sword className="w-4 h-4 text-gray-500" />
+                    <span className="text-xs text-gray-600">
+                      {player.equippedWeapon ? '✓' : '○'}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Hammer className="w-4 h-4 text-gray-500" />
+                    <span className="text-xs text-gray-600">
+                      {player.equippedTool ? '✓' : '○'}
                     </span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Quick Actions */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-3">Ações Rápidas</h3>
-                <div className="space-y-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full justify-start"
-                    onClick={() => setActiveTab('inventory')}
-                  >
-                    <Package className="w-4 h-4 mr-2" />
-                    Ver Inventário
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full justify-start"
-                    onClick={() => setActiveTab('workshops')}
-                  >
-                    <Hammer className="w-4 h-4 mr-2" />
-                    Ir para Oficinas
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full justify-start"
-                    onClick={() => window.location.href = '/'}
-                  >
-                    <Home className="w-4 h-4 mr-2" />
-                    Menu Principal
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                {/* Activity Status */}
+                {player.autoStorage && (
+                  <Badge variant="outline" className="flex items-center space-x-1">
+                    <Moon className="w-3 h-3" />
+                    <span>Atividade Offline</span>
+                  </Badge>
+                )}
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+            {/* Tab Navigation */}
+            <div className="bg-white border-b border-gray-200">
+              <div className="px-6">
+                <TabsList className="h-auto p-0 bg-transparent">
+                  <div className="flex space-x-1 overflow-x-auto">
+                    {GAME_TABS.map((tab) => {
+                      const Icon = tab.icon;
+                      return (
+                        <TabsTrigger
+                          key={tab.id}
+                          value={tab.id}
+                          className={`flex items-center space-x-2 px-4 py-3 rounded-t-lg font-medium transition-all whitespace-nowrap ${
+                            activeTab === tab.id
+                              ? "bg-white border-t border-l border-r border-gray-300 text-gray-800 -mb-px"
+                              : "bg-gray-50 hover:bg-gray-100 text-gray-600 border-b border-gray-200"
+                          }`}
+                        >
+                          <Icon className={`w-4 h-4 ${tab.color}`} />
+                          <span>{tab.label}</span>
+                        </TabsTrigger>
+                      );
+                    })}
+                  </div>
+                </TabsList>
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex-1 overflow-auto bg-gray-50">
+              <div className="p-6">
+                {/* Tab Description */}
+                <div className="mb-6">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className={`p-2 rounded-lg bg-white shadow-sm border`}>
+                      <TabIcon className={`w-5 h-5 ${currentTab?.color || 'text-gray-600'}`} />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-800">{currentTab?.label}</h2>
+                      <p className="text-gray-600">{currentTab?.description}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tab Content */}
+                <TabsContent value="status" className="mt-0">
+                  <StatusTab 
+                    player={player} 
+                    resources={resources} 
+                    equipment={equipment}
+                    isBlocked={isBlocked}
+                  />
+                </TabsContent>
+
+                <TabsContent value="inventory" className="mt-0">
+                  <EnhancedInventory
+                    playerId={player.id}
+                    resources={resources}
+                    equipment={equipment}
+                    player={player}
+                    isBlocked={isBlocked}
+                  />
+                </TabsContent>
+
+                <TabsContent value="storage" className="mt-0">
+                  <EnhancedStorageTab
+                    playerId={player.id}
+                    resources={resources}
+                    equipment={equipment}
+                    player={player}
+                    isBlocked={isBlocked}
+                  />
+                </TabsContent>
+
+                <TabsContent value="biomes" className="mt-0">
+                  <EnhancedBiomesTab
+                    player={player}
+                    biomes={biomes}
+                    resources={resources}
+                    equipment={equipment}
+                    onExpeditionStart={handleExpeditionStart}
+                    isBlocked={isBlocked}
+                  />
+                </TabsContent>
+
+                <TabsContent value="workshops" className="mt-0">
+                  <UnifiedWorkshops
+                    player={player}
+                    resources={resources}
+                    equipment={equipment}
+                    recipes={recipes}
+                    isBlocked={isBlocked}
+                  />
+                </TabsContent>
+
+                <TabsContent value="camp" className="mt-0">
+                  <CampTab
+                    player={player}
+                    resources={resources}
+                    equipment={equipment}
+                    isBlocked={isBlocked}
+                  />
+                </TabsContent>
+
+                <TabsContent value="quests" className="mt-0">
+                  <QuestsTab
+                    player={player}
+                    isBlocked={isBlocked}
+                  />
+                </TabsContent>
+
+                <TabsContent value="settings" className="mt-0">
+                  <PlayerSettings
+                    player={player}
+                    isBlocked={isBlocked}
+                  />
+                </TabsContent>
+              </div>
+            </div>
+          </Tabs>
+        </div>
+
+        {/* Expedition Panel (Fixed Position) */}
+        {activeExpedition && (
+          <div className="fixed bottom-4 right-4 z-50">
+            <ExpeditionPanel
+              expedition={activeExpedition}
+              onComplete={() => setActiveExpedition(null)}
+              onMinimize={() => {}}
+              biomes={biomes}
+              resources={resources}
+              equipment={equipment}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Settings Modal */}
-      {showSettings && (
-        null
-      )}
+      {/* Modals */}
+      <ModernExpeditionModal
+        isOpen={expeditionModalOpen}
+        onClose={() => {
+          setExpeditionModalOpen(false);
+          setSelectedBiome(null);
+        }}
+        biome={selectedBiome}
+        resources={resources}
+        equipment={equipment}
+        player={player}
+        onExpeditionStart={handleExpeditionComplete}
+      />
+
+      <OfflineActivityReport
+        isOpen={offlineReportOpen}
+        onClose={() => setOfflineReportOpen(false)}
+        player={player}
+        resources={resources}
+        equipment={equipment}
+      />
     </div>
   );
 }
