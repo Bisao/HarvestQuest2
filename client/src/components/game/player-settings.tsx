@@ -1,312 +1,592 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
-import TimeSpeedControl from './time-speed-control';
-import { useSaveGame } from "@/hooks/use-save-game";
-import type { Player, HungerDegradationMode } from "@shared/types";
-import type { GameTime } from "@shared/types/time-types";
-import { Settings, Archive, Home, Clock, Sun, Moon, Sunrise, Sunset } from "lucide-react";
-import LoadingScreen from "./loading-screen";
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  Settings,
+  Volume2,
+  Bell,
+  Eye,
+  Palette,
+  Save,
+  RotateCcw,
+  User,
+  Gamepad2,
+  Shield,
+  Info
+} from 'lucide-react';
+import type { Player } from '@shared/types';
 
 interface PlayerSettingsProps {
   player: Player;
-  isOpen: boolean;
-  onClose: () => void;
+  isBlocked?: boolean;
 }
 
-export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettingsProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [, setLocation] = useLocation();
-  const [autoStorage, setAutoStorage] = useState(player.autoStorage);
-  const [autoCompleteQuests, setAutoCompleteQuests] = useState(player.autoCompleteQuests ?? true);
-  const [hungerDegradationMode, setHungerDegradationMode] = useState(player.hungerDegradationMode || 'automatic');
-  const [isNavigatingToMenu, setIsNavigatingToMenu] = useState(false);
-  const [autoConsume, setAutoConsume] = useState(player.autoConsume ?? false);
-  const [selectedTimeOfDay, setSelectedTimeOfDay] = useState<GameTime['timeOfDay']>('dawn');
-
-  const saveGame = useSaveGame();
-
-  // Mutation para alterar o tempo do dia
-  const changeTimeMutation = useMutation({
-    mutationFn: async (timeOfDay: GameTime['timeOfDay']) => {
-      const response = await fetch('/api/time/set-time', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timeOfDay }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to change time');
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Tempo Alterado",
-        description: `O tempo foi alterado para ${getTimeOfDayLabel(selectedTimeOfDay)}!`,
-      });
-      // Invalidar queries relacionadas ao tempo
-      queryClient.invalidateQueries({ queryKey: ['gameTime'] });
-      queryClient.invalidateQueries({ queryKey: ['temperature'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Erro ao Alterar Tempo",
-        description: error.message || "Não foi possível alterar o tempo",
-        variant: "destructive",
-      });
-    },
+export default function PlayerSettings({ player, isBlocked = false }: PlayerSettingsProps) {
+  const [settings, setSettings] = useState({
+    // Configurações de Audio
+    masterVolume: 75,
+    sfxVolume: 80,
+    musicVolume: 60,
+    ambientVolume: 50,
+    
+    // Configurações de Interface
+    theme: 'auto',
+    language: 'pt-BR',
+    fontSize: 'medium',
+    animations: true,
+    reducedMotion: false,
+    
+    // Configurações de Notificações
+    expeditionNotifications: true,
+    resourceNotifications: true,
+    questNotifications: true,
+    offlineNotifications: true,
+    
+    // Configurações de Jogabilidade
+    autoSave: true,
+    autoConsume: true,
+    quickActions: true,
+    confirmActions: true,
+    
+    // Configurações de Privacidade
+    showOnlineStatus: true,
+    allowFriendRequests: true,
+    shareStatistics: false,
   });
 
-  // Função para obter label do período do dia
-  const getTimeOfDayLabel = (timeOfDay: GameTime['timeOfDay']) => {
-    switch (timeOfDay) {
-      case 'dawn': return 'Amanhecer (06:00)';
-      case 'morning': return 'Manhã (09:00)';
-      case 'afternoon': return 'Tarde (14:00)';
-      case 'evening': return 'Entardecer (18:00)';
-      case 'night': return 'Noite (21:00)';
-      case 'midnight': return 'Meia-noite (00:00)';
-      default: return 'Desconhecido';
-    }
+  const handleSettingChange = (key: string, value: any) => {
+    setSettings(prev => ({
+      ...prev,
+      [key]: value
+    }));
   };
-
-  // Função para obter ícone do período do dia
-  const getTimeOfDayIcon = (timeOfDay: GameTime['timeOfDay']) => {
-    switch (timeOfDay) {
-      case 'dawn': return '🌅';
-      case 'morning': return '☀️';
-      case 'afternoon': return '🌞';
-      case 'evening': return '🌇';
-      case 'night': return '🌙';
-      case 'midnight': return '🌚';
-      default: return '🕐';
-    }
-  };
-
-  const updateSettingsMutation = useMutation({
-    mutationFn: async (settings: { autoStorage?: boolean; autoCompleteQuests?: boolean; hungerDegradationMode?: HungerDegradationMode; autoConsume?: boolean }) => {
-      const response = await fetch(`/api/player/${player.id}/settings`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Configurações Salvas",
-        description: "Suas preferências foram atualizadas com sucesso!",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/player", player.username] });
-      onClose();
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Erro ao Salvar",
-        description: error.message || "Não foi possível salvar as configurações",
-        variant: "destructive",
-      });
-    },
-  });
 
   const handleSaveSettings = () => {
-    updateSettingsMutation.mutate({
-      autoStorage,
-      autoCompleteQuests,
-      hungerDegradationMode,
-      autoConsume,
+    // Implementar salvamento das configurações
+    console.log('Salvando configurações:', settings);
+  };
+
+  const handleResetSettings = () => {
+    // Reset para configurações padrão
+    setSettings({
+      masterVolume: 75,
+      sfxVolume: 80,
+      musicVolume: 60,
+      ambientVolume: 50,
+      theme: 'auto',
+      language: 'pt-BR',
+      fontSize: 'medium',
+      animations: true,
+      reducedMotion: false,
+      expeditionNotifications: true,
+      resourceNotifications: true,
+      questNotifications: true,
+      offlineNotifications: true,
+      autoSave: true,
+      autoConsume: true,
+      quickActions: true,
+      confirmActions: true,
+      showOnlineStatus: true,
+      allowFriendRequests: true,
+      shareStatistics: false,
     });
   };
 
-  const handleBackToMainMenu = async () => {
-    setIsNavigatingToMenu(true);
-
-    try {
-      // Save the game first
-      await saveGame.mutateAsync(player.id);
-
-      // Wait a bit for user to see the save confirmation
-      setTimeout(() => {
-        setLocation('/');
-      }, 1000);
-    } catch (error) {
-      setIsNavigatingToMenu(false);
-      // Error toast is handled by the useSaveGame hook
+  const settingsTabs = [
+    {
+      id: 'profile',
+      label: 'Perfil',
+      icon: User,
+      color: 'text-blue-600'
+    },
+    {
+      id: 'audio',
+      label: 'Áudio',
+      icon: Volume2,
+      color: 'text-green-600'
+    },
+    {
+      id: 'interface',
+      label: 'Interface',
+      icon: Palette,
+      color: 'text-purple-600'
+    },
+    {
+      id: 'notifications',
+      label: 'Notificações',
+      icon: Bell,
+      color: 'text-orange-600'
+    },
+    {
+      id: 'gameplay',
+      label: 'Jogabilidade',
+      icon: Gamepad2,
+      color: 'text-red-600'
+    },
+    {
+      id: 'privacy',
+      label: 'Privacidade',
+      icon: Shield,
+      color: 'text-gray-600'
     }
-  };
+  ];
 
-  if (!isOpen) return null;
-
-  // Show loading screen when navigating to main menu
-  if (isNavigatingToMenu) {
-    return <LoadingScreen message="Salvando e voltando ao menu..." subMessage="Aguarde um momento" />;
+  if (isBlocked) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Alert className="max-w-md">
+          <Shield className="h-4 w-4" />
+          <AlertDescription>
+            Configurações temporariamente indisponíveis.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-2">
-            <Settings className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-800">Configurações do Jogador</h3>
-          </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>✕</Button>
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">Configurações</h2>
+          <p className="text-gray-600">Personalize sua experiência de jogo</p>
         </div>
-
-        <div className="space-y-6">
-          {/* Auto Storage Setting */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <Archive className="w-5 h-5 text-green-600" />
-              <div>
-                <p className="font-medium text-gray-800">Armazenamento Automático</p>
-                <p className="text-sm text-gray-600">Itens coletados vão direto para o armazém</p>
-              </div>
-            </div>
-            <Switch
-              checked={autoStorage}
-              onCheckedChange={setAutoStorage}
-            />
-          </div>
-
-          {/* Auto Complete Quests Setting */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <span className="text-lg">📋</span>
-              <div>
-                <p className="font-medium text-gray-800">Completar Missões Automaticamente</p>
-                <p className="text-sm text-gray-600">Missões são completadas automaticamente quando objetivos são atingidos</p>
-              </div>
-            </div>
-            <Switch
-              checked={autoCompleteQuests}
-              onCheckedChange={setAutoCompleteQuests}
-            />
-          </div>
-
-          {/* Auto Consume Setting */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <span className="text-lg">🍖</span>
-              <div>
-                <p className="font-medium text-gray-800">Auto-consumir Itens</p>
-                <p className="text-sm text-gray-600">Consumir automaticamente comida e bebida equipadas quando fome/sede estiverem baixas (15%) até atingir 75%</p>
-              </div>
-            </div>
-            <Switch
-              checked={autoConsume}
-              onCheckedChange={setAutoConsume}
-            />
-          </div>
-
-          {/* Hunger Degradation Mode Setting */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-3 mb-3">
-              <span className="text-lg">🍖</span>
-              <div>
-                <p className="font-medium text-gray-800">Modo de Degradação de Fome/Sede</p>
-                <p className="text-sm text-gray-600">Controla a velocidade de perda de fome e sede (tempo alterado para 2 minutos)</p>
-              </div>
-            </div>
-            <Select value={hungerDegradationMode} onValueChange={(value: HungerDegradationMode) => setHungerDegradationMode(value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="automatic">🤖 Automático (baseado em atividades)</SelectItem>
-                <SelectItem value="slow">🐌 Lento (50% mais devagar)</SelectItem>
-                <SelectItem value="normal">⚖️ Normal (taxa padrão)</SelectItem>
-                <SelectItem value="fast">⚡ Rápido (50% mais rápido)</SelectItem>
-                <SelectItem value="disabled">🚫 Desabilitado (sem degradação)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Time Control Setting */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-3 mb-3">
-              <Clock className="w-5 h-5 text-purple-600" />
-              <div>
-                <p className="font-medium text-gray-800">Controle de Tempo</p>
-                <p className="text-sm text-gray-600">Altere o período do dia no jogo</p>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <Select value={selectedTimeOfDay} onValueChange={(value: GameTime['timeOfDay']) => setSelectedTimeOfDay(value)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="dawn">🌅 Amanhecer (06:00)</SelectItem>
-                  <SelectItem value="morning">☀️ Manhã (09:00)</SelectItem>
-                  <SelectItem value="afternoon">🌞 Tarde (14:00)</SelectItem>
-                  <SelectItem value="evening">🌇 Entardecer (18:00)</SelectItem>
-                  <SelectItem value="night">🌙 Noite (21:00)</SelectItem>
-                  <SelectItem value="midnight">🌚 Meia-noite (00:00)</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={() => changeTimeMutation.mutate(selectedTimeOfDay)}
-                disabled={changeTimeMutation.isPending}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                {changeTimeMutation.isPending ? (
-                  <>
-                    <Clock className="w-4 h-4 mr-2 animate-spin" />
-                    Alterando Tempo...
-                  </>
-                ) : (
-                  <>
-                    {getTimeOfDayIcon(selectedTimeOfDay)}
-                    <span className="ml-2">Alterar para {getTimeOfDayLabel(selectedTimeOfDay)}</span>
-                  </>
-                )}
-              </Button>
-            </div>
-
-            <div className="mt-4">
-              <label className="text-sm font-medium">Velocidade do Tempo</label>
-              <p className="text-xs text-muted-foreground mb-2">
-                Quanto tempo real para 24 horas do jogo
-              </p>
-              <TimeSpeedControl />
-            </div>
-          </div>
-
-        </div>
-
-        <div className="flex justify-between items-center mt-6">
-          <Button 
-            variant="outline" 
-            onClick={handleBackToMainMenu}
-            disabled={isNavigatingToMenu || saveGame.isPending}
-            className="flex items-center space-x-2"
-          >
-            <Home className="w-4 h-4" />
-            <span>{isNavigatingToMenu ? "Salvando..." : "Menu Principal"}</span>
+        <div className="flex space-x-2">
+          <Button variant="outline" onClick={handleResetSettings}>
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Redefinir
           </Button>
+          <Button onClick={handleSaveSettings}>
+            <Save className="w-4 h-4 mr-2" />
+            Salvar
+          </Button>
+        </div>
+      </div>
 
-          <div className="flex space-x-3">
-            <Button variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleSaveSettings}
-              disabled={updateSettingsMutation.isPending}
-            >
-              {updateSettingsMutation.isPending ? "Salvando..." : "Salvar"}
-            </Button>
-          </div>
+      <div className="grid lg:grid-cols-4 gap-6">
+        {/* Navigation Sidebar */}
+        <div className="lg:col-span-1">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Categorias</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Tabs defaultValue="profile" orientation="vertical" className="w-full">
+                <TabsList className="grid w-full grid-rows-6 h-auto bg-transparent p-1">
+                  {settingsTabs.map((tab) => {
+                    const Icon = tab.icon;
+                    return (
+                      <TabsTrigger
+                        key={tab.id}
+                        value={tab.id}
+                        className="w-full justify-start gap-2 text-left data-[state=active]:bg-primary/10"
+                      >
+                        <Icon className={`w-4 h-4 ${tab.color}`} />
+                        <span className="hidden sm:inline">{tab.label}</span>
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Settings Content */}
+        <div className="lg:col-span-3">
+          <Card className="h-[600px]">
+            <CardContent className="p-0 h-full">
+              <Tabs defaultValue="profile" className="h-full">
+                {/* Profile Tab */}
+                <TabsContent value="profile" className="h-full m-0">
+                  <ScrollArea className="h-full p-6">
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4">Informações do Jogador</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Nome do Jogador</Label>
+                            <div className="p-3 bg-gray-50 rounded-lg">
+                              <span className="font-medium">{player?.name || 'Não definido'}</span>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Nível</Label>
+                            <div className="p-3 bg-gray-50 rounded-lg">
+                              <span className="font-medium">Nível {player?.level || 0}</span>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Moedas</Label>
+                            <div className="p-3 bg-gray-50 rounded-lg">
+                              <span className="font-medium">{player?.coins || 0} moedas</span>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Tempo de Jogo</Label>
+                            <div className="p-3 bg-gray-50 rounded-lg">
+                              <span className="font-medium">--:-- horas</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4">Estatísticas</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <Card>
+                            <CardContent className="p-4 text-center">
+                              <div className="text-2xl font-bold text-blue-600">
+                                {player?.discoveredAnimals?.length || 0}
+                              </div>
+                              <div className="text-sm text-gray-600">Animais Descobertos</div>
+                            </CardContent>
+                          </Card>
+                          <Card>
+                            <CardContent className="p-4 text-center">
+                              <div className="text-2xl font-bold text-green-600">0</div>
+                              <div className="text-sm text-gray-600">Expedições Completas</div>
+                            </CardContent>
+                          </Card>
+                          <Card>
+                            <CardContent className="p-4 text-center">
+                              <div className="text-2xl font-bold text-purple-600">0</div>
+                              <div className="text-sm text-gray-600">Itens Criados</div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                {/* Audio Tab */}
+                <TabsContent value="audio" className="h-full m-0">
+                  <ScrollArea className="h-full p-6">
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold">Configurações de Áudio</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <Label>Volume Geral</Label>
+                            <span className="text-sm text-gray-600">{settings.masterVolume}%</span>
+                          </div>
+                          <Slider
+                            value={[settings.masterVolume]}
+                            onValueChange={(value) => handleSettingChange('masterVolume', value[0])}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <Label>Efeitos Sonoros</Label>
+                            <span className="text-sm text-gray-600">{settings.sfxVolume}%</span>
+                          </div>
+                          <Slider
+                            value={[settings.sfxVolume]}
+                            onValueChange={(value) => handleSettingChange('sfxVolume', value[0])}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <Label>Música</Label>
+                            <span className="text-sm text-gray-600">{settings.musicVolume}%</span>
+                          </div>
+                          <Slider
+                            value={[settings.musicVolume]}
+                            onValueChange={(value) => handleSettingChange('musicVolume', value[0])}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <Label>Sons Ambiente</Label>
+                            <span className="text-sm text-gray-600">{settings.ambientVolume}%</span>
+                          </div>
+                          <Slider
+                            value={[settings.ambientVolume]}
+                            onValueChange={(value) => handleSettingChange('ambientVolume', value[0])}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                {/* Interface Tab */}
+                <TabsContent value="interface" className="h-full m-0">
+                  <ScrollArea className="h-full p-6">
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold">Configurações de Interface</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Tema</Label>
+                          <Select 
+                            value={settings.theme} 
+                            onValueChange={(value) => handleSettingChange('theme', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="light">Claro</SelectItem>
+                              <SelectItem value="dark">Escuro</SelectItem>
+                              <SelectItem value="auto">Automático</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Idioma</Label>
+                          <Select 
+                            value={settings.language} 
+                            onValueChange={(value) => handleSettingChange('language', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pt-BR">Português (Brasil)</SelectItem>
+                              <SelectItem value="en-US">English (US)</SelectItem>
+                              <SelectItem value="es-ES">Español</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Tamanho da Fonte</Label>
+                          <Select 
+                            value={settings.fontSize} 
+                            onValueChange={(value) => handleSettingChange('fontSize', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="small">Pequena</SelectItem>
+                              <SelectItem value="medium">Média</SelectItem>
+                              <SelectItem value="large">Grande</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Animações</Label>
+                            <div className="text-sm text-gray-600">Ativar animações da interface</div>
+                          </div>
+                          <Switch
+                            checked={settings.animations}
+                            onCheckedChange={(value) => handleSettingChange('animations', value)}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Movimento Reduzido</Label>
+                            <div className="text-sm text-gray-600">Reduzir animações para acessibilidade</div>
+                          </div>
+                          <Switch
+                            checked={settings.reducedMotion}
+                            onCheckedChange={(value) => handleSettingChange('reducedMotion', value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                {/* Notifications Tab */}
+                <TabsContent value="notifications" className="h-full m-0">
+                  <ScrollArea className="h-full p-6">
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold">Configurações de Notificações</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Notificações de Expedição</Label>
+                            <div className="text-sm text-gray-600">Avisos sobre expedições concluídas</div>
+                          </div>
+                          <Switch
+                            checked={settings.expeditionNotifications}
+                            onCheckedChange={(value) => handleSettingChange('expeditionNotifications', value)}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Notificações de Recursos</Label>
+                            <div className="text-sm text-gray-600">Avisos sobre recursos encontrados</div>
+                          </div>
+                          <Switch
+                            checked={settings.resourceNotifications}
+                            onCheckedChange={(value) => handleSettingChange('resourceNotifications', value)}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Notificações de Missões</Label>
+                            <div className="text-sm text-gray-600">Avisos sobre missões completas</div>
+                          </div>
+                          <Switch
+                            checked={settings.questNotifications}
+                            onCheckedChange={(value) => handleSettingChange('questNotifications', value)}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Atividade Offline</Label>
+                            <div className="text-sm text-gray-600">Relatórios de atividade quando ausente</div>
+                          </div>
+                          <Switch
+                            checked={settings.offlineNotifications}
+                            onCheckedChange={(value) => handleSettingChange('offlineNotifications', value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                {/* Gameplay Tab */}
+                <TabsContent value="gameplay" className="h-full m-0">
+                  <ScrollArea className="h-full p-6">
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold">Configurações de Jogabilidade</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Salvamento Automático</Label>
+                            <div className="text-sm text-gray-600">Salvar progresso automaticamente</div>
+                          </div>
+                          <Switch
+                            checked={settings.autoSave}
+                            onCheckedChange={(value) => handleSettingChange('autoSave', value)}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Consumo Automático</Label>
+                            <div className="text-sm text-gray-600">Consumir itens automaticamente quando necessário</div>
+                          </div>
+                          <Switch
+                            checked={settings.autoConsume}
+                            onCheckedChange={(value) => handleSettingChange('autoConsume', value)}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Ações Rápidas</Label>
+                            <div className="text-sm text-gray-600">Atalhos de teclado e ações rápidas</div>
+                          </div>
+                          <Switch
+                            checked={settings.quickActions}
+                            onCheckedChange={(value) => handleSettingChange('quickActions', value)}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Confirmar Ações</Label>
+                            <div className="text-sm text-gray-600">Pedir confirmação para ações importantes</div>
+                          </div>
+                          <Switch
+                            checked={settings.confirmActions}
+                            onCheckedChange={(value) => handleSettingChange('confirmActions', value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                {/* Privacy Tab */}
+                <TabsContent value="privacy" className="h-full m-0">
+                  <ScrollArea className="h-full p-6">
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold">Configurações de Privacidade</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Status Online</Label>
+                            <div className="text-sm text-gray-600">Mostrar quando você está online</div>
+                          </div>
+                          <Switch
+                            checked={settings.showOnlineStatus}
+                            onCheckedChange={(value) => handleSettingChange('showOnlineStatus', value)}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Solicitações de Amizade</Label>
+                            <div className="text-sm text-gray-600">Permitir receber convites de amizade</div>
+                          </div>
+                          <Switch
+                            checked={settings.allowFriendRequests}
+                            onCheckedChange={(value) => handleSettingChange('allowFriendRequests', value)}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label>Compartilhar Estatísticas</Label>
+                            <div className="text-sm text-gray-600">Permitir que outros vejam suas estatísticas</div>
+                          </div>
+                          <Switch
+                            checked={settings.shareStatistics}
+                            onCheckedChange={(value) => handleSettingChange('shareStatistics', value)}
+                          />
+                        </div>
+
+                        <Alert>
+                          <Info className="h-4 w-4" />
+                          <AlertDescription>
+                            Suas configurações de privacidade ajudam a controlar como outras pessoas podem interagir com você no jogo.
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
