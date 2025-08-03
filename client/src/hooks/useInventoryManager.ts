@@ -38,8 +38,12 @@ export function useInventoryManager(
     inventoryManager.initialize(resources, equipment);
   }, [resources, equipment]);
 
-  // Get raw inventory data
-  const { inventory: rawInventory = [], isLoading } = useGameData({ playerId });
+  // Get raw inventory data with more frequent polling
+  const { inventory: rawInventory = [], isLoading } = useGameData({ 
+    playerId,
+    refetchInterval: 2000, // Poll every 2 seconds for real-time updates
+    staleTime: 1000 // Consider data stale after 1 second
+  });
 
   // Filter and sorting state
   const [filters, setFilters] = useState<InventoryFilters>({

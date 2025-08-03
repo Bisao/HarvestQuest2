@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useInventoryManager } from '@/hooks/useInventoryManager';
+import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
 import { 
   Package, 
   Search, 
@@ -63,6 +64,7 @@ export default function UnifiedInventory({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const inventoryManager = useInventoryManager(playerId, resources, equipment, player);
+  const { invalidateInventoryData } = useInventoryUpdates(playerId);
 
   // Consume item mutation
   const consumeMutation = useMutation({
@@ -85,6 +87,7 @@ export default function UnifiedInventory({
         title: "Item Consumido!",
         description: data.message || "Item consumido com sucesso!",
       });
+      invalidateInventoryData();
       queryClient.invalidateQueries({ queryKey: ["/api/storage"] });
       queryClient.invalidateQueries({ queryKey: ["/api/player"] });
     },

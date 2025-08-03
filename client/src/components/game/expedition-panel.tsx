@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,9 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Clock, CheckCircle, X, Minimize2, MapPin, Timer } from 'lucide-react';
 import type { Biome, Resource, Equipment } from '@shared/types';
+import { useQueryClient } from "@tanstack/react-query";
+import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
+import { usePlayer } from '@/hooks/use-player';
 
 interface ActiveExpedition {
   id: string;
@@ -39,6 +41,10 @@ export default function ExpeditionPanel({
   const [progress, setProgress] = useState(0);
   const [isMinimized, setIsMinimized] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { player } = usePlayer();
+  const playerId = player?.id
+  const { invalidateInventoryData } = useInventoryUpdates(playerId);
 
   // Find expedition biome
   const expeditionBiome = biomes.find(b => b.id === expedition.biome || b.name === expedition.biome);

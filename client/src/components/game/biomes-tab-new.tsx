@@ -7,6 +7,7 @@ import { Clock, CheckCircle, MapPin } from 'lucide-react';
 import ExpeditionModal from "./expedition-modal";
 import { useActiveExpeditions } from "@/hooks/use-active-expeditions";
 import type { Biome, Resource, Equipment, Player } from "@shared/types";
+import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
 
 interface BiomesTabProps {
   biomes: Biome[];
@@ -43,7 +44,7 @@ export default function BiomesTab({
 
   const handleExploreBiome = (biome: Biome) => {
     if (!isUnlocked(biome)) return;
-    
+
     setSelectedBiome(biome);
     setExpeditionModalOpen(true);
   };
@@ -63,7 +64,7 @@ export default function BiomesTab({
           const activeExpedition = getActiveExpeditionForBiome(biome.id);
           const isExpeditionActive = !!activeExpedition;
           const isExpeditionCompleted = activeExpedition?.progress >= 100;
-          
+
           return (
             <Card 
               key={biome.id} 
@@ -93,7 +94,7 @@ export default function BiomesTab({
                   {isExpeditionActive ? 'Expedição em andamento' : 'Explore este bioma para coletar recursos únicos'}
                 </CardDescription>
               </CardHeader>
-              
+
               <CardContent className="space-y-4">
                 {/* Expedition Progress */}
                 {isExpeditionActive && (
@@ -111,7 +112,7 @@ export default function BiomesTab({
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="flex justify-between text-sm mb-1">
                       <span>Progresso</span>
                       <span>{Math.round(activeExpedition.progress)}%</span>
@@ -120,7 +121,7 @@ export default function BiomesTab({
                       value={activeExpedition.progress} 
                       className="h-2 mb-2"
                     />
-                    
+
                     {Object.keys(activeExpedition.collectedResources).length > 0 && (
                       <div className="text-xs text-blue-700">
                         Recursos coletados: {Object.keys(activeExpedition.collectedResources).length} tipos
