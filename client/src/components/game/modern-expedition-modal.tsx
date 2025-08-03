@@ -88,6 +88,22 @@ export default function ModernExpeditionModal({
   const [selectedTab, setSelectedTab] = useState('resources');
   const { toast } = useToast();
 
+  // Verificação de props essenciais
+  if (!resources || !Array.isArray(resources)) {
+    console.error('ModernExpeditionModal: resources prop is invalid:', resources);
+    return null;
+  }
+
+  if (!equipment || !Array.isArray(equipment)) {
+    console.error('ModernExpeditionModal: equipment prop is invalid:', equipment);
+    return null;
+  }
+
+  if (!player || !player.id) {
+    console.error('ModernExpeditionModal: player prop is invalid:', player);
+    return null;
+  }
+
   // Reset quando modal abre
   useEffect(() => {
     if (isOpen) {
@@ -100,12 +116,17 @@ export default function ModernExpeditionModal({
 
   // Categorizar recursos
   const categorizeResource = (resource: Resource): string => {
-    if (!resource || !resource.name) return 'basic';
-    const name = resource.name.toLowerCase();
+    if (!resource || !resource.name || typeof resource.name !== 'string') {
+      console.warn('Invalid resource for categorization:', resource);
+      return 'basic';
+    }
+    
+    try {
+      const name = resource.name.toLowerCase();
 
-    if (name.includes('madeira') || name.includes('tronco') || name.includes('galho') ||
-        name.includes('carvalho') || name.includes('pinho') || name.includes('cedro') ||
-        name.includes('eucalipto') || name.includes('mogno') || name.includes('bambu')) return 'wood';
+      if (name.includes('madeira') || name.includes('tronco') || name.includes('galho') ||
+          name.includes('carvalho') || name.includes('pinho') || name.includes('cedro') ||
+          name.includes('eucalipto') || name.includes('mogno') || name.includes('bambu')) return 'wood';
 
     if (name.includes('pedra') || name.includes('mineral') || name.includes('ferro') || 
         name.includes('cobre') || name.includes('granito') || name.includes('calcaria') ||
@@ -144,19 +165,26 @@ export default function ModernExpeditionModal({
         name.includes('épico') || name.includes('epico') || name.includes('mistico') ||
         name.includes('místico') || name.includes('sagrado')) return 'special';
 
-    return 'basic';
+      return 'basic';
+    } catch (error) {
+      console.error('Error categorizing resource:', resource, error);
+      return 'basic';
+    }
   };
 
   // Verificar coletabilidade
   const checkResourceCollectability = (resource: Resource) => {
-    if (!resource || !resource.name) {
+    if (!resource || !resource.name || typeof resource.name !== 'string') {
+      console.warn('Invalid resource for collectability check:', resource);
       return {
         canCollect: false,
         requirementText: "Recurso inválido",
         toolIcon: "❌",
       };
     }
-    const resourceName = resource.name;
+    
+    try {
+      const resourceName = resource.name;
 
     // Recursos básicos (sem ferramentas)
     if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
@@ -220,16 +248,26 @@ export default function ModernExpeditionModal({
     }
 
     // Padrão para outros recursos
-    return {
-      canCollect: true,
-      requirementText: "Disponível para coleta",
-      toolIcon: "🤚",
-    };
+      return {
+        canCollect: true,
+        requirementText: "Disponível para coleta",
+        toolIcon: "🤚",
+      };
+    } catch (error) {
+      console.error('Error checking resource collectability:', resource, error);
+      return {
+        canCollect: false,
+        requirementText: "Erro na verificação",
+        toolIcon: "❌",
+      };
+    }
   };
 
   // Obter recursos coletáveis
   const collectableResources = useMemo((): CollectableResource[] => {
-    if (!biome || !biome.availableResources) return [];
+    if (!biome || !biome.availableResources || !resources || !Array.isArray(resources)) {
+      return [];
+    }
 
     const resourceIds = Array.isArray(biome.availableResources) 
       ? biome.availableResources as string[]
@@ -238,41 +276,63 @@ export default function ModernExpeditionModal({
     if (resourceIds.length === 0) return [];
 
     const biomeResources = resourceIds
-      .map(id => resources.find(r => r.id === id))
+      .map(id => {
+        if (!id || typeof id !== 'string') return null;
+        return resources.find(r => r && r.id === id);
+      })
       .filter(Boolean) as Resource[];
 
-    return biomeResources.map(resource => {
-      if (!resource) {
-        return null;
-      }
-      
-      const collectabilityInfo = checkResourceCollectability(resource);
-      const category = categorizeResource(resource);
+    return biomeResources
+      .map(resource => {
+        if (!resource || !resource.id || !resource.name) {
+          console.warn('Invalid resource found:', resource);
+          return null;
+        }
+        
+        const collectabilityInfo = checkResourceCollectability(resource);
+        const category = categorizeResource(resource);
 
-      return {
-        ...resource,
-        canCollect: collectabilityInfo.canCollect,
-        requirementText: collectabilityInfo.requirementText,
-        toolIcon: collectabilityInfo.toolIcon,
-        category
-      };
-    }).filter(Boolean) as CollectableResource[];
+        return {
+          ...resource,
+          canCollect: collectabilityInfo.canCollect,
+          requirementText: collectabilityInfo.requirementText,
+          toolIcon: collectabilityInfo.toolIcon,
+          category
+        };
+      })
+      .filter(Boolean) as CollectableResource[];
   }, [biome, resources, equipment, player]);
 
   // Filtrar recursos
   const filteredResources = useMemo(() => {
     if (!collectableResources || collectableResources.length === 0) return [];
     
-    let filtered = collectableResources;
+    let filtered = collectableResources.filter(resource => 
+      resource && 
+      resource.id && 
+      resource.name && 
+      typeof resource.name === 'string'
+    );
 
-    if (searchTerm) {
-      filtered = filtered.filter(resource =>
-        resource && resource.name && resource.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    if (searchTerm && typeof searchTerm === 'string' && searchTerm.trim()) {
+      try {
+        const searchLower = searchTerm.toLowerCase();
+        filtered = filtered.filter(resource =>
+          resource && 
+          resource.name && 
+          typeof resource.name === 'string' && 
+          resource.name.toLowerCase().includes(searchLower)
+        );
+      } catch (error) {
+        console.error('Error filtering resources by search term:', error);
+      }
     }
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(resource => resource && resource.category === selectedCategory);
+      filtered = filtered.filter(resource => 
+        resource && 
+        resource.category === selectedCategory
+      );
     }
 
     return filtered;
@@ -287,12 +347,19 @@ export default function ModernExpeditionModal({
     }
 
     filteredResources.forEach(resource => {
-      if (!resource || !resource.category) return;
-      
-      if (!grouped[resource.category]) {
-        grouped[resource.category] = [];
+      if (!resource || !resource.category || !resource.id || !resource.name) {
+        console.warn('Invalid resource in grouping:', resource);
+        return;
       }
-      grouped[resource.category].push(resource);
+      
+      try {
+        if (!grouped[resource.category]) {
+          grouped[resource.category] = [];
+        }
+        grouped[resource.category].push(resource);
+      } catch (error) {
+        console.error('Error grouping resource:', resource, error);
+      }
     });
 
     return grouped;
@@ -307,21 +374,44 @@ export default function ModernExpeditionModal({
   // Mutation para iniciar expedição
   const startExpeditionMutation = useMutation({
     mutationFn: async (expeditionData: any) => {
-      const response = await apiRequest('POST', '/api/expeditions', expeditionData);
-      return response.json();
+      try {
+        const response = await apiRequest('POST', '/api/expeditions', expeditionData);
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.error('Expedition creation error:', error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
+      if (!data || !data.id) {
+        console.error('Invalid expedition data received:', data);
+        toast({
+          title: "Erro",
+          description: "Dados de expedição inválidos recebidos.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
         title: "Expedição iniciada!",
         description: `Expedição para ${biome?.name} iniciada com sucesso.`,
       });
-      onExpeditionStart(data);
-      onClose();
+      
+      if (onExpeditionStart && typeof onExpeditionStart === 'function') {
+        onExpeditionStart(data);
+      }
+      
+      if (onClose && typeof onClose === 'function') {
+        onClose();
+      }
     },
     onError: (error: any) => {
+      console.error('Expedition start error:', error);
       toast({
         title: "Erro ao iniciar expedição",
-        description: error.message || "Tente novamente.",
+        description: error?.message || "Erro desconhecido. Tente novamente.",
         variant: "destructive",
       });
     },
@@ -336,7 +426,26 @@ export default function ModernExpeditionModal({
   };
 
   const handleStartExpedition = () => {
-    if (selectedResources.length === 0) {
+    // Validações essenciais
+    if (!biome || !biome.id) {
+      toast({
+        title: "Erro",
+        description: "Bioma inválido selecionado.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!player || !player.id) {
+      toast({
+        title: "Erro",
+        description: "Dados do jogador inválidos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedResources || selectedResources.length === 0) {
       toast({
         title: "Selecione recursos",
         description: "Você deve selecionar pelo menos um recurso para coletar.",
@@ -345,14 +454,39 @@ export default function ModernExpeditionModal({
       return;
     }
 
-    const expeditionData = {
-      biomeId: biome?.id,
-      playerId: player.id,
-      selectedResources,
-      selectedEquipment: [],
-    };
+    // Validar que todos os recursos selecionados existem
+    const invalidResources = selectedResources.filter(resourceId => 
+      !collectableResources.find(r => r.id === resourceId)
+    );
 
-    startExpeditionMutation.mutate(expeditionData);
+    if (invalidResources.length > 0) {
+      console.error('Invalid resources selected:', invalidResources);
+      toast({
+        title: "Erro",
+        description: "Recursos inválidos selecionados.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const expeditionData = {
+        biomeId: biome.id,
+        playerId: player.id,
+        selectedResources: selectedResources.filter(id => id && typeof id === 'string'),
+        selectedEquipment: [],
+      };
+
+      console.log('Starting expedition with data:', expeditionData);
+      startExpeditionMutation.mutate(expeditionData);
+    } catch (error) {
+      console.error('Error preparing expedition data:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao preparar dados da expedição.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!biome) return null;

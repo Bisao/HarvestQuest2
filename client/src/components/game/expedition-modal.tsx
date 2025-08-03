@@ -47,11 +47,17 @@ export default function ExpeditionModal({
 
   // Get resources available in this biome with collectability check
   const getCollectableResources = (): CollectableResource[] => {
-    if (!biome) return [];
+    if (!biome || !biome.availableResources || !resources || !Array.isArray(resources)) {
+      return [];
+    }
 
-    const resourceIds = biome.availableResources as string[];
+    const resourceIds = Array.isArray(biome.availableResources) 
+      ? biome.availableResources as string[]
+      : [];
+    
     const biomeResources = resourceIds
-      .map(id => resources.find(r => r.id === id))
+      .filter(id => id && typeof id === 'string')
+      .map(id => resources.find(r => r && r.id === id))
       .filter(Boolean) as Resource[];
 
     return biomeResources.map(resource => {
@@ -67,6 +73,14 @@ export default function ExpeditionModal({
 
   // Check if player can collect a specific resource
   const checkResourceCollectability = (resource: Resource) => {
+    if (!resource || !resource.name || typeof resource.name !== 'string') {
+      return {
+        canCollect: false,
+        requirementText: "Recurso inválido",
+        toolIcon: "❌",
+      };
+    }
+    
     const resourceName = resource.name;
 
     // Basic resources (no tools required)
