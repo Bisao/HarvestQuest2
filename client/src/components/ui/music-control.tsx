@@ -55,9 +55,9 @@ export const MusicControl: React.FC<MusicControlProps> = ({ className }) => {
         
         {enabled && (
           <div className="mt-2 flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-amber-500 animate-pulse' : 'bg-gray-400'}`}></div>
+            <div className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
             <span className="text-xs text-gray-600">
-              {isPlaying ? 'Música Medieval Tocando 🎵' : 'Música Preparada - Clique para iniciar'}
+              {isPlaying ? 'Música Épica Zelda-Style 🎼✨' : 'Orquestra Pronta - Clique para iniciar'}
             </span>
           </div>
         )}
