@@ -23,10 +23,14 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
   const queryClient = useQueryClient();
 
   // Buscar templates disponíveis para o bioma
-  const { data: templates = [], isLoading: templatesLoading } = useQuery<ExpeditionTemplate[]>({
+  const { data: templatesData, isLoading: templatesLoading } = useQuery<ExpeditionTemplate[]>({
     queryKey: ['/api/expeditions/templates/biome', biome.id],
     enabled: isOpen && !!biome.id
   });
+
+  // Ensure templates is always an array
+  const templates = Array.isArray(templatesData) ? templatesData : 
+                   (templatesData?.data && Array.isArray(templatesData.data)) ? templatesData.data : [];
 
   // Buscar expedições ativas do jogador
   const { data: activeExpeditions = [] } = useQuery<any[]>({
