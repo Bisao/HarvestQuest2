@@ -4,7 +4,7 @@
 import type { Express } from "express";
 import type { IStorage } from "../storage";
 import { GameService } from "../services/game-service";
-import { ExpeditionService } from "../services/expedition-service";
+import { NewExpeditionService } from "../services/new-expedition-service";
 
 // Route registrations
 export { registerHealthRoutes } from "./health";
@@ -13,6 +13,7 @@ export { registerAdminRoutes } from "./admin";
 export { registerStorageRoutes } from "./storage-routes";
 export { createConsumptionRoutes } from "./consumption";
 import { createTimeRoutes } from './time-routes';
+import { createCombatRoutes } from './combat-routes';
 
 // Default route exports
 export { default as savesRouter } from "./saves";
@@ -26,8 +27,7 @@ export { default as itemRoutes } from "./items-routes";
 export async function registerAllRoutes(
   app: Express, 
   storage: IStorage,
-  gameService: GameService,
-  expeditionService: ExpeditionService
+  gameService: GameService
 ): Promise<void> {
   const { 
     registerHealthRoutes,
@@ -42,7 +42,7 @@ export async function registerAllRoutes(
 
   // Register routes in order of dependency
   registerHealthRoutes(app);
-  registerEnhancedGameRoutes(app, storage, gameService, expeditionService);
+  registerEnhancedGameRoutes(app, storage, gameService);
   registerAdminRoutes(app);
   registerStorageRoutes(app, storage);
 
@@ -52,4 +52,5 @@ export async function registerAllRoutes(
   app.use('/api/v2/workshop', workshopRouter);
   app.use('/api', itemRoutes);
   app.use('/api/time', createTimeRoutes(storage));
+  app.use('/api/combat', createCombatRoutes(storage));
 }

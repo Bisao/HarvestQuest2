@@ -7,10 +7,15 @@ import {
   ExpeditionEvent,
   ExpeditionTarget 
 } from '@shared/types/expedition-types';
+import { CombatService } from './combat-service';
 import { v4 as uuidv4 } from 'uuid';
 
 export class NewExpeditionService {
-  constructor(private storage: IStorage) {}
+  private combatService: CombatService;
+  
+  constructor(private storage: IStorage) {
+    this.combatService = new CombatService(storage);
+  }
 
   // ===================== TEMPLATES DE EXPEDIÇÃO =====================
 
@@ -400,5 +405,21 @@ export class NewExpeditionService {
           status: 'completed' as const
         };
       });
+  }
+
+  // ===================== COMBAT INTEGRATION =====================
+
+  async checkForCombatEncounter(expeditionId: string, playerId: string, biomeId: string): Promise<string | null> {
+    try {
+      const encounter = await this.combatService.tryGenerateEncounter(expeditionId, playerId, biomeId);
+      if (encounter) {
+        await this.combatService.createEncounter(encounter);
+        return encounter.id;
+      }
+      return null;
+    } catch (error) {
+      console.error('❌ COMBAT-INTEGRATION: Error generating encounter:', error);
+      return null;
+    }
   }
 }

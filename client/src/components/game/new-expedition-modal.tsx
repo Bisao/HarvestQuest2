@@ -6,9 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Clock, Users, Trophy, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, Users, Trophy, AlertTriangle, CheckCircle, XCircle, Sword } from 'lucide-react';
 import type { ExpeditionTemplate } from '@shared/types/expedition-types';
 import type { Player, Biome } from '@shared/types';
+import type { CombatEncounter } from '@shared/types/combat-types';
+import { CombatModal } from './combat-modal';
 
 interface NewExpeditionModalProps {
   isOpen: boolean;
@@ -19,6 +21,9 @@ interface NewExpeditionModalProps {
 
 export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpeditionModalProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<ExpeditionTemplate | null>(null);
+  const [combatEncounter, setCombatEncounter] = useState<CombatEncounter | null>(null);
+  const [showCombatModal, setShowCombatModal] = useState(false);
+  const [currentAnimal, setCurrentAnimal] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -43,6 +48,62 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
     enabled: !!selectedTemplate && !!player.id
   });
 
+  // Check for combat encounter during expedition
+  const checkForEncounter = async (expeditionId: string, biomeId: string) => {
+    try {
+      const response = await fetch(`/api/expeditions/${expeditionId}/check-encounter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, biomeId })
+      });
+      
+      const result = await response.json();
+      
+      if (result.data.hasEncounter) {
+        // Fetch the encounter details
+        const encounterResponse = await fetch(`/api/combat/encounters/${result.data.encounterId}`);
+        const encounterData = await encounterResponse.json();
+        
+        setCombatEncounter(encounterData.data);
+        setCurrentAnimal(encounterData.data.animal);
+        setShowCombatModal(true);
+        
+        toast({
+          title: "🐾 Encontro Inesperado!",
+          description: `Você encontrou um ${encounterData.data.animal.name}! Escolha sua ação.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error checking for encounter:', error);
+    }
+  };
+
+  // Handle combat actions
+  const handleCombatAction = async (action: string) => {
+    if (!combatEncounter) return;
+    
+    try {
+      const response = await fetch(`/api/combat/encounters/${combatEncounter.id}/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, playerId: player.id })
+      });
+      
+      const result = await response.json();
+      setCombatEncounter(result.data);
+      
+      if (result.data.status === 'completed') {
+        setShowCombatModal(false);
+        toast({
+          title: "Combate Finalizado!",
+          description: result.data.winner === 'player' ? 'Você venceu!' : 'O animal escapou.',
+        });
+      }
+    } catch (error) {
+      console.error('Error handling combat action:', error);
+    }
+  };
+
   // Mutation para iniciar expedição
   const startExpeditionMutation = useMutation({
     mutationFn: async (templateId: string) => {
@@ -59,11 +120,14 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
       
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast({
         title: "Expedição Iniciada!",
         description: `${selectedTemplate?.name} começou com sucesso.`,
       });
+      
+      // Check for combat encounter
+      await checkForEncounter(data.data.id, biome.id);
       
       // Invalidar caches relevantes
       queryClient.invalidateQueries({ queryKey: ['/api/expeditions/player', player.id] });
@@ -335,6 +399,18 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
           </div>
         </div>
       </DialogContent>
+      
+      {/* Combat Modal */}
+      {showCombatModal && combatEncounter && currentAnimal && (
+        <CombatModal
+          isOpen={showCombatModal}
+          onClose={() => setShowCombatModal(false)}
+          player={player}
+          animal={currentAnimal}
+          encounter={combatEncounter}
+          onAction={handleCombatAction}
+        />
+      )}
     </Dialog>
   );
 }

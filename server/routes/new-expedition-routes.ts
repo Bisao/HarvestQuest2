@@ -238,5 +238,33 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     }
   );
 
+  // Check for combat encounter during expedition
+  router.post('/:expeditionId/check-encounter', async (req: Request, res: Response) => {
+    try {
+      const { expeditionId } = req.params;
+      const { playerId, biomeId } = req.body;
+
+      if (!playerId || !biomeId) {
+        return errorResponse(res, 400, 'Player ID and Biome ID are required');
+      }
+
+      const encounterId = await expeditionService.checkForCombatEncounter(expeditionId, playerId, biomeId);
+      
+      if (encounterId) {
+        return successResponse(res, { 
+          hasEncounter: true, 
+          encounterId 
+        }, 'Combat encounter generated');
+      } else {
+        return successResponse(res, { 
+          hasEncounter: false 
+        }, 'No encounter this time');
+      }
+    } catch (error: any) {
+      console.error('❌ EXPEDITION-ENCOUNTER: Error checking for combat encounter:', error.message);
+      return errorResponse(res, 500, error.message);
+    }
+  });
+
   return router;
 }
