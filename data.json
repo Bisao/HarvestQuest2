@@ -6,9 +6,9 @@
         "id": "8009ea29-28cb-4ef2-973c-6d08436439e6",
         "username": "Dudu",
         "level": 1,
-        "experience": 59,
+        "experience": 77,
         "coins": 100,
-        "inventoryWeight": 7785,
+        "inventoryWeight": 10190,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -25,14 +25,14 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 37,
+        "hunger": 29,
         "maxHunger": 100,
-        "thirst": 51,
+        "thirst": 46,
         "maxThirst": 100,
-        "temperature": 21,
-        "fatigue": 26,
+        "temperature": 20,
+        "fatigue": 29,
         "morale": 100,
-        "hygiene": 59,
+        "hygiene": 54,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -51,7 +51,7 @@
         "id": "fcd645e6-476b-4054-b034-79b21069137f",
         "playerId": "8009ea29-28cb-4ef2-973c-6d08436439e6",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 11
+        "quantity": 12
       }
     ],
     [
@@ -60,7 +60,7 @@
         "id": "d9a94a16-b5fa-4683-8165-fb7263b0aa37",
         "playerId": "8009ea29-28cb-4ef2-973c-6d08436439e6",
         "resourceId": "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
-        "quantity": 12
+        "quantity": 15
       }
     ],
     [
@@ -69,7 +69,7 @@
         "id": "d898a5df-4122-4a07-89b7-58078b9ab615",
         "playerId": "8009ea29-28cb-4ef2-973c-6d08436439e6",
         "resourceId": "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
-        "quantity": 5
+        "quantity": 8
       }
     ],
     [
@@ -78,7 +78,7 @@
         "id": "414850a2-9ed1-42f7-99a0-fb6821e97593",
         "playerId": "8009ea29-28cb-4ef2-973c-6d08436439e6",
         "resourceId": "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
-        "quantity": 11
+        "quantity": 15
       }
     ],
     [
@@ -87,7 +87,7 @@
         "id": "52b52ac7-18c5-406d-a3e5-a42e7bd241df",
         "playerId": "8009ea29-28cb-4ef2-973c-6d08436439e6",
         "resourceId": "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
-        "quantity": 9
+        "quantity": 12
       }
     ]
   ],
@@ -109,14 +109,14 @@
         ],
         "selectedEquipment": [],
         "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 5,
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 5,
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 1,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 3,
           "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": 3,
-          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 2,
-          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 5
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8": 4,
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9": 3
         },
         "startTime": 1754205437995,
-        "endTime": 1754205645,
+        "endTime": 1754205711,
         "progress": 100
       }
     ]
