@@ -74,34 +74,34 @@ interface GameTab {
 
 // Configuração das abas organizadas por categoria e prioridade
 const createGameTabs = (player: Player, activeExpedition: ActiveExpedition | null): GameTab[] => [
-  // CORE - Tabs essenciais
+  // CORE - Essenciais (sempre visíveis)
   {
     id: 'status',
-    label: 'Status',
-    shortLabel: 'Status',
+    label: 'Jogador',
+    shortLabel: 'Jogador',
     icon: User,
     color: 'text-blue-600',
     description: 'Estatísticas e informações do jogador',
     category: 'core',
     priority: 1
   },
-  
-  // INVENTORY - Gestão de itens
+
+  // INVENTORY - Gestão de itens (seção principal)
   {
     id: 'inventory',
     label: 'Inventário',
-    shortLabel: 'Inv.',
+    shortLabel: 'Inventário',
     icon: Backpack,
     color: 'text-green-600',
     description: 'Itens carregados e equipamentos',
     category: 'inventory',
     priority: 2,
-    hasNotification: false // TODO: implement inventory length check
+    hasNotification: false
   },
   {
     id: 'storage',
     label: 'Armazém',
-    shortLabel: 'Arm.',
+    shortLabel: 'Armazém',
     icon: Package,
     color: 'text-purple-600',
     description: 'Armazenamento expandido de itens',
@@ -109,11 +109,11 @@ const createGameTabs = (player: Player, activeExpedition: ActiveExpedition | nul
     priority: 3
   },
 
-  // EXPLORATION - Exploração e expedições
+  // EXPLORATION - Exploração (seção de aventura)
   {
     id: 'biomes',
     label: 'Expedições',
-    shortLabel: 'Exp.',
+    shortLabel: 'Expedições',
     icon: TreePine,
     color: 'text-emerald-600',
     description: 'Explorar biomas e coletar recursos',
@@ -124,20 +124,20 @@ const createGameTabs = (player: Player, activeExpedition: ActiveExpedition | nul
   {
     id: 'animals',
     label: 'Bestiário',
-    shortLabel: 'Best.',
+    shortLabel: 'Bestiário',
     icon: BookOpen,
     color: 'text-amber-600',
     description: 'Registro de animais descobertos',
     category: 'exploration',
     priority: 5,
-    hasNotification: false // TODO: implement discovered animals check
+    hasNotification: false
   },
 
-  // CRAFTING - Criação e processamento
+  // CRAFTING - Criação (seção de construção)
   {
     id: 'workshops',
     label: 'Oficinas',
-    shortLabel: 'Of.',
+    shortLabel: 'Oficinas',
     icon: Hammer,
     color: 'text-orange-600',
     description: 'Processar materiais e criar itens',
@@ -147,7 +147,7 @@ const createGameTabs = (player: Player, activeExpedition: ActiveExpedition | nul
   {
     id: 'camp',
     label: 'Acampamento',
-    shortLabel: 'Camp.',
+    shortLabel: 'Acampamento',
     icon: Home,
     color: 'text-indigo-600',
     description: 'Base, melhorias e construções',
@@ -155,24 +155,24 @@ const createGameTabs = (player: Player, activeExpedition: ActiveExpedition | nul
     priority: 7
   },
 
-  // SOCIAL - Missões e objetivos
+  // SOCIAL - Missões
   {
     id: 'quests',
     label: 'Missões',
-    shortLabel: 'Miss.',
+    shortLabel: 'Missões',
     icon: Star,
     color: 'text-yellow-600',
     description: 'Objetivos, tarefas e recompensas',
     category: 'social',
     priority: 8,
-    hasNotification: false // TODO: implement quests check
+    hasNotification: false
   },
 
   // SYSTEM - Configurações
   {
     id: 'settings',
     label: 'Configurações',
-    shortLabel: 'Conf.',
+    shortLabel: 'Configurações',
     icon: Settings,
     color: 'text-gray-600',
     description: 'Opções do jogo e preferências',
@@ -198,19 +198,19 @@ const TabCategory: React.FC<TabCategoryProps> = React.memo(({
   isMobile 
 }) => {
   const categoryColors = {
-    core: 'border-blue-200 bg-blue-50',
-    inventory: 'border-green-200 bg-green-50',
-    exploration: 'border-emerald-200 bg-emerald-50',
-    crafting: 'border-orange-200 bg-orange-50',
-    social: 'border-yellow-200 bg-yellow-50',
-    system: 'border-gray-200 bg-gray-50'
+    core: 'border-blue-300 bg-blue-50/80',
+    inventory: 'border-green-300 bg-green-50/80',
+    exploration: 'border-emerald-300 bg-emerald-50/80',
+    crafting: 'border-orange-300 bg-orange-50/80',
+    social: 'border-yellow-300 bg-yellow-50/80',
+    system: 'border-gray-300 bg-gray-50/80'
   };
 
   const categoryLabels = {
     core: '👤 Jogador',
     inventory: '🎒 Inventário',
-    exploration: '🌍 Exploração',
-    crafting: '🔨 Criação',
+    exploration: '🌍 Exploração', 
+    crafting: '🔨 Construção',
     social: '⭐ Missões',
     system: '⚙️ Sistema'
   };
@@ -218,13 +218,14 @@ const TabCategory: React.FC<TabCategoryProps> = React.memo(({
   if (tabs.length === 0) return null;
 
   return (
-    <div className={`rounded-lg border p-2 ${categoryColors[category as keyof typeof categoryColors]}`}>
-      {!isMobile && (
-        <div className="text-xs font-medium text-gray-600 mb-2 px-2">
-          {categoryLabels[category as keyof typeof categoryLabels]}
+    <div className={`rounded-xl border-2 p-3 shadow-sm ${categoryColors[category as keyof typeof categoryColors]}`}>
+      <div className="text-sm font-semibold text-gray-700 mb-3 px-1 flex items-center">
+        {categoryLabels[category as keyof typeof categoryLabels]}
+        <div className="ml-auto text-xs text-gray-500 bg-white/60 px-2 py-1 rounded-full">
+          {tabs.length}
         </div>
-      )}
-      <div className="flex flex-wrap gap-1">
+      </div>
+      <div className="flex flex-wrap gap-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -235,13 +236,13 @@ const TabCategory: React.FC<TabCategoryProps> = React.memo(({
               onClick={() => onTabChange(tab.id)}
               disabled={tab.isDisabled}
               className={`
-                relative flex items-center justify-center space-x-1 px-3 py-2 rounded-md 
-                font-medium transition-all text-xs min-w-0 border
+                relative flex items-center space-x-2 px-4 py-2.5 rounded-lg 
+                font-medium transition-all text-sm min-w-0 border shadow-sm
                 ${isActive 
-                  ? "bg-white shadow-sm border-blue-200 text-gray-800 ring-2 ring-blue-200" 
-                  : "bg-transparent border-transparent hover:bg-white/60 text-gray-600 hover:text-gray-800 hover:border-gray-200"
+                  ? "bg-white border-blue-300 text-gray-900 ring-2 ring-blue-200 shadow-md" 
+                  : "bg-white/70 border-gray-200 hover:bg-white hover:border-gray-300 text-gray-700 hover:text-gray-900 hover:shadow-md"
                 }
-                ${tab.isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                ${tab.isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-[1.02]"}
               `}
             >
               <Icon className={`w-4 h-4 ${tab.color} flex-shrink-0`} />
@@ -251,7 +252,7 @@ const TabCategory: React.FC<TabCategoryProps> = React.memo(({
                 </span>
               )}
               {tab.hasNotification && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-white shadow-sm" />
               )}
             </button>
           );
@@ -514,20 +515,25 @@ export default function ModernGameLayout() {
         {/* Main Content Area */}
         <div className="flex-1 overflow-hidden">
           {/* Tab Navigation - Sistema categorizado */}
-          <div className="bg-white border-b border-gray-200">
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
             <ScrollArea className="w-full">
-              <div className="p-2 sm:p-3 w-full">
-                <div className="flex flex-col gap-2">
-                  {Object.entries(tabsByCategory).map(([category, tabs]) => (
-                    <TabCategory
-                      key={category}
-                      category={category}
-                      tabs={tabs}
-                      activeTab={activeTab}
-                      onTabChange={handleTabChange}
-                      isMobile={isMobile}
-                    />
-                  ))}
+              <div className="p-3 sm:p-4 w-full">
+                <div className="flex flex-col gap-3">
+                  {Object.entries(tabsByCategory)
+                    .sort(([a], [b]) => {
+                      const order = ['core', 'inventory', 'exploration', 'crafting', 'social', 'system'];
+                      return order.indexOf(a) - order.indexOf(b);
+                    })
+                    .map(([category, tabs]) => (
+                      <TabCategory
+                        key={category}
+                        category={category}
+                        tabs={tabs}
+                        activeTab={activeTab}
+                        onTabChange={handleTabChange}
+                        isMobile={isMobile}
+                      />
+                    ))}
                 </div>
               </div>
             </ScrollArea>
