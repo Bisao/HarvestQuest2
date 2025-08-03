@@ -1,0 +1,65 @@
+
+/* Estilos para melhorar o scrolling horizontal das abas */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+
+/* Melhorias para responsividade das abas */
+@media (max-width: 640px) {
+  .tab-trigger-mobile {
+    min-width: 60px;
+    padding: 8px 12px;
+  }
+  
+  .tab-trigger-mobile .tab-icon {
+    margin-right: 0;
+  }
+  
+  .tab-trigger-mobile .tab-label {
+    display: none;
+  }
+}
+
+/* Animações suaves para transições */
+.status-bar-transition {
+  transition: width 0.3s ease-in-out;
+}
+
+.tab-content-transition {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Melhorias para os indicadores de status */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.status-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.status-progress {
+  width: 96px;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.status-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease-in-out;
+}
