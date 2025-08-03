@@ -49,16 +49,16 @@ const createFantasyTrack = (audioContext: AudioContext, config: {
   
   masterGain.connect(audioContext.destination);
   
-  // Set initial volumes (very soft ambient)
-  gain1.gain.value = 0.08;
-  gain2.gain.value = 0.04;
-  gain3.gain.value = 0.06;
+  // Set initial volumes (more audible ambient)
+  gain1.gain.value = 0.15;
+  gain2.gain.value = 0.08;
+  gain3.gain.value = 0.12;
   
   const now = audioContext.currentTime;
   
   // Fade in
   masterGain.gain.setValueAtTime(0, now);
-  masterGain.gain.linearRampToValueAtTime(0.3, now + fadeIn);
+  masterGain.gain.linearRampToValueAtTime(0.5, now + fadeIn);
   
   // Add subtle frequency modulation for organic feel
   const lfo = audioContext.createOscillator();
@@ -93,7 +93,7 @@ export const useBackgroundMusic = () => {
   const currentTrackRef = useRef<any>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [settings, setSettings] = useState<BackgroundMusicSettings>({
-    volume: 0.3,
+    volume: 0.6,
     enabled: true,
     currentTrackIndex: 0
   });
@@ -185,16 +185,42 @@ export const useBackgroundMusic = () => {
     });
   }, [stopMusic]);
 
-  // Start music when enabled
+  // Initialize music on user interaction
   useEffect(() => {
+    const handleUserInteraction = () => {
+      if (settings.enabled && !currentTrackRef.current) {
+        playNextTrack();
+      }
+      // Remove listeners after first interaction
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
+
+    // Add event listeners for user interaction
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
+
+    // Auto-start if already has interaction
     if (settings.enabled && !currentTrackRef.current) {
-      // Small delay to allow user interaction (required for audio context)
       const startTimeout = setTimeout(() => {
         playNextTrack();
       }, 1000);
       
-      return () => clearTimeout(startTimeout);
+      return () => {
+        clearTimeout(startTimeout);
+        document.removeEventListener('click', handleUserInteraction);
+        document.removeEventListener('keydown', handleUserInteraction);
+        document.removeEventListener('touchstart', handleUserInteraction);
+      };
     }
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
   }, [settings.enabled, playNextTrack]);
 
   // Cleanup on unmount

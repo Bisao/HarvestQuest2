@@ -53,10 +53,12 @@ export const MusicControl: React.FC<MusicControlProps> = ({ className }) => {
           )}
         </div>
         
-        {isPlaying && (
+        {enabled && (
           <div className="mt-2 flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-xs text-gray-600">Música Ambiente Fantasia</span>
+            <div className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+            <span className="text-xs text-gray-600">
+              {isPlaying ? 'Música Ambiente Tocando' : 'Música Preparada - Clique para iniciar'}
+            </span>
           </div>
         )}
       </CardContent>

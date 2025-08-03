@@ -341,25 +341,8 @@ const EquipmentIndicators: React.FC<{ player: Player }> = React.memo(({ player }
 
 EquipmentIndicators.displayName = 'EquipmentIndicators';
 
-// Music Control Component
-const MusicControl: React.FC = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    // Implement music play/pause logic here
-    console.log('Music toggled!');
-  };
-
-  return (
-    <button
-      onClick={togglePlay}
-      className="w-full flex items-center justify-center p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors touch-friendly"
-    >
-      {isPlaying ? 'Pause Music' : 'Play Music'}
-    </button>
-  );
-};
+// Import MusicControl component
+import { MusicControl } from '@/components/ui/music-control';
 
 // Componente principal refatorado
 export default function ModernGameLayout() {
@@ -579,7 +562,13 @@ export default function ModernGameLayout() {
 
               {isMobile && (
                 <div className="mt-3">
-                  <MusicControl />
+                  <MusicControl className="w-full" />
+                </div>
+              )}
+
+              {!isMobile && (
+                <div className="mt-3">
+                  <MusicControl className="w-full" />
                 </div>
               )}
             </div>
