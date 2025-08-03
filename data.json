@@ -10,7 +10,7 @@
         "coins": 100,
         "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
-        "autoStorage": false,
+        "autoStorage": true,
         "craftedItemsDestination": "storage",
         "hungerDegradationMode": "automatic",
         "waterStorage": 0,
@@ -22,17 +22,17 @@
         "equippedBoots": null,
         "equippedWeapon": null,
         "equippedTool": null,
-        "autoCompleteQuests": true,
+        "autoCompleteQuests": false,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 50,
+        "hunger": 35,
         "maxHunger": 100,
-        "thirst": 80,
+        "thirst": 74,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
         "morale": 58,
-        "hygiene": 80,
+        "hygiene": 74,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -98,7 +98,129 @@
         "progress": 0,
         "collectedResources": {}
       }
+    ],
+    [
+      "8950442c-c927-41bb-81ba-50570fb07fa5",
+      {
+        "id": "8950442c-c927-41bb-81ba-50570fb07fa5",
+        "playerId": "0e557d19-6994-40aa-8915-a077cec26507",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+          "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+          "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8"
+        ],
+        "selectedEquipment": [],
+        "status": "in_progress",
+        "startTime": 1754228677097,
+        "endTime": null,
+        "progress": 0,
+        "collectedResources": {}
+      }
     ]
   ],
-  "playerQuests": []
+  "playerQuests": [
+    [
+      "e181e8b2-5235-41f6-a6e2-c8a2a9915d7f",
+      {
+        "id": "e181e8b2-5235-41f6-a6e2-c8a2a9915d7f",
+        "playerId": "0e557d19-6994-40aa-8915-a077cec26507",
+        "questId": "d9847a2c-7003-41c8-b0cd-555dbd3db654",
+        "status": "active",
+        "progress": {
+          "expedition_61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47": {
+            "current": 0,
+            "required": 1,
+            "completed": false
+          }
+        },
+        "startedAt": 1754228616,
+        "completedAt": null
+      }
+    ],
+    [
+      "151a99e5-4fda-413a-a2b2-04846f2ab786",
+      {
+        "id": "151a99e5-4fda-413a-a2b2-04846f2ab786",
+        "playerId": "0e557d19-6994-40aa-8915-a077cec26507",
+        "questId": "7ae407bb-0a87-40db-ad34-9bf762f80ef6",
+        "status": "active",
+        "progress": {
+          "collect_res-8bd33b18-a241-4859-ae9f-870fab5673d0": {
+            "current": 0,
+            "required": 5,
+            "completed": false
+          },
+          "collect_res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": {
+            "current": 0,
+            "required": 3,
+            "completed": false
+          }
+        },
+        "startedAt": 1754228620,
+        "completedAt": null
+      }
+    ],
+    [
+      "2a0108a6-dfae-4e81-8587-1a9168f6fc2e",
+      {
+        "id": "2a0108a6-dfae-4e81-8587-1a9168f6fc2e",
+        "playerId": "0e557d19-6994-40aa-8915-a077cec26507",
+        "questId": "ad445a8b-33f9-4a0d-b9b2-994e8ebe2da1",
+        "status": "active",
+        "progress": {
+          "craft_res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1": {
+            "current": 0,
+            "required": 3,
+            "completed": false
+          }
+        },
+        "startedAt": 1754228621,
+        "completedAt": null
+      }
+    ],
+    [
+      "ae91b3b3-18b2-4a73-bf5e-e3a1f4f74d66",
+      {
+        "id": "ae91b3b3-18b2-4a73-bf5e-e3a1f4f74d66",
+        "playerId": "0e557d19-6994-40aa-8915-a077cec26507",
+        "questId": "66b43fbf-72ee-484c-b851-6e8aded8dc80",
+        "status": "active",
+        "progress": {
+          "expedition_61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47": {
+            "current": 0,
+            "required": 1,
+            "completed": false
+          }
+        },
+        "startedAt": 1754228621,
+        "completedAt": null
+      }
+    ],
+    [
+      "377841df-041b-4ada-a70e-d1a2766cb9a8",
+      {
+        "id": "377841df-041b-4ada-a70e-d1a2766cb9a8",
+        "playerId": "0e557d19-6994-40aa-8915-a077cec26507",
+        "questId": "239a05f6-07a8-4dc5-9a9f-35364d9111e2",
+        "status": "active",
+        "progress": {
+          "collect_res-8bd33b18-a241-4859-ae9f-870fab5673d0": {
+            "current": 0,
+            "required": 5,
+            "completed": false
+          },
+          "collect_res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37": {
+            "current": 0,
+            "required": 3,
+            "completed": false
+          }
+        },
+        "startedAt": 1754228623,
+        "completedAt": null
+      }
+    ]
+  ]
 }

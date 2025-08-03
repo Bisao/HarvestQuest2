@@ -85,7 +85,7 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     label: 'Acampamento',
     icon: Home,
     color: 'text-indigo-600',
-    count: 2,
+    count: 3,
     subTabs: [
       {
         id: 'camp',
@@ -100,6 +100,13 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
         icon: Hammer,
         color: 'text-orange-600',
         description: 'Processar materiais e criar itens'
+      },
+      {
+        id: 'storage',
+        label: 'Armazém',
+        icon: Package,
+        color: 'text-purple-600',
+        description: 'Armazenamento expandido de itens'
       }
     ]
   },
@@ -108,7 +115,7 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     label: 'Jogador',
     icon: User,
     color: 'text-blue-600',
-    count: 4,
+    count: 3,
     subTabs: [
       {
         id: 'status',
@@ -125,17 +132,10 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
         description: 'Itens carregados e equipamentos'
       },
       {
-        id: 'storage',
-        label: 'Armazém',
-        icon: Package,
-        color: 'text-purple-600',
-        description: 'Armazenamento expandido de itens'
-      },
-      {
         id: 'skills',
         label: 'Habilidades',
         icon: Zap,
-        color: 'text-yellow-600',
+        color: 'text-purple-600',
         description: 'Progressão e habilidades do jogador'
       }
     ]
@@ -350,7 +350,7 @@ export default function ModernGameLayout() {
   const [offlineReport, setOfflineReport] = useState<any>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const isMobile = useIsMobile();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
 
 
   const { toast } = useToast();
