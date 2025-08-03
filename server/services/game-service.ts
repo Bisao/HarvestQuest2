@@ -229,6 +229,70 @@ export class GameService {
     return await this.hasBaitInInventory(playerId);
   }
 
+  // Add resource to player inventory (try inventory first, then storage if full)
+  async addResourceToPlayer(playerId: string, resourceId: string, quantity: number): Promise<void> {
+    try {
+      // Check if player exists
+      const player = await this.storage.getPlayer(playerId);
+      if (!player) {
+        throw new Error(`Player ${playerId} not found`);
+      }
+
+      // Check if resource exists
+      const resource = await this.storage.getResource(resourceId);
+      if (!resource) {
+        console.warn(`Resource ${resourceId} not found, skipping`);
+        return;
+      }
+
+      // Try to add to inventory first
+      const inventoryItems = await this.storage.getPlayerInventory(playerId);
+      const existingItem = inventoryItems.find(item => item.resourceId === resourceId);
+
+      if (existingItem) {
+        // Update existing inventory item
+        await this.storage.updateInventoryItem(existingItem.id, {
+          quantity: existingItem.quantity + quantity
+        });
+      } else {
+        // Add new inventory item
+        await this.storage.addInventoryItem({
+          playerId,
+          resourceId,
+          quantity
+        });
+      }
+
+      // Update player inventory weight
+      const weightToAdd = resource.weight * quantity;
+      await this.storage.updatePlayer(playerId, {
+        inventoryWeight: player.inventoryWeight + weightToAdd
+      });
+
+    } catch (error) {
+      console.log(`Failed to add to inventory, adding to storage instead:`, error);
+      
+      // If inventory fails, add to storage
+      const storageItems = await this.storage.getPlayerStorage(playerId);
+      const existingStorageItem = storageItems.find(item => 
+        item.resourceId === resourceId && item.itemType === 'resource'
+      );
+
+      if (existingStorageItem) {
+        await this.storage.updateStorageItem(existingStorageItem.id, {
+          quantity: existingStorageItem.quantity + quantity
+        });
+      } else {
+        await this.storage.addStorageItem({
+          playerId,
+          resourceId,
+          quantity,
+          itemType: 'resource'
+        });
+      }
+    }
+  }
+
   // Move item from inventory to storage
   async moveToStorage(playerId: string, inventoryItemId: string, quantity: number): Promise<void> {
     const inventoryItems = await this.storage.getPlayerInventory(playerId);

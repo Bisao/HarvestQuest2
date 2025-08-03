@@ -347,5 +347,30 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     }
   );
 
+  // Complete expedition
+  router.post('/complete/:expeditionId', async (req, res) => {
+    try {
+      const { expeditionId } = req.params;
+
+      console.log(`🏁 Completing expedition ${expeditionId}`);
+
+      await expeditionService.completeExpedition(expeditionId);
+
+      console.log(`✅ Expedition ${expeditionId} completed successfully`);
+
+      res.json({ 
+        success: true, 
+        message: 'Expedition completed successfully' 
+      });
+
+    } catch (error) {
+      console.error('Complete expedition error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error instanceof Error ? error.message : 'Failed to complete expedition' 
+      });
+    }
+  });
+
   return router;
 }

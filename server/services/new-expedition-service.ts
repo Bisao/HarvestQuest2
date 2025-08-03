@@ -305,6 +305,40 @@ export class NewExpeditionService {
     return 'completed';
   }
 
+  private calculateCollectedResources(expedition: any): Record<string, number> {
+    const baseResources = expedition.biome?.resources || [];
+    const collectedResources: Record<string, number> = {};
+
+    // Ensure baseResources is an array
+    if (!Array.isArray(baseResources)) {
+      console.warn(`Invalid resources array for expedition ${expedition.id}`);
+      return collectedResources;
+    }
+
+    // Calculate resources based on progress
+    const progressPercentage = Math.min(expedition.progress || 0, 100) / 100;
+
+    baseResources.forEach(resource => {
+      if (!resource || !resource.resourceId) {
+        console.warn('Invalid resource in expedition:', resource);
+        return;
+      }
+
+      const baseQuantity = resource.minQuantity || 1;
+      const maxQuantity = resource.maxQuantity || baseQuantity;
+      const averageQuantity = (baseQuantity + maxQuantity) / 2;
+
+      // Apply progress multiplier
+      const finalQuantity = Math.floor(averageQuantity * progressPercentage);
+
+      if (finalQuantity > 0) {
+        collectedResources[resource.resourceId] = finalQuantity;
+      }
+    });
+
+    return collectedResources;
+  }
+
   async completeExpedition(expeditionId: string): Promise<ActiveExpedition> {
     const expedition = await this.storage.getExpedition(expeditionId);
     if (!expedition) throw new Error('Expedição não encontrada');
@@ -481,7 +515,7 @@ export class NewExpeditionService {
 
   async checkForCombatEncounter(expeditionId: string, playerId: string, biomeId: string): Promise<string | null> {
     try {
-      
+
       return null;
     } catch (error) {
       console.error('❌ COMBAT-INTEGRATION: Error generating encounter:', error);
