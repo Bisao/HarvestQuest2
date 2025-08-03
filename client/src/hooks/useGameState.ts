@@ -35,14 +35,27 @@ export function useGameState({
   } = useQuery({
     queryKey: ['player', playerId],
     queryFn: async () => {
-      const response = await fetch(`/api/player/${playerId}`);
-      if (!response.ok) throw new Error('Failed to fetch player');
-      const data = await response.json();
-      return data.data;
+      try {
+        console.log('🕐 HOOK: Fetching player data for:', playerId);
+        const response = await fetch(`/api/player/${playerId}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('🕐 HOOK: Player fetch failed:', response.status, errorText);
+          throw new Error(`Failed to fetch player: ${response.status} ${errorText}`);
+        }
+        const data = await response.json();
+        console.log('🕐 HOOK: Player data received:', data);
+        return data.data;
+      } catch (error) {
+        console.error('🕐 HOOK: Network or parsing error:', error);
+        throw error;
+      }
     },
     refetchInterval: enablePolling ? pollingInterval : false,
     staleTime: 1000,
-    gcTime: 5 * 60 * 1000
+    gcTime: 5 * 60 * 1000,
+    retry: 3,
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000)
   });
 
   // Resources query (static data, rarely changes)

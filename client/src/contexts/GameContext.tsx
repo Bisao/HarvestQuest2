@@ -24,6 +24,11 @@ interface GameProviderProps {
 }
 
 export function GameProvider({ children, playerId }: GameProviderProps) {
+  // Validate playerId
+  if (!playerId || playerId.trim() === '') {
+    throw new Error('GameProvider requires a valid playerId');
+  }
+
   const gameState = useGameState({ playerId });
 
   return (

@@ -1,3 +1,4 @@
+
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -11,17 +12,6 @@ import LoadingScreen from './components/game/loading-screen';
 const Game = lazy(() => import('./pages/game'));
 const MainMenu = lazy(() => import('./pages/main-menu'));
 const NotFound = lazy(() => import('./pages/not-found'));
-const AuthSuccess = lazy(() => import('./pages/auth-success'));
-
-function Router() {
-  return (
-    <Switch>
-      <Route path="/" component={MainMenu} />
-      <Route path="/game" component={Game} />
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
 
 function App() {
   return (
@@ -30,13 +20,13 @@ function App() {
         <Toaster />
         <ErrorBoundary>
           <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-            <Router>
-              <Suspense fallback={<LoadingScreen />}>
+            <Suspense fallback={<LoadingScreen />}>
+              <Switch>
                 <Route path="/" component={MainMenu} />
                 <Route path="/game" component={Game} />
                 <Route component={NotFound} />
-              </Suspense>
-            </Router>
+              </Switch>
+            </Suspense>
           </div>
         </ErrorBoundary>
       </TooltipProvider>
