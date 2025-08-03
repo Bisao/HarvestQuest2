@@ -1,4 +1,3 @@
-
 /* Modern Game Layout Styles */
 
 /* Hide scrollbar but keep functionality */
@@ -80,18 +79,47 @@
   }
 }
 
+/* Mobile-specific improvements */
 @media (max-width: 768px) {
   .sidebar {
-    width: 200px;
+    width: min(320px, 85vw);
   }
-  
+
   .sidebar-category {
     padding: 0.25rem;
   }
-  
+
   .sidebar-category button {
-    padding: 0.5rem;
+    padding: 0.75rem;
     font-size: 0.875rem;
+    min-height: 48px;
+  }
+
+  /* Mobile header improvements */
+  .mobile-header {
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Better mobile scrolling */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Mobile-friendly cards */
+  .mobile-card {
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.5rem;
+  }
+
+  /* Touch-friendly interactive elements */
+  .mobile-touch {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem;
   }
 }
 
@@ -222,25 +250,25 @@
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
-  
+
   .sidebar {
     width: 100vw !important;
     max-width: 320px;
   }
-  
+
   .mobile-header {
     padding: 0.75rem 1rem;
   }
-  
+
   .content-area {
     padding: 0.5rem;
   }
-  
+
   .status-indicators {
     flex-wrap: wrap;
     gap: 0.25rem;
   }
-  
+
   .category-badge {
     font-size: 0.6rem;
     padding: 0.1rem 0.25rem;
@@ -252,7 +280,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
-  
+
   .sidebar {
     width: 280px;
   }
@@ -263,7 +291,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
   }
-  
+
   .sidebar {
     width: 320px;
   }
@@ -273,7 +301,7 @@
   .sidebar {
     width: 384px;
   }
-  
+
   .responsive-grid {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -285,12 +313,12 @@
     min-height: 44px;
     padding: 0.75rem;
   }
-  
+
   .sidebar-category button:hover {
     transform: none;
     box-shadow: none;
   }
-  
+
   .sidebar-category button:active {
     background-color: rgba(0, 0, 0, 0.05);
     transform: scale(0.98);
@@ -302,11 +330,11 @@
   .sidebar {
     padding: 0.5rem;
   }
-  
+
   .sidebar-category {
     margin-bottom: 0.25rem;
   }
-  
+
   .player-status-header {
     padding: 0.75rem;
   }
@@ -317,7 +345,7 @@
   .shadow-soft {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
-  
+
   .shadow-medium {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   }

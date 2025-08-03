@@ -89,12 +89,42 @@
   
   /* Mobile-friendly spacing */
   .mobile-spacing {
-    padding: 0.5rem;
+    padding: 0.75rem;
   }
   
   @media (min-width: 640px) {
     .mobile-spacing {
       padding: 1rem;
+    }
+  }
+  
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    /* Prevent horizontal scroll */
+    body {
+      overflow-x: hidden;
+    }
+    
+    /* Improve button tap targets */
+    button {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Better card spacing on mobile */
+    .card {
+      margin-bottom: 0.5rem;
+    }
+    
+    /* Mobile-friendly text */
+    h1, h2, h3 {
+      line-height: 1.2;
+    }
+    
+    /* Better modal sizing */
+    .dialog-content {
+      max-width: 95vw;
+      max-height: 90vh;
     }
   }
   
