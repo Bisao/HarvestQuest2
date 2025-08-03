@@ -41,7 +41,7 @@ import PlayerSettings from './player-settings';
 import ExpeditionPanel from './expedition-panel';
 
 // Import modals
-import ModernExpeditionModal from './modern-expedition-modal';
+import { NewExpeditionModal } from './new-expedition-modal';
 import { OfflineActivityReportDialog } from './offline-activity-report';
 
 import type { Player, Biome, Resource, Equipment, Recipe } from '@shared/types';
@@ -365,7 +365,7 @@ export default function ModernGameLayout() {
 
   // Memoização das categorias da sidebar
   const sidebarCategories = useMemo(() => 
-    createSidebarCategories(player, activeExpedition), 
+    createSidebarCategories(player || null, activeExpedition), 
     [player, activeExpedition]
   );
 
@@ -582,10 +582,9 @@ export default function ModernGameLayout() {
 
           {/* Tab Content */}
           <div className="flex-1 overflow-auto bg-gray-50 p-2 sm:p-4">
-            {activeTab === 'status' && (
+            {activeTab === 'status' && player && (
               <StatusTab 
                 player={player}
-                isBlocked={isBlocked}
               />
             )}
 
@@ -619,11 +618,10 @@ export default function ModernGameLayout() {
               />
             )}
 
-            {activeTab === 'workshops' && (
+            {activeTab === 'workshops' && player && (
               <UnifiedWorkshops
                 player={player}
                 resources={resources}
-                recipes={recipes}
                 isBlocked={isBlocked}
               />
             )}
@@ -670,15 +668,14 @@ export default function ModernGameLayout() {
       </div>
 
       {/* Modals */}
-      <ModernExpeditionModal
-        isOpen={expeditionModalOpen}
-        onClose={handleExpeditionModalClose}
-        biome={selectedBiome}
-        resources={resources}
-        equipment={equipment}
-        player={player}
-        onExpeditionStart={handleExpeditionComplete}
-      />
+      {player && selectedBiome && (
+        <NewExpeditionModal
+          isOpen={expeditionModalOpen}
+          onClose={handleExpeditionModalClose}
+          biome={selectedBiome}
+          player={player}
+        />
+      )}
 
       <OfflineActivityReportDialog
         isOpen={offlineReportOpen}
