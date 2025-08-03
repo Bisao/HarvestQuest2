@@ -103,16 +103,16 @@ function AnimalCard({ animal, isDiscovered, onClick }: AnimalCardProps) {
 
         {isDiscovered && (
           <div className="space-y-2 text-xs text-gray-600">
-            <p className="line-clamp-2 leading-relaxed">{animal.generalInfo.diet}</p>
+            <p className="line-clamp-2 leading-relaxed">{animal.generalInfo?.diet || 'Informação não disponível'}</p>
             <div className="flex flex-wrap gap-1">
-              {animal.habitat.slice(0, 3).map((hab, idx) => (
+              {(animal.habitat || []).slice(0, 3).map((hab, idx) => (
                 <Badge key={idx} variant="outline" className="text-xs px-1.5 py-0.5">
                   {hab}
                 </Badge>
               ))}
-              {animal.habitat.length > 3 && (
+              {(animal.habitat || []).length > 3 && (
                 <Badge variant="outline" className="text-xs px-1.5 py-0.5">
-                  +{animal.habitat.length - 3}
+                  +{(animal.habitat || []).length - 3}
                 </Badge>
               )}
             </div>
@@ -164,21 +164,21 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold mb-2">Descrição</h3>
-                <p className="text-sm text-gray-600">{animal.generalInfo.diet}</p>
+                <p className="text-sm text-gray-600">{animal.generalInfo?.diet || 'Informação não disponível'}</p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2">Características</h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div><strong>Tamanho:</strong> {animal.generalInfo.size}</div>
-                  <div><strong>Comportamento:</strong> {animal.generalInfo.behavior.join(', ')}</div>
+                  <div><strong>Tamanho:</strong> {animal.generalInfo?.size || 'N/A'}</div>
+                  <div><strong>Comportamento:</strong> {(animal.generalInfo?.behavior || []).join(', ') || 'N/A'}</div>
                 </div>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2">Habitat</h3>
                 <div className="flex flex-wrap gap-1">
-                  {animal.habitat.map((hab, idx) => (
+                  {(animal.habitat || []).map((hab, idx) => (
                     <Badge key={idx} variant="outline" className="text-xs">
                       {hab}
                     </Badge>
@@ -186,7 +186,7 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
                 </div>
               </div>
 
-              {animal.generalInfo.funFacts && animal.generalInfo.funFacts.length > 0 && (
+              {animal.generalInfo?.funFacts && animal.generalInfo.funFacts.length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-2">Curiosidades</h3>
                   <ul className="text-sm text-gray-600 space-y-1">
@@ -203,46 +203,48 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
               <div>
                 <h3 className="font-semibold mb-2">Informações Gerais</h3>
                 <div className="text-sm space-y-1">
-                  <div>Expectativa de vida: {animal.generalInfo.lifespan}</div>
-                  <div>Peso: {animal.generalInfo.weight}</div>
-                  <div>Nível necessário: {animal.requiredLevel}</div>
+                  <div>Expectativa de vida: {animal.generalInfo?.lifespan || 'N/A'}</div>
+                  <div>Peso: {animal.generalInfo?.weight || 'N/A'}</div>
+                  <div>Nível necessário: {animal.requiredLevel || 1}</div>
                 </div>
               </div>
 
               {/* Combat Information */}
-              <div>
-                <h3 className="font-semibold mb-2">Informações de Combate</h3>
-                <div className="text-sm space-y-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>Vida: {animal.combat.health} HP</div>
-                    <div>Defesa: {animal.combat.defense}</div>
+              {animal.combat && (
+                <div>
+                  <h3 className="font-semibold mb-2">Informações de Combate</h3>
+                  <div className="text-sm space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>Vida: {animal.combat.health || 0} HP</div>
+                      <div>Defesa: {animal.combat.defense || 0}</div>
+                    </div>
+                    
+                    {(animal.combat.weaknesses || []).length > 0 && (
+                      <div>
+                        <span className="font-medium text-red-600">Fraquezas: </span>
+                        {animal.combat.weaknesses.join(', ')}
+                      </div>
+                    )}
+                    
+                    {(animal.combat.resistances || []).length > 0 && (
+                      <div>
+                        <span className="font-medium text-blue-600">Resistências: </span>
+                        {animal.combat.resistances.join(', ')}
+                      </div>
+                    )}
                   </div>
-                  
-                  {animal.combat.weaknesses.length > 0 && (
-                    <div>
-                      <span className="font-medium text-red-600">Fraquezas: </span>
-                      {animal.combat.weaknesses.join(', ')}
-                    </div>
-                  )}
-                  
-                  {animal.combat.resistances.length > 0 && (
-                    <div>
-                      <span className="font-medium text-blue-600">Resistências: </span>
-                      {animal.combat.resistances.join(', ')}
-                    </div>
-                  )}
                 </div>
-              </div>
+              )}
 
               {/* Attacks */}
-              {animal.combat.attacks.length > 0 && (
+              {animal.combat?.attacks && animal.combat.attacks.length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-2">Ataques</h3>
                   <div className="space-y-2">
                     {animal.combat.attacks.map((attack, idx) => (
                       <div key={idx} className="bg-red-50 p-2 rounded text-sm">
                         <div className="font-medium flex justify-between items-center">
-                          <span>{attack.name}</span>
+                          <span>{attack.name || 'Ataque'}</span>
                           <Badge variant="outline" className={`text-xs ${
                             attack.type === 'physical' ? 'bg-gray-100' :
                             attack.type === 'poison' ? 'bg-purple-100' :
@@ -252,12 +254,12 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
                             attack.type === 'psychic' ? 'bg-pink-100' :
                             'bg-gray-800 text-white'
                           }`}>
-                            {attack.type}
+                            {attack.type || 'physical'}
                           </Badge>
                         </div>
                         <div className="text-xs text-gray-600 mt-1">
-                          <div>Dano: {attack.damage} | Precisão: {attack.accuracy}%</div>
-                          <div>{attack.description}</div>
+                          <div>Dano: {attack.damage || 0} | Precisão: {attack.accuracy || 0}%</div>
+                          <div>{attack.description || 'Sem descrição'}</div>
                         </div>
                       </div>
                     ))}
@@ -266,26 +268,26 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
               )}
 
               {/* Abilities */}
-              {animal.combat.abilities.length > 0 && (
+              {animal.combat?.abilities && animal.combat.abilities.length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-2">Habilidades</h3>
                   <div className="space-y-2">
                     {animal.combat.abilities.map((ability, idx) => (
                       <div key={idx} className="bg-blue-50 p-2 rounded text-sm">
                         <div className="font-medium flex justify-between items-center">
-                          <span>{ability.name}</span>
+                          <span>{ability.name || 'Habilidade'}</span>
                           <Badge variant="outline" className={`text-xs ${
                             ability.type === 'passive' ? 'bg-green-100' :
                             ability.type === 'active' ? 'bg-orange-100' :
                             ability.type === 'defensive' ? 'bg-blue-100' :
                             'bg-red-100'
                           }`}>
-                            {ability.type}
+                            {ability.type || 'passive'}
                           </Badge>
                         </div>
                         <div className="text-xs text-gray-600 mt-1">
-                          <div>{ability.description}</div>
-                          <div className="text-gray-500">Efeito: {ability.effect}</div>
+                          <div>{ability.description || 'Sem descrição'}</div>
+                          <div className="text-gray-500">Efeito: {ability.effect || 'Sem efeito'}</div>
                           {ability.trigger && <div className="text-gray-500">Ativado: {ability.trigger}</div>}
                         </div>
                       </div>
@@ -295,15 +297,15 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
               )}
 
               {/* Drops */}
-              {animal.drops.length > 0 && (
+              {animal.drops && animal.drops.length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-2">Drops ao Morrer</h3>
                   <div className="space-y-1">
                     {animal.drops.map((drop, idx) => (
                       <div key={idx} className="bg-yellow-50 p-2 rounded text-sm flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">{drop.emoji}</span>
-                          <span className="font-medium">{drop.itemName}</span>
+                          <span className="text-lg">{drop.emoji || '📦'}</span>
+                          <span className="font-medium">{drop.itemName || 'Item'}</span>
                         </div>
                         <div className="text-right text-xs">
                           <div className={`font-medium ${
@@ -313,12 +315,12 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
                             drop.rarity === 'epic' ? 'text-purple-600' :
                             'text-orange-600'
                           }`}>
-                            {drop.dropRate}%
+                            {drop.dropRate || 0}%
                           </div>
                           <div className="text-gray-500">
-                            {drop.minQuantity === drop.maxQuantity ? 
-                              drop.minQuantity : 
-                              `${drop.minQuantity}-${drop.maxQuantity}`}x
+                            {(drop.minQuantity || 1) === (drop.maxQuantity || 1) ? 
+                              (drop.minQuantity || 1) : 
+                              `${drop.minQuantity || 1}-${drop.maxQuantity || 1}`}x
                           </div>
                         </div>
                       </div>
@@ -378,8 +380,8 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
   // Filtrar animais
   const filteredAnimals = useMemo(() => {
     return ANIMAL_REGISTRY.filter(animal => {
-      const matchesSearch = animal.commonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          animal.generalInfo.diet.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = (animal.commonName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (animal.generalInfo?.diet || '').toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || animal.category === selectedCategory;
       const matchesRarity = filterRarity === 'all' || animal.rarity === filterRarity;
 
