@@ -25,14 +25,14 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 92,
+        "hunger": 88,
         "maxHunger": 100,
-        "thirst": 92,
+        "thirst": 88,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 54,
-        "hygiene": 96,
+        "morale": 56,
+        "hygiene": 94,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -40,7 +40,7 @@
         "skillPoints": 0,
         "totalSkillPoints": 0,
         "skillAchievements": [],
-        "lastOnlineTime": 1754203117328
+        "lastOnlineTime": 1754204098931
       }
     ]
   ],

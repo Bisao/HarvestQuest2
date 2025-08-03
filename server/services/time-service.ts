@@ -139,4 +139,66 @@ export class TimeService {
 
     return { hunger: hungerMod, thirst: thirstMod };
   }
+
+  // Método para definir uma hora específica do dia
+  setTimeOfDay(timeOfDay: GameTime['timeOfDay']): void {
+    const targetHour = this.getHourFromTimeOfDay(timeOfDay);
+    const now = Date.now();
+    const currentGameTime = this.getCurrentGameTime();
+    
+    // Calcular a diferença de horas necessária
+    const hourDifference = targetHour - currentGameTime.hour;
+    
+    // Ajustar o startTime para que a hora atual seja a desejada
+    const millisecondsPerHour = this.config.dayDurationMs / 24;
+    const adjustment = hourDifference * millisecondsPerHour;
+    
+    this.config.startTime = this.config.startTime - adjustment;
+    
+    console.log(`⏰ TIME-SERVICE: Time changed to ${timeOfDay} (${targetHour}:00)`);
+  }
+
+  // Método para definir uma hora específica (0-23)
+  setHour(hour: number): void {
+    if (hour < 0 || hour > 23) {
+      throw new Error('Hour must be between 0 and 23');
+    }
+    
+    const now = Date.now();
+    const currentGameTime = this.getCurrentGameTime();
+    
+    // Calcular a diferença de horas necessária
+    const hourDifference = hour - currentGameTime.hour;
+    
+    // Ajustar o startTime para que a hora atual seja a desejada
+    const millisecondsPerHour = this.config.dayDurationMs / 24;
+    const adjustment = hourDifference * millisecondsPerHour;
+    
+    this.config.startTime = this.config.startTime - adjustment;
+    
+    console.log(`⏰ TIME-SERVICE: Time changed to ${hour}:00`);
+  }
+
+  // Método auxiliar para obter a hora de um período do dia
+  private getHourFromTimeOfDay(timeOfDay: GameTime['timeOfDay']): number {
+    switch (timeOfDay) {
+      case 'dawn': return 6;      // 06:00
+      case 'morning': return 9;   // 09:00
+      case 'afternoon': return 14; // 14:00
+      case 'evening': return 18;  // 18:00
+      case 'night': return 21;    // 21:00
+      case 'midnight': return 0;  // 00:00
+      default: return 12;         // meio-dia por padrão
+    }
+  }
+
+  // Método para avançar o tempo por X horas
+  advanceTime(hours: number): void {
+    const millisecondsPerHour = this.config.dayDurationMs / 24;
+    const adjustment = hours * millisecondsPerHour;
+    
+    this.config.startTime = this.config.startTime - adjustment;
+    
+    console.log(`⏰ TIME-SERVICE: Time advanced by ${hours} hours`);
+  }
 }

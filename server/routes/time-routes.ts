@@ -52,5 +52,63 @@ export function createTimeRoutes(storage: IStorage): Router {
     }
   });
 
+  // Rota para alterar o tempo do dia (POST)
+  router.post('/set-time', (req, res) => {
+    try {
+      const { timeOfDay, hour } = req.body;
+
+      console.log('⏰ TIME-ROUTE: Set time request:', { timeOfDay, hour });
+
+      if (timeOfDay) {
+        // Definir período do dia específico
+        timeService.setTimeOfDay(timeOfDay);
+      } else if (typeof hour === 'number') {
+        // Definir hora específica
+        timeService.setHour(hour);
+      } else {
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(400).json({ error: 'timeOfDay or hour is required' });
+      }
+
+      // Retornar o novo tempo
+      const newGameTime = timeService.getCurrentGameTime();
+      console.log('⏰ TIME-ROUTE: New game time:', newGameTime);
+      
+      res.setHeader('Content-Type', 'application/json');
+      return res.json({ success: true, gameTime: newGameTime });
+    } catch (error) {
+      console.error('❌ TIME-ROUTE: Erro ao alterar tempo:', error);
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(500).json({ error: 'Failed to change time' });
+    }
+  });
+
+  // Rota para avançar tempo por X horas (POST)
+  router.post('/advance', (req, res) => {
+    try {
+      const { hours } = req.body;
+
+      console.log('⏰ TIME-ROUTE: Advance time request:', { hours });
+
+      if (typeof hours !== 'number' || hours <= 0) {
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(400).json({ error: 'hours must be a positive number' });
+      }
+
+      timeService.advanceTime(hours);
+
+      // Retornar o novo tempo
+      const newGameTime = timeService.getCurrentGameTime();
+      console.log('⏰ TIME-ROUTE: New game time after advance:', newGameTime);
+      
+      res.setHeader('Content-Type', 'application/json');
+      return res.json({ success: true, gameTime: newGameTime });
+    } catch (error) {
+      console.error('❌ TIME-ROUTE: Erro ao avançar tempo:', error);
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(500).json({ error: 'Failed to advance time' });
+    }
+  });
+
   return router;
 }

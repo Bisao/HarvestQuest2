@@ -7,7 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useSaveGame } from "@/hooks/use-save-game";
 import type { Player, HungerDegradationMode } from "@shared/types";
-import { Settings, Archive, Home } from "lucide-react";
+import type { GameTime } from "@shared/types/time-types";
+import { Settings, Archive, Home, Clock, Sun, Moon, Sunrise, Sunset } from "lucide-react";
 import LoadingScreen from "./loading-screen";
 
 interface PlayerSettingsProps {
@@ -25,8 +26,67 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
   const [hungerDegradationMode, setHungerDegradationMode] = useState(player.hungerDegradationMode || 'automatic');
   const [isNavigatingToMenu, setIsNavigatingToMenu] = useState(false);
   const [autoConsume, setAutoConsume] = useState(player.autoConsume ?? false);
+  const [selectedTimeOfDay, setSelectedTimeOfDay] = useState<GameTime['timeOfDay']>('dawn');
 
   const saveGame = useSaveGame();
+
+  // Mutation para alterar o tempo do dia
+  const changeTimeMutation = useMutation({
+    mutationFn: async (timeOfDay: GameTime['timeOfDay']) => {
+      const response = await fetch('/api/time/set-time', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timeOfDay }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to change time');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Tempo Alterado",
+        description: `O tempo foi alterado para ${getTimeOfDayLabel(selectedTimeOfDay)}!`,
+      });
+      // Invalidar queries relacionadas ao tempo
+      queryClient.invalidateQueries({ queryKey: ['gameTime'] });
+      queryClient.invalidateQueries({ queryKey: ['temperature'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao Alterar Tempo",
+        description: error.message || "Não foi possível alterar o tempo",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Função para obter label do período do dia
+  const getTimeOfDayLabel = (timeOfDay: GameTime['timeOfDay']) => {
+    switch (timeOfDay) {
+      case 'dawn': return 'Amanhecer (06:00)';
+      case 'morning': return 'Manhã (09:00)';
+      case 'afternoon': return 'Tarde (14:00)';
+      case 'evening': return 'Entardecer (18:00)';
+      case 'night': return 'Noite (21:00)';
+      case 'midnight': return 'Meia-noite (00:00)';
+      default: return 'Desconhecido';
+    }
+  };
+
+  // Função para obter ícone do período do dia
+  const getTimeOfDayIcon = (timeOfDay: GameTime['timeOfDay']) => {
+    switch (timeOfDay) {
+      case 'dawn': return '🌅';
+      case 'morning': return '☀️';
+      case 'afternoon': return '🌞';
+      case 'evening': return '🌇';
+      case 'night': return '🌙';
+      case 'midnight': return '🌚';
+      default: return '🕐';
+    }
+  };
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (settings: { autoStorage?: boolean; autoCompleteQuests?: boolean; hungerDegradationMode?: HungerDegradationMode; autoConsume?: boolean }) => {
@@ -169,6 +229,49 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
                 <SelectItem value="disabled">🚫 Desabilitado (sem degradação)</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Time Control Setting */}
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3 mb-3">
+              <Clock className="w-5 h-5 text-purple-600" />
+              <div>
+                <p className="font-medium text-gray-800">Controle de Tempo</p>
+                <p className="text-sm text-gray-600">Altere o período do dia no jogo</p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <Select value={selectedTimeOfDay} onValueChange={(value: GameTime['timeOfDay']) => setSelectedTimeOfDay(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="dawn">🌅 Amanhecer (06:00)</SelectItem>
+                  <SelectItem value="morning">☀️ Manhã (09:00)</SelectItem>
+                  <SelectItem value="afternoon">🌞 Tarde (14:00)</SelectItem>
+                  <SelectItem value="evening">🌇 Entardecer (18:00)</SelectItem>
+                  <SelectItem value="night">🌙 Noite (21:00)</SelectItem>
+                  <SelectItem value="midnight">🌚 Meia-noite (00:00)</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={() => changeTimeMutation.mutate(selectedTimeOfDay)}
+                disabled={changeTimeMutation.isPending}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                {changeTimeMutation.isPending ? (
+                  <>
+                    <Clock className="w-4 h-4 mr-2 animate-spin" />
+                    Alterando Tempo...
+                  </>
+                ) : (
+                  <>
+                    {getTimeOfDayIcon(selectedTimeOfDay)}
+                    <span className="ml-2">Alterar para {getTimeOfDayLabel(selectedTimeOfDay)}</span>
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
         </div>
