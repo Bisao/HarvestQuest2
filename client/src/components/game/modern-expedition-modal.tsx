@@ -147,7 +147,7 @@ export default function ModernExpeditionModal({
       console.warn('Invalid resource for categorization:', resource);
       return 'basic';
     }
-    
+
     try {
       const name = resource.name.toLowerCase();
 
@@ -199,22 +199,40 @@ export default function ModernExpeditionModal({
     }
   };
 
-  // Verificar coletabilidade
+  // Check if player can collect a specific resource
   const checkResourceCollectability = (resource: Resource) => {
     if (!resource || !resource.name || typeof resource.name !== 'string') {
-      console.warn('Invalid resource for collectability check:', resource);
+      console.warn('Invalid resource in collectability check:', resource);
       return {
         canCollect: false,
         requirementText: "Recurso inválido",
         toolIcon: "❌",
       };
     }
-    
-    try {
-      const resourceName = resource.name;
 
-    // Recursos básicos (sem ferramentas)
-    if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
+    if (!equipment || !Array.isArray(equipment)) {
+      console.warn('Equipment data is invalid:', equipment);
+      return {
+        canCollect: false,
+        requirementText: "Dados de equipamento inválidos",
+        toolIcon: "❌",
+      };
+    }
+
+    if (!player) {
+      console.warn('Player data is invalid:', player);
+      return {
+        canCollect: false,
+        requirementText: "Dados do jogador inválidos",
+        toolIcon: "❌",
+      };
+    }
+
+    const resourceName = resource.name.toLowerCase();
+
+    // Basic resources (no tools required)
+    const basicResources = ['fibra', 'pedras soltas', 'gravetos', 'cogumelos', 'frutas silvestres', 'conchas', 'argila'];
+    if (basicResources.some(basic => resourceName.includes(basic))) {
       return {
         canCollect: true,
         requirementText: "Coletável à mão",
@@ -222,9 +240,9 @@ export default function ModernExpeditionModal({
       };
     }
 
-    // Recursos que requerem ferramentas
-    if (['Madeira', 'Bambu'].includes(resourceName)) {
-      const hasAxe = equipment.some(eq => eq.toolType === "axe" && eq.id === player.equippedTool);
+    // Tool required resources
+    if (resourceName.includes('madeira') || resourceName.includes('bambu')) {
+      const hasAxe = equipment.some(eq => eq && eq.toolType === "axe" && eq.id === player.equippedTool);
       return {
         canCollect: hasAxe,
         requirementText: hasAxe ? "Machado equipado" : "Requer machado",
@@ -232,8 +250,8 @@ export default function ModernExpeditionModal({
       };
     }
 
-    if (['Pedra', 'Ferro Fundido', 'Cristais'].includes(resourceName)) {
-      const hasPickaxe = equipment.some(eq => eq.toolType === "pickaxe" && eq.id === player.equippedTool);
+    if (resourceName.includes('pedra') || resourceName.includes('ferro') || resourceName.includes('cristais')) {
+      const hasPickaxe = equipment.some(eq => eq && eq.toolType === "pickaxe" && eq.id === player.equippedTool);
       return {
         canCollect: hasPickaxe,
         requirementText: hasPickaxe ? "Picareta equipada" : "Requer picareta",
@@ -241,9 +259,9 @@ export default function ModernExpeditionModal({
       };
     }
 
-    if (resourceName === 'Água Fresca') {
-      const hasBucket = equipment.some(eq => eq.toolType === "bucket" && eq.id === player.equippedTool);
-      const hasBambooBottle = equipment.some(eq => eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
+    if (resourceName.includes('água')) {
+      const hasBucket = equipment.some(eq => eq && eq.toolType === "bucket" && eq.id === player.equippedTool);
+      const hasBambooBottle = equipment.some(eq => eq && eq.toolType === "bamboo_bottle" && eq.id === player.equippedTool);
       const canCollect = hasBucket || hasBambooBottle;
       return {
         canCollect,
@@ -252,9 +270,9 @@ export default function ModernExpeditionModal({
       };
     }
 
-    // Peixes
-    if (['Peixe Pequeno', 'Peixe Grande', 'Salmão'].includes(resourceName) || resourceName.toLowerCase().includes('peixe')) {
-      const hasFishingRod = equipment.some(eq => eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
+    // Fish resources
+    if (resourceName.includes('peixe') || resourceName.includes('salmão')) {
+      const hasFishingRod = equipment.some(eq => eq && eq.toolType === "fishing_rod" && eq.id === player.equippedTool);
       return {
         canCollect: hasFishingRod,
         requirementText: hasFishingRod ? "Vara de pesca equipada" : "Requer vara de pesca",
@@ -262,78 +280,87 @@ export default function ModernExpeditionModal({
       };
     }
 
-    // Animais
-    if (['Coelho', 'Veado', 'Javali'].includes(resourceName) || resourceName.toLowerCase().includes('carne')) {
-      const hasWeapon = player.equippedWeapon !== null;
-      const hasKnife = equipment.some(eq => eq.toolType === "knife" && eq.id === player.equippedTool);
+    // Animals - require weapons and knife
+    if (resourceName.includes('coelho') || resourceName.includes('veado') || resourceName.includes('javali')) {
+      const hasWeapon = player.equippedWeapon !== null && player.equippedWeapon !== undefined;
+      const hasKnife = equipment.some(eq => eq && eq.toolType === "knife" && 
+        (eq.id === player.equippedTool || eq.id === player.equippedWeapon));
       const canCollect = hasWeapon && hasKnife;
+
+      let requirementText = "Requer arma + faca";
+      if (hasWeapon && hasKnife) requirementText = "Arma e faca equipadas";
+      else if (hasWeapon && !hasKnife) requirementText = "Requer faca";
+      else if (!hasWeapon && hasKnife) requirementText = "Requer arma";
+
+      const animalIcon = resourceName.includes('coelho') ? "🐰" : 
+                        resourceName.includes('veado') ? "🦌" : "🐗";
+
       return {
         canCollect,
-        requirementText: canCollect ? "Arma e faca equipadas" : "Requer arma e faca",
-        toolIcon: "🗡️",
+        requirementText,
+        toolIcon: animalIcon,
       };
     }
 
-    // Padrão para outros recursos
-      return {
-        canCollect: true,
-        requirementText: "Disponível para coleta",
-        toolIcon: "🤚",
-      };
-    } catch (error) {
-      console.error('Error checking resource collectability:', resource, error);
-      return {
-        canCollect: false,
-        requirementText: "Erro na verificação",
-        toolIcon: "❌",
-      };
-    }
+    return {
+      canCollect: true,
+      requirementText: "Coletável",
+      toolIcon: "✨",
+    };
   };
 
-  // Obter recursos coletáveis
-  const collectableResources = useMemo((): CollectableResource[] => {
+  const getCollectableResources = (): CollectableResource[] => {
     if (!biome || !biome.availableResources || !resources || !Array.isArray(resources)) {
+      console.warn('Missing data for collectable resources:', { biome, resources });
       return [];
     }
 
     const resourceIds = Array.isArray(biome.availableResources) 
       ? biome.availableResources as string[]
       : [];
-    
-    if (resourceIds.length === 0) return [];
+
+    if (resourceIds.length === 0) {
+      console.warn('No resource IDs found for biome:', biome?.name || 'unknown');
+      return [];
+    }
 
     const biomeResources = resourceIds
+      .filter(id => id && typeof id === 'string')
       .map(id => {
-        if (!id || typeof id !== 'string') return null;
-        return resources.find(r => r && r.id === id);
+        const resource = resources.find(r => r && r.id === id);
+        if (!resource) {
+          console.warn('Resource not found:', id);
+        }
+        return resource;
       })
       .filter(Boolean) as Resource[];
 
-    return biomeResources
-      .map(resource => {
-        if (!resource || !resource.id || !resource.name) {
-          console.warn('Invalid resource found:', resource);
-          return null;
-        }
-        
-        const collectabilityInfo = checkResourceCollectability(resource);
-        const category = categorizeResource(resource);
+    return biomeResources.map(resource => {
+      if (!resource || !resource.id || !resource.name) {
+        console.warn('Invalid resource found:', resource);
+        return null;
+      }
 
-        return {
-          ...resource,
-          canCollect: collectabilityInfo.canCollect,
-          requirementText: collectabilityInfo.requirementText,
-          toolIcon: collectabilityInfo.toolIcon,
-          category
-        };
-      })
-      .filter(Boolean) as CollectableResource[];
+      const collectabilityInfo = checkResourceCollectability(resource);
+      return {
+        ...resource,
+        canCollect: collectabilityInfo.canCollect,
+        requirementText: collectabilityInfo.requirementText,
+        toolIcon: collectabilityInfo.toolIcon,
+        category: categorizeResource(resource)
+      };
+    }).filter(Boolean) as CollectableResource[];
+  };
+
+  // Obter recursos coletáveis
+  const collectableResources = useMemo((): CollectableResource[] => {
+    return getCollectableResources();
   }, [biome, resources, equipment, player]);
 
   // Filtrar recursos
   const filteredResources = useMemo(() => {
     if (!collectableResources || collectableResources.length === 0) return [];
-    
+
     let filtered = collectableResources.filter(resource => 
       resource && 
       resource.id && 
@@ -378,7 +405,7 @@ export default function ModernExpeditionModal({
         console.warn('Invalid resource in grouping:', resource);
         return;
       }
-      
+
       try {
         if (!grouped[resource.category]) {
           grouped[resource.category] = [];
@@ -427,23 +454,23 @@ export default function ModernExpeditionModal({
         if (!response.ok) {
           const errorText = await response.text();
           let errorMessage = 'Erro ao iniciar expedição';
-          
+
           try {
             const errorData = JSON.parse(errorText);
             errorMessage = errorData.message || errorMessage;
           } catch {
             errorMessage = errorText || errorMessage;
           }
-          
+
           throw new Error(errorMessage);
         }
 
         const result = await response.json();
-        
+
         if (!result || !result.id) {
           throw new Error('Resposta inválida do servidor');
         }
-        
+
         return result;
       } catch (error) {
         console.error('Expedition creation error:', error);
@@ -465,11 +492,11 @@ export default function ModernExpeditionModal({
         title: "Expedição iniciada!",
         description: `Expedição para ${biome?.name} iniciada com sucesso.`,
       });
-      
+
       if (onExpeditionStart && typeof onExpeditionStart === 'function') {
         onExpeditionStart(data);
       }
-      
+
       if (onClose && typeof onClose === 'function') {
         onClose();
       }

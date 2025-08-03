@@ -531,6 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (invalidResources.length > 0) {
         return res.status(400).json({ message: "IDs de recursos inválidos" });
       }
+       const validResources = selectedResources.filter(id => id && typeof id === 'string');
 
       console.log('Creating expedition with data:', {
         playerId,
@@ -539,12 +540,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedEquipment: selectedEquipment || []
       });
 
-      const expedition = await expeditionService.createExpedition({
+      const expedition = await expeditionService.startExpedition(
         playerId,
         biomeId,
-        selectedResources,
-        selectedEquipment: selectedEquipment || []
-      });
+        validResources,
+        selectedEquipment || []
+      );
 
       if (!expedition || !expedition.id) {
         throw new Error('Falha ao criar expedição');

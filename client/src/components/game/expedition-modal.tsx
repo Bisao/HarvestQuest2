@@ -99,7 +99,7 @@ export default function ExpeditionModal({
       };
     }
     
-    const resourceName = resource.name;
+    const resourceName = resource.name || '';
 
     // Basic resources (no tools required)
     if (['Fibra', 'Pedras Soltas', 'Gravetos', 'Cogumelos', 'Frutas Silvestres', 'Conchas', 'Argila'].includes(resourceName)) {
