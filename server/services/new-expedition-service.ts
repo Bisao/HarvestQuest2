@@ -260,7 +260,8 @@ export class NewExpeditionService {
     
     if (progress > 50 && Object.keys(collectedResources).length === 0) {
       // Start collecting resources at 50% progress
-      const template = this.getTemplateById(expedition.biomeId);
+      const templates = this.getTemplatesForBiome(expedition.biomeId);
+      const template = templates.length > 0 ? templates[0] : this.getTemplateById('gathering-basic');
       if (template) {
         const rewards = this.calculateRewards(template);
         collectedResources = rewards;
@@ -306,14 +307,23 @@ export class NewExpeditionService {
     const expedition = await this.storage.getExpedition(expeditionId);
     if (!expedition) throw new Error('Expedição não encontrada');
 
-    const template = this.getTemplateById(expedition.biomeId); // Usando biomeId como templateId temporariamente
-    if (!template) throw new Error('Template de expedição não encontrado');
+    // Get template by biomeId - use default template for the biome
+    const templates = this.getTemplatesForBiome(expedition.biomeId);
+    const template = templates.length > 0 ? templates[0] : null;
+    if (!template) {
+      // Fallback to basic gathering template
+      const fallbackTemplate = this.getTemplateById('gathering-basic');
+      if (!fallbackTemplate) throw new Error('Template de expedição não encontrado');
+    }
 
+    // Use the found template or fallback
+    const activeTemplate = template || this.getTemplateById('gathering-basic')!;
+    
     // Calcular recompensas
-    const rewards = this.calculateRewards(template);
+    const rewards = this.calculateRewards(activeTemplate);
     
     // Aplicar recompensas ao jogador
-    await this.applyRewards(expedition.playerId, rewards, template.rewards.experience);
+    await this.applyRewards(expedition.playerId, rewards, activeTemplate.rewards.experience);
 
     // Marcar expedição como completa
     await this.storage.updateExpedition(expeditionId, { 
@@ -322,7 +332,7 @@ export class NewExpeditionService {
       collectedResources: rewards
     });
 
-    console.log(`✅ EXPEDITION: Completed ${template.name} for player ${expedition.playerId}`);
+    console.log(`✅ EXPEDITION: Completed ${activeTemplate.name} for player ${expedition.playerId}`);
     console.log(`🎁 REWARDS: ${JSON.stringify(rewards)}`);
 
     const startTime = expedition.startTime ?? Date.now();
@@ -331,7 +341,7 @@ export class NewExpeditionService {
     return {
       id: expedition.id,
       playerId: expedition.playerId,
-      planId: template.id,
+      planId: activeTemplate.id,
       startTime: startTime * 1000,
       estimatedEndTime: startTime * 1000 + expeditionDuration,
       currentPhase: 'completed',

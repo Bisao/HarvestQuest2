@@ -209,6 +209,8 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
                 quantity
               });
             }
+          } else {
+            console.warn(`⚠️ EXPEDITION-COMPLETE: Template not found for planId: ${expedition.planId}`);
           }
         }
         

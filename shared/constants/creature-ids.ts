@@ -256,3 +256,93 @@ export function validateCreatureData(): {
     warnings
   };
 }
+// Sistema de UUIDs para todas as criaturas do jogo
+
+export const CREATURE_IDS = {
+  // ANIMAIS PEQUENOS
+  RABBIT: 'creature-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37',
+  SQUIRREL: 'creature-4f9d2e8c-1a6b-4d73-9e45-8c7b5a3f9e12',
+  BIRD: 'creature-6b3e8f2a-5c9d-4e81-9a67-2f8e5c1b4a93',
+  
+  // ANIMAIS MÉDIOS
+  DEER: 'creature-8e5c2f9a-3b7d-4a92-8e76-5c9a3f2e8b14',
+  WILD_BOAR: 'creature-1c7a4f2e-9b8d-4e63-8a95-6f3e9c2a5b87',
+  WOLF: 'creature-3f8e5c1a-2b9d-4e74-9a58-8c6b4f3e1a92',
+  
+  // ANIMAIS GRANDES
+  BEAR: 'creature-5c9a3f2e-8b6d-4a83-9e47-1f8c5a3e9b25',
+  MOOSE: 'creature-7e2f8c5a-4b9d-4e65-8a96-3c7f5e2a8b41',
+  
+  // PEIXES
+  TROUT: 'creature-9a5f3e2c-6b8d-4e74-9a57-8e6c4f3a2b91',
+  SALMON: 'creature-2e8c5f1a-9b7d-4a64-8e53-6f9a3c2e5b84',
+  BASS: 'creature-4c7f2e9a-5b8d-4e72-9a56-1e8c6f4a3b92',
+  
+  // CRIATURAS MÍSTICAS
+  FOREST_SPIRIT: 'creature-6f9c3e2a-8b5d-4e81-9a69-4c7f2e9a5b83',
+  CRYSTAL_DEER: 'creature-8a5c2f9e-3b7d-4e64-9a58-6f3c9e2a8b75',
+  
+  // INSETOS E PEQUENAS CRIATURAS
+  BUTTERFLY: 'creature-1f8e5c3a-2b9d-4e73-9a67-5c8f3e1a9b26',
+  BEE: 'creature-3c9f2e8a-5b7d-4e82-9a48-8e6c3f2a5b94',
+  BEETLE: 'creature-5e2c8f9a-4b6d-4e71-9a59-2f8e6c3a9b85',
+  
+  // CRIATURAS AQUÁTICAS
+  TURTLE: 'creature-7c5f2e9a-8b4d-4e63-9a57-6f3e8c2a5b91',
+  FROG: 'creature-9e8c5f2a-3b7d-4e74-9a68-4c7f9e2a8b52',
+  
+  // AVES
+  EAGLE: 'creature-2a7f5e9c-8b6d-4e83-9a49-1f8c5e3a9b74',
+  OWL: 'creature-4f3c8e2a-5b9d-4e72-9a58-6e7c3f2a8b95',
+  HAWK: 'creature-6c9e5f2a-8b4d-4e61-9a57-3f8c6e2a5b83',
+  
+  // CRIATURAS NOTURNAS
+  BAT: 'creature-8e6c3f9a-2b5d-4e74-9a69-5c8f3e9a2b46',
+  FIREFLY: 'creature-1c5f8e3a-9b7d-4e62-9a58-6f3c8e5a2b91',
+  
+  // PREDADORES
+  LYNX: 'creature-3f8c5e2a-6b9d-4e73-9a67-8e5c3f2a9b84',
+  MOUNTAIN_LION: 'creature-5c7e9f3a-8b4d-4e61-9a56-2f8c7e3a5b92',
+  
+  // CRIATURAS DOMÉSTICAS/COMPANHEIROS
+  DOG: 'creature-7e5c9f2a-3b8d-4e74-9a68-4c7e5f2a8b93',
+  CAT: 'creature-9c3f8e5a-6b2d-4e63-9a57-1f8c3e5a9b85',
+  
+  // CRIATURAS DE COMBATE ESPECIAIS
+  SHADOW_WOLF: 'creature-2f8c5e9a-4b7d-4e82-9a49-6c3f8e2a5b94',
+  FROST_BEAR: 'creature-4e7c9f5a-8b3d-4e61-9a58-3f7c9e5a2b86',
+  FIRE_SALAMANDER: 'creature-6c5f8e3a-2b9d-4e74-9a69-8e5c3f9a2b47'
+} as const;
+
+// Tipo para validação
+export type CreatureId = typeof CREATURE_IDS[keyof typeof CREATURE_IDS];
+
+// Função para validar UUIDs de criaturas
+export function isValidCreatureId(id: string): id is CreatureId {
+  return Object.values(CREATURE_IDS).includes(id as CreatureId);
+}
+
+// Função para obter todas as UUIDs de criaturas
+export function getAllCreatureIds(): CreatureId[] {
+  return Object.values(CREATURE_IDS);
+}
+
+// Função para obter UUID por categoria
+export function getCreatureIdsByCategory(category: string): CreatureId[] {
+  const categories: Record<string, CreatureId[]> = {
+    small: [CREATURE_IDS.RABBIT, CREATURE_IDS.SQUIRREL, CREATURE_IDS.BIRD],
+    medium: [CREATURE_IDS.DEER, CREATURE_IDS.WILD_BOAR, CREATURE_IDS.WOLF],
+    large: [CREATURE_IDS.BEAR, CREATURE_IDS.MOOSE],
+    fish: [CREATURE_IDS.TROUT, CREATURE_IDS.SALMON, CREATURE_IDS.BASS],
+    mystical: [CREATURE_IDS.FOREST_SPIRIT, CREATURE_IDS.CRYSTAL_DEER],
+    insects: [CREATURE_IDS.BUTTERFLY, CREATURE_IDS.BEE, CREATURE_IDS.BEETLE],
+    aquatic: [CREATURE_IDS.TURTLE, CREATURE_IDS.FROG],
+    birds: [CREATURE_IDS.EAGLE, CREATURE_IDS.OWL, CREATURE_IDS.HAWK],
+    nocturnal: [CREATURE_IDS.BAT, CREATURE_IDS.FIREFLY],
+    predators: [CREATURE_IDS.LYNX, CREATURE_IDS.MOUNTAIN_LION],
+    domestic: [CREATURE_IDS.DOG, CREATURE_IDS.CAT],
+    combat: [CREATURE_IDS.SHADOW_WOLF, CREATURE_IDS.FROST_BEAR, CREATURE_IDS.FIRE_SALAMANDER]
+  };
+  
+  return categories[category] || [];
+}
