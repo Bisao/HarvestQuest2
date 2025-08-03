@@ -4,6 +4,7 @@ import type { IStorage } from '../storage';
 import { NewExpeditionService } from '../services/new-expedition-service';
 import { validateParams, validateBody } from '../middleware/validation';
 import { successResponse, errorResponse } from '../utils/response-helpers';
+import { migrateLegacyCreatureId } from '../../shared/constants/creature-ids';
 
 // Schemas de validação
 const startExpeditionSchema = z.object({
@@ -53,7 +54,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     try {
       const { templateId } = req.params;
       const template = expeditionService.getTemplateById(templateId);
-      
+
       if (!template) {
         return errorResponse(res, 404, 'Template não encontrado');
       }
@@ -76,7 +77,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         console.log(`🔍 EXPEDITION-VALIDATE: Checking requirements for player ${playerId}, template ${templateId}`);
 
         const validation = await expeditionService.validateExpeditionRequirements(playerId, templateId);
-        
+
         return successResponse(res, validation, 'Validação concluída');
       } catch (error: any) {
         console.error('❌ EXPEDITION-VALIDATE: Error:', error.message);
@@ -105,7 +106,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     async (req: Request, res: Response) => {
       try {
         const { playerId, biomeId, selectedResources, duration, selectedEquipment } = req.body;
-        
+
         // Get player
         const player = await storage.getPlayer(playerId);
         if (!player) {
@@ -133,7 +134,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         });
 
         console.log(`🚀 CUSTOM-EXPEDITION: Started custom expedition ${expedition.id} for player ${playerId}`);
-        
+
         return successResponse(res, expedition, 'Expedição customizada iniciada com sucesso');
       } catch (error: any) {
         console.error('❌ CUSTOM-EXPEDITION-START: Error:', error.message);
@@ -151,7 +152,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         console.log(`🚀 EXPEDITION-START: Starting expedition for player ${playerId}, template ${templateId}`);
 
         const expedition = await expeditionService.startExpedition(playerId, templateId);
-        
+
         return successResponse(res, expedition, 'Expedição iniciada com sucesso');
       } catch (error: any) {
         console.error('❌ EXPEDITION-START: Error:', error.message);
@@ -169,7 +170,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         console.log(`📈 EXPEDITION-PROGRESS: Updating expedition ${expeditionId}`);
 
         const expedition = await expeditionService.updateExpeditionProgress(expeditionId);
-        
+
         if (!expedition) {
           return errorResponse(res, 404, 'Expedição não encontrada ou já finalizada');
         }
@@ -191,17 +192,17 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         console.log(`🏁 EXPEDITION-COMPLETE: Completing expedition ${expeditionId}`);
 
         const expedition = await expeditionService.completeExpedition(expeditionId);
-        
+
         // Update quest progress for expedition completion and resources collected
         if (expedition && expedition.playerId) {
           const { QuestService } = await import('../services/quest-service');
           const questService = new QuestService(storage);
-          
+
           // Get the expedition template to access biomeId
           const template = expeditionService.getTemplateById(expedition.planId);
           if (template) {
             await questService.updateQuestProgress(expedition.playerId, 'expedition', { biomeId: template.biomeId });
-            
+
             // Update quest progress for resources collected
             for (const [resourceId, quantity] of Object.entries(expedition.collectedResources)) {
               await questService.updateQuestProgress(expedition.playerId, 'collect', {
@@ -213,7 +214,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
             console.warn(`⚠️ EXPEDITION-COMPLETE: Template not found for planId: ${expedition.planId}`);
           }
         }
-        
+
         return successResponse(res, expedition, 'Expedição completada com sucesso');
       } catch (error: any) {
         console.error('❌ EXPEDITION-COMPLETE: Error:', error.message);
@@ -233,7 +234,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         console.log(`🔍 EXPEDITION-ACTIVE: Fetching active expeditions for player ${playerId}`);
 
         const expeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
-        
+
         return successResponse(res, expeditions, 'Expedições ativas obtidas com sucesso');
       } catch (error: any) {
         console.error('❌ EXPEDITION-ACTIVE: Error:', error.message);
@@ -251,7 +252,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         console.log(`🔍 EXPEDITION-ACTIVE: Fetching active expeditions for player ${playerId}`);
 
         const expeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
-        
+
         return successResponse(res, expeditions, 'Expedições ativas obtidas com sucesso');
       } catch (error: any) {
         console.error('❌ EXPEDITION-ACTIVE: Error:', error.message);
@@ -269,7 +270,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         console.log(`📚 EXPEDITION-HISTORY: Fetching expedition history for player ${playerId}`);
 
         const expeditions = await expeditionService.getExpeditionHistory(playerId);
-        
+
         return successResponse(res, expeditions, 'Histórico de expedições obtido com sucesso');
       } catch (error: any) {
         console.error('❌ EXPEDITION-HISTORY: Error:', error.message);
@@ -289,7 +290,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
       }
 
       const encounterId = await expeditionService.checkForCombatEncounter(expeditionId, playerId, biomeId);
-      
+
       if (encounterId) {
         return successResponse(res, { 
           hasEncounter: true, 
@@ -316,7 +317,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
 
         // Get all player expeditions
         const expeditions = await storage.getPlayerExpeditions(playerId);
-        
+
         // Cancel all problematic expeditions (those with invalid timestamps)
         let resetCount = 0;
         for (const exp of expeditions) {
@@ -324,7 +325,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
             // Check if startTime is problematic (too far in the future)
             const currentTime = Date.now();
             const startTimeMs = exp.startTime && exp.startTime < 2000000000 ? exp.startTime * 1000 : exp.startTime;
-            
+
             if (!startTimeMs || startTimeMs > currentTime + (24 * 60 * 60 * 1000)) {
               // Cancel this expedition as it has invalid timestamp
               await storage.updateExpedition(exp.id, { 
@@ -336,7 +337,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
             }
           }
         }
-        
+
         return successResponse(res, { resetCount }, `Reset ${resetCount} problematic expeditions`);
       } catch (error: any) {
         console.error('❌ EXPEDITION-RESET: Error:', error.message);

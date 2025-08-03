@@ -1,6 +1,7 @@
 
 import { AnimalRegistryEntry } from '../../shared/types/animal-registry-types';
 import { generateCombatData } from './combat-generator';
+import { CREATURE_IDS } from '../../shared/constants/creature-ids';
 
 export const ANIMAL_CATEGORIES: { [key: string]: string } = {
   'mammal_small': 'Mamíferos Pequenos',
@@ -38,7 +39,7 @@ function createAnimalWithCombat(baseAnimal: Omit<AnimalRegistryEntry, 'combat' |
 export const ANIMAL_REGISTRY: AnimalRegistryEntry[] = [
   // MAMÍFEROS PEQUENOS (50 animais)
   createAnimalWithCombat({
-    id: 'animal-rabbit-001',
+    id: CREATURE_IDS.COELHO,
     species: 'Coelho Europeu',
     commonName: 'Coelho',
     scientificName: 'Oryctolagus cuniculus',

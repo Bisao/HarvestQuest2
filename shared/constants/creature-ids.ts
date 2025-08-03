@@ -259,32 +259,22 @@ export function validateCreatureData(): {
 // Tipo para validação
 export type CreatureId = typeof CREATURE_IDS[keyof typeof CREATURE_IDS];
 
-// Função para validar UUIDs de criaturas
-export function isValidCreatureId(id: string): id is CreatureId {
-  return Object.values(CREATURE_IDS).includes(id as CreatureId);
-}
-
-// Função para obter todas as UUIDs de criaturas
-export function getAllCreatureIds(): CreatureId[] {
-  return Object.values(CREATURE_IDS);
-}
-
-// Função para obter UUID por categoria
-export function getCreatureIdsByCategory(category: string): CreatureId[] {
-  const categories: Record<string, CreatureId[]> = {
-    small: [CREATURE_IDS.COELHO, CREATURE_IDS.ESQUILO, CREATURE_IDS.BIRD],
-    medium: [CREATURE_IDS.DEER, CREATURE_IDS.WILD_BOAR, CREATURE_IDS.WOLF],
-    large: [CREATURE_IDS.BEAR, CREATURE_IDS.MOOSE],
-    fish: [CREATURE_IDS.TROUT, CREATURE_IDS.SALMON, CREATURE_IDS.BASS],
-    mystical: [CREATURE_IDS.FOREST_SPIRIT, CREATURE_IDS.CRYSTAL_DEER],
-    insects: [CREATURE_IDS.BUTTERFLY, CREATURE_IDS.BEE, CREATURE_IDS.BEETLE],
-    aquatic: [CREATURE_IDS.TURTLE, CREATURE_IDS.FROG],
-    birds: [CREATURE_IDS.EAGLE, CREATURE_IDS.OWL, CREATURE_IDS.HAWK],
-    nocturnal: [CREATURE_IDS.BAT, CREATURE_IDS.FIREFLY],
-    predators: [CREATURE_IDS.LYNX, CREATURE_IDS.MOUNTAIN_LION],
-    domestic: [CREATURE_IDS.DOG, CREATURE_IDS.CAT],
-    combat: [CREATURE_IDS.SHADOW_WOLF, CREATURE_IDS.FROST_BEAR, CREATURE_IDS.FIRE_SALAMANDER]
+// Função para obter UUID por categoria baseada nas categorias definidas
+export function getCreatureIdsByCategory(category: string): string[] {
+  const categoryMap: Record<string, string[]> = {
+    small: CREATURE_CATEGORIES.MAMIFEROS_PEQUENOS,
+    medium: CREATURE_CATEGORIES.MAMIFEROS_MEDIOS,
+    large: CREATURE_CATEGORIES.MAMIFEROS_GRANDES,
+    fish_freshwater: CREATURE_CATEGORIES.PEIXES_AGUA_DOCE,
+    fish_saltwater: CREATURE_CATEGORIES.PEIXES_AGUA_SALGADA,
+    birds_small: CREATURE_CATEGORIES.AVES_PEQUENAS,
+    birds_medium: CREATURE_CATEGORIES.AVES_MEDIAS,
+    birds_large: CREATURE_CATEGORIES.AVES_GRANDES,
+    reptiles: CREATURE_CATEGORIES.REPTEIS,
+    insects: CREATURE_CATEGORIES.INSETOS,
+    mystical: CREATURE_CATEGORIES.CRIATURAS_FANTASTICAS,
+    elementals: CREATURE_CATEGORIES.ELEMENTAIS
   };
   
-  return categories[category] || [];
+  return categoryMap[category] || [];
 }

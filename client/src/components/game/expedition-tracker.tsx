@@ -34,12 +34,12 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
       const response = await fetch(`/api/expeditions/${expeditionId}/complete`, {
         method: 'POST'
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Erro ao completar expedição');
       }
-      
+
       return response.json();
     },
     onSuccess: (data) => {
@@ -47,10 +47,21 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
         title: "Expedição Completada!",
         description: "Recursos coletados e experiência adicionada.",
       });
-      
+
       // Invalidar caches
       queryClient.invalidateQueries({ queryKey: ['/api/expeditions/player', player.id] });
       queryClient.invalidateQueries({ queryKey: ['/api/player', player.username] });
+
+      const expeditionId = data?.data?.id;
+      const collectedData = data?.data;
+
+      console.log(`✅ EXPEDITION: Collected rewards from ${expeditionId}:`, collectedData.rewards);
+
+        // Valida que todas as criaturas têm UUIDs válidos
+        const creatureRewards = collectedData.rewards.filter(r => r.type === 'creature');
+        if (creatureRewards.length > 0) {
+          console.log(`🐾 EXPEDITION: Found ${creatureRewards.length} creature rewards with valid UUIDs`);
+        }
     },
     onError: (error: any) => {
       toast({
@@ -67,12 +78,12 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
       const response = await fetch(`/api/expeditions/player/${player.id}/reset`, {
         method: 'POST'
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Erro ao resetar expedições');
       }
-      
+
       return response.json();
     },
     onSuccess: (data) => {
@@ -80,7 +91,7 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
         title: "Expedições Resetadas!",
         description: `${data.data.resetCount} expedições problemáticas foram canceladas.`,
       });
-      
+
       // Invalidar caches
       queryClient.invalidateQueries({ queryKey: ['/api/expeditions/player', player.id] });
     },
@@ -120,7 +131,7 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
     const remaining = Math.max(0, endTime - now);
     const minutes = Math.floor(remaining / (1000 * 60));
     const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-    
+
     if (minutes > 0) {
       return `${minutes}m ${seconds}s`;
     }
@@ -176,7 +187,7 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
         {activeExpeditions.map((expedition: ActiveExpedition) => {
           const isCompleted = expedition.progress >= 100;
           const timeRemaining = formatTimeRemaining(expedition.estimatedEndTime);
-          
+
           return (
             <Card key={expedition.id} className="relative">
               <CardHeader className="pb-3">
@@ -199,7 +210,7 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
                       </div>
                     </CardDescription>
                   </div>
-                  
+
                   {isCompleted && (
                     <Button
                       size="sm"
@@ -213,7 +224,7 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
                   )}
                 </div>
               </CardHeader>
-              
+
               <CardContent className="pt-0">
                 <div className="space-y-3">
                   {/* Barra de Progresso */}
@@ -258,7 +269,7 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
                   )}
                 </div>
               </CardContent>
-              
+
               {/* Indicador de completude */}
               {isCompleted && (
                 <div className="absolute top-2 right-2">

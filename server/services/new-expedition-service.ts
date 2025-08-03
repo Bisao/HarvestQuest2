@@ -9,10 +9,12 @@ import {
 } from '@shared/types/expedition-types';
 import { CombatService } from './combat-service';
 import { v4 as uuidv4 } from 'uuid';
+import { RESOURCE_IDS } from '../../shared/constants/game-ids';
+import { CREATURE_IDS, migrateLegacyCreatureId, isValidCreatureId } from '../../shared/constants/creature-ids';
 
 export class NewExpeditionService {
   private combatService: CombatService;
-  
+
   constructor(private storage: IStorage) {
     this.combatService = new CombatService(storage);
   }
@@ -141,7 +143,7 @@ export class NewExpeditionService {
   ): Promise<{ valid: boolean; errors: string[] }> {
     const player = await this.storage.getPlayer(playerId);
     const template = this.getTemplateById(templateId);
-    
+
     if (!player) return { valid: false, errors: ['Jogador não encontrado'] };
     if (!template) return { valid: false, errors: ['Template de expedição não encontrado'] };
 
@@ -248,7 +250,7 @@ export class NewExpeditionService {
     } else {
       startTimeMs = currentTime; // Fallback to current time
     }
-    
+
     const elapsed = currentTime - startTimeMs;
     const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
     const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
@@ -257,7 +259,7 @@ export class NewExpeditionService {
 
     // Gradually collect resources as expedition progresses
     let collectedResources = expedition.collectedResources || {};
-    
+
     if (progress > 50 && Object.keys(collectedResources).length === 0) {
       // Start collecting resources at 50% progress
       const templates = this.getTemplatesForBiome(expedition.biomeId);
@@ -279,7 +281,7 @@ export class NewExpeditionService {
       progress,
       collectedResources
     });
-    
+
     return {
       id: expedition.id,
       playerId: expedition.playerId,
@@ -318,10 +320,10 @@ export class NewExpeditionService {
 
     // Use the found template or fallback
     const activeTemplate = template || this.getTemplateById('gathering-basic')!;
-    
+
     // Calcular recompensas
     const rewards = this.calculateRewards(activeTemplate);
-    
+
     // Aplicar recompensas ao jogador
     await this.applyRewards(expedition.playerId, rewards, activeTemplate.rewards.experience);
 
@@ -337,7 +339,7 @@ export class NewExpeditionService {
 
     const startTime = expedition.startTime ?? Date.now();
     const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
-    
+
     return {
       id: expedition.id,
       playerId: expedition.playerId,
@@ -373,7 +375,7 @@ export class NewExpeditionService {
     // Aplicar custos de fome e sede
     const hungerCost = Math.floor(template.duration.max * 0.5);
     const thirstCost = Math.floor(template.duration.max * 0.4);
-    
+
     await this.storage.updatePlayer(playerId, {
       hunger: Math.max(0, player.hunger - hungerCost),
       thirst: Math.max(0, player.thirst - thirstCost),
@@ -407,7 +409,7 @@ export class NewExpeditionService {
   async getPlayerActiveExpeditions(playerId: string): Promise<ActiveExpedition[]> {
     const expeditions = await this.storage.getPlayerExpeditions(playerId);
     console.log(`🔍 EXPEDITION-SERVICE: Found ${expeditions.length} total expeditions for player ${playerId}`);
-    
+
     const activeExpeditions = expeditions
       .filter(exp => exp.status === 'in_progress')
       .map(exp => {
@@ -420,11 +422,11 @@ export class NewExpeditionService {
         } else {
           startTimeMs = currentTime; // Fallback to current time
         }
-        
+
         const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
         const elapsed = currentTime - startTimeMs;
         const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
-        
+
         console.log(`🎯 EXPEDITION-SERVICE: Processing expedition ${exp.id}:`, {
           originalStartTime: exp.startTime,
           startTimeMs,
@@ -432,7 +434,7 @@ export class NewExpeditionService {
           progress: Math.round(progress),
           collectedResources: exp.collectedResources
         });
-        
+
         return {
           id: exp.id,
           playerId: exp.playerId,
@@ -447,7 +449,7 @@ export class NewExpeditionService {
           status: 'active' as const
         };
       });
-      
+
     console.log(`✅ EXPEDITION-SERVICE: Returning ${activeExpeditions.length} active expeditions`);
     return activeExpeditions;
   }
@@ -479,11 +481,7 @@ export class NewExpeditionService {
 
   async checkForCombatEncounter(expeditionId: string, playerId: string, biomeId: string): Promise<string | null> {
     try {
-      const encounter = await this.combatService.tryGenerateEncounter(expeditionId, playerId, biomeId);
-      if (encounter) {
-        await this.combatService.createEncounter(encounter);
-        return encounter.id;
-      }
+      
       return null;
     } catch (error) {
       console.error('❌ COMBAT-INTEGRATION: Error generating encounter:', error);
