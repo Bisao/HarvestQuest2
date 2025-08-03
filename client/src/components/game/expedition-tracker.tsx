@@ -18,11 +18,15 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
   const queryClient = useQueryClient();
 
   // Buscar expedições ativas
-  const { data: activeExpeditions = [], isLoading } = useQuery({
+  const { data: expeditionsData, isLoading } = useQuery({
     queryKey: ['/api/expeditions/player', player.id, 'active'],
     refetchInterval: 5000, // Atualizar a cada 5 segundos
     enabled: !!player.id
   });
+
+  // Ensure activeExpeditions is always an array
+  const activeExpeditions = Array.isArray(expeditionsData) ? expeditionsData : 
+                            (expeditionsData?.data && Array.isArray(expeditionsData.data)) ? expeditionsData.data : [];
 
   // Mutation para completar expedição
   const completeExpeditionMutation = useMutation({
