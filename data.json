@@ -1,12 +1,12 @@
 {
   "players": [
     [
-      "1a6e51fa-61d7-4ba8-ada2-bae1f7c5d10f",
+      "e6b498b0-9512-4580-aec8-9d7a5331027b",
       {
-        "id": "1a6e51fa-61d7-4ba8-ada2-bae1f7c5d10f",
-        "username": "Bison",
+        "id": "e6b498b0-9512-4580-aec8-9d7a5331027b",
+        "username": "Dccv",
         "level": 1,
-        "experience": 0,
+        "experience": 10,
         "coins": 100,
         "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
@@ -23,16 +23,16 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": true,
-        "health": 100,
+        "health": 79,
         "maxHealth": 100,
-        "hunger": 87,
+        "hunger": 0,
         "maxHunger": 100,
-        "thirst": 96,
+        "thirst": 54,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 53,
-        "hygiene": 97,
+        "morale": 47,
+        "hygiene": 61,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -45,6 +45,27 @@
   ],
   "inventoryItems": [],
   "storageItems": [],
-  "expeditions": [],
+  "expeditions": [
+    [
+      "ec73e024-dc88-46e2-bcaf-2d743970c00c",
+      {
+        "id": "ec73e024-dc88-46e2-bcaf-2d743970c00c",
+        "playerId": "e6b498b0-9512-4580-aec8-9d7a5331027b",
+        "biomeId": "biome-floresta-001",
+        "selectedResources": [
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        ],
+        "selectedEquipment": [],
+        "status": "completed",
+        "startTime": 1754242663690,
+        "progress": 100,
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 3,
+          "res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12": 2
+        },
+        "duration": 300000
+      }
+    ]
+  ],
   "playerQuests": []
 }

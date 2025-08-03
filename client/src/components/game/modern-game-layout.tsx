@@ -341,9 +341,6 @@ const EquipmentIndicators: React.FC<{ player: Player }> = React.memo(({ player }
 
 EquipmentIndicators.displayName = 'EquipmentIndicators';
 
-// Import MusicControl component
-import { MusicControl } from '@/components/ui/music-control';
-
 // Componente principal refatorado
 export default function ModernGameLayout() {
   const [activeTab, setActiveTab] = useState('camp');
@@ -559,18 +556,6 @@ export default function ModernGameLayout() {
                   </Badge>
                 )}
               </div>
-
-              {isMobile && (
-                <div className="mt-3">
-                  <MusicControl className="w-full" />
-                </div>
-              )}
-
-              {!isMobile && (
-                <div className="mt-3">
-                  <MusicControl className="w-full" />
-                </div>
-              )}
             </div>
           </div>
 
