@@ -1,9 +1,9 @@
 {
   "players": [
     [
-      "ebf0905d-e92f-4986-9a5f-f818c2a388ec",
+      "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
       {
-        "id": "ebf0905d-e92f-4986-9a5f-f818c2a388ec",
+        "id": "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
         "username": "Bison",
         "level": 1,
         "experience": 0,
@@ -25,14 +25,14 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 95,
+        "hunger": 100,
         "maxHunger": 100,
-        "thirst": 98,
+        "thirst": 100,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 52,
-        "hygiene": 98,
+        "morale": 50,
+        "hygiene": 100,
         "diseases": [],
         "immunities": [],
         "resistances": {},
