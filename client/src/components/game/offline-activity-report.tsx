@@ -20,6 +20,9 @@ export function OfflineActivityReportDialog({
   report,
   onConfigureOffline 
 }: OfflineActivityReportProps) {
+  // Early return if no report or not open
+  if (!report || !isOpen) return null;
+  
   const { data: resources } = useQuery({
     queryKey: ['/api/resources']
   });
@@ -77,28 +80,28 @@ export function OfflineActivityReportDialog({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {formatDuration(report.hoursOffline)}
+                    {formatDuration(report?.hoursOffline || 0)}
                   </div>
                   <div className="text-sm text-muted-foreground">Tempo Offline</div>
                 </div>
                 
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {report.expeditionsCompleted}
+                    {report?.expeditionsCompleted || 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Expedições</div>
                 </div>
                 
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    +{report.experienceGained}
+                    +{report?.experienceGained || 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Experiência</div>
                 </div>
                 
                 <div className="text-center">
-                  <div className={`text-2xl font-bold ${getEfficiencyColor(report.efficiency)}`}>
-                    {report.efficiency}%
+                  <div className={`text-2xl font-bold ${getEfficiencyColor(report?.efficiency || 0)}`}>
+                    {report?.efficiency || 0}%
                   </div>
                   <div className="text-sm text-muted-foreground">Eficiência</div>
                 </div>

@@ -1,0 +1,27 @@
+The above error occurred in the <OfflineActivityReportDialog> component:
+
+    at OfflineActivityReportDialog (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/src/components/game/offline-activity-report.tsx:26:3)
+    at div
+    at ModernGameLayout (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/src/components/game/modern-game-layout.tsx:357:37)
+    at GameProvider (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/src/contexts/GameContext.tsx:21:32)
+    at Game (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/src/pages/game.tsx:28:22)
+    at Route (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=63e2514b:323:16)
+    at Switch (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=63e2514b:379:17)
+    at Suspense
+    at div
+    at ErrorBoundary (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/src/components/ErrorBoundary.tsx:10:5)
+    at Provider (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=63e2514b:38:15)
+    at TooltipProvider (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=63e2514b:63:5)
+    at QueryClientProvider (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=63e2514b:2805:3)
+    at App
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+Error caught by boundary: 
+TypeError {}
+ 
+Object {componentStack: "↵    at OfflineActivityReportDialog…"}
+
+at t.value (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://4bf50908-3548-4d1b-91f7-9ece4d8347dd-00-3cutfwxhk4oww.riker.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
