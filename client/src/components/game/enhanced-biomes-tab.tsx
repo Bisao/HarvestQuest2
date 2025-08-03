@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import type { Biome, Resource, Equipment, Player } from '@shared/types';
 import { NewExpeditionModal } from './new-expedition-modal';
+import { ManualExpeditionModal } from './manual-expedition-modal';
 import { ExpeditionTracker } from './expedition-tracker';
 
 interface EnhancedBiomesTabProps {
@@ -64,6 +65,7 @@ export default function EnhancedBiomesTab({
 }: EnhancedBiomesTabProps) {
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
+  const [useManualSelection, setUseManualSelection] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -215,6 +217,22 @@ export default function EnhancedBiomesTab({
           />
         </div>
         <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 mr-4">
+            <Button
+              variant={useManualSelection ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setUseManualSelection(true)}
+            >
+              Manual
+            </Button>
+            <Button
+              variant={!useManualSelection ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setUseManualSelection(false)}
+            >
+              Templates
+            </Button>
+          </div>
           <Button
             variant={viewMode === 'grid' ? 'default' : 'outline'}
             size="sm"
@@ -432,7 +450,20 @@ export default function EnhancedBiomesTab({
       <ExpeditionTracker player={player} />
 
       {/* Modal de expedição novo */}
-      {selectedBiome && (
+      {selectedBiome && useManualSelection && (
+        <ManualExpeditionModal
+          isOpen={expeditionModalOpen}
+          onClose={() => {
+            setExpeditionModalOpen(false);
+            setSelectedBiome(null);
+          }}
+          player={player}
+          biome={selectedBiome}
+          resources={resources}
+        />
+      )}
+
+      {selectedBiome && !useManualSelection && (
         <NewExpeditionModal
           isOpen={expeditionModalOpen}
           onClose={() => {

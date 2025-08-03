@@ -1,12 +1,12 @@
 {
   "players": [
     [
-      "9732f5b0-aeeb-47e3-9911-c4045d1379f9",
+      "9863007f-f189-481a-858c-11b2df6bcd3e",
       {
-        "id": "9732f5b0-aeeb-47e3-9911-c4045d1379f9",
+        "id": "9863007f-f189-481a-858c-11b2df6bcd3e",
         "username": "Bison",
         "level": 1,
-        "experience": 5,
+        "experience": 0,
         "coins": 100,
         "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
@@ -25,14 +25,14 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 49,
+        "hunger": 90,
         "maxHunger": 100,
-        "thirst": 65,
+        "thirst": 96,
         "maxThirst": 100,
-        "temperature": 20,
-        "fatigue": 5,
-        "morale": 66,
-        "hygiene": 69,
+        "temperature": 0,
+        "fatigue": 0,
+        "morale": 54,
+        "hygiene": 96,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -43,62 +43,8 @@
       }
     ]
   ],
-  "inventoryItems": [
-    [
-      "9c474d0a-bbac-4596-88ec-1c10cdf7c226",
-      {
-        "id": "9c474d0a-bbac-4596-88ec-1c10cdf7c226",
-        "playerId": "9732f5b0-aeeb-47e3-9911-c4045d1379f9",
-        "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 5
-      }
-    ]
-  ],
+  "inventoryItems": [],
   "storageItems": [],
-  "expeditions": [
-    [
-      "66e70714-9c4f-4f8e-b401-c34b704c18fa",
-      {
-        "id": "66e70714-9c4f-4f8e-b401-c34b704c18fa",
-        "playerId": "9732f5b0-aeeb-47e3-9911-c4045d1379f9",
-        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
-        "selectedResources": [
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0"
-        ],
-        "selectedEquipment": [],
-        "status": "completed",
-        "startTime": 1754212270050,
-        "duration": 60000,
-        "progress": 100,
-        "collectedResources": {
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 5
-        },
-        "autoRepeat": false,
-        "repeatCount": 0,
-        "maxRepeats": 1,
-        "endTime": 1754212329627
-      }
-    ],
-    [
-      "6577d6ec-f9f1-4fdc-8e0b-c809e605593c",
-      {
-        "id": "6577d6ec-f9f1-4fdc-8e0b-c809e605593c",
-        "playerId": "9732f5b0-aeeb-47e3-9911-c4045d1379f9",
-        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
-        "selectedResources": [
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0"
-        ],
-        "selectedEquipment": [],
-        "status": "in_progress",
-        "startTime": 1754212329627,
-        "duration": 60000,
-        "progress": 0,
-        "collectedResources": {},
-        "autoRepeat": false,
-        "repeatCount": 0,
-        "maxRepeats": 1
-      }
-    ]
-  ],
+  "expeditions": [],
   "playerQuests": []
 }

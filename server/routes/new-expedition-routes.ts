@@ -87,6 +87,64 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
 
   // ===================== GESTÃO DE EXPEDIÇÕES =====================
 
+  // Schema para expedições customizadas
+  const customExpeditionSchema = z.object({
+    playerId: z.string().min(1, "Player ID é obrigatório"),
+    biomeId: z.string().min(1, "Biome ID é obrigatório"),
+    selectedResources: z.array(z.object({
+      resourceId: z.string(),
+      targetQuantity: z.number().min(1).max(100)
+    })).min(1, "Pelo menos um recurso deve ser selecionado"),
+    duration: z.number().min(5 * 60 * 1000).max(120 * 60 * 1000), // 5min - 120min in milliseconds
+    selectedEquipment: z.array(z.string()).optional().default([])
+  });
+
+  // Iniciar expedição customizada
+  router.post('/custom/start',
+    validateBody(customExpeditionSchema),
+    async (req: Request, res: Response) => {
+      try {
+        const { playerId, biomeId, selectedResources, duration, selectedEquipment } = req.body;
+        
+        // Get player
+        const player = await storage.getPlayer(playerId);
+        if (!player) {
+          return errorResponse(res, 404, 'Jogador não encontrado');
+        }
+
+        // Basic validation
+        const hungerCost = Math.floor((duration / (60 * 1000)) * 0.8); // Duration in minutes * 0.8
+        const thirstCost = Math.floor((duration / (60 * 1000)) * 0.6); // Duration in minutes * 0.6
+
+        if (player.hunger < hungerCost) {
+          return errorResponse(res, 400, `Fome insuficiente. Necessário: ${hungerCost}%, atual: ${player.hunger}%`);
+        }
+
+        if (player.thirst < thirstCost) {
+          return errorResponse(res, 400, `Sede insuficiente. Necessário: ${thirstCost}%, atual: ${player.thirst}%`);
+        }
+
+        // Create expedition with custom parameters
+        const expedition = await storage.createExpedition({
+          playerId,
+          biomeId,
+          selectedResources: selectedResources.map(r => r.resourceId),
+          selectedEquipment: selectedEquipment || [],
+          duration,
+          autoRepeat: false,
+          maxRepeats: 1
+        });
+
+        console.log(`🚀 CUSTOM-EXPEDITION: Started custom expedition ${expedition.id} for player ${playerId}`);
+        
+        return successResponse(res, expedition, 'Expedição customizada iniciada com sucesso');
+      } catch (error: any) {
+        console.error('❌ CUSTOM-EXPEDITION-START: Error:', error.message);
+        return errorResponse(res, 500, error.message);
+      }
+    }
+  );
+
   // Iniciar nova expedição
   router.post('/start',
     validateBody(startExpeditionSchema),
