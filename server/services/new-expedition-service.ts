@@ -360,12 +360,28 @@ export class NewExpeditionService {
     const activeTemplate = template || this.getTemplateById('gathering-basic')!;
     console.log(`📜 EXPEDITION-COMPLETE: Using template ${activeTemplate.name}`);
 
-    // Calcular recompensas (use already collected resources or calculate new ones)
-    const rewards = expedition.collectedResources && Object.keys(expedition.collectedResources).length > 0 
-      ? expedition.collectedResources 
-      : this.calculateRewards(activeTemplate);
+    // Calcular recompensas - sempre calcular novas recompensas se não existirem
+    let rewards = expedition.collectedResources || {};
+    
+    // Se não há recursos coletados ou estão vazios, calcular novas recompensas
+    if (!rewards || Object.keys(rewards).length === 0) {
+      rewards = this.calculateRewards(activeTemplate);
+      console.log(`🎲 EXPEDITION-COMPLETE: Calculated new rewards since none existed:`, rewards);
+    } else {
+      console.log(`📦 EXPEDITION-COMPLETE: Using existing collected resources:`, rewards);
+    }
 
-    console.log(`🎁 EXPEDITION-COMPLETE: Calculated rewards:`, rewards);
+    // Verificar se há recursos válidos para aplicar
+    if (!rewards || Object.keys(rewards).length === 0) {
+      console.log(`⚠️ EXPEDITION-COMPLETE: No valid rewards to apply, creating basic rewards`);
+      // Garantir que pelo menos alguns recursos básicos sejam dados
+      rewards = {
+        'res-8bd33b18-a241-4859-ae9f-870fab5673d0': 2, // Fibra
+        'res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12': 1  // Pedra
+      };
+    }
+
+    console.log(`🎁 EXPEDITION-COMPLETE: Final rewards to apply:`, rewards);
 
     // Aplicar recompensas ao jogador
     try {
@@ -384,7 +400,7 @@ export class NewExpeditionService {
     });
 
     console.log(`✅ EXPEDITION: Completed ${activeTemplate.name} for player ${expedition.playerId}`);
-    console.log(`🎁 REWARDS: ${JSON.stringify(rewards)}`);
+    console.log(`🎁 FINAL REWARDS: ${JSON.stringify(rewards)}`);
 
     const startTime = expedition.startTime ?? Date.now();
     const expeditionDuration = expedition.duration || (30 * 60 * 1000); // Use expedition.duration or default
@@ -438,18 +454,60 @@ export class NewExpeditionService {
 
     console.log(`💰 EXPEDITION-REWARDS: Applying rewards to player ${playerId}:`, rewards);
 
+    // Verificar se há recursos para aplicar
+    if (!rewards || Object.keys(rewards).length === 0) {
+      console.log(`⚠️ EXPEDITION-REWARDS: No resources to apply for player ${playerId}`);
+      return;
+    }
+
     // Import GameService to use addResourceToPlayer method
     const { GameService } = await import('./game-service');
     const gameService = new GameService(this.storage);
 
     // Adicionar recursos ao inventário (tenta inventário primeiro, depois storage)
     for (const [resourceId, quantity] of Object.entries(rewards)) {
+      if (quantity <= 0) {
+        console.log(`⚠️ EXPEDITION-REWARD: Skipping ${resourceId} with quantity ${quantity}`);
+        continue;
+      }
+
       console.log(`📦 EXPEDITION-REWARD: Adding ${quantity}x ${resourceId} to player inventory`);
       try {
+        // Verificar se o recurso existe
+        const resource = await this.storage.getResource(resourceId);
+        if (!resource) {
+          console.error(`❌ EXPEDITION-REWARD: Resource ${resourceId} not found in database`);
+          continue;
+        }
+
         await gameService.addResourceToPlayer(playerId, resourceId, quantity);
-        console.log(`✅ EXPEDITION-REWARD: Successfully added ${quantity}x ${resourceId} to player`);
+        console.log(`✅ EXPEDITION-REWARD: Successfully added ${quantity}x ${resourceId} (${resource.name}) to player`);
       } catch (error) {
         console.error(`❌ EXPEDITION-REWARD: Failed to add ${quantity}x ${resourceId}:`, error);
+        
+        // Fallback: adicionar diretamente ao storage se falhar no inventário
+        try {
+          const storageItems = await this.storage.getPlayerStorage(playerId);
+          const existingStorageItem = storageItems.find(item => 
+            item.resourceId === resourceId && item.itemType === 'resource'
+          );
+
+          if (existingStorageItem) {
+            await this.storage.updateStorageItem(existingStorageItem.id, {
+              quantity: existingStorageItem.quantity + quantity
+            });
+          } else {
+            await this.storage.addStorageItem({
+              playerId,
+              resourceId,
+              quantity,
+              itemType: 'resource'
+            });
+          }
+          console.log(`✅ EXPEDITION-REWARD: Added ${quantity}x ${resourceId} to storage as fallback`);
+        } catch (fallbackError) {
+          console.error(`❌ EXPEDITION-REWARD: Fallback also failed for ${resourceId}:`, fallbackError);
+        }
       }
     }
 

@@ -31,39 +31,55 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
   // Mutation para completar expedição
   const completeExpeditionMutation = useMutation({
     mutationFn: async (expeditionId: string) => {
-      const response = await fetch(`/api/expeditions/${expeditionId}/complete`, {
+      const response = await fetch(`/api/expeditions/complete/${expeditionId}`, {
         method: 'POST'
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Erro ao completar expedição');
+        throw new Error(error.message || 'Erro ao completar expedição');
       }
 
       return response.json();
     },
     onSuccess: (data) => {
-      toast({
-        title: "Expedição Completada!",
-        description: "Recursos coletados e experiência adicionada.",
-      });
+      console.log(`✅ EXPEDITION-COMPLETE: Response received:`, data);
 
-      // Invalidar caches
-      queryClient.invalidateQueries({ queryKey: ['/api/expeditions/player', player.id] });
-      queryClient.invalidateQueries({ queryKey: ['/api/player', player.username] });
+      // Invalidar todas as queries relacionadas ao inventário e expedições
+      queryClient.invalidateQueries({ queryKey: ['/api/expeditions/active', player.id] });
+      queryClient.invalidateQueries({ queryKey: ['/api/player', player.id] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${player.id}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/inventory', player.id] });
+      queryClient.invalidateQueries({ queryKey: [`/api/inventory/${player.id}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/storage', player.id] });
+      queryClient.invalidateQueries({ queryKey: [`/api/storage/${player.id}`] });
 
-      const expeditionId = data?.data?.id;
-      const collectedData = data?.data;
+      // Usar o hook de atualização de inventário se disponível  
+      if (invalidateInventoryData) {
+        invalidateInventoryData();
+      }
 
-      console.log(`✅ EXPEDITION: Collected rewards from ${expeditionId}:`, collectedData.rewards);
+      const expeditionData = data?.data;
+      if (expeditionData && expeditionData.collectedResources) {
+        console.log(`🎁 EXPEDITION-COMPLETE: Resources collected:`, expeditionData.collectedResources);
 
-        // Valida que todas as criaturas têm UUIDs válidos
-        const creatureRewards = collectedData.rewards.filter(r => r.type === 'creature');
-        if (creatureRewards.length > 0) {
-          console.log(`🐾 EXPEDITION: Found ${creatureRewards.length} creature rewards with valid UUIDs`);
-        }
+        const resourceCount = Object.keys(expeditionData.collectedResources).length;
+        const totalQuantity = Object.values(expeditionData.collectedResources).reduce((sum: number, qty: any) => sum + qty, 0);
+
+        toast({
+          title: "Expedição Completada!",
+          description: `Coletados ${resourceCount} tipos de recursos (${totalQuantity} itens total)`,
+        });
+      } else {
+        console.log(`⚠️ EXPEDITION-COMPLETE: No resources data in response`);
+        toast({
+          title: "Expedição Completada!",
+          description: "Expedição finalizada com sucesso.",
+        });
+      }
     },
     onError: (error: any) => {
+      console.error(`❌ EXPEDITION-COMPLETE: Error:`, error);
       toast({
         title: "Erro",
         description: error.message || "Erro ao completar expedição",

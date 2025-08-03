@@ -352,19 +352,21 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     try {
       const { expeditionId } = req.params;
 
-      console.log(`🏁 Completing expedition ${expeditionId}`);
+      console.log(`🏁 ROUTE: Completing expedition ${expeditionId}`);
 
-      await expeditionService.completeExpedition(expeditionId);
+      const completedExpedition = await expeditionService.completeExpedition(expeditionId);
 
-      console.log(`✅ Expedition ${expeditionId} completed successfully`);
+      console.log(`✅ ROUTE: Expedition ${expeditionId} completed successfully`);
+      console.log(`🎁 ROUTE: Final rewards applied:`, completedExpedition.collectedResources);
 
       res.json({ 
         success: true, 
-        message: 'Expedition completed successfully' 
+        message: 'Expedition completed successfully',
+        data: completedExpedition
       });
 
     } catch (error) {
-      console.error('Complete expedition error:', error);
+      console.error('❌ ROUTE: Complete expedition error:', error);
       res.status(500).json({ 
         success: false, 
         message: error instanceof Error ? error.message : 'Failed to complete expedition' 
