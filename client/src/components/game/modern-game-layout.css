@@ -1,65 +1,203 @@
 
-/* Estilos para melhorar o scrolling horizontal das abas */
+/* Modern Game Layout Styles */
+
+/* Hide scrollbar but keep functionality */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.scrollbar-hide::-webkit-scrollbar { 
-  display: none;  /* Safari and Chrome */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-/* Melhorias para responsividade das abas */
-@media (max-width: 640px) {
-  .tab-trigger-mobile {
-    min-width: 60px;
-    padding: 8px 12px;
-  }
-  
-  .tab-trigger-mobile .tab-icon {
-    margin-right: 0;
-  }
-  
-  .tab-trigger-mobile .tab-label {
-    display: none;
-  }
+/* Improved animations for tabs */
+.tab-transition {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Animações suaves para transições */
-.status-bar-transition {
-  transition: width 0.3s ease-in-out;
+/* Enhanced focus states for accessibility */
+.tab-focus:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
 }
 
-.tab-content-transition {
-  transition: opacity 0.2s ease-in-out;
+/* Status bar animations */
+.status-bar-fill {
+  transition: width 0.5s ease-in-out;
 }
 
-/* Melhorias para os indicadores de status */
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
+/* Category sections styling */
+.tab-category {
+  transition: all 0.2s ease-in-out;
 }
 
-.status-value {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  white-space: nowrap;
+.tab-category:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.status-progress {
-  width: 96px;
-  height: 8px;
-  background-color: #e5e7eb;
-  border-radius: 9999px;
+/* Tab button enhanced states */
+.tab-button {
+  position: relative;
   overflow: hidden;
-  flex-shrink: 0;
 }
 
-.status-progress-fill {
+.tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
   height: 100%;
-  border-radius: 9999px;
-  transition: width 0.3s ease-in-out;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s ease;
+}
+
+.tab-button:hover::before {
+  left: 100%;
+}
+
+/* Notification pulse animation */
+@keyframes notification-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.notification-dot {
+  animation: notification-pulse 2s infinite;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .mobile-optimized {
+    padding: 0.5rem;
+  }
+  
+  .mobile-tab {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Enhanced gradient backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* Improved button states */
+.btn-enhanced {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-enhanced:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-enhanced:active {
+  transform: translateY(0);
+}
+
+/* Content fade-in animation */
+.content-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading state improvements */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Category badge styling */
+.category-badge {
+  font-size: 0.7rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* Enhanced shadow utilities */
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-medium {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-strong {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+/* Equipment indicators styling */
+.equipment-indicator {
+  transition: all 0.2s ease;
+}
+
+.equipment-indicator.equipped {
+  color: #10b981;
+  transform: scale(1.1);
+}
+
+.equipment-indicator.not-equipped {
+  color: #9ca3af;
+  opacity: 0.6;
+}
+
+/* Responsive improvements */
+@media (max-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
 }
