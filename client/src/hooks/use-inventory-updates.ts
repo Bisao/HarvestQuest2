@@ -5,13 +5,25 @@ export function useInventoryUpdates(playerId: string) {
   const queryClient = useQueryClient();
 
   const invalidateInventoryData = useCallback(() => {
-    // Invalida todas as queries relacionadas ao inventário e dados do player
-    queryClient.invalidateQueries({ queryKey: ["/api/inventory", playerId] });
-    queryClient.invalidateQueries({ queryKey: ["/api/storage", playerId] });
-    queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
-    queryClient.invalidateQueries({ queryKey: ["/api/storage"] });
-    queryClient.invalidateQueries({ queryKey: ["/api/player"] });
-  }, [queryClient, playerId]);
+    if (!playerId || playerId.trim() === '') {
+      console.warn('useInventoryUpdates: No valid playerId provided');
+      return;
+    }
+
+    try {
+      // Invalidate all inventory-related queries
+      queryClient.invalidateQueries({ queryKey: ['/api/inventory', playerId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/inventory/${playerId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/storage', playerId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/storage/${playerId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/player', playerId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/player/${playerId}`] });
+
+      console.log(`🔄 Invalidated inventory data for player ${playerId}`);
+    } catch (error) {
+      console.error('Error invalidating inventory queries:', error);
+    }
+  }, [playerId, queryClient]);
 
   const updateInventoryItem = useCallback((resourceId: string, quantity: number) => {
     // Atualiza otimisticamente o cache do inventário

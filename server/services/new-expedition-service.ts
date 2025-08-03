@@ -40,16 +40,16 @@ export class NewExpeditionService {
         },
         rewards: {
           guaranteed: {
-            'res-8bd33b18-a241-4859-ae9f-870fab5673d0': 3 // Fibra
+            'res-fibra-001': 3 // Fibra
           },
           possible: [
             {
-              resourceId: 'res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12', // Pedra
+              resourceId: 'res-pedra-001', // Pedra
               quantity: 2,
               chance: 0.7
             },
             {
-              resourceId: 'res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23', // Gravetos
+              resourceId: 'res-gravetos-001', // Gravetos
               quantity: 4,
               chance: 0.8
             }
@@ -76,12 +76,12 @@ export class NewExpeditionService {
           guaranteed: {},
           possible: [
             {
-              resourceId: 'res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37', // Coelho
+              resourceId: 'res-coelho-001', // Coelho
               quantity: 1,
               chance: 0.6
             },
             {
-              resourceId: 'res-8bd33b18-a241-4859-ae9f-870fab5673d0', // Fibra (pegadilhas)
+              resourceId: 'res-fibra-001', // Fibra (pegadilhas)
               quantity: 2,
               chance: 0.4
             }
@@ -106,17 +106,17 @@ export class NewExpeditionService {
         },
         rewards: {
           guaranteed: {
-            'res-8bd33b18-a241-4859-ae9f-870fab5673d0': 5, // Fibra
-            'res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12': 3  // Pedra
+            'res-fibra-001': 5, // Fibra
+            'res-pedra-001': 3  // Pedra
           },
           possible: [
             {
-              resourceId: 'res-6d3a8e5c-1f9b-4e72-8a05-4c7e9f2b1d59', // Bambu
+              resourceId: 'res-bambu-001', // Bambu
               quantity: 3,
               chance: 0.5
             },
             {
-              resourceId: 'res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1d48', // Frutas silvestres
+              resourceId: 'res-frutas-silvestres-001', // Frutas silvestres
               quantity: 2,
               chance: 0.3
             }
@@ -376,8 +376,8 @@ export class NewExpeditionService {
       console.log(`⚠️ EXPEDITION-COMPLETE: No valid rewards to apply, creating basic rewards`);
       // Garantir que pelo menos alguns recursos básicos sejam dados
       rewards = {
-        'res-8bd33b18-a241-4859-ae9f-870fab5673d0': 2, // Fibra
-        'res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12': 1  // Pedra
+        'res-fibra-001': 2, // Fibra
+        'res-pedra-001': 1  // Pedra
       };
     }
 

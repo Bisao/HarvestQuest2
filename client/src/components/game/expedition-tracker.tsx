@@ -8,6 +8,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Clock, Play, Pause, CheckCircle, MapPin } from 'lucide-react';
 import type { ActiveExpedition } from '@shared/types/expedition-types';
 import type { Player } from '@shared/types';
+import { usePlayer } from '@/hooks/use-player';
+import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
 
 interface ExpeditionTrackerProps {
   player: Player;
@@ -16,6 +18,9 @@ interface ExpeditionTrackerProps {
 export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { player } = usePlayer();
+  const playerId = player?.id;
+  const { invalidateInventoryData } = useInventoryUpdates(playerId || '');
 
   // Buscar expedições ativas
   const { data: expeditionsData, isLoading } = useQuery({
