@@ -1,73 +1,7 @@
 {
-  "players": [
-    [
-      "9863007f-f189-481a-858c-11b2df6bcd3e",
-      {
-        "id": "9863007f-f189-481a-858c-11b2df6bcd3e",
-        "username": "Bison",
-        "level": 1,
-        "experience": 0,
-        "coins": 100,
-        "inventoryWeight": 0,
-        "maxInventoryWeight": 50000,
-        "autoStorage": false,
-        "craftedItemsDestination": "storage",
-        "hungerDegradationMode": "automatic",
-        "waterStorage": 0,
-        "maxWaterStorage": 500,
-        "waterTanks": 0,
-        "equippedHelmet": null,
-        "equippedChestplate": null,
-        "equippedLeggings": null,
-        "equippedBoots": null,
-        "equippedWeapon": null,
-        "equippedTool": null,
-        "autoCompleteQuests": true,
-        "health": 100,
-        "maxHealth": 100,
-        "hunger": 42,
-        "maxHunger": 100,
-        "thirst": 78,
-        "maxThirst": 100,
-        "temperature": 0,
-        "fatigue": 0,
-        "morale": 59,
-        "hygiene": 76,
-        "diseases": [],
-        "immunities": [],
-        "resistances": {},
-        "skills": {},
-        "skillPoints": 0,
-        "totalSkillPoints": 0,
-        "skillAchievements": []
-      }
-    ]
-  ],
+  "players": [],
   "inventoryItems": [],
   "storageItems": [],
-  "expeditions": [
-    [
-      "2b2d1819-3029-481b-862f-dd5f671182cd",
-      {
-        "id": "2b2d1819-3029-481b-862f-dd5f671182cd",
-        "playerId": "9863007f-f189-481a-858c-11b2df6bcd3e",
-        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
-        "selectedResources": [
-          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-          "res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12",
-          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23"
-        ],
-        "selectedEquipment": [],
-        "status": "in_progress",
-        "startTime": 1754214514057,
-        "duration": 1800000,
-        "progress": 0,
-        "collectedResources": {},
-        "autoRepeat": false,
-        "repeatCount": 0,
-        "maxRepeats": 1
-      }
-    ]
-  ],
+  "expeditions": [],
   "playerQuests": []
 }
