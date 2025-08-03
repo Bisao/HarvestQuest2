@@ -341,7 +341,7 @@ export class NewExpeditionService {
 
   async completeExpedition(expeditionId: string): Promise<ActiveExpedition> {
     console.log(`🏁 EXPEDITION-COMPLETE: Starting completion for expedition ${expeditionId}`);
-    
+
     const expedition = await this.storage.getExpedition(expeditionId);
     if (!expedition) throw new Error('Expedição não encontrada');
 
@@ -362,7 +362,7 @@ export class NewExpeditionService {
 
     // Calcular recompensas - sempre calcular novas recompensas se não existirem
     let rewards = expedition.collectedResources || {};
-    
+
     // Se não há recursos coletados ou estão vazios, calcular novas recompensas
     if (!rewards || Object.keys(rewards).length === 0) {
       rewards = this.calculateRewards(activeTemplate);
@@ -484,7 +484,7 @@ export class NewExpeditionService {
         console.log(`✅ EXPEDITION-REWARD: Successfully added ${quantity}x ${resourceId} (${resource.name}) to player`);
       } catch (error) {
         console.error(`❌ EXPEDITION-REWARD: Failed to add ${quantity}x ${resourceId}:`, error);
-        
+
         // Fallback: adicionar diretamente ao storage se falhar no inventário
         try {
           const storageItems = await this.storage.getPlayerStorage(playerId);
@@ -539,7 +539,7 @@ export class NewExpeditionService {
           startTimeMs = currentTime; // Fallback to current time
         }
 
-        const expeditionDuration = exp.duration || (30 * 60 * 1000); // Use expedition.duration or default
+        const expeditionDuration = exp.duration || (5 * 60 * 1000); // Use expedition.duration or default to 5 minutes
         const elapsed = currentTime - startTimeMs;
         const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
 
@@ -576,7 +576,7 @@ export class NewExpeditionService {
       .filter(exp => exp.status === 'completed')
       .map(exp => {
         const startTime = exp.startTime ?? Date.now();
-        const expeditionDuration = exp.duration || (30 * 60 * 1000); // Use expedition.duration or default
+        const expeditionDuration = exp.duration || (5 * 60 * 1000); // Use expedition.duration or default to 5 minutes
         return {
           id: exp.id,
           playerId: exp.playerId,

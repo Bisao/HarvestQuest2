@@ -86,7 +86,7 @@ export interface IStorage {
 
   // Resource management methods
   addPlayerResource(playerId: string, resourceId: string, quantity: number): Promise<void>;
-  
+
   // Game initialization
   initializeGameData(): Promise<void>;
 
@@ -344,7 +344,7 @@ export class MemStorage implements IStorage {
       equippedWeapon: insertPlayer.equippedWeapon || null,
       equippedTool: insertPlayer.equippedTool || null,
       autoCompleteQuests: insertPlayer.autoCompleteQuests ?? true,
-      
+
       // Enhanced Status System - Initialize with default values
       health: insertPlayer.health ?? 100,
       maxHealth: 100,
@@ -356,12 +356,12 @@ export class MemStorage implements IStorage {
       fatigue: 0,
       morale: 50,
       hygiene: 100,
-      
+
       // Disease System
       diseases: [],
       immunities: [],
       resistances: {},
-      
+
       // Skill System
       skills: {},
       skillPoints: 0,
@@ -608,19 +608,20 @@ export class MemStorage implements IStorage {
     return this.expeditions.get(id);
   }
 
-  async createExpedition(insertExpedition: InsertExpedition): Promise<Expedition> {
+  async createExpedition(expedition: InsertExpedition): Promise<Expedition> {
     const id = randomUUID();
     const expedition: Expedition = {
       id,
-      playerId: insertExpedition.playerId,
-      biomeId: insertExpedition.biomeId,
-      selectedResources: insertExpedition.selectedResources,
-      selectedEquipment: insertExpedition.selectedEquipment,
+      playerId: expedition.playerId,
+      biomeId: expedition.biomeId,
+      selectedResources: expedition.selectedResources,
+      selectedEquipment: expedition.selectedEquipment,
       status: "in_progress",
       startTime: Date.now(),
       endTime: null,
       progress: 0,
       collectedResources: {},
+      duration: expedition.duration || (5 * 60 * 1000)
     };
 
     console.log('Storing expedition with ID:', id);

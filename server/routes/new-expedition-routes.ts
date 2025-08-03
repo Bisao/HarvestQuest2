@@ -125,6 +125,13 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
           return errorResponse(res, 400, `Sede insuficiente. Necessário: ${thirstCost}%, atual: ${player.thirst}%`);
         }
 
+        // Apply costs before creating expedition
+        await storage.updatePlayer(playerId, {
+          hunger: Math.max(0, player.hunger - hungerCost),
+          thirst: Math.max(0, player.thirst - thirstCost),
+          fatigue: Math.min(100, player.fatigue + Math.floor((duration / (60 * 1000)) * 0.3))
+        });
+
         // Create expedition with custom parameters including duration
         const expedition = await storage.createExpedition({
           playerId,
