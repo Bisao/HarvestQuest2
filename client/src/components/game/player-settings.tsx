@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import TimeSpeedControl from './time-speed-control';
 import { useSaveGame } from "@/hooks/use-save-game";
 import type { Player, HungerDegradationMode } from "@shared/types";
 import type { GameTime } from "@shared/types/time-types";
@@ -271,6 +272,14 @@ export default function PlayerSettings({ player, isOpen, onClose }: PlayerSettin
                   </>
                 )}
               </Button>
+            </div>
+
+            <div className="mt-4">
+              <label className="text-sm font-medium">Velocidade do Tempo</label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Quanto tempo real para 24 horas do jogo
+              </p>
+              <TimeSpeedControl />
             </div>
           </div>
 

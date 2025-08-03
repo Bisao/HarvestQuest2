@@ -50,6 +50,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register time routes
   const { createTimeRoutes } = await import('./routes/time-routes');
   app.use('/api/time', createTimeRoutes(storage));
+  
+  // Register time speed routes
+  const timeSpeedRoutes = await import('./routes/time-speed');
+  app.use('/api/time/speed', timeSpeedRoutes.default);
 
   // Register saves routes  
   app.use('/api/saves', savesRouter);

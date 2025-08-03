@@ -11,7 +11,8 @@ export class TimeService {
     this.config = {
       dayDurationMs: TIME_CONFIG.DAY_DURATION_MS,
       startTime: Date.now(),
-      timeMultiplier: 1
+      timeMultiplier: 1,
+      currentSpeed: 'NORMAL' as keyof typeof TIME_CONFIG.SPEED_OPTIONS
     };
   }
 
@@ -218,6 +219,52 @@ export class TimeService {
     this.config.startTime = this.config.startTime - adjustment;
     
     console.log(`⏰ TIME-SERVICE: Time changed to ${hour}:00`);
+  }
+
+  // Método para alterar a velocidade do tempo
+  setTimeSpeed(speed: keyof typeof TIME_CONFIG.SPEED_OPTIONS): void {
+    const newDuration = TIME_CONFIG.SPEED_OPTIONS[speed];
+    const currentGameTime = this.getCurrentGameTime();
+    
+    // Calcular o progresso atual do dia
+    const dayProgress = (currentGameTime.hour + currentGameTime.minute / 60) / 24;
+    
+    // Ajustar o startTime para manter a hora atual com a nova velocidade
+    const elapsedToday = dayProgress * newDuration;
+    const totalElapsed = (currentGameTime.dayNumber - 1) * newDuration + elapsedToday;
+    
+    this.config.startTime = Date.now() - totalElapsed;
+    this.config.dayDurationMs = newDuration;
+    this.config.currentSpeed = speed;
+    
+    const speedLabel = {
+      FAST: '45 minutos',
+      NORMAL: '60 minutos', 
+      SLOW: '90 minutos',
+      VERY_SLOW: '120 minutos'
+    }[speed];
+    
+    console.log(`⏰ TIME-SERVICE: Speed changed to ${speed} (${speedLabel} = 24h do jogo)`);
+  }
+
+  // Método para obter a velocidade atual
+  getCurrentSpeed(): keyof typeof TIME_CONFIG.SPEED_OPTIONS {
+    return this.config.currentSpeed || 'NORMAL';
+  }
+
+  // Método para obter informações sobre velocidades disponíveis
+  getSpeedOptions() {
+    return Object.entries(TIME_CONFIG.SPEED_OPTIONS).map(([key, duration]) => ({
+      key: key as keyof typeof TIME_CONFIG.SPEED_OPTIONS,
+      label: {
+        FAST: '⚡ Rápido (45 min)',
+        NORMAL: '🕐 Normal (60 min)',
+        SLOW: '🐢 Lento (90 min)', 
+        VERY_SLOW: '🐌 Muito Lento (120 min)'
+      }[key as keyof typeof TIME_CONFIG.SPEED_OPTIONS],
+      duration: duration / (60 * 1000), // Em minutos
+      isActive: this.config.currentSpeed === key
+    }));
   }
 
   // Método auxiliar para obter a hora de um período do dia

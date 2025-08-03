@@ -13,9 +13,10 @@ export interface GameTime {
 }
 
 export interface TimeConfig {
-  dayDurationMs: number; // Duração de um dia em ms (padrão: 24 minutos = 1440000ms)
+  dayDurationMs: number; // Duração de um dia em ms
   startTime: number; // Timestamp de início do jogo
   timeMultiplier: number; // Multiplicador de velocidade do tempo
+  currentSpeed?: 'FAST' | 'NORMAL' | 'SLOW' | 'VERY_SLOW'; // Velocidade atual do tempo
 }
 
 export interface TemperatureSystem {

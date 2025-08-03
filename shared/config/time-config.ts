@@ -1,7 +1,14 @@
 
 export const TIME_CONFIG = {
-  // Um dia do jogo = 24 minutos reais
-  DAY_DURATION_MS: 24 * 60 * 1000, // 24 minutos
+  // Configurações de velocidade do tempo
+  SPEED_OPTIONS: {
+    FAST: 45 * 60 * 1000,      // 45 minutos reais = 24h do jogo
+    NORMAL: 60 * 60 * 1000,    // 60 minutos reais = 24h do jogo  
+    SLOW: 90 * 60 * 1000,      // 90 minutos reais = 24h do jogo
+    VERY_SLOW: 120 * 60 * 1000 // 120 minutos reais = 24h do jogo
+  },
+  // Velocidade padrão (60 minutos)
+  DAY_DURATION_MS: 60 * 60 * 1000, // 60 minutos
   
   // Divisões do dia
   DAWN: { start: 5, end: 7 },      // 5h-7h
