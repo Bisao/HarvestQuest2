@@ -1,10 +1,10 @@
 {
   "players": [
     [
-      "e28205ad-b5a2-4fe4-9749-c3e1cf0c8fdf",
+      "f3d204d5-6424-4a22-81a8-9390de46f1d4",
       {
-        "id": "e28205ad-b5a2-4fe4-9749-c3e1cf0c8fdf",
-        "username": "oChaps",
+        "id": "f3d204d5-6424-4a22-81a8-9390de46f1d4",
+        "username": "Bison",
         "level": 1,
         "experience": 0,
         "coins": 100,
@@ -25,9 +25,9 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 95,
+        "hunger": 96,
         "maxHunger": 100,
-        "thirst": 98,
+        "thirst": 99,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
@@ -40,7 +40,7 @@
         "skillPoints": 0,
         "totalSkillPoints": 0,
         "skillAchievements": [],
-        "lastOnlineTime": 1754206699042
+        "lastOnlineTime": 1754206209068
       }
     ]
   ],

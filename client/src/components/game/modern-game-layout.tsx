@@ -106,7 +106,7 @@ const GAME_TABS = [
     label: 'Bestiário', 
     icon: BookOpen, 
     color: 'text-amber-600',
-    description: 'Registro de animais descobertos'
+    description: 'Registro de animais'
   },
   { 
     id: 'quests', 
@@ -460,8 +460,8 @@ export default function ModernGameLayout({
 
                 <TabsContent value="animals" className="mt-0">
                   <AnimalRegistryTab 
-                    discoveredAnimals={player?.discoveredAnimals || []}
-                    playerId={player?.id || ''}
+                    discoveredAnimals={player.discoveredAnimals || []}
+                    playerId={player.id}
                     onAnimalSelect={(animal) => {
                       console.log('Animal selecionado:', animal);
                     }}
