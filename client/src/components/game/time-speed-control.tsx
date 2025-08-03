@@ -23,7 +23,7 @@ export default function TimeSpeedControl() {
       if (!response.ok) throw new Error('Failed to fetch speed options');
       return response.json();
     },
-    refetchInterval: 5000, // Atualizar a cada 5 segundos
+    refetchInterval: 1000, // Atualizar a cada 1 segundo para mudanças mais rápidas
   });
 
   // Mutação para alterar velocidade
@@ -50,11 +50,16 @@ export default function TimeSpeedControl() {
       queryClient.invalidateQueries({ queryKey: ['/api/temperature/'] });
       queryClient.invalidateQueries({ queryKey: ['/api/player/'] });
       
-      // Forçar refetch imediato
+      // Forçar refetch imediato e contínuo
       setTimeout(() => {
         queryClient.refetchQueries({ queryKey: ['/api/time/current'] });
         queryClient.refetchQueries({ queryKey: ['/api/time/speed/options'] });
       }, 100);
+      
+      // Segundo refetch para garantir
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['/api/time/current'] });
+      }, 500);
     },
     onError: (error) => {
       console.error('⏰ SPEED-CONTROL: Error changing speed:', error);
