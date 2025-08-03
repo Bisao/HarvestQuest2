@@ -378,72 +378,6 @@ const EnhancedInventory = React.memo(function EnhancedInventory({
 
   return (
     <div className="space-y-6">
-      {/* Player Stats */}
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">👤</span>
-              <div>
-                <h3 className="text-lg">Status do Jogador</h3>
-                <p className="text-sm text-gray-600">Nível {player.level} • {player.experience} XP</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-yellow-600">💰</span>
-                <span className="font-bold">{player.coins}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-red-600">❤️</span>
-                <span className="font-bold">{player.health}/{player.maxHealth}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-orange-600">🍖</span>
-                <span className="font-bold">{player.hunger}/{player.maxHunger}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600">💧</span>
-                <span className="font-bold">{player.thirst}/{player.maxThirst}</span>
-              </div>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Capacidade do Inventário:</span>
-                <span>{player.inventoryWeight}kg / {player.maxInventoryWeight}kg</span>
-              </div>
-              <Progress 
-                value={(player.inventoryWeight / player.maxInventoryWeight) * 100} 
-                className="w-full h-2"
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Fome:</span>
-                <span>{Math.round((player.hunger / player.maxHunger) * 100)}%</span>
-              </div>
-              <Progress 
-                value={(player.hunger / player.maxHunger) * 100} 
-                className="w-full h-2"
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Sede:</span>
-                <span>{Math.round((player.thirst / player.maxThirst) * 100)}%</span>
-              </div>
-              <Progress 
-                value={(player.thirst / player.maxThirst) * 100} 
-                className="w-full h-2"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
         {/* Equipment Panel */}
@@ -615,36 +549,7 @@ const EnhancedInventory = React.memo(function EnhancedInventory({
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>⚡ Ações Rápidas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3">
-            <Button variant="outline" className="flex items-center gap-2">
-              <span>🏪</span>
-              Armazém
-            </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <span>🔨</span>
-              Crafting
-            </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <span>🛡️</span>
-              Auto-Equipar
-            </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <span>💰</span>
-              Vender Tudo
-            </Button>
-            <Button variant="outline" className="flex items-center gap-2">
-              <span>🔄</span>
-              Organizar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* Equipment Selector Modal */}
       {selectedEquipmentSlot && (

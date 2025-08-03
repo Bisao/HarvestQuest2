@@ -36,6 +36,7 @@ import UnifiedWorkshops from './unified-workshops';
 import CampTab from './camp-tab';
 import AnimalRegistryTab from './animal-registry-tab';
 import StatusTab from './status-tab';
+import SkillsTab from './skills-tab';
 import QuestsTab from './quests-tab';
 import PlayerSettings from './player-settings';
 import ExpeditionPanel from './expedition-panel';
@@ -84,7 +85,7 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     label: 'Jogador',
     icon: User,
     color: 'text-blue-600',
-    count: 2,
+    count: 3,
     subTabs: [
       {
         id: 'status',
@@ -99,6 +100,13 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
         icon: Backpack,
         color: 'text-green-600',
         description: 'Itens carregados e equipamentos'
+      },
+      {
+        id: 'skills',
+        label: 'Habilidades',
+        icon: Zap,
+        color: 'text-purple-600',
+        description: 'Progressão e habilidades do jogador'
       }
     ]
   },
@@ -664,6 +672,12 @@ export default function ModernGameLayout() {
                 onAnimalSelect={(animal) => {
                   console.log('Animal selecionado:', animal);
                 }}
+              />
+            )}
+
+            {activeTab === 'skills' && (
+              <SkillsTab
+                player={player}
               />
             )}
 
