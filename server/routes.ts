@@ -50,7 +50,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register time routes
   const { createTimeRoutes } = await import('./routes/time-routes');
   app.use('/api/time', createTimeRoutes(storage));
-  
+
   // Register time speed routes
   const timeSpeedRoutes = await import('./routes/time-speed');
   app.use('/api/time/speed', timeSpeedRoutes.default);
@@ -508,42 +508,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // REMOVED: Legacy craft API - use /api/v2/craft instead for modern attribute-based crafting
 
-  // Start expedition using service
+  // Create expedition using service
   app.post("/api/expeditions", async (req, res) => {
     try {
       const { playerId, biomeId, selectedResources, selectedEquipment } = req.body;
 
-      console.log('Starting expedition:', { playerId, biomeId, selectedResources, selectedEquipment });
-
-      if (!playerId || !biomeId) {
-        return res.status(400).json({ message: "playerId and biomeId are required" });
+      // Validações detalhadas
+      if (!playerId || typeof playerId !== 'string') {
+        return res.status(400).json({ message: "ID do jogador inválido" });
       }
 
-      if (!selectedResources || selectedResources.length === 0) {
-        return res.status(400).json({ message: "At least one resource must be selected" });
+      if (!biomeId || typeof biomeId !== 'string') {
+        return res.status(400).json({ message: "ID do bioma inválido" });
       }
 
-      const expedition = await expeditionService.startExpedition(
-        playerId, 
-        biomeId, 
-        selectedResources || [], 
-        selectedEquipment || []
-      );
+      if (!selectedResources || !Array.isArray(selectedResources) || selectedResources.length === 0) {
+        return res.status(400).json({ message: "Recursos selecionados inválidos" });
+      }
 
-      console.log('Expedition created successfully:', expedition);
+      // Verificar se todos os recursos são strings válidas
+      const invalidResources = selectedResources.filter(id => !id || typeof id !== 'string');
+      if (invalidResources.length > 0) {
+        return res.status(400).json({ message: "IDs de recursos inválidos" });
+      }
 
-      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately (hunger/thirst change)
-      const { invalidatePlayerCache } = await import("./cache/memory-cache");
-      invalidatePlayerCache(playerId);
+      console.log('Creating expedition with data:', {
+        playerId,
+        biomeId,
+        selectedResources,
+        selectedEquipment: selectedEquipment || []
+      });
 
+      const expedition = await expeditionService.createExpedition({
+        playerId,
+        biomeId,
+        selectedResources,
+        selectedEquipment: selectedEquipment || []
+      });
+
+      if (!expedition || !expedition.id) {
+        throw new Error('Falha ao criar expedição');
+      }
+
+      console.log('Expedition created successfully:', expedition.id);
       res.json(expedition);
     } catch (error) {
-      console.error('Expedition creation error:', error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to create expedition";
-      res.status(400).json({ 
-        message: errorMessage,
-        error: process.env.NODE_ENV === 'development' ? error : undefined 
-      });
+      console.error("Create expedition error:", error);
+
+      let errorMessage = "Erro interno ao criar expedição";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      res.status(500).json({ message: errorMessage });
     }
   });
 

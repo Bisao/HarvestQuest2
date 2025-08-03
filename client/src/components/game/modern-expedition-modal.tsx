@@ -91,17 +91,44 @@ export default function ModernExpeditionModal({
   // Verificação de props essenciais
   if (!resources || !Array.isArray(resources)) {
     console.error('ModernExpeditionModal: resources prop is invalid:', resources);
-    return null;
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Erro</DialogTitle>
+            <DialogDescription>Dados de recursos inválidos.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   if (!equipment || !Array.isArray(equipment)) {
     console.error('ModernExpeditionModal: equipment prop is invalid:', equipment);
-    return null;
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Erro</DialogTitle>
+            <DialogDescription>Dados de equipamentos inválidos.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   if (!player || !player.id) {
     console.error('ModernExpeditionModal: player prop is invalid:', player);
-    return null;
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Erro</DialogTitle>
+            <DialogDescription>Dados do jogador inválidos.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   // Reset quando modal abre
@@ -373,10 +400,50 @@ export default function ModernExpeditionModal({
 
   // Mutation para iniciar expedição
   const startExpeditionMutation = useMutation({
-    mutationFn: async (expeditionData: any) => {
+    mutationFn: async (expeditionData: {
+      biomeId: string;
+      playerId: string;
+      selectedResources: string[];
+      selectedEquipment: string[];
+    }) => {
       try {
-        const response = await apiRequest('POST', '/api/expeditions', expeditionData);
+        // Validar dados antes de enviar
+        if (!expeditionData.biomeId || !expeditionData.playerId || !expeditionData.selectedResources) {
+          throw new Error('Dados de expedição incompletos');
+        }
+
+        if (expeditionData.selectedResources.length === 0) {
+          throw new Error('Selecione pelo menos um recurso');
+        }
+
+        const response = await fetch('/api/expeditions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(expeditionData),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          let errorMessage = 'Erro ao iniciar expedição';
+          
+          try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.message || errorMessage;
+          } catch {
+            errorMessage = errorText || errorMessage;
+          }
+          
+          throw new Error(errorMessage);
+        }
+
         const result = await response.json();
+        
+        if (!result || !result.id) {
+          throw new Error('Resposta inválida do servidor');
+        }
+        
         return result;
       } catch (error) {
         console.error('Expedition creation error:', error);

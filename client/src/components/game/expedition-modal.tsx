@@ -48,6 +48,7 @@ export default function ExpeditionModal({
   // Get resources available in this biome with collectability check
   const getCollectableResources = (): CollectableResource[] => {
     if (!biome || !biome.availableResources || !resources || !Array.isArray(resources)) {
+      console.warn('Missing data for collectable resources:', { biome, resources });
       return [];
     }
 
@@ -55,12 +56,28 @@ export default function ExpeditionModal({
       ? biome.availableResources as string[]
       : [];
     
+    if (resourceIds.length === 0) {
+      console.warn('No resource IDs found for biome:', biome.name);
+      return [];
+    }
+
     const biomeResources = resourceIds
       .filter(id => id && typeof id === 'string')
-      .map(id => resources.find(r => r && r.id === id))
+      .map(id => {
+        const resource = resources.find(r => r && r.id === id);
+        if (!resource) {
+          console.warn('Resource not found:', id);
+        }
+        return resource;
+      })
       .filter(Boolean) as Resource[];
 
     return biomeResources.map(resource => {
+      if (!resource || !resource.id || !resource.name) {
+        console.warn('Invalid resource found:', resource);
+        return null;
+      }
+      
       const collectabilityInfo = checkResourceCollectability(resource);
       return {
         ...resource,
@@ -68,12 +85,13 @@ export default function ExpeditionModal({
         requirementText: collectabilityInfo.requirementText,
         toolIcon: collectabilityInfo.toolIcon,
       };
-    });
+    }).filter(Boolean) as CollectableResource[];
   };
 
   // Check if player can collect a specific resource
   const checkResourceCollectability = (resource: Resource) => {
     if (!resource || !resource.name || typeof resource.name !== 'string') {
+      console.warn('Invalid resource in collectability check:', resource);
       return {
         canCollect: false,
         requirementText: "Recurso inválido",
@@ -191,9 +209,18 @@ export default function ExpeditionModal({
       biomeId: string;
       selectedResources: string[];
     }) => {
+      // Validar dados antes de enviar
+      if (!expeditionData.playerId || !expeditionData.biomeId || !expeditionData.selectedResources) {
+        throw new Error('Dados de expedição incompletos');
+      }
+
+      if (expeditionData.selectedResources.length === 0) {
+        throw new Error('Selecione pelo menos um recurso');
+      }
+
       // First check if there's an active expedition and try to complete it
       try {
-        const activeExpeditionResponse = await fetch(`/api/player/${player.id}/expeditions/active`);
+        const activeExpeditionResponse = await fetch(`/api/player/${expeditionData.playerId}/expeditions/active`);
         
         if (activeExpeditionResponse.ok) {
           const contentType = activeExpeditionResponse.headers.get('content-type');
@@ -201,37 +228,39 @@ export default function ExpeditionModal({
             const activeExpedition = await activeExpeditionResponse.json();
             if (activeExpedition && activeExpedition.id) {
               // Try to complete the active expedition
+              console.log('Completing active expedition:', activeExpedition.id);
               const completeResponse = await fetch(`/api/expeditions/${activeExpedition.id}/complete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
               });
               
               if (completeResponse.ok) {
-                const completeContentType = completeResponse.headers.get('content-type');
-                if (completeContentType && completeContentType.includes('application/json')) {
-                  await completeResponse.json();
-                  
-                  // Wait a moment for cache invalidation
-                  await new Promise(resolve => setTimeout(resolve, 1000));
-                }
+                console.log('Active expedition completed successfully');
+                // Wait a moment for cache invalidation
+                await new Promise(resolve => setTimeout(resolve, 500));
               }
             }
           }
         }
       } catch (error) {
-        // Silent error handling - expedition conflicts are common
+        console.warn('Error handling active expedition:', error);
+        // Continue with new expedition creation
       }
 
       // Now try to start the new expedition
+      console.log('Starting new expedition with data:', expeditionData);
       const response = await fetch(`/api/expeditions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(expeditionData)
+        body: JSON.stringify({
+          ...expeditionData,
+          selectedEquipment: [] // Equipment managed through equipped items
+        })
       });
 
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
-        let errorMessage = 'Failed to start expedition';
+        let errorMessage = 'Erro ao iniciar expedição';
         
         if (contentType && contentType.includes('application/json')) {
           try {
@@ -258,7 +287,13 @@ export default function ExpeditionModal({
         throw new Error('Resposta inválida do servidor');
       }
 
-      return response.json();
+      const result = await response.json();
+      
+      if (!result || !result.id) {
+        throw new Error('Dados de expedição inválidos recebidos');
+      }
+
+      return result;
     },
     onSuccess: (data) => {
       toast({
@@ -278,10 +313,44 @@ export default function ExpeditionModal({
   });
 
   const handleStartExpedition = () => {
-    if (!biome || selectedResources.length === 0) {
+    // Validações essenciais
+    if (!biome || !biome.id) {
+      toast({
+        title: "Erro",
+        description: "Bioma inválido selecionado",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!player || !player.id) {
+      toast({
+        title: "Erro",
+        description: "Dados do jogador inválidos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedResources || selectedResources.length === 0) {
       toast({
         title: "Erro",
         description: "Selecione pelo menos um recurso para coletar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Verificar se todos os recursos selecionados são válidos
+    const invalidResources = selectedResources.filter(resourceId => 
+      !collectableResources.find(r => r && r.id === resourceId)
+    );
+
+    if (invalidResources.length > 0) {
+      console.error('Invalid resources selected:', invalidResources);
+      toast({
+        title: "Erro",
+        description: "Recursos inválidos selecionados",
         variant: "destructive",
       });
       return;
@@ -296,10 +365,31 @@ export default function ExpeditionModal({
       return;
     }
 
+    // Verificar se há recursos coletáveis
+    const validResources = selectedResources.filter(resourceId => {
+      const resource = collectableResources.find(r => r.id === resourceId);
+      return resource && resource.canCollect;
+    });
+
+    if (validResources.length === 0) {
+      toast({
+        title: "Erro",
+        description: "Nenhum dos recursos selecionados pode ser coletado com seu equipamento atual",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('Starting expedition with validated data:', {
+      playerId: player.id,
+      biomeId: biome.id,
+      selectedResources: validResources,
+    });
+
     startExpeditionMutation.mutate({
       playerId: player.id,
       biomeId: biome.id,
-      selectedResources,
+      selectedResources: validResources,
     });
   };
 
