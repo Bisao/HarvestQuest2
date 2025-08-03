@@ -608,20 +608,19 @@ export class MemStorage implements IStorage {
     return this.expeditions.get(id);
   }
 
-  async createExpedition(expedition: InsertExpedition): Promise<Expedition> {
+  async createExpedition(expeditionData: InsertExpedition): Promise<Expedition> {
     const id = randomUUID();
     const expedition: Expedition = {
       id,
-      playerId: expedition.playerId,
-      biomeId: expedition.biomeId,
-      selectedResources: expedition.selectedResources,
-      selectedEquipment: expedition.selectedEquipment,
+      playerId: expeditionData.playerId,
+      biomeId: expeditionData.biomeId,
+      selectedResources: expeditionData.selectedResources,
+      selectedEquipment: expeditionData.selectedEquipment,
       status: "in_progress",
       startTime: Date.now(),
-      endTime: null,
       progress: 0,
       collectedResources: {},
-      duration: expedition.duration || (5 * 60 * 1000)
+      duration: expeditionData.duration
     };
 
     console.log('Storing expedition with ID:', id);
