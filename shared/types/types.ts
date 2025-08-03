@@ -67,6 +67,9 @@ export interface PlayerSkill {
 // Import types from skill-types.ts
 export type { PlayerDisease } from './skill-types';
 
+// Import types from time-types.ts
+export type { GameTime, TimeConfig, TemperatureSystem } from './time-types';
+
 export interface InsertPlayer {
   username: string;
   level?: number;

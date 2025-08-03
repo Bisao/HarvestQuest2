@@ -12,6 +12,7 @@ export { registerEnhancedGameRoutes } from "./enhanced-game-routes";
 export { registerAdminRoutes } from "./admin";
 export { registerStorageRoutes } from "./storage-routes";
 export { createConsumptionRoutes } from "./consumption";
+import { createTimeRoutes } from './time-routes';
 
 // Default route exports
 export { default as savesRouter } from "./saves";
@@ -44,10 +45,11 @@ export async function registerAllRoutes(
   registerEnhancedGameRoutes(app, storage, gameService, expeditionService);
   registerAdminRoutes(app);
   registerStorageRoutes(app, storage);
-  
+
   // Mount router-based routes
   app.use('/api', createConsumptionRoutes(storage));
   app.use('/api/saves', savesRouter);
   app.use('/api/v2/workshop', workshopRouter);
   app.use('/api', itemRoutes);
+  app.use('/api/time', createTimeRoutes(storage));
 }

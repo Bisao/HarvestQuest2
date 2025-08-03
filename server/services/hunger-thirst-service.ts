@@ -1,5 +1,7 @@
 // Hunger and Thirst Degradation Service for Coletor Adventures
-import type { IStorage } from "../storage";
+import { GAME_CONFIG } from '@shared/config/game-config';
+import { TimeService } from './time-service';
+import type { IStorage } from '../storage';
 import type { HungerDegradationMode } from "@shared/types";
 import { CONSUMPTION_CONFIG } from "@shared/config/consumption-config";
 import { PlayerStatusService } from "./player-status-service";
@@ -164,15 +166,15 @@ export class HungerThirstService {
    */
   private calculateDegradationByMode(player: any): { hunger: number; thirst: number } {
     const mode: HungerDegradationMode = player.hungerDegradationMode || 'automatic';
-    
+
     // Disabled mode - no degradation
     if (mode === 'disabled') {
       return { hunger: 0, thirst: 0 };
     }
-    
+
     let hungerRate = 1; // Base rate
     let thirstRate = 1; // Base rate
-    
+
     // Apply mode-specific multipliers
     switch (mode) {
       case 'slow':
@@ -192,7 +194,7 @@ export class HungerThirstService {
         // Use dynamic calculation for automatic mode
         return this.calculateDynamicDegradation(player);
     }
-    
+
     return {
       hunger: Math.ceil(hungerRate),
       thirst: Math.ceil(thirstRate)
@@ -343,5 +345,15 @@ export class HungerThirstService {
       isRunning: this.isRunning,
       intervalMs: 120000 // 2 minutes (120 seconds)
     };
+  }
+
+  private logDegradation(playerId: string, oldHunger: number, newHunger: number, oldThirst: number, newThirst: number, timeModifiers?: { hunger: number; thirst: number }) {
+    const hungerDrop = oldHunger - newHunger;
+    const thirstDrop = oldThirst - newThirst;
+
+    if (hungerDrop > 0 || thirstDrop > 0) {
+      const modifierInfo = timeModifiers ? ` (Mods: H${timeModifiers.hunger.toFixed(1)}x T${timeModifiers.thirst.toFixed(1)}x)` : '';
+      console.log(`🍖💧 DEGRADATION: Player ${playerId} - Hunger: ${oldHunger}→${newHunger} (-${hungerDrop.toFixed(1)}), Thirst: ${oldThirst}→${newThirst} (-${thirstDrop.toFixed(1)})${modifierInfo}`);
+    }
   }
 }
