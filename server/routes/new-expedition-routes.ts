@@ -222,7 +222,25 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
 
   // ===================== CONSULTAS =====================
 
-  // Obter expedições ativas do jogador
+  // Obter expedições ativas do jogador (rota principal)
+  router.get('/active/:playerId',
+    validateParams(playerParamSchema),
+    async (req: Request, res: Response) => {
+      try {
+        const { playerId } = req.params;
+        console.log(`🔍 EXPEDITION-ACTIVE: Fetching active expeditions for player ${playerId}`);
+
+        const expeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
+        
+        return successResponse(res, expeditions, 'Expedições ativas obtidas com sucesso');
+      } catch (error: any) {
+        console.error('❌ EXPEDITION-ACTIVE: Error:', error.message);
+        return errorResponse(res, 500, error.message);
+      }
+    }
+  );
+
+  // Obter expedições ativas do jogador (rota alternativa)
   router.get('/player/:playerId/active',
     validateParams(playerParamSchema),
     async (req: Request, res: Response) => {
