@@ -111,7 +111,7 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] p-0">
+      <DialogContent className="max-w-6xl max-h-[90vh] p-0" aria-describedby="expedition-modal-description">
         <DialogHeader className="p-6 border-b bg-gradient-to-r from-blue-50 to-cyan-50">
           <DialogTitle className="text-2xl flex items-center gap-3">
             <span className="text-3xl">{biome.emoji}</span>
@@ -123,6 +123,10 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
             </div>
           </DialogTitle>
         </DialogHeader>
+
+        <div id="expedition-modal-description" className="sr-only">
+          Modal para selecionar e iniciar expedições em {biome.name}
+        </div>
 
         <div className="flex flex-1 overflow-hidden">
           {/* Lista de Templates */}

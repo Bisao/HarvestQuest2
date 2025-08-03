@@ -60,13 +60,17 @@ export function OfflineActivityReportDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden" aria-describedby="offline-report-description">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-blue-500" />
             Bem-vindo de volta, Aventureiro!
           </DialogTitle>
         </DialogHeader>
+
+        <div id="offline-report-description" className="sr-only">
+          Relatório de atividade offline mostrando o progresso e recursos coletados enquanto o jogador esteve ausente
+        </div>
 
         <ScrollArea className="max-h-[70vh] pr-4">
           <div className="space-y-6">

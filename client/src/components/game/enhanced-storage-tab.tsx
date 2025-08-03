@@ -1000,13 +1000,18 @@ export default function EnhancedStorageTab({
         open={withdrawDialog.open} 
         onOpenChange={(open) => setWithdrawDialog(prev => ({ ...prev, open }))}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" aria-describedby="withdraw-modal-description">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <span>{withdrawDialog.item?.itemData.emoji}</span>
               <span>Retirar {withdrawDialog.item?.itemData.name}</span>
             </DialogTitle>
           </DialogHeader>
+          
+          <div id="withdraw-modal-description" className="sr-only">
+            Modal para retirar itens do armazém para o inventário
+          </div>
+          
           <div className="space-y-4">
             <div className="bg-gray-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-2">

@@ -225,7 +225,7 @@ export function EnhancedItemModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[480px] max-w-lg p-0 overflow-hidden">
+      <DialogContent className="w-[480px] max-w-lg p-0 overflow-hidden" aria-describedby="item-modal-description">
         {/* Header with gradient background */}
         <div className={`bg-gradient-to-r ${rarityConfig.gradient} text-white p-6 relative overflow-hidden`}>
           {/* Decorative elements */}
@@ -267,6 +267,10 @@ export function EnhancedItemModal({
           </DialogHeader>
         </div>
 
+        <div id="item-modal-description" className="sr-only">
+          Modal de detalhes do item {itemData.name} com informações completas e opções de ação
+        </div>
+
         <div className="p-6 space-y-6">
           {/* Item Description & Stats */}
           <div className="space-y-4">
@@ -280,7 +284,7 @@ export function EnhancedItemModal({
               <div className={`p-4 rounded-lg ${rarityConfig.bg} ${rarityConfig.border} border`}>
                 <div className="text-sm text-gray-600 mb-1">Valor Total</div>
                 <div className="text-2xl font-bold text-green-600">
-                  {((itemData.sellPrice || itemData.value || 0) * item.quantity).toLocaleString()}
+                  {((itemData.value || 0) * item.quantity).toLocaleString()}
                   <span className="text-sm font-normal ml-1">moedas</span>
                 </div>
               </div>
@@ -315,7 +319,7 @@ export function EnhancedItemModal({
                 <div className="flex justify-between">
                   <span className="text-gray-600">Valor unitário:</span>
                   <span className="font-medium text-green-600">
-                    {(itemData.sellPrice || itemData.value || 0).toLocaleString()} moedas
+                    {(itemData.value || 0).toLocaleString()} moedas
                   </span>
                 </div>
 

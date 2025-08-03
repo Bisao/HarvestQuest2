@@ -174,7 +174,7 @@ export function ManualExpeditionModal({ isOpen, onClose, player, biome, resource
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col" aria-describedby="manual-expedition-description">
         <DialogHeader className="shrink-0 border-b pb-4">
           <DialogTitle className="text-2xl flex items-center gap-3">
             <span className="text-3xl">{biome.emoji}</span>
@@ -186,6 +186,10 @@ export function ManualExpeditionModal({ isOpen, onClose, player, biome, resource
             </div>
           </DialogTitle>
         </DialogHeader>
+
+        <div id="manual-expedition-description" className="sr-only">
+          Modal para criar expedições personalizadas em {biome.name}, permitindo selecionar recursos específicos e duração
+        </div>
 
         <div className="flex-1 overflow-hidden flex gap-6 pt-4">
           {/* Left Panel - Resource Selection */}
