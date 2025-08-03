@@ -340,8 +340,12 @@ export class NewExpeditionService {
   }
 
   async completeExpedition(expeditionId: string): Promise<ActiveExpedition> {
+    console.log(`🏁 EXPEDITION-COMPLETE: Starting completion for expedition ${expeditionId}`);
+    
     const expedition = await this.storage.getExpedition(expeditionId);
     if (!expedition) throw new Error('Expedição não encontrada');
+
+    console.log(`📋 EXPEDITION-COMPLETE: Found expedition for player ${expedition.playerId}`);
 
     // Get template by biomeId - use default template for the biome
     const templates = this.getTemplatesForBiome(expedition.biomeId);
@@ -354,12 +358,23 @@ export class NewExpeditionService {
 
     // Use the found template or fallback
     const activeTemplate = template || this.getTemplateById('gathering-basic')!;
+    console.log(`📜 EXPEDITION-COMPLETE: Using template ${activeTemplate.name}`);
 
-    // Calcular recompensas
-    const rewards = this.calculateRewards(activeTemplate);
+    // Calcular recompensas (use already collected resources or calculate new ones)
+    const rewards = expedition.collectedResources && Object.keys(expedition.collectedResources).length > 0 
+      ? expedition.collectedResources 
+      : this.calculateRewards(activeTemplate);
+
+    console.log(`🎁 EXPEDITION-COMPLETE: Calculated rewards:`, rewards);
 
     // Aplicar recompensas ao jogador
-    await this.applyRewards(expedition.playerId, rewards, activeTemplate.rewards.experience);
+    try {
+      await this.applyRewards(expedition.playerId, rewards, activeTemplate.rewards.experience);
+      console.log(`✅ EXPEDITION-COMPLETE: Rewards applied successfully`);
+    } catch (error) {
+      console.error(`❌ EXPEDITION-COMPLETE: Failed to apply rewards:`, error);
+      throw error;
+    }
 
     // Marcar expedição como completa
     await this.storage.updateExpedition(expeditionId, { 
@@ -423,10 +438,19 @@ export class NewExpeditionService {
 
     console.log(`💰 EXPEDITION-REWARDS: Applying rewards to player ${playerId}:`, rewards);
 
-    // Adicionar recursos ao inventário
+    // Import GameService to use addResourceToPlayer method
+    const { GameService } = await import('./game-service');
+    const gameService = new GameService(this.storage);
+
+    // Adicionar recursos ao inventário (tenta inventário primeiro, depois storage)
     for (const [resourceId, quantity] of Object.entries(rewards)) {
       console.log(`📦 EXPEDITION-REWARD: Adding ${quantity}x ${resourceId} to player inventory`);
-      await this.storage.addPlayerResource(playerId, resourceId, quantity);
+      try {
+        await gameService.addResourceToPlayer(playerId, resourceId, quantity);
+        console.log(`✅ EXPEDITION-REWARD: Successfully added ${quantity}x ${resourceId} to player`);
+      } catch (error) {
+        console.error(`❌ EXPEDITION-REWARD: Failed to add ${quantity}x ${resourceId}:`, error);
+      }
     }
 
     // Adicionar experiência

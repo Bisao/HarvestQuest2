@@ -231,6 +231,8 @@ export class GameService {
 
   // Add resource to player inventory (try inventory first, then storage if full)
   async addResourceToPlayer(playerId: string, resourceId: string, quantity: number): Promise<void> {
+    console.log(`🎒 GAME-SERVICE: Adding ${quantity}x ${resourceId} to player ${playerId}`);
+    
     try {
       // Check if player exists
       const player = await this.storage.getPlayer(playerId);
@@ -245,32 +247,46 @@ export class GameService {
         return;
       }
 
-      // Try to add to inventory first
-      const inventoryItems = await this.storage.getPlayerInventory(playerId);
-      const existingItem = inventoryItems.find(item => item.resourceId === resourceId);
+      // Calculate weight check
+      const weightToAdd = resource.weight * quantity;
+      const canCarry = await this.canCarryMore(playerId, weightToAdd);
 
-      if (existingItem) {
-        // Update existing inventory item
-        await this.storage.updateInventoryItem(existingItem.id, {
-          quantity: existingItem.quantity + quantity
+      if (canCarry) {
+        // Try to add to inventory first
+        const inventoryItems = await this.storage.getPlayerInventory(playerId);
+        const existingItem = inventoryItems.find(item => item.resourceId === resourceId);
+
+        if (existingItem) {
+          // Update existing inventory item
+          await this.storage.updateInventoryItem(existingItem.id, {
+            quantity: existingItem.quantity + quantity
+          });
+          console.log(`📦 GAME-SERVICE: Updated existing inventory item ${existingItem.id}`);
+        } else {
+          // Add new inventory item
+          await this.storage.addInventoryItem({
+            playerId,
+            resourceId,
+            quantity
+          });
+          console.log(`📦 GAME-SERVICE: Added new inventory item`);
+        }
+
+        // Update player inventory weight
+        await this.storage.updatePlayer(playerId, {
+          inventoryWeight: player.inventoryWeight + weightToAdd
         });
+
+        console.log(`✅ GAME-SERVICE: Successfully added ${quantity}x ${resourceId} to inventory`);
       } else {
-        // Add new inventory item
-        await this.storage.addInventoryItem({
-          playerId,
-          resourceId,
-          quantity
-        });
+        throw new Error("Cannot carry more weight - moving to storage");
       }
 
-      // Update player inventory weight
-      const weightToAdd = resource.weight * quantity;
-      await this.storage.updatePlayer(playerId, {
-        inventoryWeight: player.inventoryWeight + weightToAdd
-      });
+      // Invalidate cache
+      this.invalidateCache('weight', playerId);
 
     } catch (error) {
-      console.log(`Failed to add to inventory, adding to storage instead:`, error);
+      console.log(`⚠️ GAME-SERVICE: Failed to add to inventory, adding to storage instead:`, error);
       
       // If inventory fails, add to storage
       const storageItems = await this.storage.getPlayerStorage(playerId);
@@ -282,6 +298,7 @@ export class GameService {
         await this.storage.updateStorageItem(existingStorageItem.id, {
           quantity: existingStorageItem.quantity + quantity
         });
+        console.log(`📦 GAME-SERVICE: Updated existing storage item ${existingStorageItem.id}`);
       } else {
         await this.storage.addStorageItem({
           playerId,
@@ -289,7 +306,10 @@ export class GameService {
           quantity,
           itemType: 'resource'
         });
+        console.log(`📦 GAME-SERVICE: Added new storage item`);
       }
+
+      console.log(`✅ GAME-SERVICE: Successfully added ${quantity}x ${resourceId} to storage`);
     }
   }
 
