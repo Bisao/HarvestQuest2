@@ -27,11 +27,14 @@ export class TimeService {
     const now = Date.now();
     const elapsed = now - this.config.startTime;
     
+    // Usar a duração atual configurada (pode ter mudado)
+    const currentDayDuration = this.config.dayDurationMs;
+    
     // Calcular quantos dias passaram
-    const totalDays = Math.floor(elapsed / this.config.dayDurationMs);
+    const totalDays = Math.floor(elapsed / currentDayDuration);
     
     // Calcular hora atual (0-23)
-    const dayProgress = (elapsed % this.config.dayDurationMs) / this.config.dayDurationMs;
+    const dayProgress = (elapsed % currentDayDuration) / currentDayDuration;
     const hour = Math.floor(dayProgress * 24);
     const minute = Math.floor((dayProgress * 24 * 60) % 60);
     
@@ -223,17 +226,21 @@ export class TimeService {
 
   // Método para alterar a velocidade do tempo
   setTimeSpeed(speed: keyof typeof TIME_CONFIG.SPEED_OPTIONS): void {
+    const oldDuration = this.config.dayDurationMs;
     const newDuration = TIME_CONFIG.SPEED_OPTIONS[speed];
-    const currentGameTime = this.getCurrentGameTime();
+    const now = Date.now();
     
-    // Calcular o progresso atual do dia
-    const dayProgress = (currentGameTime.hour + currentGameTime.minute / 60) / 24;
+    // Obter o tempo atual do jogo ANTES da mudança
+    const currentElapsed = now - this.config.startTime;
+    const currentDayProgress = (currentElapsed % oldDuration) / oldDuration;
+    const currentTotalDays = Math.floor(currentElapsed / oldDuration);
     
-    // Ajustar o startTime para manter a hora atual com a nova velocidade
-    const elapsedToday = dayProgress * newDuration;
-    const totalElapsed = (currentGameTime.dayNumber - 1) * newDuration + elapsedToday;
+    // Calcular novo startTime para manter o mesmo progresso do dia
+    const newElapsedToday = currentDayProgress * newDuration;
+    const newTotalElapsed = currentTotalDays * newDuration + newElapsedToday;
     
-    this.config.startTime = Date.now() - totalElapsed;
+    // Atualizar configuração
+    this.config.startTime = now - newTotalElapsed;
     this.config.dayDurationMs = newDuration;
     this.config.currentSpeed = speed;
     
@@ -244,7 +251,8 @@ export class TimeService {
       VERY_SLOW: '120 minutos'
     }[speed];
     
-    console.log(`⏰ TIME-SERVICE: Speed changed to ${speed} (${speedLabel} = 24h do jogo)`);
+    console.log(`⏰ TIME-SERVICE: Speed changed from ${oldDuration}ms to ${newDuration}ms (${speedLabel} = 24h do jogo)`);
+    console.log(`⏰ TIME-SERVICE: Day progress preserved: ${(currentDayProgress * 100).toFixed(1)}%`);
   }
 
   // Método para obter a velocidade atual

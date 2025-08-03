@@ -44,9 +44,17 @@ export default function TimeSpeedControl() {
         description: `Agora ${data.speedInfo.label}`,
       });
       
-      // Invalidar cache para atualizar tempo
+      // Invalidar TODOS os caches relacionados ao tempo
       queryClient.invalidateQueries({ queryKey: ['/api/time/speed/options'] });
       queryClient.invalidateQueries({ queryKey: ['/api/time/current'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/temperature/'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/player/'] });
+      
+      // Forçar refetch imediato
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['/api/time/current'] });
+        queryClient.refetchQueries({ queryKey: ['/api/time/speed/options'] });
+      }, 100);
     },
     onError: (error) => {
       console.error('⏰ SPEED-CONTROL: Error changing speed:', error);
