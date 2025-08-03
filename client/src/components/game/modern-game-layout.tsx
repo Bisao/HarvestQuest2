@@ -230,19 +230,18 @@ const TabCategory: React.FC<TabCategoryProps> = React.memo(({
           const isActive = activeTab === tab.id;
           
           return (
-            <TabsTrigger
+            <button
               key={tab.id}
-              value={tab.id}
               onClick={() => onTabChange(tab.id)}
               disabled={tab.isDisabled}
               className={`
-                relative flex items-center justify-center space-x-1 px-2 py-2 rounded-md 
-                font-medium transition-all text-xs min-w-0
+                relative flex items-center justify-center space-x-1 px-3 py-2 rounded-md 
+                font-medium transition-all text-xs min-w-0 border
                 ${isActive 
-                  ? "bg-white shadow-sm border text-gray-800 ring-2 ring-blue-200" 
-                  : "hover:bg-white/60 text-gray-600 hover:text-gray-800"
+                  ? "bg-white shadow-sm border-blue-200 text-gray-800 ring-2 ring-blue-200" 
+                  : "bg-transparent border-transparent hover:bg-white/60 text-gray-600 hover:text-gray-800 hover:border-gray-200"
                 }
-                ${tab.isDisabled ? "opacity-50 cursor-not-allowed" : ""}
+                ${tab.isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
               `}
             >
               <Icon className={`w-4 h-4 ${tab.color} flex-shrink-0`} />
@@ -254,7 +253,7 @@ const TabCategory: React.FC<TabCategoryProps> = React.memo(({
               {tab.hasNotification && (
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               )}
-            </TabsTrigger>
+            </button>
           );
         })}
       </div>
@@ -537,26 +536,34 @@ export default function ModernGameLayout({
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-hidden">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full">
-            {/* Tab Navigation - Sistema categorizado */}
-            <div className="bg-white border-b border-gray-200">
-              <ScrollArea className="w-full">
-                <div className="p-2 sm:p-3">
-                  <div className="flex flex-col gap-2">
-                    {Object.entries(tabsByCategory).map(([category, tabs]) => (
-                      <TabCategory
-                        key={category}
-                        category={category}
-                        tabs={tabs}
-                        activeTab={activeTab}
-                        onTabChange={handleTabChange}
-                        isMobile={isMobile}
-                      />
-                    ))}
-                  </div>
+          {/* Tab Navigation - Sistema categorizado */}
+          <div className="bg-white border-b border-gray-200">
+            <ScrollArea className="w-full">
+              <div className="p-2 sm:p-3 w-full">
+                <div className="flex flex-col gap-2">
+                  {Object.entries(tabsByCategory).map(([category, tabs]) => (
+                    <TabCategory
+                      key={category}
+                      category={category}
+                      tabs={tabs}
+                      activeTab={activeTab}
+                      onTabChange={handleTabChange}
+                      isMobile={isMobile}
+                    />
+                  ))}
                 </div>
-              </ScrollArea>
-            </div>
+              </div>
+            </ScrollArea>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full">{/* Hidden TabsList for shadcn compatibility */}
+            <TabsList className="hidden">
+              {gameTabs.map((tab) => (
+                <TabsTrigger key={tab.id} value={tab.id}>
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
 
             {/* Tab Content */}
             <div className="flex-1 overflow-auto bg-gray-50">
@@ -655,7 +662,6 @@ export default function ModernGameLayout({
                   />
                 </TabsContent>
               </div>
-            </div>
           </Tabs>
         </div>
 
