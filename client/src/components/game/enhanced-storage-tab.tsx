@@ -10,6 +10,7 @@ import { ItemFinder } from "@shared/utils/item-finder";
 import { CacheManager } from "@shared/utils/cache-manager";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SoundButton } from "@/components/ui/sound-button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { StorageItem, Resource, Equipment, Player } from "@shared/types";

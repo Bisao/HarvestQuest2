@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SoundButton } from "@/components/ui/sound-button";
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -146,12 +147,12 @@ export default function UnifiedWorkshops({ player, resources, isBlocked = false 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ playerId: player.id, processId, quantity }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: "Erro no servidor" }));
         throw new Error(errorData.message || `Erro HTTP ${response.status}`);
       }
-      
+
       return response.json();
     },
     onSuccess: (data) => {
@@ -182,19 +183,19 @@ export default function UnifiedWorkshops({ player, resources, isBlocked = false 
   const canProcess = (process: WorkshopProcess, quantity: number) => {
     const inputItem = storageItems.find(item => item.resourceId === process.input.resourceId);
     const hasInput = inputItem && inputItem.quantity >= (process.input.quantity * quantity);
-    
+
     let hasSecondary = true;
     if (process.secondary) {
       const secondaryItem = storageItems.find(item => item.resourceId === process.secondary!.resourceId);
       hasSecondary = secondaryItem && secondaryItem.quantity >= (process.secondary.quantity * quantity);
     }
-    
+
     let hasFuel = true;
     if (process.fuel) {
       const fuelItem = storageItems.find(item => item.resourceId === process.fuel!.resourceId);
       hasFuel = fuelItem && fuelItem.quantity >= (process.fuel.quantity * quantity);
     }
-    
+
     return hasInput && hasSecondary && hasFuel;
   };
 
@@ -249,7 +250,7 @@ export default function UnifiedWorkshops({ player, resources, isBlocked = false 
                   {availableProcesses.filter(p => p.category === categoryKey).map((process) => {
                     const currentQuantity = processQuantities[process.id] || 1;
                     const canExecute = canProcess(process, currentQuantity);
-                    
+
                     return (
                       <Card key={process.id} className={`transition-all ${canExecute ? 'border-green-200 bg-green-50/50' : 'border-gray-200 bg-gray-50/50'}`}>
                         <CardContent className="p-4">
@@ -318,14 +319,15 @@ export default function UnifiedWorkshops({ player, resources, isBlocked = false 
                                   step={1}
                                   className="w-full"
                                 />
-                                <Button
+                                <SoundButton
                                   onClick={() => handleProcess(process.id)}
                                   disabled={!canExecute || isBlocked || processMutation.isPending}
                                   className="w-full"
                                   size="sm"
+                                  soundType="craft"
                                 >
                                   {processMutation.isPending ? "Processando..." : `Processar ${currentQuantity}x`}
-                                </Button>
+                                </SoundButton>
                               </div>
                             </div>
                           </div>
@@ -333,7 +335,7 @@ export default function UnifiedWorkshops({ player, resources, isBlocked = false 
                       </Card>
                     );
                   })}
-                  
+
                   {availableProcesses.filter(p => p.category === categoryKey).length === 0 && (
                     <Alert>
                       <AlertTriangle className="h-4 w-4" />

@@ -28,6 +28,7 @@ import { ImprovedCustomExpeditionModal } from './improved-custom-expedition-moda
 import { ExpeditionTracker } from './expedition-tracker';
 import { ExpeditionStatus } from './expedition-status';
 import { useActiveExpeditions } from '@/hooks/use-active-expeditions';
+import { SoundButton } from '@/components/ui/sound-button'; // Assuming SoundButton component exists
 
 interface EnhancedBiomesTabProps {
   biomes: Biome[];
@@ -76,22 +77,22 @@ export default function EnhancedBiomesTab({
   // Sistema robusto de categorização de recursos
   const categorizeResource = (resource: Resource): string => {
     const name = resource.name.toLowerCase();
-    
+
     // Madeiras e materiais lenhosos
     if (name.includes('madeira') || name.includes('tronco') || name.includes('galho') ||
         name.includes('carvalho') || name.includes('pinho') || name.includes('cedro') ||
         name.includes('eucalipto') || name.includes('mogno') || name.includes('bambu')) return 'wood';
-    
+
     // Pedras, minerais e metais
     if (name.includes('pedra') || name.includes('mineral') || name.includes('ferro') || 
         name.includes('cobre') || name.includes('granito') || name.includes('calcaria') ||
         name.includes('quartzo') || name.includes('argila')) return 'stone';
-    
+
     // Fibras naturais
     if (name.includes('fibra') || name.includes('linho') || name.includes('algodao') ||
         name.includes('algodão') || name.includes('juta') || name.includes('sisal') ||
         name.includes('canamo') || name.includes('cânamo')) return 'fiber';
-    
+
     // Animais de caça
     if (name.includes('coelho') || name.includes('veado') || name.includes('urso') ||
         name.includes('javali') || name.includes('cervo') || name.includes('raposa') ||
@@ -99,34 +100,34 @@ export default function EnhancedBiomesTab({
         name.includes('ovelha') || name.includes('alce') || name.includes('rena') ||
         name.includes('bisao') || name.includes('bisão') || name.includes('boi') ||
         name.includes('carne')) return 'animals';
-    
+
     // Peixes e recursos aquáticos
     if (name.includes('peixe') || name.includes('salmao') || name.includes('salmão') ||
         name.includes('truta') || name.includes('carpa') || name.includes('bagre') ||
         name.includes('dourado') || name.includes('pintado') || name.includes('tucunare') ||
         name.includes('tucunaré') || name.includes('piranha') || name.includes('lambari') ||
         name.includes('tilapia') || name.includes('tilápia')) return 'fish';
-    
+
     // Plantas e ervas
     if (name.includes('erva') || name.includes('flor') || name.includes('cogumelo') || 
         name.includes('planta') || name.includes('folha') || name.includes('raiz') ||
         name.includes('semente') || name.includes('fruto') || name.includes('baga')) return 'plants';
-    
+
     // Recursos raros e preciosos
     if (name.includes('cristal') || name.includes('gema') || name.includes('ouro') || 
         name.includes('prata') || name.includes('diamante') || name.includes('rubi') ||
         name.includes('safira') || name.includes('esmeralda') || name.includes('ametista')) return 'rare';
-    
+
     // Materiais processados
     if (name.includes('processado') || name.includes('refinado') || name.includes('trabalhado') ||
         name.includes('fundido') || name.includes('forjado') || name.includes('polido') ||
         name.includes('lapidado')) return 'processed';
-    
+
     // Recursos especiais únicos
     if (name.includes('raro') || name.includes('lendario') || name.includes('lendário') ||
         name.includes('épico') || name.includes('epico') || name.includes('mistico') ||
         name.includes('místico') || name.includes('sagrado')) return 'special';
-    
+
     return 'basic';
   };
 
@@ -138,7 +139,7 @@ export default function EnhancedBiomesTab({
       .filter(Boolean) as Resource[];
 
     const categorized: Record<string, Resource[]> = {};
-    
+
     biomeResources.forEach(resource => {
       const category = categorizeResource(resource);
       if (!categorized[category]) categorized[category] = [];
@@ -151,7 +152,7 @@ export default function EnhancedBiomesTab({
   // Filtrar biomas baseado na busca
   const filteredBiomes = useMemo(() => {
     let filtered = biomes;
-    
+
     if (searchTerm) {
       filtered = filtered.filter(biome => 
         biome.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -261,7 +262,7 @@ export default function EnhancedBiomesTab({
           const unlocked = isUnlocked(biome);
           const theme = getBiomeTheme(biome.name);
           const BiomeIcon = theme.icon;
-          
+
           return (
             <Card 
               key={biome.id}
@@ -292,7 +293,7 @@ export default function EnhancedBiomesTab({
                     <span>Nível {biome.requiredLevel}</span>
                   </Badge>
                 </div>
-                
+
                 <p className="text-sm text-gray-600 mt-2">Explore {biome.name} para descobrir recursos únicos.</p>
               </CardHeader>
 
@@ -321,7 +322,7 @@ export default function EnhancedBiomesTab({
                     {Object.entries(resourceCounts).map(([category, count]) => {
                       const categoryInfo = RESOURCE_CATEGORIES[category as keyof typeof RESOURCE_CATEGORIES];
                       if (!categoryInfo || count === 0) return null;
-                      
+
                       return (
                         <div
                           key={category}

@@ -3,6 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useGameContext } from '@/contexts/GameContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
+import { SoundButton } from '@/components/ui/sound-button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
