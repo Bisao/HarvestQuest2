@@ -32,7 +32,7 @@ export class CombatService {
 
     // Selecionar animal aleatório
     const selectedAnimal = biomeAnimals[Math.floor(Math.random() * biomeAnimals.length)];
-    
+
     const player = await this.storage.getPlayer(playerId);
     if (!player) throw new Error('Player not found');
 
@@ -82,7 +82,7 @@ export class CombatService {
       case 'attack':
         playerDamage = this.calculateDamage(playerStats, animalStats);
         encounter.animalHealth = Math.max(0, encounter.animalHealth - playerDamage);
-        
+
         actionLog.push({
           turn: encounter.turn,
           actor: 'player',
@@ -108,7 +108,7 @@ export class CombatService {
         // Analisar revela informações e termina o combate
         await this.addAnimalToRegistry(encounter.playerId, encounter.animalId);
         encounter.status = 'analyzed';
-        
+
         actionLog.push({
           turn: encounter.turn,
           actor: 'player',
@@ -169,7 +169,7 @@ export class CombatService {
     if (encounter.animalHealth <= 0) {
       encounter.status = 'victory';
       const rewards = this.calculateRewards(animal);
-      
+
       await this.storage.updatePlayer(encounter.playerId, {
         experience: player.experience + rewards.experience
       });
@@ -191,7 +191,7 @@ export class CombatService {
     // Turno do animal (se ainda estiver vivo e jogador não fugiu)
     if (encounter.status === 'active') {
       animalDamage = this.calculateAnimalDamage(animalStats, playerStats);
-      
+
       // Aplicar defesa se o jogador se defendeu
       if (action === 'defend') {
         animalDamage = Math.floor(animalDamage / 2);
@@ -212,7 +212,7 @@ export class CombatService {
       // Verificar se o jogador foi derrotado
       if (encounter.playerHealth <= 0) {
         encounter.status = 'defeat';
-        
+
         // Aplicar penalidade por derrota
         await this.storage.updatePlayer(encounter.playerId, {
           health: 1, // Deixa com 1 HP
@@ -246,7 +246,7 @@ export class CombatService {
   private getPlayerCombatStats(player: Player): PlayerCombatStats {
     const baseAttack = 10 + Math.floor(player.level * 2);
     const baseDefense = 5 + Math.floor(player.level * 1.5);
-    
+
     return {
       health: player.health || 100,
       maxHealth: player.maxHealth || 100,
@@ -279,7 +279,7 @@ export class CombatService {
     const baseDamage = attacker.attack + attacker.weaponBonus;
     const defense = defender.defense;
     const randomFactor = 0.8 + Math.random() * 0.4; // 80% a 120%
-    
+
     const damage = Math.max(1, Math.floor((baseDamage - defense * 0.5) * randomFactor));
     return damage;
   }
@@ -288,7 +288,7 @@ export class CombatService {
     const baseDamage = attacker.attack;
     const defense = defender.defense + defender.armorBonus;
     const randomFactor = 0.8 + Math.random() * 0.4;
-    
+
     const damage = Math.max(1, Math.floor((baseDamage - defense * 0.3) * randomFactor));
     return damage;
   }

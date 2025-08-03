@@ -13,7 +13,7 @@ import { validateRecipeIngredients, validateGameDataConsistency } from "@shared/
 import { createNewExpeditionRoutes } from './routes/new-expedition-routes';
 
 const app = express();
-const port = Number(process.env.PORT) || 5000;
+const port = Number(process.env.PORT) || 3000;
 
 // Validate game data consistency on startup
 console.log("🔍 Validating game data consistency...");

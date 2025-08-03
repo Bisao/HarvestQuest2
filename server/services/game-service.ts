@@ -511,7 +511,7 @@ export class GameService {
     } else {
       await this.storage.addStorageItem({
         playerId,
-        resourceId,
+        resourceId: resourceId,
         quantity: amount,
         itemType: 'resource'
       });

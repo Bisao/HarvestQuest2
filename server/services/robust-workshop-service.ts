@@ -462,7 +462,7 @@ export class RobustWorkshopService {
       result.waste.push(waste);
     }
 
-    // Dar experiência ao player
+    // Dar experiência ao player e processar level up
     if (player && result.statistics.experienceGained > 0) {
       const newExp = player.experience + result.statistics.experienceGained;
       const newLevel = Math.floor(Math.sqrt(newExp / 100)) + 1;
@@ -478,7 +478,19 @@ export class RobustWorkshopService {
           type: "discovery",
           description: `Parabéns! Você subiu para o nível ${newLevel}!`
         });
+
+        // Award skill points for level up
+        const { SkillService } = await import('./skill-service');
+        const skillService = new SkillService(this.storage);
+        await skillService.handlePlayerLevelUp(playerId, newLevel);
+        
+        console.log(`🎉 LEVEL-UP: Player ${playerId} leveled up to ${newLevel} from crafting!`);
       }
+
+      // Award skill experience for crafting
+      const { SkillService } = await import('./skill-service');
+      const skillService = new SkillService(this.storage);
+      await skillService.addSkillExperience(playerId, 'skill-12345678-1234-1234-1234-123456789abc', result.statistics.experienceGained);
     }
 
     return result;
