@@ -140,6 +140,36 @@
     min-width: 44px;
     padding: 0.75rem;
   }
+
+  /* Animal registry specific mobile improvements */
+  .animal-category-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .animal-category-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Better spacing for mobile content */
+  .mobile-content-spacing {
+    padding-bottom: 5rem;
+  }
+
+  /* Improved touch targets */
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Better modal positioning on mobile */
+  .mobile-modal {
+    max-height: 85vh;
+    margin: 2rem 1rem;
+  }
 }
 
 /* Content area transitions */

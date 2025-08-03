@@ -584,28 +584,30 @@ export default function ModernGameLayout() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Content Header */}
-          <div className={`bg-white border-b border-gray-200 safe-area-top ${isMobile ? 'p-3' : 'p-4'}`}>
-            <div className="flex items-center space-x-3">
+          <div className={`bg-white border-b border-gray-200 safe-area-top ${isMobile ? 'p-2' : 'p-4'}`}>
+            <div className="flex items-center space-x-2 md:space-x-3">
               {isMobile && (
                 <button
                   onClick={toggleSidebar}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors touch-friendly"
+                  className="p-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors touch-friendly flex-shrink-0"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
               )}
-              <div className={`p-2 rounded-lg bg-gray-50 border ${isMobile ? 'flex-shrink-0' : ''}`}>
+              <div className={`p-2 rounded-lg bg-gray-50 border flex-shrink-0`}>
                 <TabIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} ${currentTab?.color || 'text-gray-600'}`} />
               </div>
-              <div className="min-w-0 flex-1">
-                <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-800 truncate`}>
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <h2 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 truncate`}>
                   {currentTab?.label || 'Carregando...'}
                 </h2>
-                <p className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-sm'} truncate`}>
-                  {currentTab?.description || 'Preparando conteúdo...'}
-                </p>
+                {!isMobile && (
+                  <p className="text-gray-600 text-sm truncate">
+                    {currentTab?.description || 'Preparando conteúdo...'}
+                  </p>
+                )}
               </div>
             </div>
           </div>

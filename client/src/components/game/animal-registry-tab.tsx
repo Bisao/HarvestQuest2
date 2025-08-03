@@ -79,40 +79,40 @@ interface AnimalCardProps {
 function AnimalCard({ animal, isDiscovered, onClick }: AnimalCardProps) {
   return (
     <Card 
-      className={`cursor-pointer transition-all hover:shadow-md ${
+      className={`cursor-pointer transition-all hover:shadow-md touch-manipulation min-h-[120px] ${
         isDiscovered ? 'border-green-200 bg-green-50' : 'border-gray-200 opacity-60'
       }`}
       onClick={onClick}
     >
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className={`${getSizeColor(animal.size)}`}>
+      <CardContent className="p-3 md:p-4">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <span className={`${getSizeColor(animal.size)} text-lg flex-shrink-0`}>
               {animal.emoji}
             </span>
-            <span className="font-semibold text-sm">
+            <span className="font-semibold text-sm truncate">
               {isDiscovered ? animal.commonName : '???'}
             </span>
           </div>
           {isDiscovered && (
-            <Badge className={`text-xs ${getRarityColor(animal.rarity)} text-white`}>
+            <Badge className={`text-xs ${getRarityColor(animal.rarity)} text-white flex-shrink-0 ml-2`}>
               {animal.rarity}
             </Badge>
           )}
         </div>
 
         {isDiscovered && (
-          <div className="space-y-1 text-xs text-gray-600">
-            <p className="line-clamp-2">{animal.generalInfo.diet}</p>
-            <div className="flex flex-wrap gap-1 mt-2">
-              {animal.habitat.slice(0, 2).map((hab, idx) => (
-                <Badge key={idx} variant="outline" className="text-xs">
+          <div className="space-y-2 text-xs text-gray-600">
+            <p className="line-clamp-2 leading-relaxed">{animal.generalInfo.diet}</p>
+            <div className="flex flex-wrap gap-1">
+              {animal.habitat.slice(0, 3).map((hab, idx) => (
+                <Badge key={idx} variant="outline" className="text-xs px-1.5 py-0.5">
                   {hab}
                 </Badge>
               ))}
-              {animal.habitat.length > 2 && (
-                <Badge variant="outline" className="text-xs">
-                  +{animal.habitat.length - 2}
+              {animal.habitat.length > 3 && (
+                <Badge variant="outline" className="text-xs px-1.5 py-0.5">
+                  +{animal.habitat.length - 3}
                 </Badge>
               )}
             </div>
@@ -120,7 +120,7 @@ function AnimalCard({ animal, isDiscovered, onClick }: AnimalCardProps) {
         )}
 
         {!isDiscovered && (
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-gray-400 py-2">
             <p>Descubra este animal explorando!</p>
           </div>
         )}
@@ -140,9 +140,9 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
   if (!animal || !isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 md:p-4">
+      <div className="bg-white rounded-lg max-w-md w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto m-2">
+        <div className="p-4 md:p-6">
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-3">
               <span className="text-3xl">{animal.emoji}</span>
@@ -260,7 +260,7 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-2 md:p-4 space-y-3 md:space-y-4 pb-20 md:pb-4">
       {/* Header com estatísticas */}
       <Card>
         <CardHeader>
@@ -283,40 +283,46 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
         </CardContent>
       </Card>
 
-      {/* Filtros */}
+      {/* Filtros Mobile-Friendly */}
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3 md:p-4">
           <div className="space-y-3">
+            {/* Busca */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Pesquisar animais..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-10"
               />
             </div>
 
-            <div className="flex gap-2 overflow-x-auto">
-              {ANIMAL_CATEGORIES.map(category => (
-                <Button
-                  key={category.id}
-                  variant={selectedCategory === category.id ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category.id)}
-                  className="whitespace-nowrap"
-                >
-                  <span className="mr-1">{category.emoji}</span>
-                  {category.name}
-                </Button>
-              ))}
+            {/* Categorias com scroll horizontal otimizado para mobile */}
+            <div className="overflow-x-auto pb-2">
+              <div className="flex gap-2 min-w-max">
+                {ANIMAL_CATEGORIES.map(category => (
+                  <Button
+                    key={category.id}
+                    variant={selectedCategory === category.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category.id)}
+                    className="whitespace-nowrap flex-shrink-0 min-w-fit px-3 py-2 text-xs md:text-sm"
+                  >
+                    <span className="mr-1 text-sm">{category.emoji}</span>
+                    <span className="hidden sm:inline">{category.name}</span>
+                    <span className="sm:hidden">{category.name.split(' ')[0]}</span>
+                  </Button>
+                ))}
+              </div>
             </div>
 
+            {/* Filtro de raridade mobile-friendly */}
             <div className="flex gap-2">
               <select
                 value={filterRarity}
                 onChange={(e) => setFilterRarity(e.target.value)}
-                className="px-3 py-1 border rounded text-sm"
+                className="flex-1 px-3 py-2 border rounded text-sm bg-white min-h-[40px]"
               >
                 <option value="all">Todas as Raridades</option>
                 <option value="common">Comum</option>
@@ -330,8 +336,8 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
         </CardContent>
       </Card>
 
-      {/* Grid de animais */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Grid de animais responsivo */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
         {filteredAnimals.map(animal => (
           <AnimalCard
             key={animal.id}
