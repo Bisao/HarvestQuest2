@@ -100,6 +100,7 @@ export default function ModernExpeditionModal({
 
   // Categorizar recursos
   const categorizeResource = (resource: Resource): string => {
+    if (!resource || !resource.name) return 'basic';
     const name = resource.name.toLowerCase();
 
     if (name.includes('madeira') || name.includes('tronco') || name.includes('galho') ||
@@ -148,6 +149,13 @@ export default function ModernExpeditionModal({
 
   // Verificar coletabilidade
   const checkResourceCollectability = (resource: Resource) => {
+    if (!resource || !resource.name) {
+      return {
+        canCollect: false,
+        requirementText: "Recurso inválido",
+        toolIcon: "❌",
+      };
+    }
     const resourceName = resource.name;
 
     // Recursos básicos (sem ferramentas)
@@ -234,6 +242,10 @@ export default function ModernExpeditionModal({
       .filter(Boolean) as Resource[];
 
     return biomeResources.map(resource => {
+      if (!resource) {
+        return null;
+      }
+      
       const collectabilityInfo = checkResourceCollectability(resource);
       const category = categorizeResource(resource);
 
@@ -244,7 +256,7 @@ export default function ModernExpeditionModal({
         toolIcon: collectabilityInfo.toolIcon,
         category
       };
-    });
+    }).filter(Boolean) as CollectableResource[];
   }, [biome, resources, equipment, player]);
 
   // Filtrar recursos
