@@ -174,13 +174,14 @@ export function ManualExpeditionModal({ isOpen, onClose, player, biome, resource
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col" aria-describedby="manual-expedition-description">
-        <DialogHeader className="shrink-0 border-b pb-4">
-          <DialogTitle className="text-2xl flex items-center gap-3">
-            <span className="text-3xl">{biome.emoji}</span>
+      <DialogContent className="max-w-6xl max-h-[95vh] md:max-h-[90vh] overflow-hidden flex flex-col p-3 md:p-6" aria-describedby="manual-expedition-description">
+        <DialogHeader className="shrink-0 border-b pb-2 md:pb-4">
+          <DialogTitle className="text-lg md:text-2xl flex items-center gap-2 md:gap-3">
+            <span className="text-2xl md:text-3xl">{biome.emoji}</span>
             <div>
-              <div>Expedição Personalizada - {biome.name}</div>
-              <div className="text-sm font-normal text-gray-600 mt-1">
+              <div className="text-base md:text-xl">Expedição Personalizada</div>
+              <div className="text-sm md:text-base text-gray-600">{biome.name}</div>
+              <div className="text-xs md:text-sm font-normal text-gray-500 mt-1">
                 Selecione os recursos que deseja coletar e defina a duração
               </div>
             </div>
@@ -191,9 +192,9 @@ export function ManualExpeditionModal({ isOpen, onClose, player, biome, resource
           Modal para criar expedições personalizadas em {biome.name}, permitindo selecionar recursos específicos e duração
         </div>
 
-        <div className="flex-1 overflow-hidden flex gap-6 pt-4">
+        <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-4 md:gap-6 pt-4">
           {/* Left Panel - Resource Selection */}
-          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2 max-h-[45vh] md:max-h-none">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -268,12 +269,12 @@ export function ManualExpeditionModal({ isOpen, onClose, player, biome, resource
           </div>
 
           {/* Right Panel - Expedition Summary */}
-          <div className="w-80 shrink-0 space-y-4">
+          <div className="w-full md:w-80 shrink-0 space-y-4 max-h-[45vh] md:max-h-none overflow-y-auto">
             {/* Duration Selector */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Clock className="w-4 h-4" />
                   Duração da Expedição
                 </CardTitle>
               </CardHeader>
@@ -303,13 +304,13 @@ export function ManualExpeditionModal({ isOpen, onClose, player, biome, resource
 
             {/* Expedition Stats */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-5 h-5" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Zap className="w-4 h-4" />
                   Resumo da Expedição
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span>Recursos selecionados:</span>
                   <span className="font-bold">{selectedResources.length}</span>
@@ -320,7 +321,7 @@ export function ManualExpeditionModal({ isOpen, onClose, player, biome, resource
                 </div>
                 <div className="flex justify-between">
                   <span>XP estimado:</span>
-                  <Badge variant="outline">{expeditionStats.estimatedXP} XP</Badge>
+                  <Badge variant="outline" className="text-xs">{expeditionStats.estimatedXP} XP</Badge>
                 </div>
                 
                 <Separator />
@@ -390,7 +391,7 @@ export function ManualExpeditionModal({ isOpen, onClose, player, biome, resource
             )}
 
             {/* Action Buttons */}
-            <div className="space-y-2">
+            <div className="space-y-2 pt-2 sticky bottom-0 bg-white dark:bg-gray-950 border-t md:border-t-0 -mx-3 md:mx-0 px-3 md:px-0 py-3 md:py-0">
               <Button
                 onClick={() => startExpeditionMutation.mutate()}
                 disabled={!canStartExpedition || startExpeditionMutation.isPending}
