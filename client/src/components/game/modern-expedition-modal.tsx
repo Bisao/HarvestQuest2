@@ -221,9 +221,14 @@ export default function ModernExpeditionModal({
 
   // Obter recursos coletáveis
   const collectableResources = useMemo((): CollectableResource[] => {
-    if (!biome) return [];
+    if (!biome || !biome.availableResources) return [];
 
-    const resourceIds = biome.availableResources as string[];
+    const resourceIds = Array.isArray(biome.availableResources) 
+      ? biome.availableResources as string[]
+      : [];
+    
+    if (resourceIds.length === 0) return [];
+
     const biomeResources = resourceIds
       .map(id => resources.find(r => r.id === id))
       .filter(Boolean) as Resource[];
@@ -244,16 +249,18 @@ export default function ModernExpeditionModal({
 
   // Filtrar recursos
   const filteredResources = useMemo(() => {
+    if (!collectableResources || collectableResources.length === 0) return [];
+    
     let filtered = collectableResources;
 
     if (searchTerm) {
       filtered = filtered.filter(resource =>
-        resource.name.toLowerCase().includes(searchTerm.toLowerCase())
+        resource && resource.name && resource.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(resource => resource.category === selectedCategory);
+      filtered = filtered.filter(resource => resource && resource.category === selectedCategory);
     }
 
     return filtered;
@@ -263,7 +270,13 @@ export default function ModernExpeditionModal({
   const resourcesByCategory = useMemo(() => {
     const grouped: Record<string, CollectableResource[]> = {};
 
+    if (!filteredResources || filteredResources.length === 0) {
+      return grouped;
+    }
+
     filteredResources.forEach(resource => {
+      if (!resource || !resource.category) return;
+      
       if (!grouped[resource.category]) {
         grouped[resource.category] = [];
       }
@@ -416,9 +429,9 @@ export default function ModernExpeditionModal({
               {/* Lista de recursos por categoria */}
               <ScrollArea className="h-[400px]">
                 <div className="space-y-6">
-                  {Object.entries(resourcesByCategory).map(([categoryId, categoryResources]) => {
+                  {Object.entries(resourcesByCategory || {}).map(([categoryId, categoryResources]) => {
                     const category = RESOURCE_CATEGORIES[categoryId as keyof typeof RESOURCE_CATEGORIES];
-                    if (!category || categoryResources.length === 0) return null;
+                    if (!category || !categoryResources || categoryResources.length === 0) return null;
 
                     return (
                       <div key={categoryId} className="space-y-3">
