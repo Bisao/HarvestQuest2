@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useGameData } from '@/hooks/useGamePolling';
+import { useGameState } from '@/hooks/useGameState';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +44,16 @@ import ExpeditionPanel from './expedition-panel';
 import ModernExpeditionModal from './modern-expedition-modal';
 import { OfflineActivityReportDialog } from './offline-activity-report';
 
-import type { Player, Biome, Resource, Equipment, Recipe, ActiveExpedition } from '@shared/types';
+import type { Player, Biome, Resource, Equipment, Recipe } from '@shared/types';
+
+// Define ActiveExpedition type locally since it's not in shared types
+interface ActiveExpedition {
+  id: string;
+  biome: string;
+  startTime: number;
+  endTime: number;
+  status: 'active' | 'completed';
+}
 import './modern-game-layout.css';
 
 interface ModernGameLayoutProps {
@@ -96,7 +106,7 @@ const createGameTabs = (player: Player, activeExpedition: ActiveExpedition | nul
     description: 'Itens carregados e equipamentos',
     category: 'inventory',
     priority: 2,
-    hasNotification: (player?.inventory?.length || 0) > 20
+    hasNotification: false // TODO: implement inventory length check
   },
   {
     id: 'storage',
@@ -130,7 +140,7 @@ const createGameTabs = (player: Player, activeExpedition: ActiveExpedition | nul
     description: 'Registro de animais descobertos',
     category: 'exploration',
     priority: 5,
-    hasNotification: (player?.discoveredAnimals?.length || 0) > 0
+    hasNotification: false // TODO: implement discovered animals check
   },
 
   // CRAFTING - Criação e processamento
@@ -165,7 +175,7 @@ const createGameTabs = (player: Player, activeExpedition: ActiveExpedition | nul
     description: 'Objetivos, tarefas e recompensas',
     category: 'social',
     priority: 8,
-    hasNotification: (player?.quests?.filter(q => q.status === 'available')?.length || 0) > 0
+    hasNotification: false // TODO: implement quests check
   },
 
   // SYSTEM - Configurações
@@ -300,8 +310,8 @@ const EquipmentIndicators: React.FC<{ player: Player }> = React.memo(({ player }
   <div className="flex items-center space-x-3">
     <div className="flex items-center space-x-1">
       <Shield className="w-3 h-3 text-blue-500 flex-shrink-0" />
-      <span className={`text-xs ${player?.equippedArmor ? 'text-green-600' : 'text-gray-400'}`}>
-        {player?.equippedArmor ? '✓' : '○'}
+      <span className={`text-xs ${player?.equippedHelmet ? 'text-green-600' : 'text-gray-400'}`}>
+        {player?.equippedHelmet ? '✓' : '○'}
       </span>
     </div>
     <div className="flex items-center space-x-1">
@@ -321,22 +331,7 @@ const EquipmentIndicators: React.FC<{ player: Player }> = React.memo(({ player }
 
 EquipmentIndicators.displayName = 'EquipmentIndicators';
 
-// Hook para detectar dispositivos móveis
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkIfMobile();
-    window.addEventListener('resize', checkIfMobile);
-    return () => window.removeEventListener('resize', checkIfMobile);
-  }, []);
-
-  return isMobile;
-};
+// Hook is imported from @/hooks/use-mobile, removed local definition
 
 // Componente principal refatorado
 export default function ModernGameLayout({
@@ -426,9 +421,9 @@ export default function ModernGameLayout({
 
   // Verificação de atividade offline otimizada
   useEffect(() => {
-    if (!player?.lastSeen) return;
+    if (!player?.lastOnlineTime) return;
     
-    const lastSeenTime = new Date(player.lastSeen).getTime();
+    const lastSeenTime = new Date(player.lastOnlineTime).getTime();
     const currentTime = Date.now();
     const offlineTime = (currentTime - lastSeenTime) / 1000;
 
@@ -441,10 +436,10 @@ export default function ModernGameLayout({
       setOfflineReport(mockedReport);
       setOfflineReportOpen(true);
     }
-  }, [player?.lastSeen]);
+  }, [player?.lastOnlineTime]);
 
   // Loading state
-  if (isLoading || !player) {
+  if (gameState.isLoading || !player) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="text-center">
@@ -481,12 +476,12 @@ export default function ModernGameLayout({
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                   <span className="text-white font-bold text-sm sm:text-base">
-                    {player?.name?.charAt(0) || '?'}
+                    {player?.username?.charAt(0) || '?'}
                   </span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
-                    {player?.name || 'Carregando...'}
+                    {player?.username || 'Carregando...'}
                   </h1>
                   <div className="flex items-center space-x-3 text-xs sm:text-sm text-gray-600">
                     <div className="flex items-center space-x-1">
@@ -555,7 +550,8 @@ export default function ModernGameLayout({
             </ScrollArea>
           </div>
 
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full">{/* Hidden TabsList for shadcn compatibility */}
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full">
+            {/* Hidden TabsList for shadcn compatibility */}
             <TabsList className="hidden">
               {gameTabs.map((tab) => (
                 <TabsTrigger key={tab.id} value={tab.id}>
@@ -587,9 +583,7 @@ export default function ModernGameLayout({
                 {/* Tab Content Components */}
                 <TabsContent value="status" className="mt-0">
                   <StatusTab 
-                    player={player} 
-                    resources={resources} 
-                    equipment={equipment}
+                    player={player}
                     isBlocked={isBlocked}
                   />
                 </TabsContent>
@@ -621,7 +615,6 @@ export default function ModernGameLayout({
                     resources={resources}
                     equipment={equipment}
                     onExpeditionStart={handleExpeditionStart}
-                    isBlocked={isBlocked}
                   />
                 </TabsContent>
 
@@ -629,7 +622,6 @@ export default function ModernGameLayout({
                   <UnifiedWorkshops
                     player={player}
                     resources={resources}
-                    equipment={equipment}
                     recipes={recipes}
                     isBlocked={isBlocked}
                   />
@@ -640,13 +632,12 @@ export default function ModernGameLayout({
                     player={player}
                     resources={resources}
                     equipment={equipment}
-                    isBlocked={isBlocked}
                   />
                 </TabsContent>
 
                 <TabsContent value="animals" className="mt-0">
                   <AnimalRegistryTab 
-                    discoveredAnimals={player.discoveredAnimals || []}
+                    discoveredAnimals={[]}
                     playerId={player.id}
                     onAnimalSelect={(animal) => {
                       console.log('Animal selecionado:', animal);
@@ -657,10 +648,10 @@ export default function ModernGameLayout({
                 <TabsContent value="quests" className="mt-0">
                   <QuestsTab
                     player={player}
-                    isBlocked={isBlocked}
                   />
                 </TabsContent>
               </div>
+            </div>
           </Tabs>
         </div>
 
@@ -708,3 +699,5 @@ export default function ModernGameLayout({
     </div>
   );
 }
+
+export { ModernGameLayout };

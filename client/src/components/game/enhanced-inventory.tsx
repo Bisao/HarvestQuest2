@@ -227,7 +227,7 @@ const EnhancedInventory = React.memo(function EnhancedInventory({
       toast({
         title: "Erro",
         description: error.message || "Não foi possível consumir o item.",
-        variant: "destructive"structive"
+        variant: "destructive"
       });
     }
   });
