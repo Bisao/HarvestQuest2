@@ -15,11 +15,12 @@ function Game() {
 
   useEffect(() => {
     try {
-      // Extract player from URL params
-      const urlParams = new URLSearchParams(location.split('?')[1] || '');
+      // Extract player from URL params using window.location for full query string
+      const urlParams = new URLSearchParams(window.location.search);
       const playerParam = urlParams.get('player');
 
       console.log('🎮 GAME: URL location:', location);
+      console.log('🎮 GAME: Window search:', window.location.search);
       console.log('🎮 GAME: Player param:', playerParam);
 
       if (!playerParam) {
