@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Clock, Package, Zap, AlertTriangle, CheckCircle, Search, ArrowLeft, ArrowRight, Settings2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { Player, Biome, Resource } from '@shared/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ImprovedCustomExpeditionModalProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ const useIsMobile = () => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
@@ -54,11 +55,11 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
   // Check if player has required tools for a resource
   const hasRequiredTools = (resource: Resource): boolean => {
     if (!resource.requiredTool) return true;
-    
+
     // Check player's equipped tools
     const equippedTool = player.equippedTool;
     const equippedWeapon = player.equippedWeapon;
-    
+
     switch (resource.requiredTool) {
       case 'axe':
         return equippedTool === 'machado' || (equippedTool?.includes('axe') || false);
@@ -86,18 +87,18 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
       'peixe_grelhado',
       'ensopado_carne'
     ];
-    
+
     return resources.filter(resource => {
       // Exclude cooked/processed items
       if (excludedCookedItems.includes(resource.id)) {
         return false;
       }
-      
+
       // Filter by search term
       if (searchTerm && !resource.name.toLowerCase().includes(searchTerm.toLowerCase())) {
         return false;
       }
-      
+
       return true;
     });
   }, [resources, searchTerm]);
@@ -111,7 +112,7 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
                           category === 'organic' ? 'Plantas' :
                           category === 'creatures' ? 'Animais' :
                           category === 'processed_materials' ? 'Minerais' : 'Outros';
-      
+
       if (!grouped[categoryName]) grouped[categoryName] = [];
       grouped[categoryName].push(resource);
     });
@@ -124,7 +125,7 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
     const estimatedXP = Math.floor(totalResources * 2 + duration[0] * 0.5);
     const hungerCost = Math.floor(duration[0] * 0.8);
     const thirstCost = Math.floor(duration[0] * 0.6);
-    
+
     return {
       totalResources,
       estimatedXP,
@@ -158,12 +159,12 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
           selectedEquipment: []
         })
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Erro ao iniciar expedição');
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -171,11 +172,11 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
         title: "Expedição Iniciada!",
         description: `Expedição customizada em ${biome.name} iniciada com duração de ${duration[0]} minutos.`,
       });
-      
+
       // Invalidate relevant caches
       queryClient.invalidateQueries({ queryKey: ['/api/expeditions/player', player.id] });
       queryClient.invalidateQueries({ queryKey: ['/api/player', player.username] });
-      
+
       // Reset form and close
       setSelectedResources([]);
       setDuration([30]);
@@ -194,21 +195,28 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
 
   const handleResourceToggle = (resourceId: string) => {
     setSelectedResources(prev => {
-      const existing = prev.find(sel => sel.resourceId === resourceId);
-      if (existing) {
-        return prev.filter(sel => sel.resourceId !== resourceId);
+      const exists = prev.find(r => r.resourceId === resourceId);
+      if (exists) {
+        return prev.filter(r => r.resourceId !== resourceId);
       } else {
-        return [...prev, { resourceId, quantity: 5 }];
+        return [...prev, { resourceId, quantity: 1 }];
       }
     });
   };
 
-  const handleQuantityChange = (resourceId: string, quantity: number) => {
-    setSelectedResources(prev => prev.map(sel => 
-      sel.resourceId === resourceId 
-        ? { ...sel, quantity: quantity }
-        : sel
-    ));
+  const updateResourceQuantity = (resourceId: string, newQuantity: number) => {
+    if (newQuantity <= 0) {
+      handleResourceToggle(resourceId); // Remove if quantity is 0
+      return;
+    }
+
+    setSelectedResources(prev => 
+      prev.map(r => 
+        r.resourceId === resourceId 
+          ? { ...r, quantity: newQuantity }
+          : r
+      )
+    );
   };
 
   const handleSelectAll = () => {
@@ -241,6 +249,10 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
     return { color: 'text-red-600', icon: AlertTriangle };
   };
 
+  const getResourceById = (resourceId: string) => {
+    return resources.find(resource => resource.id === resourceId);
+  };
+
   if (!biome) return null;
 
   // Mobile two-step layout
@@ -270,98 +282,150 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
 
           <div className="flex-1 overflow-hidden min-h-0">
             {currentStep === 'selection' ? (
-              // Step 1: Resource Selection
-              <div className="flex flex-col h-full min-h-0">
-                <div className="shrink-0 p-2 space-y-3">
-                  {/* Search */}
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Buscar recursos..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+              // Step 1: Resource Selection with Tabs
+              <Tabs defaultValue="resources" className="flex flex-col h-full min-h-0">
+                <TabsList className="shrink-0 grid w-full grid-cols-2">
+                  <TabsTrigger value="resources">📦 Recursos</TabsTrigger>
+                  <TabsTrigger value="selected">✅ Selecionados ({selectedResources.length})</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="resources" className="flex flex-col flex-1 min-h-0 mt-4">
+                  <div className="shrink-0 p-2 space-y-3">
+                    {/* Search */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Buscar recursos..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSelectAll}
+                        className="flex-1"
+                      >
+                        Selecionar Tudo
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDeselectAll}
+                        className="flex-1"
+                      >
+                        Limpar
+                      </Button>
+                    </div>
                   </div>
 
-                  {/* Quick Actions */}
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSelectAll}
-                      className="flex-1"
-                    >
-                      Selecionar Tudo
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDeselectAll}
-                      className="flex-1"
-                    >
-                      Limpar
-                    </Button>
-                  </div>
+                  {/* Resource list */}
+                  <div className="flex-1 overflow-y-auto space-y-3 p-2 min-h-0" style={{ WebkitOverflowScrolling: 'touch' }}>
+                    {Object.entries(categorizedResources).map(([category, categoryResources]) => (
+                      <Card key={category} className="overflow-hidden">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <span>{getResourceIcon(category)}</span>
+                            {category}
+                            <Badge variant="secondary" className="ml-auto text-xs">
+                              {categoryResources.length}
+                            </Badge>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          {categoryResources.map(resource => {
+                            const isSelected = selectedResources.some(sel => sel.resourceId === resource.id);
 
-                  {/* Selected count */}
-                  <div className="text-center text-sm text-gray-600">
-                    {selectedResources.length} recursos selecionados
-                  </div>
-                </div>
-
-                {/* Resource list */}
-                <div className="flex-1 overflow-y-auto space-y-3 p-2 min-h-0" style={{ WebkitOverflowScrolling: 'touch' }}>
-                  {Object.entries(categorizedResources).map(([category, categoryResources]) => (
-                    <Card key={category} className="overflow-hidden">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          <span>{getResourceIcon(category)}</span>
-                          {category}
-                          <Badge variant="secondary" className="ml-auto text-xs">
-                            {categoryResources.length}
-                          </Badge>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        {categoryResources.map(resource => {
-                          const isSelected = selectedResources.some(sel => sel.resourceId === resource.id);
-                          
-                          return (
-                            <div key={resource.id} className="flex items-center gap-2 p-2 rounded border hover:bg-gray-50">
-                              <Checkbox
-                                checked={isSelected}
-                                onCheckedChange={() => handleResourceToggle(resource.id)}
-                              />
-                              <div className="flex-1">
-                                <div className="font-medium text-sm">{resource.name}</div>
-                                {resource.requiredTool && (
-                                  <div className="text-xs text-gray-500">
-                                    Requer: {resource.requiredTool}
-                                  </div>
-                                )}
+                            return (
+                              <div key={resource.id} className="flex items-center gap-2 p-2 rounded border hover:bg-gray-50">
+                                <Checkbox
+                                  checked={isSelected}
+                                  onCheckedChange={() => handleResourceToggle(resource.id)}
+                                />
+                                <span className="text-lg">{resource.emoji}</span>
+                                <div className="flex-1">
+                                  <p className="font-medium text-sm">{resource.name}</p>
+                                  <p className="text-xs text-gray-500">
+                                    Peso: {resource.weight}kg • Raridade: {
+                                      resource.rarity === "common" ? "Comum" : 
+                                      resource.rarity === "uncommon" ? "Incomum" : "Raro"
+                                    }
+                                  </p>
+                                </div>
                               </div>
-                              <span className="text-lg">{resource.emoji}</span>
-                            </div>
-                          );
-                        })}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                            );
+                          })}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
 
-                {/* Next button */}
-                <div className="shrink-0 p-3 border-t">
-                  <Button
-                    onClick={() => setCurrentStep('configuration')}
-                    disabled={selectedResources.length === 0}
-                    className="w-full"
-                  >
-                    Continuar
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </div>
-              </div>
+                <TabsContent value="selected" className="flex flex-col flex-1 min-h-0 mt-4">
+                  <div className="shrink-0 p-2">
+                    <div className="text-center text-sm text-gray-600 mb-4">
+                      {selectedResources.length} recursos selecionados
+                    </div>
+                  </div>
+
+                  {selectedResources.length === 0 ? (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center text-gray-500">
+                        <Package className="mx-auto h-12 w-12 mb-2 opacity-50" />
+                        <p>Nenhum recurso selecionado</p>
+                        <p className="text-sm">Vá para a aba "Recursos" para selecionar itens</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex-1 overflow-y-auto space-y-2 p-2 min-h-0">
+                      {selectedResources.map(selected => {
+                        const resource = getResourceById(selected.resourceId);
+                        if (!resource) return null;
+
+                        return (
+                          <div key={selected.resourceId} className="flex items-center gap-3 p-3 border rounded-lg bg-white">
+                            <span className="text-2xl">{resource.emoji}</span>
+                            <div className="flex-1">
+                              <p className="font-medium">{resource.name}</p>
+                              <p className="text-sm text-gray-500">
+                                Quantidade: {selected.quantity} • Peso total: {(resource.weight * selected.quantity).toFixed(1)}kg
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => updateResourceQuantity(selected.resourceId, Math.max(1, selected.quantity - 1))}
+                              >
+                                -
+                              </Button>
+                              <span className="w-12 text-center">{selected.quantity}</span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => updateResourceQuantity(selected.resourceId, selected.quantity + 1)}
+                              >
+                                +
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleResourceToggle(selected.resourceId)}
+                              >
+                                ✕
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
             ) : (
               // Step 2: Configuration and Start
               <div className="flex flex-col h-full space-y-4 p-2">
@@ -374,7 +438,7 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
                     {selectedResources.map(sel => {
                       const resource = resources.find(r => r.id === sel.resourceId);
                       if (!resource) return null;
-                      
+
                       return (
                         <div key={sel.resourceId} className="flex items-center gap-2">
                           <span className="text-sm flex-1">{resource.name}</span>
@@ -651,9 +715,9 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
                   <span>XP estimado:</span>
                   <Badge variant="outline" className="text-xs">{expeditionStats.estimatedXP} XP</Badge>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Fome necessária:</span>
