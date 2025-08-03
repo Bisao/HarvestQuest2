@@ -33,6 +33,13 @@ export function useActiveExpeditions(playerId: string) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(100, (elapsed / expeditionDuration) * 100);
       
+      console.log('🔍 Processing expedition:', {
+        id: exp.id,
+        biomeId: exp.biomeId,
+        progress,
+        collectedResources: exp.collectedResources
+      });
+      
       return {
         id: exp.id,
         playerId: exp.playerId,
@@ -47,6 +54,8 @@ export function useActiveExpeditions(playerId: string) {
         status: 'active' as const
       };
     });
+
+  console.log('🎯 Active expeditions found:', activeExpeditions.length);
 
   const getActiveExpeditionForBiome = (biomeId: string) => {
     return activeExpeditions.find(exp => exp.planId === biomeId);

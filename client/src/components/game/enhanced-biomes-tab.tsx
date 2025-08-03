@@ -26,6 +26,7 @@ import type { Biome, Resource, Equipment, Player } from '@shared/types';
 import { NewExpeditionModal } from './new-expedition-modal';
 import { ManualExpeditionModal } from './manual-expedition-modal';
 import { ExpeditionTracker } from './expedition-tracker';
+import { ExpeditionStatus } from './expedition-status';
 import { useActiveExpeditions } from '@/hooks/use-active-expeditions';
 
 interface EnhancedBiomesTabProps {
@@ -367,145 +368,13 @@ export default function EnhancedBiomesTab({
                 </div>
 
                 {/* Sistema de expedição em tempo real */}
-                <div className="pt-2">
-                  {(() => {
-                    const { getActiveExpeditionForBiome, formatTimeRemaining } = useActiveExpeditions(player.id);
-                    const activeExpedition = getActiveExpeditionForBiome(biome.id);
-                    
-                    if (activeExpedition) {
-                      const isCompleted = activeExpedition.progress >= 100;
-                      
-                      return (
-                        <div className="space-y-3">
-                          {/* Log de progresso */}
-                          <div className="bg-gray-50 rounded-lg p-3 max-h-32 overflow-y-auto">
-                            <div className="text-sm font-medium text-gray-700 mb-2">
-                              📋 Log da Expedição
-                            </div>
-                            <div className="space-y-1 text-xs">
-                              {/* Recursos coletados */}
-                              {Object.entries(activeExpedition.collectedResources).map(([resourceId, quantity]) => {
-                                const resource = resources.find(r => r.id === resourceId);
-                                return (
-                                  <div key={resourceId} className="flex items-center space-x-2 text-green-700">
-                                    <span>✅</span>
-                                    <span>Coletou {quantity}x {resource?.emoji || '📦'} {resource?.name || resourceId}</span>
-                                  </div>
-                                );
-                              })}
-                              
-                              {/* Progresso por fase */}
-                              {activeExpedition.progress >= 20 && (
-                                <div className="flex items-center space-x-2 text-blue-700">
-                                  <span>🚶</span>
-                                  <span>Chegou ao bioma</span>
-                                </div>
-                              )}
-                              {activeExpedition.progress >= 40 && (
-                                <div className="flex items-center space-x-2 text-yellow-700">
-                                  <span>🔍</span>
-                                  <span>Iniciou exploração</span>
-                                </div>
-                              )}
-                              {activeExpedition.progress >= 80 && (
-                                <div className="flex items-center space-x-2 text-orange-700">
-                                  <span>📦</span>
-                                  <span>Coletando recursos</span>
-                                </div>
-                              )}
-                              {activeExpedition.progress >= 100 && (
-                                <div className="flex items-center space-x-2 text-purple-700">
-                                  <span>🏠</span>
-                                  <span>Retornando ao acampamento</span>
-                                </div>
-                              )}
-                              
-                              {/* Mostrar XP estimado quando completar */}
-                              {isCompleted && (
-                                <div className="flex items-center space-x-2 text-green-800 font-medium">
-                                  <span>⭐</span>
-                                  <span>Expedição concluída! XP estimado: {Math.floor(Object.values(activeExpedition.collectedResources).reduce((a, b) => a + b, 0) * 2)}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Barra de progresso (só mostra se não completou) */}
-                          {!isCompleted && (
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Progresso da Expedição</span>
-                                <div className="flex items-center space-x-2">
-                                  <Clock className="w-3 h-3 text-blue-500" />
-                                  <span className="text-blue-600">{formatTimeRemaining(activeExpedition.estimatedEndTime)}</span>
-                                </div>
-                              </div>
-                              <Progress 
-                                value={activeExpedition.progress} 
-                                className="h-3"
-                              />
-                              <div className="text-center text-xs text-gray-500">
-                                {Math.round(activeExpedition.progress)}% - {
-                                  activeExpedition.currentPhase === 'preparing' ? 'Preparando' :
-                                  activeExpedition.currentPhase === 'traveling' ? 'Viajando' :
-                                  activeExpedition.currentPhase === 'exploring' ? 'Explorando' :
-                                  activeExpedition.currentPhase === 'returning' ? 'Retornando' : 'Expedição'
-                                }
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Botão de finalizar (só aparece quando completou) */}
-                          {isCompleted && (
-                            <Button 
-                              onClick={async () => {
-                                try {
-                                  const response = await fetch(`/api/expeditions/${activeExpedition.id}/complete`, {
-                                    method: 'POST'
-                                  });
-                                  if (response.ok) {
-                                    // Força atualização dos dados
-                                    window.location.reload();
-                                  }
-                                } catch (error) {
-                                  console.error('Erro ao finalizar expedição:', error);
-                                }
-                              }}
-                              className="w-full"
-                              size="lg"
-                            >
-                              <CheckCircle className="w-4 h-4 mr-2" />
-                              Finalizar Expedição
-                            </Button>
-                          )}
-                        </div>
-                      );
-                    }
-                    
-                    // Botão normal quando não há expedição ativa
-                    return (
-                      <Button 
-                        onClick={() => handleExploreBiome(biome)}
-                        disabled={!unlocked}
-                        className="w-full"
-                        variant={unlocked ? "default" : "secondary"}
-                        size="lg"
-                      >
-                        {unlocked ? (
-                          <>
-                            <Compass className="w-4 h-4 mr-2" />
-                            Explorar Bioma
-                          </>
-                        ) : (
-                          <>
-                            <Clock className="w-4 h-4 mr-2" />
-                            Desbloqueado no Nível {biome.requiredLevel}
-                          </>
-                        )}
-                      </Button>
-                    );
-                  })()}
-                </div>
+                <ExpeditionStatus 
+                  biome={biome}
+                  player={player}
+                  resources={resources}
+                  unlocked={unlocked}
+                  onExploreBiome={handleExploreBiome}
+                />
               </CardContent>
             </Card>
           );
