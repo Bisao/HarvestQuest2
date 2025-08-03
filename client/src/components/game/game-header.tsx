@@ -63,12 +63,12 @@ const GameHeader = ({ player }: GameHeaderProps) => {
 
   return (
     <>
-      <header className="bg-white shadow-md border-b-4 border-forest">
-        <div className="container mx-auto px-4 py-3 md:py-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0">
+      <header className="bg-white shadow-md border-b-4 border-forest sticky top-0 z-40">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 md:py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 md:gap-0">
             {/* Informações de Tempo e Data */}
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center space-x-6 text-sm">
+              <div className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 text-xs sm:text-sm">
                 {isLoading && (
                   <div className="flex items-center space-x-2">
                     <span className="text-gray-500">Carregando tempo...</span>

@@ -472,7 +472,7 @@ export default function ModernGameLayout() {
       )}
 
       {/* Layout Principal */}
-      <div className="flex h-screen">
+      <div className="flex h-screen overflow-hidden">
         {/* Overlay para mobile */}
         {isMobile && isSidebarOpen && (
           <div 
@@ -612,7 +612,7 @@ export default function ModernGameLayout() {
           </div>
 
           {/* Tab Content */}
-          <div className={`flex-1 overflow-auto bg-gray-50 ${isMobile ? 'p-2' : 'p-4'} safe-area-bottom`}>
+          <div className={`flex-1 overflow-auto bg-gray-50 ${isMobile ? 'p-2 pb-safe' : 'p-4'} safe-area-bottom mobile-content-spacing`}>
             {activeTab === 'status' && player && (
               <StatusTab 
                 player={player}

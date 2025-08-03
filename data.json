@@ -1,10 +1,10 @@
 {
   "players": [
     [
-      "bf47f441-4958-4f8b-9d98-7a407ead701b",
+      "76b9b775-1cd0-4e1b-8b9f-81349cab76e7",
       {
-        "id": "bf47f441-4958-4f8b-9d98-7a407ead701b",
-        "username": "Nha",
+        "id": "76b9b775-1cd0-4e1b-8b9f-81349cab76e7",
+        "username": "Bison",
         "level": 1,
         "experience": 0,
         "coins": 100,
@@ -25,14 +25,14 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 85,
+        "hunger": 63.5,
         "maxHunger": 100,
-        "thirst": 94,
+        "thirst": 86,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 56,
-        "hygiene": 94,
+        "morale": 59,
+        "hygiene": 85,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -45,41 +45,6 @@
   ],
   "inventoryItems": [],
   "storageItems": [],
-  "expeditions": [
-    [
-      "d028cd92-94d5-4e2d-83bc-33263d050a26",
-      {
-        "id": "d028cd92-94d5-4e2d-83bc-33263d050a26",
-        "playerId": "bf47f441-4958-4f8b-9d98-7a407ead701b",
-        "biomeId": "biome-floresta-001",
-        "selectedResources": [
-          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
-        ],
-        "selectedEquipment": [],
-        "status": "in_progress",
-        "startTime": 1754234148652,
-        "endTime": null,
-        "progress": 0,
-        "collectedResources": {}
-      }
-    ],
-    [
-      "a6e32f48-5e62-4bcc-9100-06912c55d7a8",
-      {
-        "id": "a6e32f48-5e62-4bcc-9100-06912c55d7a8",
-        "playerId": "bf47f441-4958-4f8b-9d98-7a407ead701b",
-        "biomeId": "biome-floresta-001",
-        "selectedResources": [
-          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
-        ],
-        "selectedEquipment": [],
-        "status": "in_progress",
-        "startTime": 1754234386067,
-        "endTime": null,
-        "progress": 0,
-        "collectedResources": {}
-      }
-    ]
-  ],
+  "expeditions": [],
   "playerQuests": []
 }
