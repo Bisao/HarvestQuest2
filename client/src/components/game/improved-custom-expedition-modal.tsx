@@ -61,16 +61,16 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
     
     switch (resource.requiredTool) {
       case 'axe':
-        return equippedTool === 'machado' || equippedTool?.includes('axe');
+        return equippedTool === 'machado' || (equippedTool?.includes('axe') || false);
       case 'pickaxe':
-        return equippedTool === 'picareta' || equippedTool?.includes('pickaxe');
+        return equippedTool === 'picareta' || (equippedTool?.includes('pickaxe') || false);
       case 'knife':
-        return equippedTool === 'faca' || equippedTool?.includes('knife');
+        return equippedTool === 'faca' || (equippedTool?.includes('knife') || false);
       case 'fishing_rod':
-        return equippedTool === 'vara_pesca' || equippedTool?.includes('fishing');
+        return equippedTool === 'vara_pesca' || (equippedTool?.includes('fishing') || false);
       case 'weapon_and_knife':
         return (equippedWeapon && equippedTool === 'faca') || 
-               (equippedWeapon?.includes('weapon') && equippedTool?.includes('knife'));
+               ((equippedWeapon?.includes('weapon') || false) && (equippedTool?.includes('knife') || false));
       default:
         return true;
     }
@@ -108,9 +108,9 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
     filteredResources.forEach(resource => {
       const category = resource.category || 'raw_materials';
       const categoryName = category === 'raw_materials' ? 'Materiais Básicos' : 
-                          category === 'plants' ? 'Plantas' :
-                          category === 'animals' ? 'Animais' :
-                          category === 'minerals' ? 'Minerais' : 'Outros';
+                          category === 'organic' ? 'Plantas' :
+                          category === 'creatures' ? 'Animais' :
+                          category === 'processed_materials' ? 'Minerais' : 'Outros';
       
       if (!grouped[categoryName]) grouped[categoryName] = [];
       grouped[categoryName].push(resource);
@@ -268,10 +268,10 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
             </DialogTitle>
           </DialogHeader>
 
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden min-h-0">
             {currentStep === 'selection' ? (
               // Step 1: Resource Selection
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col h-full min-h-0">
                 <div className="shrink-0 p-2 space-y-3">
                   {/* Search */}
                   <div className="relative">
@@ -311,7 +311,7 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
                 </div>
 
                 {/* Resource list */}
-                <div className="flex-1 overflow-y-auto space-y-3 p-2">
+                <div className="flex-1 overflow-y-auto space-y-3 p-2 min-h-0" style={{ WebkitOverflowScrolling: 'touch' }}>
                   {Object.entries(categorizedResources).map(([category, categoryResources]) => (
                     <Card key={category} className="overflow-hidden">
                       <CardHeader className="pb-2">

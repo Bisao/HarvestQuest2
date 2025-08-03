@@ -121,11 +121,36 @@
       line-height: 1.2;
     }
     
-    /* Better modal sizing */
+    /* Better modal sizing and scrolling */
     .dialog-content {
-      max-width: 95vw;
       max-height: 90vh;
     }
+    
+    /* Enhanced mobile scrolling */
+    .mobile-scroll {
+      -webkit-overflow-scrolling: touch;
+      overflow-y: auto;
+      max-height: calc(90vh - 120px);
+    }
+    
+    /* Smooth scrolling areas */
+    .scroll-smooth {
+      scroll-behavior: smooth;
+    }
+  }
+  
+  /* General scrolling improvements */
+  .enhanced-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Fix for nested flex containers with scrolling */
+  .flex-scroll-container {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
   }
   
   /* Responsive text sizing */
@@ -175,7 +200,6 @@
   .safe-area-right {
     padding-right: env(safe-area-inset-right);
   }
-}
 
 :root {
   --background: hsl(0, 0%, 100%);
