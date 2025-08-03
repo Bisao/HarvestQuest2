@@ -23,9 +23,9 @@ import {
   Info
 } from 'lucide-react';
 
-// Importar dados reais do registry
-import { ANIMAL_REGISTRY } from '../../../shared/data/animal-registry';
-import type { AnimalData } from '../../../shared/data/animal-registry';
+// Importar dados reais do registry do servidor
+import { ANIMAL_REGISTRY } from '../../../../server/data/animal-registry';
+import type { AnimalRegistryEntry } from '../../../../shared/types/animal-registry-types';
 
 const ANIMAL_CATEGORIES = [
   { id: 'all', name: 'Todos', emoji: '🌍', description: 'Todos os animais' },
@@ -63,11 +63,11 @@ const getSizeColor = (size: string) => {
 interface AnimalRegistryTabProps {
   discoveredAnimals: string[];
   playerId: string;
-  onAnimalSelect?: (animal: AnimalData) => void;
+  onAnimalSelect?: (animal: AnimalRegistryEntry) => void;
 }
 
 interface AnimalCardProps {
-  animal: AnimalData;
+  animal: AnimalRegistryEntry;
   isDiscovered: boolean;
   onClick: () => void;
 }
@@ -87,7 +87,7 @@ function AnimalCard({ animal, isDiscovered, onClick }: AnimalCardProps) {
               {animal.emoji}
             </span>
             <span className="font-semibold text-sm">
-              {isDiscovered ? animal.name : '???'}
+              {isDiscovered ? animal.commonName : '???'}
             </span>
           </div>
           {isDiscovered && (
@@ -99,7 +99,7 @@ function AnimalCard({ animal, isDiscovered, onClick }: AnimalCardProps) {
 
         {isDiscovered && (
           <div className="space-y-1 text-xs text-gray-600">
-            <p className="line-clamp-2">{animal.description}</p>
+            <p className="line-clamp-2">{animal.generalInfo.diet}</p>
             <div className="flex flex-wrap gap-1 mt-2">
               {animal.habitat.slice(0, 2).map((hab, idx) => (
                 <Badge key={idx} variant="outline" className="text-xs">
@@ -126,7 +126,7 @@ function AnimalCard({ animal, isDiscovered, onClick }: AnimalCardProps) {
 }
 
 interface AnimalDetailModalProps {
-  animal: AnimalData | null;
+  animal: AnimalRegistryEntry | null;
   isOpen: boolean;
   onClose: () => void;
   isDiscovered: boolean;
@@ -144,7 +144,7 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
               <span className="text-3xl">{animal.emoji}</span>
               <div>
                 <h2 className="text-xl font-bold">
-                  {isDiscovered ? animal.name : 'Animal Desconhecido'}
+                  {isDiscovered ? animal.commonName : 'Animal Desconhecido'}
                 </h2>
                 {isDiscovered && (
                   <Badge className={`${getRarityColor(animal.rarity)} text-white`}>
@@ -160,14 +160,14 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold mb-2">Descrição</h3>
-                <p className="text-sm text-gray-600">{animal.description}</p>
+                <p className="text-sm text-gray-600">{animal.generalInfo.diet}</p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2">Características</h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div><strong>Tamanho:</strong> {animal.size}</div>
-                  <div><strong>Comportamento:</strong> {animal.behavior}</div>
+                  <div><strong>Tamanho:</strong> {animal.generalInfo.size}</div>
+                  <div><strong>Comportamento:</strong> {animal.generalInfo.behavior.join(', ')}</div>
                 </div>
               </div>
 
@@ -182,24 +182,11 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
                 </div>
               </div>
 
-              {animal.products && animal.products.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-2">Produtos</h3>
-                  <div className="flex flex-wrap gap-1">
-                    {animal.products.map((product, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
-                        {product}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {animal.facts && animal.facts.length > 0 && (
+              {animal.generalInfo.funFacts && animal.generalInfo.funFacts.length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-2">Curiosidades</h3>
                   <ul className="text-sm text-gray-600 space-y-1">
-                    {animal.facts.map((fact, idx) => (
+                    {animal.generalInfo.funFacts.map((fact, idx) => (
                       <li key={idx} className="flex items-start gap-2">
                         <span className="text-blue-500 mt-1">•</span>
                         <span>{fact}</span>
@@ -210,12 +197,11 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
               )}
 
               <div>
-                <h3 className="font-semibold mb-2">Estatísticas</h3>
+                <h3 className="font-semibold mb-2">Informações Gerais</h3>
                 <div className="text-sm space-y-1">
-                  <div>Encontros: {animal.encounterCount}</div>
-                  {animal.lastSeen && (
-                    <div>Último avistamento: {new Date(animal.lastSeen).toLocaleDateString()}</div>
-                  )}
+                  <div>Expectativa de vida: {animal.generalInfo.lifespan}</div>
+                  <div>Peso: {animal.generalInfo.weight}</div>
+                  <div>Nível necessário: {animal.requiredLevel}</div>
                 </div>
               </div>
             </div>
@@ -232,7 +218,7 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
 }
 
 export default function AnimalRegistryTab({ discoveredAnimals, playerId }: AnimalRegistryTabProps) {
-  const [selectedAnimal, setSelectedAnimal] = useState<AnimalData | null>(null);
+  const [selectedAnimal, setSelectedAnimal] = useState<AnimalRegistryEntry | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [filterRarity, setFilterRarity] = useState<string>('all');
@@ -241,8 +227,8 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
   // Filtrar animais
   const filteredAnimals = useMemo(() => {
     return ANIMAL_REGISTRY.filter(animal => {
-      const matchesSearch = animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          animal.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = animal.commonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          animal.generalInfo.diet.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || animal.category === selectedCategory;
       const matchesRarity = filterRarity === 'all' || animal.rarity === filterRarity;
 
@@ -255,7 +241,7 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
   const discoveredCount = discoveredAnimals.length;
   const discoveryPercentage = Math.round((discoveredCount / totalAnimals) * 100);
 
-  const handleAnimalClick = (animal: AnimalData) => {
+  const handleAnimalClick = (animal: AnimalRegistryEntry) => {
     setSelectedAnimal(animal);
     setShowModal(true);
   };
