@@ -101,48 +101,48 @@ export default function ModernExpeditionModal({
   // Categorizar recursos
   const categorizeResource = (resource: Resource): string => {
     const name = resource.name.toLowerCase();
-    
+
     if (name.includes('madeira') || name.includes('tronco') || name.includes('galho') ||
         name.includes('carvalho') || name.includes('pinho') || name.includes('cedro') ||
         name.includes('eucalipto') || name.includes('mogno') || name.includes('bambu')) return 'wood';
-    
+
     if (name.includes('pedra') || name.includes('mineral') || name.includes('ferro') || 
         name.includes('cobre') || name.includes('granito') || name.includes('calcaria') ||
         name.includes('quartzo') || name.includes('argila')) return 'stone';
-    
+
     if (name.includes('fibra') || name.includes('linho') || name.includes('algodao') ||
         name.includes('algodão') || name.includes('juta') || name.includes('sisal') ||
         name.includes('canamo') || name.includes('cânamo')) return 'fiber';
-    
+
     if (name.includes('coelho') || name.includes('veado') || name.includes('urso') ||
         name.includes('javali') || name.includes('cervo') || name.includes('raposa') ||
         name.includes('esquilo') || name.includes('castor') || name.includes('cabra') ||
         name.includes('ovelha') || name.includes('alce') || name.includes('rena') ||
         name.includes('bisao') || name.includes('bisão') || name.includes('boi') ||
         name.includes('carne')) return 'animals';
-    
+
     if (name.includes('peixe') || name.includes('salmao') || name.includes('salmão') ||
         name.includes('truta') || name.includes('carpa') || name.includes('bagre') ||
         name.includes('dourado') || name.includes('pintado') || name.includes('tucunare') ||
         name.includes('tucunaré') || name.includes('piranha') || name.includes('lambari') ||
         name.includes('tilapia') || name.includes('tilápia')) return 'fish';
-    
+
     if (name.includes('erva') || name.includes('flor') || name.includes('cogumelo') || 
         name.includes('planta') || name.includes('folha') || name.includes('raiz') ||
         name.includes('semente') || name.includes('fruto') || name.includes('baga')) return 'plants';
-    
+
     if (name.includes('cristal') || name.includes('gema') || name.includes('ouro') || 
         name.includes('prata') || name.includes('diamante') || name.includes('rubi') ||
         name.includes('safira') || name.includes('esmeralda') || name.includes('ametista')) return 'rare';
-    
+
     if (name.includes('processado') || name.includes('refinado') || name.includes('trabalhado') ||
         name.includes('fundido') || name.includes('forjado') || name.includes('polido') ||
         name.includes('lapidado')) return 'processed';
-    
+
     if (name.includes('raro') || name.includes('lendario') || name.includes('lendário') ||
         name.includes('épico') || name.includes('epico') || name.includes('mistico') ||
         name.includes('místico') || name.includes('sagrado')) return 'special';
-    
+
     return 'basic';
   };
 
@@ -231,7 +231,7 @@ export default function ModernExpeditionModal({
     return biomeResources.map(resource => {
       const collectabilityInfo = checkResourceCollectability(resource);
       const category = categorizeResource(resource);
-      
+
       return {
         ...resource,
         canCollect: collectabilityInfo.canCollect,
@@ -262,7 +262,7 @@ export default function ModernExpeditionModal({
   // Agrupar por categoria
   const resourcesByCategory = useMemo(() => {
     const grouped: Record<string, CollectableResource[]> = {};
-    
+
     filteredResources.forEach(resource => {
       if (!grouped[resource.category]) {
         grouped[resource.category] = [];
@@ -428,7 +428,7 @@ export default function ModernExpeditionModal({
                             {category.name} ({categoryResources.length})
                           </div>
                         </div>
-                        
+
                         <div className="grid gap-3">
                           {categoryResources.map((resource) => (
                             <Card 
