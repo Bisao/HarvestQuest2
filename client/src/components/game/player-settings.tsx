@@ -30,8 +30,43 @@ export default function PlayerSettings({ player, isOpen, onClose, isBlocked = fa
   const [isNavigatingToMenu, setIsNavigatingToMenu] = useState(false);
   const [autoConsume, setAutoConsume] = useState(player.autoConsume ?? false);
   const [selectedTimeOfDay, setSelectedTimeOfDay] = useState<GameTime['timeOfDay']>('dawn');
+  const [devModeUnlockAnimals, setDevModeUnlockAnimals] = useState(false);
 
   const saveGame = useSaveGame();
+
+  // Mutation para modo desenvolvedor - desbloquear todos os animais
+  const devModeUnlockMutation = useMutation({
+    mutationFn: async (unlock: boolean) => {
+      const response = await fetch('/api/developer/unlock-animals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, unlock }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to toggle dev mode');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: devModeUnlockAnimals ? "Animais Desbloqueados" : "Modo Normal Ativado",
+        description: devModeUnlockAnimals ? "Todos os animais foram desbloqueados para teste!" : "Modo normal restaurado",
+      });
+      // Invalidar queries relacionadas ao bestiário
+      queryClient.invalidateQueries({ queryKey: ['animalRegistry'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/player', player.username] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro no Modo Desenvolvedor",
+        description: error.message || "Não foi possível alterar o modo desenvolvedor",
+        variant: "destructive",
+      });
+      // Reverter o estado local em caso de erro
+      setDevModeUnlockAnimals(!devModeUnlockAnimals);
+    },
+  });
 
   // Mutation para alterar o tempo do dia
   const changeTimeMutation = useMutation({
@@ -120,6 +155,11 @@ export default function PlayerSettings({ player, isOpen, onClose, isBlocked = fa
       });
     },
   });
+
+  const handleDevModeToggle = (checked: boolean) => {
+    setDevModeUnlockAnimals(checked);
+    devModeUnlockMutation.mutate(checked);
+  };
 
   const handleSaveSettings = () => {
     if (isBlocked) {
@@ -298,6 +338,39 @@ export default function PlayerSettings({ player, isOpen, onClose, isBlocked = fa
                 </p>
                 <TimeSpeedControl />
               </div>
+            </div>
+
+            {/* Developer Mode Section */}
+            <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+              <div className="flex items-center space-x-3 mb-3">
+                <span className="text-lg">🧪</span>
+                <div>
+                  <p className="font-medium text-red-800">Modo Desenvolvedor</p>
+                  <p className="text-sm text-red-600">Ferramentas de teste e debug</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-white rounded border border-red-200">
+                <div className="flex items-center space-x-3">
+                  <span className="text-lg">🔓</span>
+                  <div>
+                    <p className="font-medium text-gray-800">Desbloquear Todos os Animais</p>
+                    <p className="text-sm text-gray-600">Para testes: mostra todos os animais como descobertos no bestiário</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={devModeUnlockAnimals}
+                  onCheckedChange={handleDevModeToggle}
+                  disabled={isBlocked || devModeUnlockMutation.isPending}
+                />
+              </div>
+              
+              {devModeUnlockMutation.isPending && (
+                <div className="mt-2 text-sm text-red-600 flex items-center gap-2">
+                  <Clock className="w-4 h-4 animate-spin" />
+                  Aplicando alterações...
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -19,6 +19,8 @@ import { createConsumptionRoutes } from "./routes/consumption";
 import { createSkillRoutes } from "./routes/skill-routes";
 import savesRouter from "./routes/saves";
 import animalRegistryRoutes from './routes/animal-registry-routes';
+import animalRoutes from './routes/animal-routes';
+import developerRoutes from './routes/developer-routes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -879,7 +881,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Transfer from storage to inventory using service
-  app.post("/api/storage/withdraw", async (req, res) => {
+  app.post("/api/storage/withdraw", async (req, res){
     try {
       const { playerId, storageItemId, quantity } = req.body;
 
@@ -1262,7 +1264,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // WebSocket service will be initialized in index.ts
 
   // WebSocket service will be initialized in index.ts
-  app.use('/api/animals', animalRegistryRoutes);
+  app.use('/api/animal-registry', animalRegistryRoutes);
+  app.use('/api/animals', animalRoutes);
+
+  // Developer routes
+  app.use('/api/developer', developerRoutes);
 
   return httpServer;
 }

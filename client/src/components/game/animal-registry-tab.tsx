@@ -227,10 +227,35 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [filterRarity, setFilterRarity] = useState<string>('all');
   const [showModal, setShowModal] = useState(false);
+  const [devModeActive, setDevModeActive] = useState(false);
+
+  // Check if dev mode is active
+  useEffect(() => {
+    const checkDevMode = async () => {
+      try {
+        const response = await fetch(`/api/developer/status/${playerId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setDevModeActive(data.devModeActive);
+        }
+      } catch (error) {
+        console.error('Error checking dev mode:', error);
+      }
+    };
+    
+    if (playerId) {
+      checkDevMode();
+    }
+  }, [playerId]);
 
   // Para teste: alguns animais descobertos
   const mockDiscoveredAnimals = ['animal-rabbit-001', 'animal-smallfish-001'];
-  const actualDiscoveredAnimals = discoveredAnimals.length > 0 ? discoveredAnimals : mockDiscoveredAnimals;
+  const baseDiscoveredAnimals = discoveredAnimals.length > 0 ? discoveredAnimals : mockDiscoveredAnimals;
+  
+  // If dev mode is active, show all animals as discovered
+  const actualDiscoveredAnimals = devModeActive 
+    ? ANIMAL_REGISTRY.map(animal => animal.id)
+    : baseDiscoveredAnimals;
 
   // Filtrar animais
   const filteredAnimals = useMemo(() => {
@@ -267,9 +292,19 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
           <CardTitle className="flex items-center gap-2">
             <Book className="h-5 w-5" />
             Bestiário
+            {devModeActive && (
+              <Badge className="bg-red-500 text-white text-xs ml-2">
+                🧪 MODO DEV
+              </Badge>
+            )}
           </CardTitle>
           <CardDescription>
             Registro completo da fauna descoberta
+            {devModeActive && (
+              <span className="text-red-500 block text-xs mt-1">
+                ⚠️ Modo desenvolvedor ativo - todos os animais visíveis
+              </span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
