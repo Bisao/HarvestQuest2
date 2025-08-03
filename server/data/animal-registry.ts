@@ -1959,6 +1959,904 @@ export const ANIMAL_REGISTRY: AnimalRegistryEntry[] = [
     discoveryLocation: ["costa_oceânica", "mar_calmo"]
   },
 
+  // === MAIS MAMÍFEROS PEQUENOS ===
+  {
+    id: "animal-mouse-001",
+    species: "Mus musculus",
+    commonName: "Camundongo",
+    emoji: "🐭",
+    category: "mammal_small",
+    habitat: ["casa", "celeiro", "campo"],
+    rarity: "common",
+    male: {
+      name: "Camundongo Macho",
+      characteristics: ["Menor que a fêmea", "Mais territorial"],
+      physicalTraits: {
+        size: "7-10cm",
+        weight: "12-30g",
+        distinctiveFeatures: ["Cauda longa", "Orelhas grandes", "Bigodes sensíveis"]
+      },
+      behavior: ["Marca território", "Ativo à noite", "Escavador"],
+      reproductiveInfo: "Múltiplas parceiras por temporada"
+    },
+    female: {
+      name: "Camundonga",
+      characteristics: ["Ligeiramente maior", "Construtora de ninhos"],
+      physicalTraits: {
+        size: "8-11cm",
+        weight: "15-35g",
+        distinctiveFeatures: ["Abdômen mais arredondado"]
+      },
+      behavior: ["Constrói ninhos elaborados", "Cuidado maternal intenso"],
+      reproductiveInfo: "Gestação de 19-21 dias, 4-8 filhotes"
+    },
+    generalInfo: {
+      diet: "Onívoro - grãos, sementes, insetos",
+      lifespan: "1-2 anos",
+      size: "Muito pequeno",
+      weight: "12-35g",
+      behavior: ["Noturno", "Rápido", "Adaptável"],
+      funFacts: [
+        "Podem saltar até 46cm de altura",
+        "Coração bate 632 vezes por minuto",
+        "Excelente memória espacial"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 1,
+    discoveryLocation: ["casa_abandonada", "celeiro"]
+  },
+
+  {
+    id: "animal-rat-001",
+    species: "Rattus norvegicus",
+    commonName: "Rato",
+    emoji: "🐭",
+    category: "mammal_small",
+    habitat: ["esgoto", "cidade", "porão"],
+    rarity: "common",
+    male: {
+      name: "Rato Macho",
+      characteristics: ["Maior que camundongo", "Mais robusto"],
+      physicalTraits: {
+        size: "20-25cm",
+        weight: "200-500g",
+        distinctiveFeatures: ["Cauda grossa", "Dentes incisivos", "Corpo robusto"]
+      },
+      behavior: ["Dominante", "Inteligente", "Social"],
+      reproductiveInfo: "Alfa do grupo reprodutivo"
+    },
+    female: {
+      name: "Rata",
+      characteristics: ["Maternal", "Organizadora social"],
+      physicalTraits: {
+        size: "18-23cm",
+        weight: "250-400g",
+        distinctiveFeatures: ["Abdômen expandido quando grávida"]
+      },
+      behavior: ["Lidera colônia", "Ensina filhotes", "Cooperativa"],
+      reproductiveInfo: "Gestação de 21-23 dias, 6-12 filhotes"
+    },
+    generalInfo: {
+      diet: "Onívoro - lixo, carne, grãos",
+      lifespan: "2-3 anos",
+      size: "Pequeno",
+      weight: "200-500g",
+      behavior: ["Noturno", "Social", "Inteligente"],
+      funFacts: [
+        "Inteligência comparável a primatas",
+        "Podem nadar por dias",
+        "Comunicam-se por ultrassom"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 2,
+    discoveryLocation: ["esgoto_urbano", "lixão"]
+  },
+
+  {
+    id: "animal-squirrel-001",
+    species: "Sciurus vulgaris",
+    commonName: "Esquilo",
+    emoji: "🐿️",
+    category: "mammal_small",
+    habitat: ["floresta", "parque", "jardim"],
+    rarity: "common",
+    male: {
+      name: "Esquilo Macho",
+      characteristics: ["Territorial", "Acrobático"],
+      physicalTraits: {
+        size: "20-25cm",
+        weight: "250-400g",
+        distinctiveFeatures: ["Cauda fofa", "Dentes afiados", "Garras curvas"]
+      },
+      behavior: ["Defende território", "Acrobacias", "Coleta nozes"],
+      reproductiveInfo: "Corteja fêmeas com perseguições"
+    },
+    female: {
+      name: "Esquilo Fêmea",
+      characteristics: ["Coletora", "Mãe cuidadosa"],
+      physicalTraits: {
+        size: "18-23cm",
+        weight: "200-350g",
+        distinctiveFeatures: ["Bolsas nas bochechas"]
+      },
+      behavior: ["Armazena comida", "Constrói ninhos", "Ensina filhotes"],
+      reproductiveInfo: "Gestação de 38-39 dias, 2-5 filhotes"
+    },
+    generalInfo: {
+      diet: "Onívoro - nozes, sementes, ovos, insetos",
+      lifespan: "6-10 anos",
+      size: "Pequeno",
+      weight: "200-400g",
+      behavior: ["Diurno", "Acrobático", "Acumulador"],
+      funFacts: [
+        "Podem saltar 3 metros horizontalmente",
+        "Esquecem onde enterram 25% das nozes",
+        "Visão quase 360 graus"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 2,
+    discoveryLocation: ["copa_árvores", "parque_urbano"]
+  },
+
+  {
+    id: "animal-bat-001",
+    species: "Pipistrellus pipistrellus",
+    commonName: "Morcego",
+    emoji: "🦇",
+    category: "mammal_small",
+    habitat: ["caverna", "sótão", "floresta"],
+    rarity: "uncommon",
+    male: {
+      name: "Morcego Macho",
+      characteristics: ["Ecolocalização precisa", "Voador noturno"],
+      physicalTraits: {
+        size: "3-5cm corpo",
+        weight: "3-8g",
+        distinctiveFeatures: ["Membranas alares", "Orelhas grandes", "Dentes pequenos"]
+      },
+      behavior: ["Voo noturno", "Caça insetos", "Pendurado"],
+      reproductiveInfo: "Competição vocal por fêmeas"
+    },
+    female: {
+      name: "Morcego Fêmea",
+      characteristics: ["Maternal", "Carrega filhotes"],
+      physicalTraits: {
+        size: "3.5-5.5cm corpo",
+        weight: "4-10g",
+        distinctiveFeatures: ["Abdômen expandido durante gestação"]
+      },
+      behavior: ["Cuida filhotes voando", "Colônias maternais"],
+      reproductiveInfo: "Gestação de 44-53 dias, 1 filhote"
+    },
+    generalInfo: {
+      diet: "Insetívoro - mosquitos, mariposas, besouros",
+      lifespan: "4-8 anos",
+      size: "Muito pequeno",
+      weight: "3-10g",
+      behavior: ["Noturno", "Voador", "Ecolocalização"],
+      funFacts: [
+        "Comem 1000 mosquitos por hora",
+        "Navegam por ecolocalização",
+        "Únicos mamíferos que voam"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 4,
+    discoveryLocation: ["caverna_escura", "sótão_abandonado"]
+  },
+
+  // === MAIS MAMÍFEROS MÉDIOS ===
+  {
+    id: "animal-wolf-001",
+    species: "Canis lupus",
+    commonName: "Lobo",
+    emoji: "🐺",
+    category: "mammal_medium",
+    habitat: ["floresta", "montanha", "tundra"],
+    rarity: "rare",
+    male: {
+      name: "Lobo Macho",
+      characteristics: ["Alfa da matilha", "Maior e mais forte"],
+      physicalTraits: {
+        size: "100-130cm",
+        weight: "30-50kg",
+        distinctiveFeatures: ["Mandíbulas poderosas", "Pelagem densa", "Olhos amarelos"]
+      },
+      behavior: ["Lidera matilha", "Caça coordenada", "Territorial"],
+      reproductiveInfo: "Acasala apenas com alfa fêmea"
+    },
+    female: {
+      name: "Loba",
+      characteristics: ["Alfa fêmea", "Mãe protetora"],
+      physicalTraits: {
+        size: "90-120cm",
+        weight: "25-40kg",
+        distinctiveFeatures: ["Mais ágil que o macho"]
+      },
+      behavior: ["Organiza matilha", "Protege filhotes", "Caçadora estratégica"],
+      reproductiveInfo: "Gestação de 62-64 dias, 4-6 filhotes"
+    },
+    generalInfo: {
+      diet: "Carnívoro - cervos, alces, pequenos mamíferos",
+      lifespan: "13-16 anos",
+      size: "Grande",
+      weight: "25-50kg",
+      behavior: ["Matilha", "Caçador", "Territorial"],
+      funFacts: [
+        "Ancestrais dos cães domésticos",
+        "Podem correr 65 km/h",
+        "Comunicação complexa por uivos"
+      ]
+    },
+    discoveryMethod: "hunting",
+    requiredLevel: 12,
+    discoveryLocation: ["floresta_densa", "montanha_remota"]
+  },
+
+  {
+    id: "animal-lynx-001",
+    species: "Lynx lynx",
+    commonName: "Lince",
+    emoji: "🐱",
+    category: "mammal_medium",
+    habitat: ["floresta_boreal", "montanha", "taiga"],
+    rarity: "rare",
+    male: {
+      name: "Lince Macho",
+      characteristics: ["Solitário", "Caçador silencioso"],
+      physicalTraits: {
+        size: "80-130cm",
+        weight: "18-30kg",
+        distinctiveFeatures: ["Tufos nas orelhas", "Patas grandes", "Cauda curta"]
+      },
+      behavior: ["Caça emboscada", "Territorial", "Escalador"],
+      reproductiveInfo: "Território pode se sobrepor com fêmeas"
+    },
+    female: {
+      name: "Lince Fêmea",
+      characteristics: ["Menor", "Mãe dedicada"],
+      physicalTraits: {
+        size: "70-110cm",
+        weight: "15-25kg",
+        distinctiveFeatures: ["Mais ágil", "Pelagem mais densa"]
+      },
+      behavior: ["Ensina caça aos filhotes", "Defende território"],
+      reproductiveInfo: "Gestação de 70 dias, 2-4 filhotes"
+    },
+    generalInfo: {
+      diet: "Carnívoro - lebres, roedores, aves",
+      lifespan: "12-20 anos",
+      size: "Médio-grande",
+      weight: "15-30kg",
+      behavior: ["Solitário", "Crepuscular", "Silencioso"],
+      funFacts: [
+        "Podem saltar 4 metros horizontalmente",
+        "Patas funcionam como raquetes de neve",
+        "Visão 6x melhor que humanos"
+      ]
+    },
+    discoveryMethod: "hunting",
+    requiredLevel: 15,
+    discoveryLocation: ["floresta_boreal", "montanha_nevada"]
+  },
+
+  {
+    id: "animal-pig-001",
+    species: "Sus scrofa domesticus",
+    commonName: "Porco",
+    emoji: "🐷",
+    category: "mammal_medium",
+    habitat: ["fazenda", "chiqueiro", "pasto"],
+    rarity: "common",
+    male: {
+      name: "Porco Macho",
+      characteristics: ["Maior", "Presas desenvolvidas"],
+      physicalTraits: {
+        size: "120-180cm",
+        weight: "150-300kg",
+        distinctiveFeatures: ["Focinho largo", "Corpo robusto", "Cauda enrolada"]
+      },
+      behavior: ["Dominante", "Protetor", "Territorial"],
+      reproductiveInfo: "Competem por fêmeas durante cio"
+    },
+    female: {
+      name: "Porca",
+      characteristics: ["Maternal", "Produtiva"],
+      physicalTraits: {
+        size: "100-160cm",
+        weight: "120-250kg",
+        distinctiveFeatures: ["Mamas desenvolvidas"]
+      },
+      behavior: ["Constrói ninhos", "Protege leitões", "Social"],
+      reproductiveInfo: "Gestação de 114 dias, 6-12 leitões"
+    },
+    generalInfo: {
+      diet: "Onívoro - ração, restos, vegetais",
+      lifespan: "15-20 anos",
+      size: "Grande",
+      weight: "120-300kg",
+      behavior: ["Social", "Inteligente", "Dominéstico"],
+      funFacts: [
+        "4ª espécie animal mais inteligente",
+        "Podem aprender truques complexos",
+        "Memória excelente"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 3,
+    discoveryLocation: ["fazenda_suína", "pasto_cercado"]
+  },
+
+  {
+    id: "animal-sheep-001",
+    species: "Ovis aries",
+    commonName: "Ovelha",
+    emoji: "🐑",
+    category: "mammal_medium",
+    habitat: ["pasto", "campo", "fazenda"],
+    rarity: "common",
+    male: {
+      name: "Carneiro",
+      characteristics: ["Chifres curvos", "Maior"],
+      physicalTraits: {
+        size: "120-180cm",
+        weight: "45-90kg",
+        distinctiveFeatures: ["Chifres espiralados", "Lã densa", "Musculatura robusta"]
+      },
+      behavior: ["Protetor do rebanho", "Competição por dominância"],
+      reproductiveInfo: "Época de acasalamento no outono"
+    },
+    female: {
+      name: "Ovelha",
+      characteristics: ["Sem chifres", "Produz lã"],
+      physicalTraits: {
+        size: "100-140cm",
+        weight: "35-70kg",
+        distinctiveFeatures: ["Lã mais fina", "Úbere desenvolvido"]
+      },
+      behavior: ["Rebanho", "Maternal", "Segue líder"],
+      reproductiveInfo: "Gestação de 147 dias, 1-3 cordeiros"
+    },
+    generalInfo: {
+      diet: "Herbívoro - gramíneas, ervas",
+      lifespan: "10-12 anos",
+      size: "Médio",
+      weight: "35-90kg",
+      behavior: ["Gregário", "Dócil", "Pastoreio"],
+      funFacts: [
+        "Reconhecem até 50 faces",
+        "Lã cresce continuamente",
+        "Símbolo de docilidade"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 2,
+    discoveryLocation: ["pasto_verde", "fazenda_rural"]
+  },
+
+  {
+    id: "animal-goat-001",
+    species: "Capra aegagrus hircus",
+    commonName: "Cabra",
+    emoji: "🐐",
+    category: "mammal_medium",
+    habitat: ["montanha", "campo_rochoso", "fazenda"],
+    rarity: "common",
+    male: {
+      name: "Bode",
+      characteristics: ["Chifres retos", "Barba"],
+      physicalTraits: {
+        size: "120-170cm",
+        weight: "30-60kg",
+        distinctiveFeatures: ["Barba longa", "Chifres pontiagudos", "Odor forte"]
+      },
+      behavior: ["Dominante", "Escalador", "Protetor"],
+      reproductiveInfo: "Odor forte durante época reprodutiva"
+    },
+    female: {
+      name: "Cabra",
+      characteristics: ["Ágil", "Produtora de leite"],
+      physicalTraits: {
+        size: "100-140cm",
+        weight: "25-45kg",
+        distinctiveFeatures: ["Úbere desenvolvido", "Mais ágil"]
+      },
+      behavior: ["Escaladora expert", "Maternal", "Curiosa"],
+      reproductiveInfo: "Gestação de 150 dias, 1-3 cabritos"
+    },
+    generalInfo: {
+      diet: "Herbívoro - folhas, arbustos, ervas",
+      lifespan: "15-18 anos",
+      size: "Médio",
+      weight: "25-60kg",
+      behavior: ["Escalador", "Curioso", "Adaptável"],
+      funFacts: [
+        "Podem escalar árvores",
+        "Excelente equilíbrio",
+        "Pupilas retangulares"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 2,
+    discoveryLocation: ["montanha_rochosa", "fazenda_montanha"]
+  },
+
+  // === MAIS AVES ===
+  {
+    id: "animal-sparrow-001",
+    species: "Passer domesticus",
+    commonName: "Pardal",
+    emoji: "🐦",
+    category: "bird",
+    habitat: ["cidade", "jardim", "campo"],
+    rarity: "common",
+    male: {
+      name: "Pardal Macho",
+      characteristics: ["Babador preto", "Mais colorido"],
+      physicalTraits: {
+        size: "14-16cm",
+        weight: "20-30g",
+        distinctiveFeatures: ["Babador preto", "Coroa cinza", "Bochechas brancas"]
+      },
+      behavior: ["Territorial", "Canto forte", "Gregário"],
+      reproductiveInfo: "Múltiplas ninhadas por ano"
+    },
+    female: {
+      name: "Pardal Fêmea",
+      characteristics: ["Cores mais suaves", "Construtora"],
+      physicalTraits: {
+        size: "13-15cm",
+        weight: "18-28g",
+        distinctiveFeatures: ["Plumagem marrom discreta"]
+      },
+      behavior: ["Constrói ninhos", "Alimenta filhotes", "Cautelosa"],
+      reproductiveInfo: "Incubação de 11-14 dias, 3-5 ovos"
+    },
+    generalInfo: {
+      diet: "Onívoro - sementes, insetos, migalhas",
+      lifespan: "4-7 anos",
+      size: "Pequeno",
+      weight: "18-30g",
+      behavior: ["Gregário", "Urbano", "Adaptável"],
+      funFacts: [
+        "Podem viver em qualquer clima",
+        "Banhos de poeira para higiene",
+        "Saltam ao invés de caminhar"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 1,
+    discoveryLocation: ["praça_cidade", "jardim_casa"]
+  },
+
+  {
+    id: "animal-pigeon-001",
+    species: "Columba livia",
+    commonName: "Pombo",
+    emoji: "🐦",
+    category: "bird",
+    habitat: ["cidade", "praça", "telhado"],
+    rarity: "common",
+    male: {
+      name: "Pombo Macho",
+      characteristics: ["Exibicionista", "Territorial"],
+      physicalTraits: {
+        size: "25-35cm",
+        weight: "300-500g",
+        distinctiveFeatures: ["Pescoço iridescente", "Peito inflado", "Cauda em leque"]
+      },
+      behavior: ["Cortejo elaborado", "Arrulhos", "Defende território"],
+      reproductiveInfo: "Corteja curvando e arrulhando"
+    },
+    female: {
+      name: "Pomba",
+      characteristics: ["Mais discreta", "Construtora"],
+      physicalTraits: {
+        size: "23-30cm",
+        weight: "250-450g",
+        distinctiveFeatures: ["Cores menos vibrantes"]
+      },
+      behavior: ["Constrói ninhos simples", "Produz 'leite' de papo"],
+      reproductiveInfo: "Incubação de 18 dias, 1-2 ovos"
+    },
+    generalInfo: {
+      diet: "Granívoro - sementes, migalhas, restos",
+      lifespan: "6-10 anos",
+      size: "Médio",
+      weight: "250-500g",
+      behavior: ["Urbano", "Gregário", "Navegador"],
+      funFacts: [
+        "Excelente navegação por magnetismo",
+        "Usados como correio na guerra",
+        "Podem reconhecer-se no espelho"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 1,
+    discoveryLocation: ["praça_central", "telhado_urbano"]
+  },
+
+  {
+    id: "animal-robin-001",
+    species: "Erithacus rubecula",
+    commonName: "Pisco-de-peito-ruivo",
+    emoji: "🐦",
+    category: "bird",
+    habitat: ["jardim", "floresta", "parque"],
+    rarity: "common",
+    male: {
+      name: "Pisco Macho",
+      characteristics: ["Peito vermelho brilhante", "Canto melodioso"],
+      physicalTraits: {
+        size: "12-14cm",
+        weight: "16-22g",
+        distinctiveFeatures: ["Peito vermelho", "Olhos grandes", "Pernas finas"]
+      },
+      behavior: ["Canto territorial", "Agressivo com intrusos", "Saltitante"],
+      reproductiveInfo: "Canta para atrair fêmeas"
+    },
+    female: {
+      name: "Pisco Fêmea",
+      characteristics: ["Peito menos vibrante", "Construtora hábil"],
+      physicalTraits: {
+        size: "11-13cm",
+        weight: "14-20g",
+        distinctiveFeatures: ["Vermelho mais suave"]
+      },
+      behavior: ["Constrói ninhos escondidos", "Alimenta filhotes sozinha"],
+      reproductiveInfo: "Incubação de 13-14 dias, 4-6 ovos"
+    },
+    generalInfo: {
+      diet: "Insetívoro - minhocas, insetos, bagas",
+      lifespan: "2-3 anos",
+      size: "Pequeno",
+      weight: "14-22g",
+      behavior: ["Territorial", "Confiante", "Curioso"],
+      funFacts: [
+        "Símbolo natalino na Europa",
+        "Não migram no inverno",
+        "Podem ser domesticados facilmente"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 1,
+    discoveryLocation: ["jardim_inglês", "trilha_floresta"]
+  },
+
+  {
+    id: "animal-woodpecker-001",
+    species: "Dendrocopos major",
+    commonName: "Pica-pau",
+    emoji: "🐦",
+    category: "bird",
+    habitat: ["floresta", "parque", "bosque"],
+    rarity: "uncommon",
+    male: {
+      name: "Pica-pau Macho",
+      characteristics: ["Crista vermelha", "Bicadas ritmadas"],
+      physicalTraits: {
+        size: "20-25cm",
+        weight: "60-90g",
+        distinctiveFeatures: ["Bico forte", "Crista vermelha", "Garras curvas"]
+      },
+      behavior: ["Bica madeira", "Marca território", "Armazena comida"],
+      reproductiveInfo: "Escava cavidade para ninho"
+    },
+    female: {
+      name: "Pica-pau Fêmea",
+      characteristics: ["Sem crista vermelha", "Escavadora"],
+      physicalTraits: {
+        size: "19-23cm",
+        weight: "55-85g",
+        distinctiveFeatures: ["Cabeça preta sem vermelho"]
+      },
+      behavior: ["Ajuda na escavação", "Incuba ovos", "Alimenta filhotes"],
+      reproductiveInfo: "Incubação de 10-12 dias, 4-7 ovos"
+    },
+    generalInfo: {
+      diet: "Insetívoro - larvas, insetos da madeira",
+      lifespan: "4-12 anos",
+      size: "Médio",
+      weight: "55-90g",
+      behavior: ["Percussivo", "Escalador", "Escavador"],
+      funFacts: [
+        "Bica 20 vezes por segundo",
+        "Língua 4x maior que o bico",
+        "Crânio adaptado para impactos"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 3,
+    discoveryLocation: ["floresta_madura", "tronco_morto"]
+  },
+
+  {
+    id: "animal-hummingbird-001",
+    species: "Trochilus polytmus",
+    commonName: "Beija-flor",
+    emoji: "🐦",
+    category: "bird",
+    habitat: ["jardim_florido", "floresta_tropical", "campo"],
+    rarity: "uncommon",
+    male: {
+      name: "Beija-flor Macho",
+      characteristics: ["Cores iridescentes", "Voo acrobático"],
+      physicalTraits: {
+        size: "7-13cm",
+        weight: "2-6g",
+        distinctiveFeatures: ["Bico longo", "Plumagem iridescente", "Asas rápidas"]
+      },
+      behavior: ["Voo estacionário", "Territorial", "Displays aéreos"],
+      reproductiveInfo: "Corteja com voos em U"
+    },
+    female: {
+      name: "Beija-flor Fêmea",
+      characteristics: ["Cores mais suaves", "Construtora expert"],
+      physicalTraits: {
+        size: "6-12cm",
+        weight: "2-5g",
+        distinctiveFeatures: ["Plumagem menos vibrante"]
+      },
+      behavior: ["Constrói ninhos minúsculos", "Cuida filhotes sozinha"],
+      reproductiveInfo: "Incubação de 14-16 dias, 2 ovos"
+    },
+    generalInfo: {
+      diet: "Nectarívoro - néctar, pequenos insetos",
+      lifespan: "3-5 anos",
+      size: "Muito pequeno",
+      weight: "2-6g",
+      behavior: ["Voador", "Territorial", "Energético"],
+      funFacts: [
+        "Únicos que voam para trás",
+        "Coração bate 1260 vezes/min",
+        "Entram em torpor à noite"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 4,
+    discoveryLocation: ["jardim_néctar", "floresta_florida"]
+  },
+
+  // === MAIS PEIXES ===
+  {
+    id: "animal-carp-001",
+    species: "Cyprinus carpio",
+    commonName: "Carpa",
+    emoji: "🐟",
+    category: "fish_freshwater",
+    habitat: ["lago", "rio_lento", "represa"],
+    rarity: "common",
+    male: {
+      name: "Carpa Macho",
+      characteristics: ["Tubérculos nupciais", "Mais ativo"],
+      physicalTraits: {
+        size: "40-80cm",
+        weight: "2-10kg",
+        distinctiveFeatures: ["Barbilhões", "Escamas grandes", "Corpo robusto"]
+      },
+      behavior: ["Escava fundo", "Persegue fêmeas", "Resistente"],
+      reproductiveInfo: "Desenvolve tubérculos durante reprodução"
+    },
+    female: {
+      name: "Carpa Fêmea",
+      characteristics: ["Maior", "Abdômen arredondado"],
+      physicalTraits: {
+        size: "50-90cm",
+        weight: "3-15kg",
+        distinctiveFeatures: ["Abdômen expandido com ovos"]
+      },
+      behavior: ["Seleciona local de desova", "Deposita ovos em vegetação"],
+      reproductiveInfo: "Deposita até 300.000 ovos"
+    },
+    generalInfo: {
+      diet: "Onívoro - plantas, insetos, moluscos",
+      lifespan: "20-40 anos",
+      size: "Grande",
+      weight: "2-15kg",
+      behavior: ["Bentônico", "Resistente", "Adaptável"],
+      funFacts: [
+        "Podem viver mais de 100 anos",
+        "Conseguem sobreviver em água com pouco oxigênio",
+        "Inteligência surpreendente para peixes"
+      ]
+    },
+    discoveryMethod: "fishing",
+    requiredLevel: 6,
+    discoveryLocation: ["lago_urbano", "represa_calma"]
+  },
+
+  {
+    id: "animal-bass-001",
+    species: "Micropterus salmoides",
+    commonName: "Black Bass",
+    emoji: "🐟",
+    category: "fish_freshwater",
+    habitat: ["lago", "rio", "represa"],
+    rarity: "uncommon",
+    male: {
+      name: "Bass Macho",
+      characteristics: ["Protetor de ninho", "Agressivo"],
+      physicalTraits: {
+        size: "30-60cm",
+        weight: "1-5kg",
+        distinctiveFeatures: ["Mandíbula proeminente", "Barbatana dorsal dupla"]
+      },
+      behavior: ["Constrói ninhos", "Defende território", "Predador"],
+      reproductiveInfo: "Protege ovos e alevinos ferozmente"
+    },
+    female: {
+      name: "Bass Fêmea",
+      characteristics: ["Maior", "Deposita ovos"],
+      physicalTraits: {
+        size: "35-70cm",
+        weight: "2-7kg",
+        distinctiveFeatures: ["Corpo mais robusto"]
+      },
+      behavior: ["Escolhe machos pelos ninhos", "Abandona após desova"],
+      reproductiveInfo: "Deposita 2000-10000 ovos por ninho"
+    },
+    generalInfo: {
+      diet: "Carnívoro - peixes menores, crustáceos",
+      lifespan: "10-16 anos",
+      size: "Médio-grande",
+      weight: "1-7kg",
+      behavior: ["Predador", "Territorial", "Esportivo"],
+      funFacts: [
+        "Peixe esportivo muito popular",
+        "Excelente visão e audição",
+        "Podem saltar fora da água"
+      ]
+    },
+    discoveryMethod: "fishing",
+    requiredLevel: 10,
+    discoveryLocation: ["lago_esportivo", "rio_pedregoso"]
+  },
+
+  {
+    id: "animal-catfish-001",
+    species: "Silurus glanis",
+    commonName: "Bagre",
+    emoji: "🐟",
+    category: "fish_freshwater",
+    habitat: ["rio", "lago_profundo", "pântano"],
+    rarity: "uncommon",
+    male: {
+      name: "Bagre Macho",
+      characteristics: ["Barbilhões longos", "Noturno"],
+      physicalTraits: {
+        size: "50-100cm",
+        weight: "2-15kg",
+        distinctiveFeatures: ["Barbilhões sensíveis", "Pele lisa", "Cabeça achatada"]
+      },
+      behavior: ["Caça noturna", "Escondido durante dia", "Solitário"],
+      reproductiveInfo: "Corteja fêmeas em águas rasas"
+    },
+    female: {
+      name: "Bagre Fêmea",
+      characteristics: ["Abdômen arredondado", "Escava ninhos"],
+      physicalTraits: {
+        size: "60-120cm",
+        weight: "3-20kg",
+        distinctiveFeatures: ["Corpo mais robusto durante desova"]
+      },
+      behavior: ["Escava ninhos no fundo", "Protege ovos"],
+      reproductiveInfo: "Cuida ovos até eclosão"
+    },
+    generalInfo: {
+      diet: "Carnívoro - peixes, crustáceos, anfíbios",
+      lifespan: "15-25 anos",
+      size: "Grande",
+      weight: "2-20kg",
+      behavior: ["Noturno", "Bentônico", "Oportunista"],
+      funFacts: [
+        "Podem crescer mais de 2 metros",
+        "Sentem vibrações com barbilhões",
+        "Engolindo presas inteiras"
+      ]
+    },
+    discoveryMethod: "fishing",
+    requiredLevel: 8,
+    discoveryLocation: ["rio_lamacento", "lago_profundo"]
+  },
+
+  // === MAIS RÉPTEIS ===
+  {
+    id: "animal-gecko-001",
+    species: "Hemidactylus mabouia",
+    commonName: "Lagartixa",
+    emoji: "🦎",
+    category: "reptile",
+    habitat: ["casa", "parede", "telhado"],
+    rarity: "common",
+    male: {
+      name: "Lagartixa Macho",
+      characteristics: ["Territorial", "Vocal"],
+      physicalTraits: {
+        size: "8-12cm",
+        weight: "3-8g",
+        distinctiveFeatures: ["Ventosas nos dedos", "Cauda regenerável", "Olhos grandes"]
+      },
+      behavior: ["Caça noturna", "Vocalização", "Territorial"],
+      reproductiveInfo: "Emite sons para atrair fêmeas"
+    },
+    female: {
+      name: "Lagartixa Fêmea",
+      characteristics: ["Silenciosa", "Põe ovos"],
+      physicalTraits: {
+        size: "7-10cm",
+        weight: "2-6g",
+        distinctiveFeatures: ["Abdômen expandido com ovos"]
+      },
+      behavior: ["Esconde ovos em frestas", "Menos territorial"],
+      reproductiveInfo: "Deposita 1-2 ovos em locais protegidos"
+    },
+    generalInfo: {
+      diet: "Insetívoro - mosquitos, traças, aranhas",
+      lifespan: "5-7 anos",
+      size: "Muito pequeno",
+      weight: "2-8g",
+      behavior: ["Noturno", "Escalador", "Doméstico"],
+      funFacts: [
+        "Podem andar no teto",
+        "Regeneram cauda perdida",
+        "Controle natural de insetos"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 1,
+    discoveryLocation: ["parede_casa", "varanda_noturna"]
+  },
+
+  {
+    id: "animal-iguana-001",
+    species: "Iguana iguana",
+    commonName: "Iguana",
+    emoji: "🦎",
+    category: "reptile",
+    habitat: ["jardim_tropical", "árvore", "rocha"],
+    rarity: "uncommon",
+    male: {
+      name: "Iguana Macho",
+      characteristics: ["Crista desenvolvida", "Cores vibrantes"],
+      physicalTraits: {
+        size: "120-180cm",
+        weight: "4-8kg",
+        distinctiveFeatures: ["Crista dorsal", "Papada grande", "Cauda longa"]
+      },
+      behavior: ["Territorial", "Exibições", "Termorregulação"],
+      reproductiveInfo: "Cores ficam mais vibrantes durante cio"
+    },
+    female: {
+      name: "Iguana Fêmea",
+      characteristics: ["Menor", "Escava ninhos"],
+      physicalTraits: {
+        size: "100-150cm",
+        weight: "3-6kg",
+        distinctiveFeatures: ["Crista menor", "Cores mais suaves"]
+      },
+      behavior: ["Escava túneis para ovos", "Toma sol"],
+      reproductiveInfo: "Deposita 20-70 ovos em túneis"
+    },
+    generalInfo: {
+      diet: "Herbívoro - folhas, flores, frutas",
+      lifespan: "15-20 anos",
+      size: "Grande",
+      weight: "3-8kg",
+      behavior: ["Arborícola", "Territorial", "Herbívoro"],
+      funFacts: [
+        "Terceiro olho no topo da cabeça",
+        "Excelentes nadadores",
+        "Podem mudar de cor levemente"
+      ]
+    },
+    discoveryMethod: "observation",
+    requiredLevel: 7,
+    discoveryLocation: ["jardim_tropical", "rocha_solar"]
+  },
+
   // === CRIATURAS MÍTICAS ===
   {
     id: "animal-unicorn-001",
@@ -2099,6 +2997,431 @@ export const ANIMAL_REGISTRY: AnimalRegistryEntry[] = [
     discoveryMethod: "special_event",
     requiredLevel: 75,
     discoveryLocation: ["deserto_sagrado", "pira_eterna"]
+  },
+
+  // === MAIS CRIATURAS MÍTICAS ===
+  {
+    id: "animal-griffin-001",
+    species: "Gryphon magnificus",
+    commonName: "Grifo",
+    emoji: "🦅",
+    category: "mythical",
+    habitat: ["montanha_alta", "ninho_rochoso"],
+    rarity: "legendary",
+    male: {
+      name: "Grifo Macho",
+      characteristics: ["Águia gigante com corpo de leão", "Guardião de tesouros"],
+      physicalTraits: {
+        size: "300-400cm",
+        weight: "200-350kg",
+        distinctiveFeatures: ["Cabeça de águia", "Corpo de leão", "Asas douradas"]
+      },
+      behavior: ["Protetor territorial", "Voo majestoso", "Guardião"],
+      reproductiveInfo: "Acasala em ninhos no topo de montanhas"
+    },
+    female: {
+      name: "Grifa",
+      characteristics: ["Menor", "Mãe protetora"],
+      physicalTraits: {
+        size: "250-350cm",
+        weight: "180-300kg",
+        distinctiveFeatures: ["Plumagem mais suave"]
+      },
+      behavior: ["Constrói ninhos elaborados", "Ensina voo aos filhotes"],
+      reproductiveInfo: "Incuba ovos por 6 meses"
+    },
+    generalInfo: {
+      diet: "Carnívoro - grandes presas, cavalos",
+      lifespan: "500+ anos",
+      size: "Colossal",
+      weight: "180-350kg",
+      behavior: ["Majestoso", "Guardião", "Territorial"],
+      funFacts: [
+        "Símbolo de poder divino",
+        "Podem carregar um cavalo",
+        "Guardiões de tesouros sagrados"
+      ]
+    },
+    discoveryMethod: "special_event",
+    requiredLevel: 80,
+    discoveryLocation: ["pico_sagrado", "ninho_dourado"]
+  },
+
+  {
+    id: "animal-pegasus-001",
+    species: "Equus alatus",
+    commonName: "Pégaso",
+    emoji: "🐴",
+    category: "mythical",
+    habitat: ["nuvens", "monte_olimpo"],
+    rarity: "legendary",
+    male: {
+      name: "Pégaso Macho",
+      characteristics: ["Cavalo alado branco", "Voo celestial"],
+      physicalTraits: {
+        size: "160-200cm",
+        weight: "400-600kg",
+        distinctiveFeatures: ["Asas de anjo", "Pelagem branca", "Crina prateada"]
+      },
+      behavior: ["Voa entre nuvens", "Inspira poetas", "Livre"],
+      reproductiveInfo: "Corteja voando em espirais celestiais"
+    },
+    female: {
+      name: "Pégaso Fêmea",
+      characteristics: ["Graciosidade divina", "Maternal"],
+      physicalTraits: {
+        size: "150-180cm",
+        weight: "350-500kg",
+        distinctiveFeatures: ["Asas mais delicadas"]
+      },
+      behavior: ["Dança aérea", "Protege potros voadores"],
+      reproductiveInfo: "Filhotes nascem já sabendo voar"
+    },
+    generalInfo: {
+      diet: "Herbívoro celestial - nuvens, orvalho, flores etéreas",
+      lifespan: "Imortal",
+      size: "Grande",
+      weight: "350-600kg",
+      behavior: ["Celestial", "Livre", "Inspirador"],
+      funFacts: [
+        "Símbolo da inspiração poética",
+        "Pode voar à velocidade da luz",
+        "Cascos fazem nascer fontes"
+      ]
+    },
+    discoveryMethod: "special_event",
+    requiredLevel: 85,
+    discoveryLocation: ["monte_olimpo", "jardim_celestial"]
+  },
+
+  {
+    id: "animal-kelpie-001",
+    species: "Hippocampus aquaticus",
+    commonName: "Kelpie",
+    emoji: "🐴",
+    category: "mythical",
+    habitat: ["lago_místico", "rio_encantado"],
+    rarity: "epic",
+    male: {
+      name: "Kelpie Macho",
+      characteristics: ["Cavalo aquático", "Metamorfo"],
+      physicalTraits: {
+        size: "140-180cm",
+        weight: "300-500kg",
+        distinctiveFeatures: ["Crina de algas", "Cascos palmados", "Olhos aquáticos"]
+      },
+      behavior: ["Arai viajantes", "Forma mutável", "Predador"],
+      reproductiveInfo: "Seduz éguas terrestres"
+    },
+    female: {
+      name: "Kelpie Fêmea",
+      characteristics: ["Mais sedutora", "Guardiã de águas"],
+      physicalTraits: {
+        size: "130-170cm",
+        weight: "250-450kg",
+        distinctiveFeatures: ["Crina fluida como água"]
+      },
+      behavior: ["Protege nascentes", "Seduz cavaleiros"],
+      reproductiveInfo: "Filhotes nascem nas águas profundas"
+    },
+    generalInfo: {
+      diet: "Carnívoro aquático - peixes, às vezes humanos",
+      lifespan: "300+ anos",
+      size: "Grande",
+      weight: "250-500kg",
+      behavior: ["Aquático", "Metamorfo", "Perigoso"],
+      funFacts: [
+        "Pode assumir forma humana",
+        "Pele gruosa como algas",
+        "Lenda escocesa das águas"
+      ]
+    },
+    discoveryMethod: "special_event",
+    requiredLevel: 60,
+    discoveryLocation: ["lago_escocês", "rio_místico"]
+  },
+
+  {
+    id: "animal-wendigo-001",
+    species: "Wendigo horribilis",
+    commonName: "Wendigo",
+    emoji: "👹",
+    category: "mythical",
+    habitat: ["floresta_sombria", "tundra_gelada"],
+    rarity: "legendary",
+    male: {
+      name: "Wendigo Macho",
+      characteristics: ["Gigante canibal", "Criatura do inverno"],
+      physicalTraits: {
+        size: "300-500cm",
+        weight: "200-400kg",
+        distinctiveFeatures: ["Esquelético", "Chifres de cervo", "Olhos brilhantes"]
+      },
+      behavior: ["Caça humanos", "Mimicry vocal", "Territorial"],
+      reproductiveInfo: "Criado por canibalismo humano"
+    },
+    female: {
+      name: "Wendigo Fêmea",
+      characteristics: ["Igualmente terrível", "Caçadora noturna"],
+      physicalTraits: {
+        size: "250-450cm",
+        weight: "180-350kg",
+        distinctiveFeatures: ["Garras longas", "Pele acinzentada"]
+      },
+      behavior: ["Seduz com vozes familiares", "Caça em matilhas"],
+      reproductiveInfo: "Reprodução através de maldição"
+    },
+    generalInfo: {
+      diet: "Carnívoro - especialmente carne humana",
+      lifespan: "Imortal até ser destruído",
+      size: "Gigante",
+      weight: "180-400kg",
+      behavior: ["Predador", "Sobrenatural", "Maligno"],
+      funFacts: [
+        "Lenda dos nativos americanos",
+        "Criado por canibalismo",
+        "Associado ao inverno e fome"
+      ]
+    },
+    discoveryMethod: "special_event",
+    requiredLevel: 95,
+    discoveryLocation: ["floresta_amaldiçoada", "tundra_perdida"]
+  },
+
+  {
+    id: "animal-sphinx-001",
+    species: "Sphinx mysterius",
+    commonName: "Esfinge",
+    emoji: "🐱",
+    category: "mythical",
+    habitat: ["deserto_antigo", "ruína_egípcia"],
+    rarity: "legendary",
+    male: {
+      name: "Esfinge Macho",
+      characteristics: ["Guardião de enigmas", "Sabedoria antiga"],
+      physicalTraits: {
+        size: "200-300cm",
+        weight: "300-500kg",
+        distinctiveFeatures: ["Cabeça humana", "Corpo de leão", "Asas de águia"]
+      },
+      behavior: ["Propõe enigmas", "Guardião", "Sábio"],
+      reproductiveInfo: "Acasala apenas com quem resolve seus enigmas"
+    },
+    female: {
+      name: "Esfinge Fêmea",
+      characteristics: ["Mais enigmática", "Guardiã de conhecimento"],
+      physicalTraits: {
+        size: "180-250cm",
+        weight: "250-400kg",
+        distinctiveFeatures: ["Rosto feminino sereno"]
+      },
+      behavior: ["Protege tesouros antigos", "Ensina sabedoria"],
+      reproductiveInfo: "Ovípara, ovos guardados por séculos"
+    },
+    generalInfo: {
+      diet: "Conhecimento e essência vital",
+      lifespan: "Imortal",
+      size: "Muito grande",
+      weight: "250-500kg",
+      behavior: ["Enigmático", "Guardião", "Sábio"],
+      funFacts: [
+        "Devora quem erra os enigmas",
+        "Guardiã de tesouros antigos",
+        "Símbolo da sabedoria egípcia"
+      ]
+    },
+    discoveryMethod: "special_event",
+    requiredLevel: 90,
+    discoveryLocation: ["pirâmide_perdida", "templo_antigo"]
+  },
+
+  {
+    id: "animal-basilisk-001",
+    species: "Basiliscus rex",
+    commonName: "Basilisco",
+    emoji: "🐍",
+    category: "mythical",
+    habitat: ["caverna_profunda", "ruína_escura"],
+    rarity: "legendary",
+    male: {
+      name: "Basilisco Macho",
+      characteristics: ["Rei das serpentes", "Olhar mortal"],
+      physicalTraits: {
+        size: "800-1200cm",
+        weight: "200-400kg",
+        distinctiveFeatures: ["Crista de galo", "Olhos mortais", "Veneno letal"]
+      },
+      behavior: ["Mata com o olhar", "Territorial", "Solitário"],
+      reproductiveInfo: "Nasce de ovo chocado por serpente"
+    },
+    female: {
+      name: "Basilisco Fêmea",
+      characteristics: ["Igualmente letal", "Mãe protetora"],
+      physicalTraits: {
+        size: "600-1000cm",
+        weight: "180-350kg",
+        distinctiveFeatures: ["Crista menor", "Veneno mais potente"]
+      },
+      behavior: ["Protege ovos", "Caça grandes presas"],
+      reproductiveInfo: "Ovos eclodem apenas com calor vulcânico"
+    },
+    generalInfo: {
+      diet: "Carnívoro - qualquer ser vivo",
+      lifespan: "1000+ anos",
+      size: "Gigante",
+      weight: "180-400kg",
+      behavior: ["Letal", "Solitário", "Territorial"],
+      funFacts: [
+        "Mata com o olhar direto",
+        "Rei de todas as serpentes",
+        "Só pode ser morto por galo"
+      ]
+    },
+    discoveryMethod: "special_event",
+    requiredLevel: 99,
+    discoveryLocation: ["câmara_secreta", "poço_serpentes"]
+  },
+
+  // === CRIATURAS ZOMBIES/FANTASMAS ===
+  {
+    id: "animal-zombie-001",
+    species: "Homo zombicus",
+    commonName: "Zumbi",
+    emoji: "🧟",
+    category: "mythical",
+    habitat: ["cemitério", "cidade_abandonada"],
+    rarity: "epic",
+    male: {
+      name: "Zumbi Macho",
+      characteristics: ["Morto-vivo", "Busca cérebros"],
+      physicalTraits: {
+        size: "160-190cm",
+        weight: "60-90kg",
+        distinctiveFeatures: ["Pele em decomposição", "Movimentos lentos", "Olhos vazios"]
+      },
+      behavior: ["Caça humanos", "Andar cambaleante", "Grunh"],
+      reproductiveInfo: "Propaga-se por mordida"
+    },
+    female: {
+      name: "Zumbi Fêmea",
+      characteristics: ["Morta-viva", "Instinto predatório"],
+      physicalTraits: {
+        size: "150-180cm",
+        weight: "50-80kg",
+        distinctiveFeatures: ["Decomposição avançada"]
+      },
+      behavior: ["Horda", "Persistente", "Sem dor"],
+      reproductiveInfo: "Reprodução por contágio viral"
+    },
+    generalInfo: {
+      diet: "Carnívoro - cérebros e carne humana",
+      lifespan: "Não-morto (até destruição)",
+      size: "Humano",
+      weight: "50-90kg",
+      behavior: ["Morto-vivo", "Predador", "Horda"],
+      funFacts: [
+        "Não sentem dor",
+        "Movidos por fome de cérebros",
+        "Contágio por mordida"
+      ]
+    },
+    discoveryMethod: "special_event",
+    requiredLevel: 40,
+    discoveryLocation: ["cemitério_assombrado", "hospital_abandonado"]
+  },
+
+  {
+    id: "animal-vampire-001",
+    species: "Vampirus nosferatu",
+    commonName: "Vampiro",
+    emoji: "🧛",
+    category: "mythical",
+    habitat: ["castelo_sombrio", "cripta_antiga"],
+    rarity: "epic",
+    male: {
+      name: "Vampiro",
+      characteristics: ["Morto-vivo aristocrático", "Sede de sangue"],
+      physicalTraits: {
+        size: "170-200cm",
+        weight: "70-100kg",
+        distinctiveFeatures: ["Presas afiadas", "Pele pálida", "Sem reflexo"]
+      },
+      behavior: ["Noturno", "Sedutor", "Aristocrático"],
+      reproductiveInfo: "Cria vampiros por mordida"
+    },
+    female: {
+      name: "Vampira",
+      characteristics: ["Sedutora mortal", "Beleza sobrenatural"],
+      physicalTraits: {
+        size: "160-180cm",
+        weight: "50-70kg",
+        distinctiveFeatures: ["Beleza hipnótica", "Graça sobrenatural"]
+      },
+      behavior: ["Sedução fatal", "Manipulação", "Elegante"],
+      reproductiveInfo: "Transforma vítimas em vampiros"
+    },
+    generalInfo: {
+      diet: "Hematófago - sangue humano",
+      lifespan: "Imortal",
+      size: "Humano",
+      weight: "50-100kg",
+      behavior: ["Noturno", "Aristocrático", "Predador"],
+      funFacts: [
+        "Queima na luz solar",
+        "Não aparecem em espelhos",
+        "Transformam-se em morcego"
+      ]
+    },
+    discoveryMethod: "special_event",
+    requiredLevel: 45,
+    discoveryLocation: ["castelo_transilvania", "cripta_nobre"]
+  },
+
+  {
+    id: "animal-ghost-001",
+    species: "Spiritus phantasma",
+    commonName: "Fantasma",
+    emoji: "👻",
+    category: "mythical",
+    habitat: ["casa_assombrada", "cemitério"],
+    rarity: "epic",
+    male: {
+      name: "Fantasma Macho",
+      characteristics: ["Espírito preso", "Assombração"],
+      physicalTraits: {
+        size: "160-190cm",
+        weight: "0kg (etéreo)",
+        distinctiveFeatures: ["Translúcido", "Flutua", "Brilho espectral"]
+      },
+      behavior: ["Assombra locais", "Atravessa paredes", "Aparições"],
+      reproductiveInfo: "Não se reproduz fisicamente"
+    },
+    female: {
+      name: "Fantasma Fêmea",
+      characteristics: ["Espírito melancólico", "Aparição"],
+      physicalTraits: {
+        size: "150-180cm",
+        weight: "0kg (etérea)",
+        distinctiveFeatures: ["Véu espectral", "Lamentação"]
+      },
+      behavior: ["Choro espectral", "Nostalgia eterna"],
+      reproductiveInfo: "Existência puramente espiritual"
+    },
+    generalInfo: {
+      diet: "Energia emocional, memórias",
+      lifespan: "Eternidade (até redenção)",
+      size: "Humano",
+      weight: "0kg",
+      behavior: ["Espectral", "Melancólico", "Assombração"],
+      funFacts: [
+        "Presos por assuntos pendentes",
+        "Podem mover objetos",
+        "Visíveis apenas em certas condições"
+      ]
+    },
+    discoveryMethod: "special_event",
+    requiredLevel: 35,
+    discoveryLocation: ["mansão_abandonada", "cemitério_antigo"]
   }
 ];
 
