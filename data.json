@@ -25,14 +25,14 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 100,
+        "hunger": 95,
         "maxHunger": 100,
-        "thirst": 100,
+        "thirst": 98,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 50,
-        "hygiene": 100,
+        "morale": 52,
+        "hygiene": 98,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -45,6 +45,26 @@
   ],
   "inventoryItems": [],
   "storageItems": [],
-  "expeditions": [],
+  "expeditions": [
+    [
+      "008ec470-7e1e-492c-a716-d1679e08e26f",
+      {
+        "id": "008ec470-7e1e-492c-a716-d1679e08e26f",
+        "playerId": "8a6e743a-7b2a-471a-886f-76dabfa674d3",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+          "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37"
+        ],
+        "selectedEquipment": [],
+        "status": "in_progress",
+        "startTime": 1754225852474,
+        "endTime": null,
+        "progress": 0,
+        "collectedResources": {}
+      }
+    ]
+  ],
   "playerQuests": []
 }
