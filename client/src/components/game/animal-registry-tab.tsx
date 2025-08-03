@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,39 +19,46 @@ import {
   Calendar,
   Target,
   Heart,
-  Sparkles
+  Sparkles,
+  Info
 } from 'lucide-react';
 
-// Mock data para teste - substituir pela importação real quando disponível
-const ANIMAL_REGISTRY = [
-  {
-    id: 'rabbit-001',
-    name: 'Coelho',
-    emoji: '🐰',
-    description: 'Um pequeno mamífero herbívoro',
-    rarity: 'common' as const,
-    size: 'small' as const,
-    category: 'mammal_small' as const,
-    habitat: ['floresta', 'pradaria'],
-    behavior: 'Pacífico e tímido',
-    huntable: true,
-    tameable: true,
-    products: ['carne', 'pele'],
-    facts: ['São muito rápidos', 'Vivem em tocas'],
-    encounterCount: 0,
-    lastSeen: null
-  }
-];
+// Importar dados reais do registry
+import { ANIMAL_REGISTRY } from '../../../shared/data/animal-registry';
+import type { AnimalData } from '../../../shared/data/animal-registry';
 
 const ANIMAL_CATEGORIES = [
-  { id: 'mammal_small', name: 'Mamíferos Pequenos', emoji: '🐭', description: 'Pequenos mamíferos' }
+  { id: 'all', name: 'Todos', emoji: '🌍', description: 'Todos os animais' },
+  { id: 'mammal', name: 'Mamíferos', emoji: '🐾', description: 'Animais de sangue quente com pelos' },
+  { id: 'bird', name: 'Aves', emoji: '🐦', description: 'Criaturas voadoras com penas' },
+  { id: 'aquatic', name: 'Vida Aquática', emoji: '🐟', description: 'Criaturas que vivem na água' },
+  { id: 'insect', name: 'Insetos', emoji: '🦋', description: 'Pequenos artrópodes' },
+  { id: 'reptile', name: 'Répteis', emoji: '🦎', description: 'Animais de sangue frio com escamas' },
+  { id: 'amphibian', name: 'Anfíbios', emoji: '🐸', description: 'Criaturas que vivem na terra e água' },
+  { id: 'mythical', name: 'Criaturas Míticas', emoji: '🦄', description: 'Seres lendários e mágicos' }
 ];
 
-const getAnimalsByCategory = (categoryId: string) => {
-  return ANIMAL_REGISTRY.filter(animal => animal.category === categoryId);
+const getRarityColor = (rarity: string) => {
+  switch (rarity) {
+    case 'common': return 'bg-gray-500';
+    case 'uncommon': return 'bg-green-500';
+    case 'rare': return 'bg-blue-500';
+    case 'epic': return 'bg-purple-500';
+    case 'legendary': return 'bg-yellow-500';
+    default: return 'bg-gray-500';
+  }
 };
 
-type AnimalData = typeof ANIMAL_REGISTRY[0];
+const getSizeColor = (size: string) => {
+  switch (size) {
+    case 'tiny': return 'text-xs';
+    case 'small': return 'text-sm';
+    case 'medium': return 'text-base';
+    case 'large': return 'text-lg';
+    case 'huge': return 'text-xl';
+    default: return 'text-base';
+  }
+};
 
 interface AnimalRegistryTabProps {
   discoveredAnimals: string[];
@@ -60,373 +66,303 @@ interface AnimalRegistryTabProps {
   onAnimalSelect?: (animal: AnimalData) => void;
 }
 
-interface AnimalDetailModalProps {
+interface AnimalCardProps {
   animal: AnimalData;
   isDiscovered: boolean;
-  onClose: () => void;
-}
-
-function AnimalDetailModal({ animal, isDiscovered, onClose }: AnimalDetailModalProps) {
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span className="text-4xl">{animal.emoji}</span>
-            <div>
-              <CardTitle>{isDiscovered ? animal.name : '???'}</CardTitle>
-              <CardDescription className="flex items-center space-x-2">
-                <Badge variant={animal.rarity === 'common' ? 'default' : 
-                             animal.rarity === 'uncommon' ? 'secondary' :
-                             animal.rarity === 'rare' ? 'outline' : 'destructive'}>
-                  {animal.rarity}
-                </Badge>
-                <span>•</span>
-                <span className="capitalize">{animal.size}</span>
-              </CardDescription>
-            </div>
-          </div>
-          <Button variant="ghost" onClick={onClose}>✕</Button>
-        </CardHeader>
-        
-        <CardContent>
-          <ScrollArea className="h-[60vh]">
-            <div className="space-y-4">
-              {/* Descrição */}
-              <div>
-                <h4 className="font-semibold mb-2">Descrição</h4>
-                <p className="text-sm text-gray-600">
-                  {isDiscovered ? animal.description : 'Você ainda não descobriu este animal...'}
-                </p>
-              </div>
-
-              {isDiscovered && (
-                <>
-                  {/* Comportamento */}
-                  <div>
-                    <h4 className="font-semibold mb-2">Comportamento</h4>
-                    <p className="text-sm text-gray-600">{animal.behavior}</p>
-                  </div>
-
-                  {/* Habitat */}
-                  <div>
-                    <h4 className="font-semibold mb-2 flex items-center space-x-2">
-                      <MapPin className="w-4 h-4" />
-                      <span>Habitat</span>
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {animal.habitat.map((hab) => (
-                        <Badge key={hab} variant="outline" className="text-xs">
-                          {hab}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Informações de Caça/Domesticação */}
-                  {(animal.huntable || animal.tameable) && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Interações</h4>
-                      <div className="space-y-2">
-                        {animal.huntable && (
-                          <div className="flex items-center space-x-2 text-sm">
-                            <Target className="w-4 h-4 text-red-500" />
-                            <span>Caçável</span>
-                            {animal.requiredTool && (
-                              <Badge variant="outline" className="text-xs">
-                                Requer: {animal.requiredTool}
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                        {animal.tameable && (
-                          <div className="flex items-center space-x-2 text-sm">
-                            <Heart className="w-4 h-4 text-pink-500" />
-                            <span>Domesticável</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Produtos */}
-                  {animal.products && animal.products.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Recursos</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {animal.products.map((product) => (
-                          <Badge key={product} variant="secondary" className="text-xs">
-                            {product}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Fatos Interessantes */}
-                  <div>
-                    <h4 className="font-semibold mb-2 flex items-center space-x-2">
-                      <Sparkles className="w-4 h-4" />
-                      <span>Fatos Interessantes</span>
-                    </h4>
-                    <ul className="space-y-1">
-                      {animal.facts.map((fact, index) => (
-                        <li key={index} className="text-sm text-gray-600 flex items-start space-x-2">
-                          <span className="text-yellow-500 mt-1">•</span>
-                          <span>{fact}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Estatísticas do Jogador */}
-                  <div className="border-t pt-4">
-                    <h4 className="font-semibold mb-2">Suas Estatísticas</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600">Encontros:</span>
-                        <span className="ml-2 font-medium">{animal.encounterCount}</span>
-                      </div>
-                      {animal.lastSeen && (
-                        <div>
-                          <span className="text-gray-600">Último avistamento:</span>
-                          <span className="ml-2 font-medium">{animal.lastSeen}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function AnimalCard({ animal, isDiscovered, onClick }: { 
-  animal: AnimalData; 
-  isDiscovered: boolean; 
   onClick: () => void;
-}) {
+}
+
+function AnimalCard({ animal, isDiscovered, onClick }: AnimalCardProps) {
   return (
     <Card 
       className={`cursor-pointer transition-all hover:shadow-md ${
-        isDiscovered ? 'border-green-200 bg-green-50/30' : 'border-gray-200 opacity-60'
+        isDiscovered ? 'border-green-200 bg-green-50' : 'border-gray-200 opacity-60'
       }`}
       onClick={onClick}
     >
       <CardContent className="p-4">
-        <div className="flex items-center space-x-3">
-          <div className="text-3xl">
-            {isDiscovered ? animal.emoji : '❓'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-medium truncate">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className={`${getSizeColor(animal.size)}`}>
+              {animal.emoji}
+            </span>
+            <span className="font-semibold text-sm">
               {isDiscovered ? animal.name : '???'}
-            </h3>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <Badge 
-                variant={isDiscovered ? 'default' : 'secondary'} 
-                className="text-xs"
-              >
-                {animal.rarity}
-              </Badge>
-              <span className="capitalize">{animal.size}</span>
-            </div>
-            {isDiscovered && (
-              <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                {animal.description}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col items-center">
-            {isDiscovered ? (
-              <Eye className="w-4 h-4 text-green-500" />
-            ) : (
-              <Eye className="w-4 h-4 text-gray-400" />
-            )}
-            <span className="text-xs text-gray-500 mt-1">
-              {animal.encounterCount}
             </span>
           </div>
+          {isDiscovered && (
+            <Badge className={`text-xs ${getRarityColor(animal.rarity)} text-white`}>
+              {animal.rarity}
+            </Badge>
+          )}
         </div>
+
+        {isDiscovered && (
+          <div className="space-y-1 text-xs text-gray-600">
+            <p className="line-clamp-2">{animal.description}</p>
+            <div className="flex flex-wrap gap-1 mt-2">
+              {animal.habitat.slice(0, 2).map((hab, idx) => (
+                <Badge key={idx} variant="outline" className="text-xs">
+                  {hab}
+                </Badge>
+              ))}
+              {animal.habitat.length > 2 && (
+                <Badge variant="outline" className="text-xs">
+                  +{animal.habitat.length - 2}
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+
+        {!isDiscovered && (
+          <div className="text-xs text-gray-400">
+            <p>Descubra este animal explorando!</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-export default function AnimalRegistryTab({ discoveredAnimals, playerId, onAnimalSelect }: AnimalRegistryTabProps) {
+interface AnimalDetailModalProps {
+  animal: AnimalData | null;
+  isOpen: boolean;
+  onClose: () => void;
+  isDiscovered: boolean;
+}
+
+function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDetailModalProps) {
+  if (!animal || !isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{animal.emoji}</span>
+              <div>
+                <h2 className="text-xl font-bold">
+                  {isDiscovered ? animal.name : 'Animal Desconhecido'}
+                </h2>
+                {isDiscovered && (
+                  <Badge className={`${getRarityColor(animal.rarity)} text-white`}>
+                    {animal.rarity}
+                  </Badge>
+                )}
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" onClick={onClose}>✕</Button>
+          </div>
+
+          {isDiscovered ? (
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold mb-2">Descrição</h3>
+                <p className="text-sm text-gray-600">{animal.description}</p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Características</h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div><strong>Tamanho:</strong> {animal.size}</div>
+                  <div><strong>Comportamento:</strong> {animal.behavior}</div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Habitat</h3>
+                <div className="flex flex-wrap gap-1">
+                  {animal.habitat.map((hab, idx) => (
+                    <Badge key={idx} variant="outline" className="text-xs">
+                      {hab}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {animal.products && animal.products.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Produtos</h3>
+                  <div className="flex flex-wrap gap-1">
+                    {animal.products.map((product, idx) => (
+                      <Badge key={idx} variant="secondary" className="text-xs">
+                        {product}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {animal.facts && animal.facts.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Curiosidades</h3>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    {animal.facts.map((fact, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-1">•</span>
+                        <span>{fact}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div>
+                <h3 className="font-semibold mb-2">Estatísticas</h3>
+                <div className="text-sm space-y-1">
+                  <div>Encontros: {animal.encounterCount}</div>
+                  {animal.lastSeen && (
+                    <div>Último avistamento: {new Date(animal.lastSeen).toLocaleDateString()}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <Info className="mx-auto mb-2" size={48} />
+              <p>Descubra este animal para ver seus detalhes!</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function AnimalRegistryTab({ discoveredAnimals, playerId }: AnimalRegistryTabProps) {
   const [selectedAnimal, setSelectedAnimal] = useState<AnimalData | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [filterRarity, setFilterRarity] = useState<string>('all');
-  const [stats, setStats] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
 
-  // Buscar estatísticas do jogador
-  useEffect(() => {
-    if (playerId) {
-      fetch(`/api/animals/stats/${playerId}`)
-        .then(res => res.json())
-        .then(data => setStats(data))
-        .catch(err => console.error('Error fetching animal stats:', err));
-    }
-  }, [playerId, discoveredAnimals]);
-
-  // Estatísticas
-  const totalAnimals = stats?.totalAnimals || ANIMAL_REGISTRY.length;
-  const discoveredCount = stats?.discoveredCount || discoveredAnimals.length;
-  const discoveryPercentage = stats?.discoveryPercentage || ((discoveredCount / totalAnimals) * 100);
-
-  // Filtros
+  // Filtrar animais
   const filteredAnimals = useMemo(() => {
     return ANIMAL_REGISTRY.filter(animal => {
       const matchesSearch = animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           animal.description.toLowerCase().includes(searchTerm.toLowerCase());
+                          animal.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || animal.category === selectedCategory;
       const matchesRarity = filterRarity === 'all' || animal.rarity === filterRarity;
-      
+
       return matchesSearch && matchesCategory && matchesRarity;
     });
   }, [searchTerm, selectedCategory, filterRarity]);
 
+  // Estatísticas
+  const totalAnimals = ANIMAL_REGISTRY.length;
+  const discoveredCount = discoveredAnimals.length;
+  const discoveryPercentage = Math.round((discoveredCount / totalAnimals) * 100);
+
   const handleAnimalClick = (animal: AnimalData) => {
     setSelectedAnimal(animal);
-    onAnimalSelect?.(animal);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedAnimal(null);
   };
 
   return (
-    <div className="space-y-4">
+    <div className="p-4 space-y-4">
       {/* Header com estatísticas */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Book className="w-5 h-5 text-amber-600" />
-            <span>Livro de Registro de Animais</span>
+          <CardTitle className="flex items-center gap-2">
+            <Book className="h-5 w-5" />
+            Bestiário
           </CardTitle>
           <CardDescription>
-            Descubra e aprenda sobre a fauna do mundo
+            Registro completo da fauna descoberta
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{discoveredCount}</div>
-              <div className="text-sm text-gray-600">Descobertos</div>
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Progresso de Descoberta</span>
+              <span>{discoveredCount}/{totalAnimals} ({discoveryPercentage}%)</span>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-600">{totalAnimals}</div>
-              <div className="text-sm text-gray-600">Total</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{discoveryPercentage.toFixed(1)}%</div>
-              <div className="text-sm text-gray-600">Completude</div>
-            </div>
+            <Progress value={discoveryPercentage} className="h-2" />
           </div>
-          <Progress value={discoveryPercentage} className="mt-4" />
         </CardContent>
       </Card>
 
       {/* Filtros */}
       <Card>
         <CardContent className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-3">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Buscar animais..."
+                placeholder="Pesquisar animais..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
-            
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 border rounded-md"
-            >
-              <option value="all">Todas as categorias</option>
-              {ANIMAL_CATEGORIES.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.emoji} {category.name}
-                </option>
-              ))}
-            </select>
 
-            <select
-              value={filterRarity}
-              onChange={(e) => setFilterRarity(e.target.value)}
-              className="px-3 py-2 border rounded-md"
-            >
-              <option value="all">Todas as raridades</option>
-              <option value="common">Comum</option>
-              <option value="uncommon">Incomum</option>
-              <option value="rare">Raro</option>
-              <option value="epic">Épico</option>
-              <option value="legendary">Lendário</option>
-            </select>
+            <div className="flex gap-2 overflow-x-auto">
+              {ANIMAL_CATEGORIES.map(category => (
+                <Button
+                  key={category.id}
+                  variant={selectedCategory === category.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category.id)}
+                  className="whitespace-nowrap"
+                >
+                  <span className="mr-1">{category.emoji}</span>
+                  {category.name}
+                </Button>
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              <select
+                value={filterRarity}
+                onChange={(e) => setFilterRarity(e.target.value)}
+                className="px-3 py-1 border rounded text-sm"
+              >
+                <option value="all">Todas as Raridades</option>
+                <option value="common">Comum</option>
+                <option value="uncommon">Incomum</option>
+                <option value="rare">Raro</option>
+                <option value="epic">Épico</option>
+                <option value="legendary">Lendário</option>
+              </select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Lista de animais em categorias */}
-      <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
-          <TabsTrigger value="all">Todos</TabsTrigger>
-          {ANIMAL_CATEGORIES.map(category => (
-            <TabsTrigger key={category.id} value={category.id} className="text-xs">
-              {category.emoji}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        <TabsContent value="all" className="space-y-4">
-          <ScrollArea className="h-[600px]">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
-              {filteredAnimals.map(animal => (
-                <AnimalCard
-                  key={animal.id}
-                  animal={animal}
-                  isDiscovered={discoveredAnimals.includes(animal.id)}
-                  onClick={() => handleAnimalClick(animal)}
-                />
-              ))}
-            </div>
-          </ScrollArea>
-        </TabsContent>
-
-        {ANIMAL_CATEGORIES.map(category => (
-          <TabsContent key={category.id} value={category.id} className="space-y-4">
-            <div className="text-center py-4">
-              <h3 className="text-lg font-semibold">{category.emoji} {category.name}</h3>
-              <p className="text-sm text-gray-600">{category.description}</p>
-            </div>
-            <ScrollArea className="h-[600px]">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
-                {getAnimalsByCategory(category.id as any).map(animal => (
-                  <AnimalCard
-                    key={animal.id}
-                    animal={animal}
-                    isDiscovered={discoveredAnimals.includes(animal.id)}
-                    onClick={() => handleAnimalClick(animal)}
-                  />
-                ))}
-              </div>
-            </ScrollArea>
-          </TabsContent>
+      {/* Grid de animais */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredAnimals.map(animal => (
+          <AnimalCard
+            key={animal.id}
+            animal={animal}
+            isDiscovered={discoveredAnimals.includes(animal.id)}
+            onClick={() => handleAnimalClick(animal)}
+          />
         ))}
-      </Tabs>
+      </div>
+
+      {filteredAnimals.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <p className="text-gray-500">Nenhum animal encontrado com os filtros aplicados.</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Modal de detalhes */}
-      {selectedAnimal && (
-        <AnimalDetailModal
-          animal={selectedAnimal}
-          isDiscovered={discoveredAnimals.includes(selectedAnimal.id)}
-          onClose={() => setSelectedAnimal(null)}
-        />
-      )}
+      <AnimalDetailModal
+        animal={selectedAnimal}
+        isOpen={showModal}
+        onClose={closeModal}
+        isDiscovered={discoveredAnimals.includes(selectedAnimal?.id || '')}
+      />
     </div>
   );
 }
