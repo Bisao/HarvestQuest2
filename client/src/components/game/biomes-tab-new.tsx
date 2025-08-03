@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Clock, CheckCircle, MapPin } from 'lucide-react';
 import ExpeditionModal from "./expedition-modal";
+import { useActiveExpeditions } from "@/hooks/use-active-expeditions";
 import type { Biome, Resource, Equipment, Player } from "@shared/types";
 
 interface BiomesTabProps {
@@ -23,6 +25,14 @@ export default function BiomesTab({
 }: BiomesTabProps) {
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
+
+  // Hook para gerenciar expedições ativas
+  const { 
+    activeExpeditions, 
+    getActiveExpeditionForBiome, 
+    formatTimeRemaining, 
+    getPhaseLabel 
+  } = useActiveExpeditions(player.id);
 
   const getResourcesForBiome = (biome: Biome) => {
     const resourceIds = biome.availableResources as string[];
@@ -50,28 +60,77 @@ export default function BiomesTab({
         {biomes.map((biome) => {
           const biomeResources = getResourcesForBiome(biome);
           const unlocked = isUnlocked(biome);
+          const activeExpedition = getActiveExpeditionForBiome(biome.id);
+          const isExpeditionActive = !!activeExpedition;
+          const isExpeditionCompleted = activeExpedition?.progress >= 100;
           
           return (
             <Card 
               key={biome.id} 
-              className={`transition-all ${unlocked ? 'hover:shadow-lg cursor-pointer' : 'opacity-60'}`}
+              className={`transition-all ${unlocked ? 'hover:shadow-lg cursor-pointer' : 'opacity-60'} ${isExpeditionActive ? 'ring-2 ring-blue-500' : ''}`}
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <span className="text-2xl">{biome.emoji}</span>
                     <CardTitle className="text-lg">{biome.name}</CardTitle>
+                    {isExpeditionActive && (
+                      <MapPin className="w-4 h-4 text-blue-600" />
+                    )}
                   </div>
-                  <Badge variant={unlocked ? "default" : "secondary"}>
-                    Nível {biome.requiredLevel}
-                  </Badge>
+                  <div className="flex items-center space-x-2">
+                    {isExpeditionActive && (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        {isExpeditionCompleted ? 'Completa' : getPhaseLabel(activeExpedition.currentPhase)}
+                      </Badge>
+                    )}
+                    <Badge variant={unlocked ? "default" : "secondary"}>
+                      Nível {biome.requiredLevel}
+                    </Badge>
+                  </div>
                 </div>
-                <CardDescription>Explore este bioma para coletar recursos únicos</CardDescription>
+                <CardDescription>
+                  {isExpeditionActive ? 'Expedição em andamento' : 'Explore este bioma para coletar recursos únicos'}
+                </CardDescription>
               </CardHeader>
               
               <CardContent className="space-y-4">
+                {/* Expedition Progress */}
+                {isExpeditionActive && (
+                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-blue-800">Expedição Ativa</span>
+                      <div className="flex items-center space-x-2 text-sm text-blue-700">
+                        {isExpeditionCompleted ? (
+                          <CheckCircle className="w-4 h-4" />
+                        ) : (
+                          <>
+                            <Clock className="w-4 h-4" />
+                            <span>{formatTimeRemaining(activeExpedition.estimatedEndTime)}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Progresso</span>
+                      <span>{Math.round(activeExpedition.progress)}%</span>
+                    </div>
+                    <Progress 
+                      value={activeExpedition.progress} 
+                      className="h-2 mb-2"
+                    />
+                    
+                    {Object.keys(activeExpedition.collectedResources).length > 0 && (
+                      <div className="text-xs text-blue-700">
+                        Recursos coletados: {Object.keys(activeExpedition.collectedResources).length} tipos
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Progress bar for locked biomes */}
-                {!unlocked && (
+                {!unlocked && !isExpeditionActive && (
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span>Progresso para desbloqueio</span>
@@ -105,11 +164,16 @@ export default function BiomesTab({
                 {/* Explore button */}
                 <Button 
                   onClick={() => handleExploreBiome(biome)}
-                  disabled={!unlocked}
+                  disabled={!unlocked || isExpeditionActive}
                   className="w-full"
-                  variant={unlocked ? "default" : "secondary"}
+                  variant={unlocked && !isExpeditionActive ? "default" : "secondary"}
                 >
-                  {unlocked ? "Explorar" : `Desbloqueado no Nível ${biome.requiredLevel}`}
+                  {!unlocked 
+                    ? `Desbloqueado no Nível ${biome.requiredLevel}`
+                    : isExpeditionActive 
+                      ? (isExpeditionCompleted ? "Coletar Recompensas" : "Expedição em Andamento")
+                      : "Explorar"
+                  }
                 </Button>
               </CardContent>
             </Card>
