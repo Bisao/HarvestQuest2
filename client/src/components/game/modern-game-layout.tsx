@@ -355,7 +355,6 @@ export default function ModernGameLayout() {
 
 
   const { toast } = useToast();
-  const isMobile = useIsMobile();
 
   // Use context instead of props
   const gameState = useGameContext();
@@ -368,7 +367,7 @@ export default function ModernGameLayout() {
 
   // Memoização das categorias da sidebar
   const sidebarCategories = useMemo(() => 
-    createSidebarCategories(player || null, activeExpedition), 
+    player ? createSidebarCategories(player, activeExpedition) : [], 
     [player, activeExpedition]
   );
 
