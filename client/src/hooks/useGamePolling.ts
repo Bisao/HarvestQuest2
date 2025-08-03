@@ -49,7 +49,9 @@ export function useGameData({
     enabled: enabled && !!playerId,
     refetchInterval: pollInterval,
     refetchIntervalInBackground: true,
-    staleTime: 1000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 500, // Reduced stale time for more real-time updates
   });
 
   // Single inventory query
@@ -79,7 +81,9 @@ export function useGameData({
     enabled: enabled && !!playerId,
     refetchInterval: pollInterval,
     refetchIntervalInBackground: true,
-    staleTime: 500,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 300, // Even faster for storage updates
   });
 
   return {

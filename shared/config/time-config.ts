@@ -13,17 +13,33 @@ export const TIME_CONFIG = {
   
   // Configurações de temperatura
   TEMPERATURE: {
-    BASE_MIN: -30,
-    BASE_MAX: 40,
+    BASE_MIN: -40,
+    BASE_MAX: 50,
     DAY_NIGHT_VARIANCE: 8, // Diferença entre dia e noite
     SEASON_VARIANCE: 15,   // Diferença entre estações
     BIOME_MODIFIERS: {
-      forest: 0,
-      desert: 15,
-      mountain: -10,
-      ocean: -5,
-      cave: -8,
-      special: 0
+      forest: 2,     // Floresta temperada
+      desert: 25,    // Deserto muito quente
+      mountain: -15, // Montanha muito fria
+      ocean: -3,     // Oceano fresco
+      cave: -12,     // Caverna fria
+      tundra: -20,   // Tundra gelada
+      jungle: 8,     // Selva quente e úmida
+      swamp: 5,      // Pântano úmido
+      special: 0     // Área especial
+    },
+    // Modificadores de degradação baseados na temperatura
+    DEGRADATION_MODIFIERS: {
+      EXTREME_COLD_THRESHOLD: -15, // Abaixo disso: fome aumenta drasticamente
+      COLD_THRESHOLD: -5,          // Abaixo disso: fome aumenta moderadamente
+      HOT_THRESHOLD: 30,           // Acima disso: sede aumenta moderadamente
+      EXTREME_HOT_THRESHOLD: 40,   // Acima disso: sede aumenta drasticamente
+      MULTIPLIERS: {
+        EXTREME_COLD_HUNGER: 2.5,  // 150% mais fome no frio extremo
+        COLD_HUNGER: 1.5,          // 50% mais fome no frio
+        HOT_THIRST: 1.5,           // 50% mais sede no calor
+        EXTREME_HOT_THIRST: 2.5,   // 150% mais sede no calor extremo
+      }
     }
   },
   

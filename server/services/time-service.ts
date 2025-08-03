@@ -79,30 +79,45 @@ export class TimeService {
   calculateTemperature(biomeType: string, gameTime: GameTime, player?: Player): TemperatureSystem {
     const baseTemp = TIME_CONFIG.TEMPERATURE.BIOME_MODIFIERS[biomeType as keyof typeof TIME_CONFIG.TEMPERATURE.BIOME_MODIFIERS] || 0;
     
-    // Modificador dia/noite
+    // Modificador dia/noite mais realista
     let timeModifier = 0;
     if (gameTime.isDay) {
-      timeModifier = TIME_CONFIG.TEMPERATURE.DAY_NIGHT_VARIANCE / 2;
+      // Durante o dia, temperatura sobe gradualmente
+      if (gameTime.hour >= 6 && gameTime.hour <= 12) {
+        // Manhã: aquecimento gradual
+        timeModifier = (gameTime.hour - 6) * (TIME_CONFIG.TEMPERATURE.DAY_NIGHT_VARIANCE / 12);
+      } else if (gameTime.hour > 12 && gameTime.hour <= 18) {
+        // Tarde: temperatura máxima
+        timeModifier = TIME_CONFIG.TEMPERATURE.DAY_NIGHT_VARIANCE / 2;
+      } else {
+        // Final do dia: esfriamento
+        timeModifier = TIME_CONFIG.TEMPERATURE.DAY_NIGHT_VARIANCE / 4;
+      }
     } else {
+      // Durante a noite, mais frio
       timeModifier = -TIME_CONFIG.TEMPERATURE.DAY_NIGHT_VARIANCE / 2;
     }
     
-    // Modificador sazonal
+    // Modificador sazonal mais pronunciado
     let seasonModifier = 0;
     switch (gameTime.season) {
-      case 'summer': seasonModifier = TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE / 2; break;
-      case 'winter': seasonModifier = -TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE / 2; break;
-      case 'spring': seasonModifier = TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE / 4; break;
-      case 'autumn': seasonModifier = -TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE / 4; break;
+      case 'summer': seasonModifier = TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE; break;
+      case 'winter': seasonModifier = -TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE; break;
+      case 'spring': seasonModifier = TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE / 3; break;
+      case 'autumn': seasonModifier = -TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE / 3; break;
     }
     
-    // Modificador do jogador (equipamentos, etc.)
+    // Modificador do jogador (equipamentos que protegem do frio/calor)
     let playerModifier = 0;
     if (player) {
-      // Verificar equipamentos que afetam temperatura
-      if (player.equippedChestplate) playerModifier += 2;
-      if (player.equippedHelmet) playerModifier += 1;
-      // Adicionar outros modificadores conforme necessário
+      // Equipamentos de proteção térmica
+      if (player.equippedChestplate) playerModifier += 3; // Armadura do peito protege mais
+      if (player.equippedHelmet) playerModifier += 2;     // Capacete protege moderadamente
+      if (player.equippedBoots) playerModifier += 1;      // Botas protegem pouco
+      if (player.equippedLeggings) playerModifier += 2;   // Calças protegem moderadamente
+      
+      // Limite máximo de proteção
+      playerModifier = Math.min(playerModifier, 8);
     }
 
     const current = Math.round(baseTemp + timeModifier + seasonModifier + playerModifier);
@@ -135,6 +150,32 @@ export class TimeService {
     // Inverno aumenta fome
     if (gameTime.season === 'winter') {
       hungerMod *= 1.1;
+    }
+
+    return { hunger: hungerMod, thirst: thirstMod };
+  }
+
+  // Novo método para calcular modificadores baseados na temperatura
+  getTemperatureModifiers(temperature: number): { hunger: number; thirst: number } {
+    const { TEMPERATURE } = TIME_CONFIG;
+    let hungerMod = 1;
+    let thirstMod = 1;
+
+    // Frio extremo: muito mais fome
+    if (temperature <= TEMPERATURE.DEGRADATION_MODIFIERS.EXTREME_COLD_THRESHOLD) {
+      hungerMod = TEMPERATURE.DEGRADATION_MODIFIERS.MULTIPLIERS.EXTREME_COLD_HUNGER;
+    }
+    // Frio moderado: mais fome
+    else if (temperature <= TEMPERATURE.DEGRADATION_MODIFIERS.COLD_THRESHOLD) {
+      hungerMod = TEMPERATURE.DEGRADATION_MODIFIERS.MULTIPLIERS.COLD_HUNGER;
+    }
+    // Calor moderado: mais sede
+    else if (temperature >= TEMPERATURE.DEGRADATION_MODIFIERS.HOT_THRESHOLD) {
+      thirstMod = TEMPERATURE.DEGRADATION_MODIFIERS.MULTIPLIERS.HOT_THIRST;
+    }
+    // Calor extremo: muito mais sede
+    if (temperature >= TEMPERATURE.DEGRADATION_MODIFIERS.EXTREME_HOT_THRESHOLD) {
+      thirstMod = TEMPERATURE.DEGRADATION_MODIFIERS.MULTIPLIERS.EXTREME_HOT_THIRST;
     }
 
     return { hunger: hungerMod, thirst: thirstMod };
