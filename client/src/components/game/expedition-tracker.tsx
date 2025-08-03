@@ -61,6 +61,38 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
     }
   });
 
+  // Mutation para resetar expedições problemáticas
+  const resetExpeditionsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/expeditions/player/${player.id}/reset`, {
+        method: 'POST'
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Erro ao resetar expedições');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Expedições Resetadas!",
+        description: `${data.data.resetCount} expedições problemáticas foram canceladas.`,
+      });
+      
+      // Invalidar caches
+      queryClient.invalidateQueries({ queryKey: ['/api/expeditions/player', player.id] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao resetar expedições",
+        variant: "destructive"
+      });
+    }
+  });
+
   const getPhaseLabel = (phase: string) => {
     switch (phase) {
       case 'preparing': return 'Preparando';
@@ -119,9 +151,27 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
     );
   }
 
+  // Check if there are problematic expeditions (0% progress for a long time)
+  const hasProblematicExpeditions = activeExpeditions.some(exp => 
+    exp.progress === 0 && (Date.now() - exp.startTime) > 5 * 60 * 1000 // 5 minutes
+  );
+
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Expedições Ativas</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Expedições Ativas</h3>
+        {hasProblematicExpeditions && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => resetExpeditionsMutation.mutate()}
+            disabled={resetExpeditionsMutation.isPending}
+            className="text-orange-600 border-orange-300 hover:bg-orange-50"
+          >
+            🔧 Resetar Problemas
+          </Button>
+        )}
+      </div>
       <div className="space-y-3">
         {activeExpeditions.map((expedition: ActiveExpedition) => {
           const isCompleted = expedition.progress >= 100;

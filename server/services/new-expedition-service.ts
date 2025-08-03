@@ -205,12 +205,13 @@ export class NewExpeditionService {
       Math.random() * (template.duration.max - template.duration.min) + template.duration.min
     );
 
+    const startTime = Date.now();
     const expedition: ActiveExpedition = {
       id: uuidv4(),
       playerId,
       planId: templateId,
-      startTime: Date.now(),
-      estimatedEndTime: Date.now() + (duration * 60 * 1000),
+      startTime: startTime,
+      estimatedEndTime: startTime + (duration * 60 * 1000),
       currentPhase: 'preparing',
       progress: 0,
       completedTargets: [],
@@ -239,10 +240,20 @@ export class NewExpeditionService {
     if (!expedition || expedition.status !== 'in_progress') return null;
 
     const currentTime = Date.now();
-    const startTime = expedition.startTime ?? Math.floor(Date.now() / 1000);
-    const elapsed = currentTime - (startTime * 1000);
+    // Fix: startTime is stored in seconds, but we need milliseconds for calculation
+    let startTimeMs: number;
+    if (expedition.startTime) {
+      // If startTime looks like it's in seconds (reasonable timestamp), convert to ms
+      startTimeMs = expedition.startTime < 2000000000 ? expedition.startTime * 1000 : expedition.startTime;
+    } else {
+      startTimeMs = currentTime; // Fallback to current time
+    }
+    
+    const elapsed = currentTime - startTimeMs;
     const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
     const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
+
+    console.log(`📈 EXPEDITION-PROGRESS: ${expeditionId} - elapsed: ${elapsed}ms, progress: ${Math.round(progress)}%`);
 
     // Gradually collect resources as expedition progresses
     let collectedResources = expedition.collectedResources || {};
@@ -272,8 +283,8 @@ export class NewExpeditionService {
       id: expedition.id,
       playerId: expedition.playerId,
       planId: expedition.biomeId,
-      startTime: startTime * 1000,
-      estimatedEndTime: startTime * 1000 + expeditionDuration,
+      startTime: startTimeMs,
+      estimatedEndTime: startTimeMs + expeditionDuration,
       currentPhase: this.getPhaseFromProgress(progress),
       progress,
       completedTargets: [],
@@ -390,16 +401,25 @@ export class NewExpeditionService {
     const activeExpeditions = expeditions
       .filter(exp => exp.status === 'in_progress')
       .map(exp => {
-        const startTime = exp.startTime ?? Math.floor(Date.now() / 1000);
-        const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
         const currentTime = Date.now();
-        const elapsed = currentTime - (startTime * 1000);
+        // Fix: Handle startTime conversion properly
+        let startTimeMs: number;
+        if (exp.startTime) {
+          // If startTime looks like it's in seconds (reasonable timestamp), convert to ms
+          startTimeMs = exp.startTime < 2000000000 ? exp.startTime * 1000 : exp.startTime;
+        } else {
+          startTimeMs = currentTime; // Fallback to current time
+        }
+        
+        const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
+        const elapsed = currentTime - startTimeMs;
         const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
         
         console.log(`🎯 EXPEDITION-SERVICE: Processing expedition ${exp.id}:`, {
-          startTime,
+          originalStartTime: exp.startTime,
+          startTimeMs,
           elapsed,
-          progress,
+          progress: Math.round(progress),
           collectedResources: exp.collectedResources
         });
         
@@ -407,8 +427,8 @@ export class NewExpeditionService {
           id: exp.id,
           playerId: exp.playerId,
           planId: exp.biomeId,
-          startTime: startTime * 1000,
-          estimatedEndTime: startTime * 1000 + expeditionDuration,
+          startTime: startTimeMs,
+          estimatedEndTime: startTimeMs + expeditionDuration,
           currentPhase: this.getPhaseFromProgress(progress),
           progress: progress,
           completedTargets: [],

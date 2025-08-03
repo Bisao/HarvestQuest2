@@ -304,5 +304,44 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     }
   });
 
+  // Reset/Fix problematic expeditions
+  router.post('/player/:playerId/reset',
+    validateParams(playerParamSchema),
+    async (req: Request, res: Response) => {
+      try {
+        const { playerId } = req.params;
+        console.log(`🔧 EXPEDITION-RESET: Resetting expeditions for player ${playerId}`);
+
+        // Get all player expeditions
+        const expeditions = await storage.getPlayerExpeditions(playerId);
+        
+        // Cancel all problematic expeditions (those with invalid timestamps)
+        let resetCount = 0;
+        for (const exp of expeditions) {
+          if (exp.status === 'in_progress') {
+            // Check if startTime is problematic (too far in the future)
+            const currentTime = Date.now();
+            const startTimeMs = exp.startTime && exp.startTime < 2000000000 ? exp.startTime * 1000 : exp.startTime;
+            
+            if (!startTimeMs || startTimeMs > currentTime + (24 * 60 * 60 * 1000)) {
+              // Cancel this expedition as it has invalid timestamp
+              await storage.updateExpedition(exp.id, { 
+                status: 'failed',
+                progress: 0 
+              });
+              resetCount++;
+              console.log(`🔧 EXPEDITION-RESET: Cancelled problematic expedition ${exp.id}`);
+            }
+          }
+        }
+        
+        return successResponse(res, { resetCount }, `Reset ${resetCount} problematic expeditions`);
+      } catch (error: any) {
+        console.error('❌ EXPEDITION-RESET: Error:', error.message);
+        return errorResponse(res, 500, error.message);
+      }
+    }
+  );
+
   return router;
 }
