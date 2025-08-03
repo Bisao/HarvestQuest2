@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useGameState } from '@/hooks/useGameState';
+import { useGameContext } from '@/contexts/GameContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -56,17 +56,7 @@ interface ActiveExpedition {
 }
 import './modern-game-layout.css';
 
-interface ModernGameLayoutProps {
-  player: Player;
-  biomes: Biome[];
-  resources: Resource[];
-  equipment: Equipment[];
-  recipes: Recipe[];
-  activeExpedition: ActiveExpedition | null;
-  setActiveExpedition: (expedition: ActiveExpedition | null) => void;
-  authWarning?: boolean;
-  isBlocked?: boolean;
-}
+// Props interface removed since we're using GameContext now
 
 // Tipos para as abas
 interface GameTab {
@@ -334,17 +324,7 @@ EquipmentIndicators.displayName = 'EquipmentIndicators';
 // Hook is imported from @/hooks/use-mobile, removed local definition
 
 // Componente principal refatorado
-export default function ModernGameLayout({
-  player,
-  biomes,
-  resources,
-  equipment,
-  recipes,
-  activeExpedition,
-  setActiveExpedition,
-  authWarning = false,
-  isBlocked = false
-}: ModernGameLayoutProps) {
+export default function ModernGameLayout() {
   const [activeTab, setActiveTab] = useState('status');
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
@@ -355,11 +335,14 @@ export default function ModernGameLayout({
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
-  // Use optimized game state hook
-  const gameState = useGameState({ 
-    playerId: player?.id || '', 
-    enablePolling: !isBlocked 
-  });
+  // Use context instead of props
+  const gameState = useGameContext();
+
+  const { player, activeExpedition, setActiveExpedition, resources, equipment, biomes, recipes } = gameState;
+  
+  // Local state for auth warning and blocked status
+  const authWarning = false; // TODO: implement auth warning logic
+  const isBlocked = false; // TODO: implement blocked status logic
 
   // Memoização das abas com notificações
   const gameTabs = useMemo(() => 

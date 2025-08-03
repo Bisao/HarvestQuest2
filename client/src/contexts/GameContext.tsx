@@ -1,13 +1,14 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useGameState } from '../hooks/useGameState';
-import type { Player, Resource, Equipment, Biome, ActiveExpedition } from '@shared/types';
+import type { Player, Resource, Equipment, Biome, ActiveExpedition, Recipe } from '@shared/types';
 
 interface GameContextValue {
   player: Player | null;
   resources: Resource[];
   equipment: Equipment[];
   biomes: Biome[];
+  recipes: Recipe[];
   activeExpedition: ActiveExpedition | null;
   isLoading: boolean;
   error: string | null;
@@ -48,8 +49,8 @@ export function useGameContext() {
 
 // Hook for accessing specific parts of game state
 export function useGameData() {
-  const { player, resources, equipment, biomes } = useGameContext();
-  return { player, resources, equipment, biomes };
+  const { player, resources, equipment, biomes, recipes } = useGameContext();
+  return { player, resources, equipment, biomes, recipes };
 }
 
 export function useGameActions() {

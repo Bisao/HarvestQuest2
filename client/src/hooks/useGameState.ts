@@ -1,13 +1,14 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Player, Resource, Equipment, Biome, ActiveExpedition } from '@shared/types';
+import type { Player, Resource, Equipment, Biome, ActiveExpedition, Recipe } from '@shared/types';
 
 interface GameState {
   player: Player | null;
   resources: Resource[];
   equipment: Equipment[];
   biomes: Biome[];
+  recipes: Recipe[];
   activeExpedition: ActiveExpedition | null;
   isLoading: boolean;
   error: string | null;
@@ -45,7 +46,7 @@ export function useGameState({
         }
         const data = await response.json();
         console.log('🕐 HOOK: Player data received:', data);
-        return data.data;
+        return data;
       } catch (error) {
         console.error('🕐 HOOK: Network or parsing error:', error);
         throw error;
@@ -68,7 +69,7 @@ export function useGameState({
       const response = await fetch('/api/resources');
       if (!response.ok) throw new Error('Failed to fetch resources');
       const data = await response.json();
-      return data.data;
+      return data;
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 30 * 60 * 1000 // 30 minutes
@@ -84,7 +85,7 @@ export function useGameState({
       const response = await fetch('/api/equipment');
       if (!response.ok) throw new Error('Failed to fetch equipment');
       const data = await response.json();
-      return data.data;
+      return data;
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000
@@ -100,7 +101,23 @@ export function useGameState({
       const response = await fetch('/api/biomes');
       if (!response.ok) throw new Error('Failed to fetch biomes');
       const data = await response.json();
-      return data.data;
+      return data;
+    },
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000
+  });
+
+  // Recipes query (static data)
+  const { 
+    data: recipes = [], 
+    isLoading: recipesLoading 
+  } = useQuery({
+    queryKey: ['recipes'],
+    queryFn: async () => {
+      const response = await fetch('/api/recipes');
+      if (!response.ok) throw new Error('Failed to fetch recipes');
+      const data = await response.json();
+      return data;
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000
@@ -108,8 +125,8 @@ export function useGameState({
 
   // Computed values
   const isLoading = useMemo(() => 
-    playerLoading || resourcesLoading || equipmentLoading || biomesLoading,
-    [playerLoading, resourcesLoading, equipmentLoading, biomesLoading]
+    playerLoading || resourcesLoading || equipmentLoading || biomesLoading || recipesLoading,
+    [playerLoading, resourcesLoading, equipmentLoading, biomesLoading, recipesLoading]
   );
 
   const error = useMemo(() => 
@@ -151,10 +168,11 @@ export function useGameState({
     resources,
     equipment,
     biomes,
+    recipes,
     activeExpedition,
     isLoading,
     error
-  }), [player, resources, equipment, biomes, activeExpedition, isLoading, error]);
+  }), [player, resources, equipment, biomes, recipes, activeExpedition, isLoading, error]);
 
   return {
     ...gameState,
