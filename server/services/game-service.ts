@@ -3,6 +3,17 @@ import type { IStorage } from "../storage";
 import type { Player, Resource, Equipment, InventoryItem, StorageItem } from "@shared/types";
 import { EQUIPMENT_IDS, SKILL_IDS } from "@shared/constants/game-ids";
 import { SkillService } from "./skill-service";
+import { GameData, Player, Item, Recipe, Equipment, Quest, Biome, Resource, BiomeLocation, Storage as GameStorage, InventoryItem, StorageItem, BiomeResourceLocation } from '../types';
+import { Storage } from '../storage';
+import { v4 as uuidv4 } from 'uuid';
+import { biomes } from '../data/biomes';
+import { recipes } from '../data/recipes-modern';
+import { items } from '../data/items-modern';
+import { equipment } from '../data/equipment';
+import { quests } from '../data/quests';
+import { resources } from '../data/resources';
+import { timeService } from './time-service';
+import { HungerThirstService } from './hunger-thirst-service';
 
 export class GameService {
   private skillService: SkillService;
@@ -24,12 +35,12 @@ export class GameService {
   private getFromCache<T>(type: string, id: string): T | null {
     const key = this.getCacheKey(type, id);
     const cached = this.cache.get(key);
-    
+
     if (!cached || this.isExpired(cached.timestamp, cached.ttl)) {
       this.cache.delete(key);
       return null;
     }
-    
+
     return cached.data as T;
   }
 
@@ -310,7 +321,7 @@ export class GameService {
     if (player) {
       const newWeight = await this.calculateInventoryWeight(playerId);
       await this.storage.updatePlayer(playerId, { inventoryWeight: newWeight });
-      
+
       // Award skill experience for resource management
       await this.skillService.recordSkillUsage(playerId, SKILL_IDS.COLETA, 'gathering');
     }

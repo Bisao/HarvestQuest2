@@ -1,4 +1,3 @@
-
 import type { GameTime, TimeConfig, TemperatureSystem } from '@shared/types/time-types';
 import type { Player } from '@shared/types';
 import { TIME_CONFIG } from '@shared/config/time-config';
@@ -27,27 +26,27 @@ export class TimeService {
   getCurrentGameTime(): GameTime {
     const now = Date.now();
     const elapsed = now - this.config.startTime;
-    
+
     // Usar a duração atual configurada (pode ter mudado)
     const currentDayDuration = this.config.dayDurationMs;
-    
+
     // Calcular quantos dias passaram
     const totalDays = Math.floor(elapsed / currentDayDuration);
-    
+
     // Calcular hora atual (0-23)
     const dayProgress = (elapsed % currentDayDuration) / currentDayDuration;
     const hour = Math.floor(dayProgress * 24);
     const minute = Math.floor((dayProgress * 24 * 60) % 60);
-    
+
     // Calcular data
     const dayNumber = totalDays + 1;
     const monthNumber = Math.floor((dayNumber - 1) / 30) % 12 + 1;
     const yearNumber = Math.floor((dayNumber - 1) / 360) + 1;
-    
+
     // Determinar período do dia
     const timeOfDay = this.getTimeOfDay(hour);
     const isDay = hour >= 6 && hour < 20;
-    
+
     // Determinar estação
     const season = this.getSeason(monthNumber);
 
@@ -83,7 +82,7 @@ export class TimeService {
 
   calculateTemperature(biomeType: string, gameTime: GameTime, player?: Player): TemperatureSystem {
     const baseTemp = TIME_CONFIG.TEMPERATURE.BIOME_MODIFIERS[biomeType as keyof typeof TIME_CONFIG.TEMPERATURE.BIOME_MODIFIERS] || 0;
-    
+
     // Modificador dia/noite mais realista
     let timeModifier = 0;
     if (gameTime.isDay) {
@@ -102,7 +101,7 @@ export class TimeService {
       // Durante a noite, mais frio
       timeModifier = -TIME_CONFIG.TEMPERATURE.DAY_NIGHT_VARIANCE / 2;
     }
-    
+
     // Modificador sazonal mais pronunciado
     let seasonModifier = 0;
     switch (gameTime.season) {
@@ -111,7 +110,7 @@ export class TimeService {
       case 'spring': seasonModifier = TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE / 3; break;
       case 'autumn': seasonModifier = -TIME_CONFIG.TEMPERATURE.SEASON_VARIANCE / 3; break;
     }
-    
+
     // Modificador do jogador (equipamentos que protegem do frio/calor)
     let playerModifier = 0;
     if (player) {
@@ -120,7 +119,7 @@ export class TimeService {
       if (player.equippedHelmet) playerModifier += 2;     // Capacete protege moderadamente
       if (player.equippedBoots) playerModifier += 1;      // Botas protegem pouco
       if (player.equippedLeggings) playerModifier += 2;   // Calças protegem moderadamente
-      
+
       // Limite máximo de proteção
       playerModifier = Math.min(playerModifier, 8);
     }
@@ -191,16 +190,16 @@ export class TimeService {
     const targetHour = this.getHourFromTimeOfDay(timeOfDay);
     const now = Date.now();
     const currentGameTime = this.getCurrentGameTime();
-    
+
     // Calcular a diferença de horas necessária
     const hourDifference = targetHour - currentGameTime.hour;
-    
+
     // Ajustar o startTime para que a hora atual seja a desejada
     const millisecondsPerHour = this.config.dayDurationMs / 24;
     const adjustment = hourDifference * millisecondsPerHour;
-    
+
     this.config.startTime = this.config.startTime - adjustment;
-    
+
     console.log(`⏰ TIME-SERVICE: Time changed to ${timeOfDay} (${targetHour}:00)`);
   }
 
@@ -209,19 +208,19 @@ export class TimeService {
     if (hour < 0 || hour > 23) {
       throw new Error('Hour must be between 0 and 23');
     }
-    
+
     const now = Date.now();
     const currentGameTime = this.getCurrentGameTime();
-    
+
     // Calcular a diferença de horas necessária
     const hourDifference = hour - currentGameTime.hour;
-    
+
     // Ajustar o startTime para que a hora atual seja a desejada
     const millisecondsPerHour = this.config.dayDurationMs / 24;
     const adjustment = hourDifference * millisecondsPerHour;
-    
+
     this.config.startTime = this.config.startTime - adjustment;
-    
+
     console.log(`⏰ TIME-SERVICE: Time changed to ${hour}:00`);
   }
 
@@ -230,34 +229,34 @@ export class TimeService {
     const oldDuration = this.config.dayDurationMs;
     const newDuration = TIME_CONFIG.SPEED_OPTIONS[speed];
     const now = Date.now();
-    
+
     // Obter tempo atual ANTES da mudança
     const currentGameTime = this.getCurrentGameTime();
-    
+
     // Calcular progresso exato do dia atual (0.0 a 1.0)
     const dayProgress = currentGameTime.dayProgress;
-    
+
     // Calcular quanto tempo de jogo já passou desde o início
     const totalGameDays = currentGameTime.dayNumber - 1; // Dias completos
     const elapsedGameTime = totalGameDays * newDuration + (dayProgress * newDuration);
-    
+
     // Definir novo startTime para manter a mesma hora/progresso
     this.config.startTime = now - elapsedGameTime;
     this.config.dayDurationMs = newDuration;
     this.config.currentSpeed = speed;
-    
+
     const speedLabel = {
       FAST: '45 minutos',
       NORMAL: '60 minutos', 
       SLOW: '90 minutos',
       VERY_SLOW: '120 minutos'
     }[speed];
-    
+
     console.log(`⏰ TIME-SERVICE: Speed changed from ${oldDuration/60000}min to ${newDuration/60000}min (${speedLabel} = 24h do jogo)`);
     console.log(`⏰ TIME-SERVICE: Time preserved at ${currentGameTime.hour}:${currentGameTime.minute.toString().padStart(2, '0')}`);
     console.log(`⏰ TIME-SERVICE: New startTime: ${this.config.startTime}, dayDuration: ${this.config.dayDurationMs}ms`);
     console.log(`⏰ TIME-SERVICE: Day progress: ${(dayProgress * 100).toFixed(2)}%, Total days: ${totalGameDays}`);
-    
+
     // Verificar imediatamente se a mudança foi aplicada
     const verifyTime = this.getCurrentGameTime();
     console.log(`⏰ TIME-SERVICE: Verification - New time: ${verifyTime.hour}:${verifyTime.minute.toString().padStart(2, '0')}, dayProgress: ${(verifyTime.dayProgress * 100).toFixed(2)}%`);
@@ -300,9 +299,9 @@ export class TimeService {
   advanceTime(hours: number): void {
     const millisecondsPerHour = this.config.dayDurationMs / 24;
     const adjustment = hours * millisecondsPerHour;
-    
+
     this.config.startTime = this.config.startTime - adjustment;
-    
+
     console.log(`⏰ TIME-SERVICE: Time advanced by ${hours} hours`);
   }
 }

@@ -67,7 +67,7 @@ export class HungerThirstService {
 
         // Calculate degradation based on player's selected mode
         const baseDegradation = this.calculateDegradationByMode(player);
-        
+
         // Apply temperature modifiers to degradation
         const temperatureModifiers = await this.getTemperatureModifiers(player);
         const hungerDecrease = Math.min((baseDegradation.hunger || 1) * temperatureModifiers.hunger, player.hunger); 
@@ -211,14 +211,14 @@ export class HungerThirstService {
     try {
       const timeService = TimeService.getInstance();
       const gameTime = timeService.getCurrentGameTime();
-      
+
       // Get player's current biome (default to forest if not specified)
       const biome = player.currentBiome || 'forest';
-      
+
       // Calculate temperature
       const temperatureData = timeService.calculateTemperature(biome, gameTime, player);
       const temperature = temperatureData.current;
-      
+
       // Apply temperature modifiers
       return timeService.getTemperatureModifiers(temperature);
     } catch (error) {

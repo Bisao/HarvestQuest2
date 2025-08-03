@@ -117,3 +117,38 @@ export function createGameRoutes(
 
   return router;
 }
+
+
+
+// Manual degradation trigger for testing
+router.post('/players/:username/degrade', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { minutes = 5 } = req.body;
+    
+    const data = await storage.load();
+    const player = data.players.find(p => p.username === username);
+    
+    if (!player) {
+      return res.status(404).json({ error: 'Player not found' });
+    }
+
+    // Import here to avoid circular dependencies
+    const { HungerThirstService } = await import('../services/hunger-thirst-service');
+    
+    // Apply manual degradation
+    HungerThirstService.updatePlayerStats(player, minutes);
+    
+    console.log(`🧪 Manual degradation applied: ${minutes} minutes to ${username}`);
+    
+    await storage.save(data);
+    
+    res.json({ 
+      message: `Applied ${minutes} minutes of degradation to ${username}`,
+      player 
+    });
+  } catch (error) {
+    console.error('Error applying manual degradation:', error);
+    res.status(500).json({ error: 'Failed to apply degradation' });
+  }
+});
