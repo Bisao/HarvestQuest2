@@ -84,7 +84,7 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     label: 'Jogador',
     icon: User,
     color: 'text-blue-600',
-    count: 1,
+    count: 2,
     subTabs: [
       {
         id: 'status',
@@ -92,29 +92,13 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
         icon: User,
         color: 'text-blue-600',
         description: 'Estatísticas e informações do jogador'
-      }
-    ]
-  },
-  {
-    id: 'inventario',
-    label: 'Inventário',
-    icon: Backpack,
-    color: 'text-green-600',
-    count: 2,
-    subTabs: [
+      },
       {
         id: 'inventory',
         label: 'Inventário',
         icon: Backpack,
         color: 'text-green-600',
         description: 'Itens carregados e equipamentos'
-      },
-      {
-        id: 'storage',
-        label: 'Armazém',
-        icon: Package,
-        color: 'text-purple-600',
-        description: 'Armazenamento expandido de itens'
       }
     ]
   },
@@ -147,7 +131,7 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     label: 'Construção',
     icon: Hammer,
     color: 'text-orange-600',
-    count: 2,
+    count: 3,
     subTabs: [
       {
         id: 'workshops',
@@ -162,6 +146,13 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
         icon: Home,
         color: 'text-indigo-600',
         description: 'Base, melhorias e construções'
+      },
+      {
+        id: 'storage',
+        label: 'Armazém',
+        icon: Package,
+        color: 'text-purple-600',
+        description: 'Armazenamento expandido de itens'
       }
     ]
   },
