@@ -39,10 +39,7 @@ const ANIMAL_CATEGORIES = [
   { id: 'amphibian', name: 'Anfíbios', emoji: '🐸', description: 'Criaturas que vivem na terra e água' },
   { id: 'insect', name: 'Insetos', emoji: '🦋', description: 'Pequenos artrópodes' },
   { id: 'arthropod', name: 'Artrópodes', emoji: '🦂', description: 'Artrópodes diversos' },
-  { id: 'mythical', name: 'Criaturas Míticas', emoji: '🦄', description: 'Seres lendários e mágicos' },
-  { id: 'undead', name: 'Mortos-Vivos', emoji: '🧟', description: 'Criaturas sobrenaturais não-mortas' },
-  { id: 'supernatural', name: 'Sobrenaturais', emoji: '👻', description: 'Entidades sobrenaturais' },
-  { id: 'marine', name: 'Vida Marinha', emoji: '🐙', description: 'Criaturas marinhas diversas' }
+  { id: 'mythical', name: 'Criaturas Míticas', emoji: '🦄', description: 'Seres lendários e mágicos' }
 ];
 
 const getRarityColor = (rarity: string) => {

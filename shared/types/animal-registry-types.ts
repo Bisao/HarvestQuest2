@@ -55,10 +55,7 @@ export type AnimalCategory =
   | 'amphibian'
   | 'insect'
   | 'arthropod'
-  | 'mythical'
-  | 'undead'
-  | 'supernatural'
-  | 'marine';
+  | 'mythical';
 
 export interface PlayerAnimalRegistry {
   playerId: string;
