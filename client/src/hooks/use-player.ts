@@ -1,12 +1,8 @@
 
-import { useContext } from 'react';
-import { GameContext } from '@/contexts/GameContext';
+import { useGameContext } from '@/contexts/GameContext';
 
 export function usePlayer() {
-  const context = useContext(GameContext);
-  if (!context) {
-    throw new Error('usePlayer must be used within a GameProvider');
-  }
+  const context = useGameContext();
   return {
     player: context.player,
     isLoading: context.isLoading,
