@@ -64,65 +64,49 @@ const GameHeader = ({ player }: GameHeaderProps) => {
       <header className="bg-white shadow-md border-b-4 border-forest">
         <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0">
-            {/* Logo */}
-            <div className="flex items-center space-x-2 md:space-x-3">
-              <span className="text-2xl md:text-3xl">🎮</span>
-              <h1 className="text-lg md:text-2xl font-bold text-gray-800">Coletor Adventures</h1>
-            </div>
-            
             {/* Informações de Tempo e Data */}
-            <div className="flex items-center space-x-4 md:space-x-6 text-sm">
-              {gameTime && (
-                <>
-                  {/* Data */}
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="w-4 h-4 text-gray-600" />
-                    <span className="font-medium text-gray-700">
-                      {formatDate(gameTime.dayNumber, gameTime.monthNumber, gameTime.yearNumber)}
-                    </span>
-                  </div>
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center space-x-6 text-sm">
+                {gameTime && (
+                  <>
+                    {/* Data */}
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="w-5 h-5 text-gray-600" />
+                      <span className="font-semibold text-gray-800 text-base">
+                        {formatDate(gameTime.dayNumber, gameTime.monthNumber, gameTime.yearNumber)}
+                      </span>
+                    </div>
 
-                  {/* Hora */}
-                  <div className="flex items-center space-x-1">
-                    <span className="text-lg">{getTimeEmoji(gameTime.timeOfDay)}</span>
-                    <span className="font-medium text-gray-700">
-                      {formatTime(gameTime.hour, gameTime.minute)}
-                    </span>
-                  </div>
+                    {/* Hora */}
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xl">{getTimeEmoji(gameTime.timeOfDay)}</span>
+                      <span className="font-semibold text-gray-800 text-base">
+                        {formatTime(gameTime.hour, gameTime.minute)}
+                      </span>
+                    </div>
 
-                  {/* Estação */}
-                  <div className="flex items-center space-x-1">
-                    <span className="text-lg">{getSeasonEmoji(gameTime.season)}</span>
-                    <span className="font-medium text-gray-600 capitalize">
-                      {gameTime.season === 'spring' ? 'Primavera' :
-                       gameTime.season === 'summer' ? 'Verão' :
-                       gameTime.season === 'autumn' ? 'Outono' : 'Inverno'}
-                    </span>
-                  </div>
+                    {/* Estação */}
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xl">{getSeasonEmoji(gameTime.season)}</span>
+                      <span className="font-semibold text-gray-700 capitalize text-base">
+                        {gameTime.season === 'spring' ? 'Primavera' :
+                         gameTime.season === 'summer' ? 'Verão' :
+                         gameTime.season === 'autumn' ? 'Outono' : 'Inverno'}
+                      </span>
+                    </div>
 
-                  {/* Indicador Dia/Noite */}
-                  <div className="flex items-center space-x-1">
-                    {gameTime.isDay ? (
-                      <Sun className="w-4 h-4 text-yellow-500" />
-                    ) : (
-                      <Moon className="w-4 h-4 text-blue-400" />
+                    {/* Temperatura */}
+                    {temperature && (
+                      <div className="flex items-center space-x-2">
+                        <Thermometer className="w-5 h-5 text-gray-600" />
+                        <span className={`font-semibold text-base ${getTemperatureColor(temperature.current)}`}>
+                          {temperature.current}°C
+                        </span>
+                      </div>
                     )}
-                    <span className="text-xs text-gray-500">
-                      {gameTime.isDay ? 'Dia' : 'Noite'}
-                    </span>
-                  </div>
-                </>
-              )}
-
-              {/* Temperatura */}
-              {temperature && (
-                <div className="flex items-center space-x-1">
-                  <Thermometer className="w-4 h-4 text-gray-600" />
-                  <span className={`font-medium ${getTemperatureColor(temperature.current)}`}>
-                    {temperature.current}°C
-                  </span>
-                </div>
-              )}
+                  </>
+                )}
+              </div>
 
               {/* Botão de Configurações */}
               <Button
@@ -131,7 +115,7 @@ const GameHeader = ({ player }: GameHeaderProps) => {
                 onClick={() => setSettingsOpen(true)}
                 className="text-gray-600 hover:text-gray-800 p-2"
               >
-                <Settings className="w-4 h-4" />
+                <Settings className="w-5 h-5" />
               </Button>
             </div>
           </div>
