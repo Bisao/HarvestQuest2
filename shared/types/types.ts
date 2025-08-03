@@ -29,7 +29,10 @@ export interface Player {
   expeditionEndTime?: number;
   offlineActivityConfig?: OfflineActivityConfig;
   autoConsume?: boolean;
-  
+  selectedBiome?: string;
+  lastBiomeChange?: string;
+  discoveredAnimals?: string[];
+
   // Enhanced Status System (Centralized)
   health: number; // 1-100
   maxHealth: number; // default 100
@@ -41,12 +44,12 @@ export interface Player {
   fatigue: number; // 0 (rested) to 100 (exhausted), default 0
   morale: number; // 0 (depressed) to 100 (euphoric), default 50
   hygiene: number; // 0 (filthy) to 100 (clean), default 100
-  
+
   // Disease System
   diseases: any[]; // PlayerDisease[];
   immunities: string[]; // disease IDs player is immune to
   resistances: { [diseaseId: string]: number }; // resistance level 0-100
-  
+
   // Skill System
   skills: { [skillId: string]: PlayerSkill };
   skillPoints: number;
@@ -91,7 +94,7 @@ export interface InsertPlayer {
   equippedBoots?: string | null;
   equippedWeapon?: string | null;
   equippedTool?: string | null;
-  
+
   // Enhanced Status System
   health?: number;
   maxHealth?: number;
@@ -103,12 +106,12 @@ export interface InsertPlayer {
   fatigue?: number;
   morale?: number;
   hygiene?: number;
-  
+
   // Disease System
   diseases?: any[]; // PlayerDisease[];
   immunities?: string[];
   resistances?: { [diseaseId: string]: number };
-  
+
   // Skill System
   skills?: { [skillId: string]: PlayerSkill };
   skillPoints?: number;

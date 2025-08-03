@@ -30,6 +30,7 @@ import EnhancedStorageTab from './enhanced-storage-tab';
 import EnhancedBiomesTab from './enhanced-biomes-tab';
 import UnifiedWorkshops from './unified-workshops';
 import CampTab from './camp-tab';
+import AnimalRegistryTab from './animal-registry-tab';
 import StatusTab from './status-tab';
 import QuestsTab from './quests-tab';
 import PlayerSettings from './player-settings';
@@ -96,6 +97,13 @@ const GAME_TABS = [
     icon: Home, 
     color: 'text-purple-600',
     description: 'Base e melhorias'
+  },
+  { 
+    id: 'animals', 
+    label: 'Bestiário', 
+    icon: Star, 
+    color: 'text-yellow-600',
+    description: 'Registro de animais'
   },
   { 
     id: 'quests', 
@@ -395,6 +403,16 @@ export default function ModernGameLayout({
                     resources={resources}
                     equipment={equipment}
                     isBlocked={isBlocked}
+                  />
+                </TabsContent>
+
+                <TabsContent value="animals" className="mt-0">
+                  <AnimalRegistryTab 
+                    discoveredAnimals={player.discoveredAnimals || []}
+                    playerId={player.id}
+                    onAnimalSelect={(animal) => {
+                      console.log('Animal selecionado:', animal);
+                    }}
                   />
                 </TabsContent>
 
