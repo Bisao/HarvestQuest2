@@ -27,13 +27,8 @@ export const RESOURCE_IDS = {
   // Consumables
   ISCA_PESCA: "eq-tool-bait-fishing-001", // Isca movida para recursos
 
-  // Animals 
-  COELHO: "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
-  VEADO: "res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3",
-  JAVALI: "res-f7a1c9e5-3d8b-4e13-9a24-8c6e2f9b7de4",
-  PEIXE_PEQUENO: "res-a1c9f7e5-8b3d-4e12-9a23-2c8e6f5b9df5",
-  PEIXE_GRANDE: "res-c9e5a1f7-3d8b-4e11-9a22-6c2e8f9b5de6",
-  SALMAO: "res-e5a1c9f7-8b3d-4e10-9a21-8c6e2f7b9df7",
+  // Nota: IDs de animais/criaturas foram movidos para shared/constants/creature-ids.ts
+  // Este arquivo agora foca apenas em recursos não-vivos
   COGUMELOS: "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
   FRUTAS_SILVESTRES: "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
 
