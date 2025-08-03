@@ -6,9 +6,9 @@
         "id": "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
         "username": "Bison",
         "level": 1,
-        "experience": 9,
+        "experience": 13,
         "coins": 100,
-        "inventoryWeight": 380,
+        "inventoryWeight": 1140,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -25,14 +25,14 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 32,
+        "hunger": 19,
         "maxHunger": 100,
-        "thirst": 51,
+        "thirst": 38,
         "maxThirst": 100,
-        "temperature": 25,
-        "fatigue": 22,
-        "morale": 84,
-        "hygiene": 56,
+        "temperature": 30,
+        "fatigue": 39,
+        "morale": 96,
+        "hygiene": 45,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -50,7 +50,7 @@
         "id": "efbcdb0b-cf9e-4723-8630-f9c772673a44",
         "playerId": "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 6
+        "quantity": 10
       }
     ],
     [
@@ -113,13 +113,32 @@
         "id": "e83aa557-56a9-4f49-acc8-10d744c1ff80",
         "playerId": "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
         "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "completed",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 4
+        },
+        "startTime": 1754210348448,
+        "endTime": 1754210458,
+        "progress": 100
+      }
+    ],
+    [
+      "018d4bd8-c157-405f-a4eb-7b1aacdcf7f7",
+      {
+        "id": "018d4bd8-c157-405f-a4eb-7b1aacdcf7f7",
+        "playerId": "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
         "status": "in_progress",
         "selectedResources": [
           "res-8bd33b18-a241-4859-ae9f-870fab5673d0"
         ],
         "selectedEquipment": [],
         "collectedResources": {},
-        "startTime": 1754210348448,
+        "startTime": 1754210458149,
         "endTime": null,
         "progress": 0
       }
