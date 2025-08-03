@@ -23,16 +23,16 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": false,
-        "health": 90,
+        "health": 85,
         "maxHealth": 100,
-        "hunger": 3,
+        "hunger": 1,
         "maxHunger": 100,
         "thirst": 0,
         "maxThirst": 100,
         "temperature": 20,
         "fatigue": 0,
-        "morale": 75,
-        "hygiene": 56,
+        "morale": 74,
+        "hygiene": 55,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -40,7 +40,7 @@
         "skillPoints": 0,
         "totalSkillPoints": 0,
         "skillAchievements": [],
-        "lastOnlineTime": 1754202654148
+        "lastOnlineTime": 1754202838273
       }
     ]
   ],
