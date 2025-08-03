@@ -1,220 +1,115 @@
-
-/**
- * CENTRALIZED INVENTORY MANAGER
- * Handles all inventory operations with proper validation and state management
- */
-
-import type { 
-  InventoryItem, 
-  StorageItem, 
-  EnhancedInventoryItem, 
-  InventoryOperationResult,
-  InventoryConstraints,
-  InventoryStats 
-} from '../types/inventory-types';
-import type { Resource, Equipment, Player } from '@shared/types';
+import type { Resource, Equipment, InventoryItem } from '../types';
+import type { EnhancedInventoryItem, InventoryStats } from '../types/inventory-types';
 import { ItemFinder } from './item-finder';
 import { isConsumable } from './consumable-utils';
 
 export class InventoryManager {
-  private static instance: InventoryManager;
-  private resources: Resource[] = [];
-  private equipment: Equipment[] = [];
+  private resources: Resource[];
+  private equipment: Equipment[];
 
-  private constructor() {}
-
-  static getInstance(): InventoryManager {
-    if (!InventoryManager.instance) {
-      InventoryManager.instance = new InventoryManager();
-    }
-    return InventoryManager.instance;
-  }
-
-  initialize(resources: Resource[], equipment: Equipment[]): void {
+  constructor(resources: Resource[], equipment: Equipment[]) {
     this.resources = resources;
     this.equipment = equipment;
-    ItemFinder.initialize(resources, equipment);
   }
 
-  // Enhanced item creation with all computed properties
-  createEnhancedItem(item: InventoryItem): EnhancedInventoryItem | null {
-    const itemData = ItemFinder.getItemById(item.resourceId);
-    if (!itemData) return null;
+  /**
+   * Process raw inventory items into enhanced inventory items with additional metadata
+   */
+  processInventoryItems(inventoryItems: InventoryItem[]): EnhancedInventoryItem[] {
+    return inventoryItems.map(item => this.enhanceInventoryItem(item)).filter(Boolean) as EnhancedInventoryItem[];
+  }
 
-    const type = 'slot' in itemData ? 'equipment' : 'resource';
-    const totalWeight = itemData.weight * item.quantity;
-    const totalValue = (itemData.value || 0) * item.quantity;
-    const isEquipmentItem = type === 'equipment';
-    const isConsumableItem = type === 'resource' && isConsumable(itemData);
-    const canStack = 'stackable' in itemData ? itemData.stackable : true;
-    const maxStackSize = 'maxStackSize' in itemData ? itemData.maxStackSize || 999 : 999;
+  /**
+   * Enhance a single inventory item with metadata
+   */
+  private enhanceInventoryItem(item: InventoryItem): EnhancedInventoryItem | null {
+    const itemData = ItemFinder.getItemById(item.resourceId);
+    
+    if (!itemData) {
+      console.warn(`Item not found for ID: ${item.resourceId}`);
+      return null;
+    }
+
+    const type = this.equipment.some(eq => eq.id === item.resourceId) ? 'equipment' : 'resource';
+    const weight = itemData.weight || 0;
+    const value = itemData.value || 0;
 
     return {
       item,
       itemData,
       type,
-      totalWeight,
-      totalValue,
-      isConsumable: isConsumableItem,
-      isEquipment: isEquipmentItem,
-      canStack,
-      maxStackSize
+      totalWeight: weight * item.quantity,
+      totalValue: value * item.quantity,
+      isConsumable: isConsumable(itemData),
+      isEquipment: type === 'equipment',
+      canStack: type === 'resource', // Resources can stack, equipment typically cannot
+      maxStackSize: type === 'resource' ? 999 : 1,
+      rarity: 'rarity' in itemData ? itemData.rarity : undefined
     };
   }
 
-  // Process inventory items into enhanced format
-  processInventoryItems(items: InventoryItem[]): EnhancedInventoryItem[] {
-    return items
-      .map(item => this.createEnhancedItem(item))
-      .filter(Boolean) as EnhancedInventoryItem[];
-  }
-
-  // Calculate inventory statistics
-  calculateInventoryStats(items: EnhancedInventoryItem[]): InventoryStats {
-    const stats: InventoryStats = {
-      totalItems: 0,
-      totalWeight: 0,
-      totalValue: 0,
-      uniqueItems: items.length,
-      consumableItems: 0,
-      equipmentItems: 0,
-      resourceItems: 0
-    };
-
-    items.forEach(enhancedItem => {
-      stats.totalItems += enhancedItem.item.quantity;
-      stats.totalWeight += enhancedItem.totalWeight;
-      stats.totalValue += enhancedItem.totalValue;
-
-      if (enhancedItem.isConsumable) {
-        stats.consumableItems++;
-      } else if (enhancedItem.isEquipment) {
-        stats.equipmentItems++;
-      } else {
-        stats.resourceItems++;
-      }
-    });
-
-    return stats;
-  }
-
-  // Check inventory constraints
-  checkInventoryConstraints(
-    items: EnhancedInventoryItem[], 
-    player: Player
-  ): InventoryConstraints {
-    const stats = this.calculateInventoryStats(items);
-    
+  /**
+   * Calculate inventory statistics
+   */
+  calculateInventoryStats(enhancedItems: EnhancedInventoryItem[]): InventoryStats {
     return {
-      maxWeight: player.maxInventoryWeight,
-      maxSlots: 36, // Fixed inventory slots
-      currentWeight: stats.totalWeight,
-      currentSlots: stats.uniqueItems
+      totalItems: enhancedItems.reduce((sum, item) => sum + item.item.quantity, 0),
+      totalWeight: enhancedItems.reduce((sum, item) => sum + item.totalWeight, 0),
+      totalValue: enhancedItems.reduce((sum, item) => sum + item.totalValue, 0),
+      uniqueItems: enhancedItems.length
     };
   }
 
-  // Validate item addition to inventory
-  canAddToInventory(
-    currentItems: EnhancedInventoryItem[],
-    newItemId: string,
-    quantity: number,
-    player: Player
-  ): InventoryOperationResult {
-    const itemData = ItemFinder.getItemById(newItemId);
-    if (!itemData) {
-      return { success: false, message: "Item não encontrado", error: "ITEM_NOT_FOUND" };
-    }
-
-    const newItemWeight = itemData.weight * quantity;
-    const constraints = this.checkInventoryConstraints(currentItems, player);
-
-    // Check weight limit
-    if (constraints.currentWeight + newItemWeight > constraints.maxWeight) {
-      return { 
-        success: false, 
-        message: "Peso máximo do inventário excedido", 
-        error: "WEIGHT_LIMIT_EXCEEDED" 
-      };
-    }
-
-    // Check if item can stack with existing items
-    const existingItem = currentItems.find(item => 
-      item.item.resourceId === newItemId && item.canStack
-    );
-
-    if (existingItem) {
-      const newTotalQuantity = existingItem.item.quantity + quantity;
-      if (newTotalQuantity > existingItem.maxStackSize) {
-        return { 
-          success: false, 
-          message: `Limite de empilhamento excedido (máx: ${existingItem.maxStackSize})`, 
-          error: "STACK_LIMIT_EXCEEDED" 
-        };
-      }
-    } else {
-      // Check slot limit for new items
-      if (constraints.currentSlots >= constraints.maxSlots) {
-        return { 
-          success: false, 
-          message: "Inventário cheio", 
-          error: "INVENTORY_FULL" 
-        };
-      }
-    }
-
-    return { success: true, message: "Item pode ser adicionado" };
-  }
-
-  // Filter and search functionality
-  filterItems(
-    items: EnhancedInventoryItem[],
-    filters: {
-      search?: string;
-      type?: 'all' | 'resource' | 'equipment';
-      rarity?: 'all' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-      consumableOnly?: boolean;
-    }
+  /**
+   * Filter inventory items based on search and type filters
+   */
+  filterInventoryItems(
+    enhancedItems: EnhancedInventoryItem[],
+    searchTerm: string = '',
+    typeFilter: 'all' | 'resources' | 'equipment' | 'consumables' = 'all'
   ): EnhancedInventoryItem[] {
-    let filtered = [...items];
+    let filtered = enhancedItems;
 
-    // Search filter
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      filtered = filtered.filter(item => 
-        item.itemData.name.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // Type filter
-    if (filters.type && filters.type !== 'all') {
-      filtered = filtered.filter(item => item.type === filters.type);
-    }
-
-    // Rarity filter
-    if (filters.rarity && filters.rarity !== 'all') {
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(item => {
-        if ('rarity' in item.itemData) {
-          return item.itemData.rarity === filters.rarity;
-        }
-        return false;
+        const nameMatch = item.itemData.name.toLowerCase().includes(searchLower);
+        const descMatch = ('description' in item.itemData && typeof item.itemData.description === 'string') 
+          ? item.itemData.description.toLowerCase().includes(searchLower) 
+          : false;
+        return nameMatch || descMatch;
       });
     }
 
-    // Consumable filter
-    if (filters.consumableOnly) {
-      filtered = filtered.filter(item => item.isConsumable);
+    // Apply type filter
+    switch (typeFilter) {
+      case 'resources':
+        filtered = filtered.filter(item => item.type === 'resource');
+        break;
+      case 'equipment':
+        filtered = filtered.filter(item => item.type === 'equipment');
+        break;
+      case 'consumables':
+        filtered = filtered.filter(item => item.isConsumable);
+        break;
+      // 'all' case - no additional filtering
     }
 
     return filtered;
   }
 
-  // Sort functionality
-  sortItems(
-    items: EnhancedInventoryItem[],
-    sortBy: 'name' | 'quantity' | 'weight' | 'value' | 'type',
-    order: 'asc' | 'desc' = 'asc'
+  /**
+   * Sort inventory items by specified criteria
+   */
+  sortInventoryItems(
+    enhancedItems: EnhancedInventoryItem[],
+    sortBy: 'name' | 'quantity' | 'weight' | 'value' = 'name',
+    sortOrder: 'asc' | 'desc' = 'asc'
   ): EnhancedInventoryItem[] {
-    const sorted = [...items].sort((a, b) => {
+    const sortedItems = [...enhancedItems];
+
+    sortedItems.sort((a, b) => {
       let comparison = 0;
 
       switch (sortBy) {
@@ -230,88 +125,56 @@ export class InventoryManager {
         case 'value':
           comparison = a.totalValue - b.totalValue;
           break;
-        case 'type':
-          comparison = a.type.localeCompare(b.type);
-          break;
       }
 
-      return order === 'asc' ? comparison : -comparison;
+      return sortOrder === 'asc' ? comparison : -comparison;
     });
 
-    return sorted;
+    return sortedItems;
   }
 
-  // Batch operations
-  validateBatchOperation(
-    items: EnhancedInventoryItem[],
-    operations: Array<{ itemId: string; quantity: number; operation: 'add' | 'remove' }>,
-    player: Player
-  ): InventoryOperationResult {
-    let weightDelta = 0;
-    const itemChanges = new Map<string, number>();
+  /**
+   * Find items that can be consumed (food/drink)
+   */
+  getConsumableItems(enhancedItems: EnhancedInventoryItem[]): EnhancedInventoryItem[] {
+    return enhancedItems.filter(item => item.isConsumable);
+  }
 
-    for (const op of operations) {
-      const itemData = ItemFinder.getItemById(op.itemId);
-      if (!itemData) {
-        return { 
-          success: false, 
-          message: `Item não encontrado: ${op.itemId}`, 
-          error: "ITEM_NOT_FOUND" 
-        };
-      }
+  /**
+   * Find equipment items that can be equipped
+   */
+  getEquipmentItems(enhancedItems: EnhancedInventoryItem[]): EnhancedInventoryItem[] {
+    return enhancedItems.filter(item => item.isEquipment);
+  }
 
-      const weightChange = itemData.weight * op.quantity;
-      weightDelta += op.operation === 'add' ? weightChange : -weightChange;
+  /**
+   * Get items suitable for a specific equipment slot
+   */
+  getItemsForSlot(enhancedItems: EnhancedInventoryItem[], slot: string): EnhancedInventoryItem[] {
+    return enhancedItems.filter(item => {
+      if (item.type !== 'equipment') return false;
+      const equipment = item.itemData as Equipment;
+      return equipment.slot === slot;
+    });
+  }
 
-      const currentChange = itemChanges.get(op.itemId) || 0;
-      itemChanges.set(op.itemId, currentChange + (op.operation === 'add' ? op.quantity : -op.quantity));
-    }
+  /**
+   * Check if inventory has sufficient space for new items
+   */
+  checkInventorySpace(
+    enhancedItems: EnhancedInventoryItem[],
+    maxWeight: number,
+    newItemWeight: number
+  ): boolean {
+    const currentWeight = this.calculateInventoryStats(enhancedItems).totalWeight;
+    return currentWeight + newItemWeight <= maxWeight;
+  }
 
-    // Check final weight
-    const constraints = this.checkInventoryConstraints(items, player);
-    if (constraints.currentWeight + weightDelta > constraints.maxWeight) {
-      return { 
-        success: false, 
-        message: "Operação excederia o limite de peso", 
-        error: "WEIGHT_LIMIT_EXCEEDED" 
-      };
-    }
-
-    // Check individual item constraints
-    for (const [itemId, totalChange] of itemChanges) {
-      const existingItem = items.find(item => item.item.resourceId === itemId);
-      
-      if (existingItem) {
-        const newQuantity = existingItem.item.quantity + totalChange;
-        if (newQuantity < 0) {
-          return { 
-            success: false, 
-            message: `Quantidade insuficiente para: ${existingItem.itemData.name}`, 
-            error: "INSUFFICIENT_QUANTITY" 
-          };
-        }
-        if (newQuantity > existingItem.maxStackSize) {
-          return { 
-            success: false, 
-            message: `Limite de empilhamento excedido para: ${existingItem.itemData.name}`, 
-            error: "STACK_LIMIT_EXCEEDED" 
-          };
-        }
-      } else if (totalChange > 0) {
-        // New item being added
-        if (constraints.currentSlots >= constraints.maxSlots) {
-          return { 
-            success: false, 
-            message: "Inventário cheio", 
-            error: "INVENTORY_FULL" 
-          };
-        }
-      }
-    }
-
-    return { success: true, message: "Operação em lote válida" };
+  /**
+   * Get weight percentage used
+   */
+  getWeightPercentage(enhancedItems: EnhancedInventoryItem[], maxWeight: number): number {
+    const currentWeight = this.calculateInventoryStats(enhancedItems).totalWeight;
+    return maxWeight > 0 ? (currentWeight / maxWeight) * 100 : 0;
   }
 }
-
-// Export singleton instance
-export const inventoryManager = InventoryManager.getInstance();

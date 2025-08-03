@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 // Import all tab components
-import EnhancedInventory from './enhanced-inventory';
+import NewInventorySystem from './new-inventory-system';
 import EnhancedStorageTab from './enhanced-storage-tab';
 import EnhancedBiomesTab from './enhanced-biomes-tab';
 import UnifiedWorkshops from './unified-workshops';
@@ -620,7 +620,7 @@ export default function ModernGameLayout() {
             )}
 
             {activeTab === 'inventory' && (
-              <EnhancedInventory
+              <NewInventorySystem
                 playerId={player.id}
                 resources={resources}
                 equipment={equipment}

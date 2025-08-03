@@ -886,6 +886,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Move item to storage endpoint
+  app.post("/api/inventory/move-to-storage", async (req, res) => {
+    try {
+      const { playerId, itemId, quantity } = req.body;
+
+      if (!playerId || !itemId || !quantity) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const player = await storage.getPlayer(playerId);
+      if (!player) {
+        return res.status(404).json({ error: "Player not found" });
+      }
+
+      // Get inventory item
+      const inventory = await storage.getPlayerInventory(playerId);
+      const inventoryItem = inventory.find(item => item.resourceId === itemId);
+
+      if (!inventoryItem || inventoryItem.quantity < quantity) {
+        return res.status(400).json({ error: "Insufficient items in inventory" });
+      }
+
+      // Get or create storage item
+      const storageItems = await storage.getPlayerStorage(playerId);
+      let storageItem = storageItems.find(item => item.resourceId === itemId);
+
+      if (storageItem) {
+        // Update existing storage item
+        await storage.updateStorageItem(storageItem.id, {
+          quantity: storageItem.quantity + quantity
+        });
+      } else {
+        // Create new storage item
+        await storage.addStorageItem({
+          playerId,
+          resourceId: itemId,
+          quantity,
+          itemType: inventoryItem.itemType || 'resource'
+        });
+      }
+
+      // Update or remove inventory item
+      if (inventoryItem.quantity === quantity) {
+        await storage.removeInventoryItem(inventoryItem.id);
+      } else {
+        await storage.updateInventoryItem(inventoryItem.id, {
+          quantity: inventoryItem.quantity - quantity
+        });
+      }
+
+      // Invalidate caches
+      const { invalidatePlayerCache, invalidateCache, CACHE_KEYS } = await import("./cache/memory-cache");
+      invalidatePlayerCache(playerId);
+      invalidateCache(CACHE_KEYS.PLAYER_INVENTORY(playerId));
+      invalidateCache(CACHE_KEYS.PLAYER_STORAGE(playerId));
+
+      res.json({ success: true, message: "Item moved to storage successfully" });
+    } catch (error) {
+      console.error("Move to storage error:", error);
+      res.status(500).json({ error: "Failed to move item to storage" });
+    }
+  });
+
   // Get resources by category (hunting, fishing, etc.)
   app.get("/api/resources/category/:category", async (req, res) => {
     try {
