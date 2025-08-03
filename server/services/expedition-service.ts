@@ -25,7 +25,8 @@ export class ExpeditionService {
     playerId: string, 
     biomeId: string, 
     selectedResources: string[], 
-    selectedEquipment: string[] = []
+    selectedEquipment: string[] = [],
+    duration: number = 60000
   ): Promise<Expedition> {
     console.log('ExpeditionService.startExpedition called with:', { playerId, biomeId, selectedResources, selectedEquipment });
 
@@ -115,6 +116,7 @@ export class ExpeditionService {
       biomeId,
       selectedResources: validResources,
       selectedEquipment,
+      duration,
     });
 
     console.log('Expedition created:', expedition);

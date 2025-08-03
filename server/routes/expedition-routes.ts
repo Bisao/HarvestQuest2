@@ -12,7 +12,8 @@ const startExpeditionSchema = z.object({
   playerId: z.string().min(1, "Player ID is required"),
   biomeId: z.string().min(1, "Biome ID is required"),
   selectedResources: z.array(z.string()).min(1, "At least one resource must be selected"),
-  selectedEquipment: z.array(z.string()).optional().default([])
+  selectedEquipment: z.array(z.string()).optional().default([]),
+  duration: z.number().optional().default(60000)
 });
 
 const expeditionParamSchema = z.object({
@@ -36,13 +37,13 @@ export function createExpeditionRoutes(
     async (req: Request, res: Response) => {
       try {
         console.log('🚀 EXPEDITION-START: Request received:', req.body);
-        const { playerId, biomeId, selectedResources, selectedEquipment } = req.body;
+        const { playerId, biomeId, selectedResources, selectedEquipment, duration } = req.body;
 
         // Validate player exists
         const player = await storage.getPlayer(playerId);
         if (!player) {
           console.error('❌ EXPEDITION-START: Player not found:', playerId);
-          return errorResponse(res, 'Player not found', 404);
+          return errorResponse(res, 404, 'Player not found');
         }
 
         // Start expedition
@@ -50,7 +51,8 @@ export function createExpeditionRoutes(
           playerId,
           biomeId,
           selectedResources,
-          selectedEquipment
+          selectedEquipment,
+          duration
         );
 
         console.log('✅ EXPEDITION-START: Success:', expedition.id);
@@ -61,7 +63,7 @@ export function createExpeditionRoutes(
         return successResponse(res, expedition, 'Expedition started successfully');
       } catch (error: any) {
         console.error('❌ EXPEDITION-START: Error:', error.message);
-        return errorResponse(res, error.message, 400);
+        return errorResponse(res, 400, error.message);
       }
     }
   );
@@ -86,7 +88,7 @@ export function createExpeditionRoutes(
         return successResponse(res, activeExpedition);
       } catch (error: any) {
         console.error('❌ EXPEDITION-ACTIVE: Error:', error.message);
-        return errorResponse(res, error.message, 500);
+        return errorResponse(res, 500, error.message);
       }
     }
   );
@@ -105,7 +107,7 @@ export function createExpeditionRoutes(
         return successResponse(res, expeditions);
       } catch (error: any) {
         console.error('❌ EXPEDITION-LIST: Error:', error.message);
-        return errorResponse(res, error.message, 500);
+        return errorResponse(res, 500, error.message);
       }
     }
   );
@@ -130,7 +132,7 @@ export function createExpeditionRoutes(
         return successResponse(res, result, 'Expedition completed successfully');
       } catch (error: any) {
         console.error('❌ EXPEDITION-COMPLETE: Error:', error.message);
-        return errorResponse(res, error.message, 400);
+        return errorResponse(res, 400, error.message);
       }
     }
   );
@@ -154,7 +156,7 @@ export function createExpeditionRoutes(
         return successResponse(res, result, 'Expedition cancelled successfully');
       } catch (error: any) {
         console.error('❌ EXPEDITION-CANCEL: Error:', error.message);
-        return errorResponse(res, error.message, 400);
+        return errorResponse(res, 400, error.message);
       }
     }
   );
@@ -173,7 +175,7 @@ export function createExpeditionRoutes(
         return successResponse(res, expedition);
       } catch (error: any) {
         console.error('❌ EXPEDITION-PROGRESS: Error:', error.message);
-        return errorResponse(res, error.message, 400);
+        return errorResponse(res, 400, error.message);
       }
     }
   );
@@ -190,14 +192,14 @@ export function createExpeditionRoutes(
         
         if (!expedition) {
           console.log('❌ EXPEDITION-DETAILS: Not found:', expeditionId);
-          return errorResponse(res, 'Expedition not found', 404);
+          return errorResponse(res, 404, 'Expedition not found');
         }
 
         console.log('✅ EXPEDITION-DETAILS: Success:', expedition.id);
         return successResponse(res, expedition);
       } catch (error: any) {
         console.error('❌ EXPEDITION-DETAILS: Error:', error.message);
-        return errorResponse(res, error.message, 500);
+        return errorResponse(res, 500, error.message);
       }
     }
   );

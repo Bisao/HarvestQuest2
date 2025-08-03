@@ -443,7 +443,7 @@ export default function ModernExpeditionModal({
           throw new Error('Selecione pelo menos um recurso');
         }
 
-        const response = await fetch('/api/expeditions', {
+        const response = await fetch('/api/expeditions/start', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -569,6 +569,7 @@ export default function ModernExpeditionModal({
         playerId: player.id,
         selectedResources: selectedResources.filter(id => id && typeof id === 'string'),
         selectedEquipment: [],
+        duration: 60000, // 1 minute default duration
       };
 
       console.log('Starting expedition with data:', expeditionData);
