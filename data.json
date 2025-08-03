@@ -1,12 +1,12 @@
 {
   "players": [
     [
-      "1a6e51fa-61d7-4ba8-ada2-bae1f7c5d10f",
+      "57be933a-5784-4399-980c-b0fc5a2cc97b",
       {
-        "id": "1a6e51fa-61d7-4ba8-ada2-bae1f7c5d10f",
+        "id": "57be933a-5784-4399-980c-b0fc5a2cc97b",
         "username": "Bison",
         "level": 1,
-        "experience": 0,
+        "experience": 10,
         "coins": 100,
         "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
@@ -22,17 +22,17 @@
         "equippedBoots": null,
         "equippedWeapon": null,
         "equippedTool": null,
-        "autoCompleteQuests": true,
-        "health": 1,
+        "autoCompleteQuests": false,
+        "health": 100,
         "maxHealth": 100,
-        "hunger": 0,
+        "hunger": 52,
         "maxHunger": 100,
-        "thirst": 18,
+        "thirst": 80,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 28,
-        "hygiene": 58,
+        "morale": 54,
+        "hygiene": 91,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -45,6 +45,128 @@
   ],
   "inventoryItems": [],
   "storageItems": [],
-  "expeditions": [],
-  "playerQuests": []
+  "expeditions": [
+    [
+      "3d0cb918-2b5f-40e7-a645-177416a7232f",
+      {
+        "id": "3d0cb918-2b5f-40e7-a645-177416a7232f",
+        "playerId": "57be933a-5784-4399-980c-b0fc5a2cc97b",
+        "biomeId": "biome-floresta-001",
+        "selectedResources": [
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "res-d5e6f7g8-h9i0-1234-ef01-567890123456",
+          "res-b3c4d5e6-f7g8-9012-cdef-345678901234",
+          "res-h9i0j1k2-l3m4-5678-2345-901234567890",
+          "res-i0j1k2l3-m4n5-6789-3456-012345678901"
+        ],
+        "selectedEquipment": [],
+        "status": "completed",
+        "startTime": 1754264713881,
+        "progress": 100,
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 3,
+          "res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12": 2,
+          "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 4
+        },
+        "duration": 300000
+      }
+    ]
+  ],
+  "playerQuests": [
+    [
+      "b5e9c1ea-5c40-4f54-a920-55b5859a06fa",
+      {
+        "id": "b5e9c1ea-5c40-4f54-a920-55b5859a06fa",
+        "playerId": "57be933a-5784-4399-980c-b0fc5a2cc97b",
+        "questId": "ba628c2d-1fa2-4ca5-a452-a2c24042a104",
+        "status": "active",
+        "progress": {
+          "expedition_biome-floresta-001": {
+            "current": 0,
+            "required": 1,
+            "completed": false
+          }
+        },
+        "startedAt": 1754264766,
+        "completedAt": null
+      }
+    ],
+    [
+      "a7e0c46b-3692-4b89-bf57-83cd9f42bf34",
+      {
+        "id": "a7e0c46b-3692-4b89-bf57-83cd9f42bf34",
+        "playerId": "57be933a-5784-4399-980c-b0fc5a2cc97b",
+        "questId": "62fcd3ec-b1a9-48fc-80f5-73501013a8d2",
+        "status": "active",
+        "progress": {
+          "collect_res-f1b2c3d4-e5f6-7890-abcd-ef1234567890": {
+            "current": 0,
+            "required": 5,
+            "completed": false
+          },
+          "collect_res-d5e6f7g8-h9i0-1234-ef01-567890123456": {
+            "current": 0,
+            "required": 3,
+            "completed": false
+          }
+        },
+        "startedAt": 1754264766,
+        "completedAt": null
+      }
+    ],
+    [
+      "0add04be-918b-49ff-a6c6-4e8ca22b962b",
+      {
+        "id": "0add04be-918b-49ff-a6c6-4e8ca22b962b",
+        "playerId": "57be933a-5784-4399-980c-b0fc5a2cc97b",
+        "questId": "cb251d1c-0213-4ddf-bec6-a1cb0a222abe",
+        "status": "active",
+        "progress": {
+          "craft_res-n5o6p7q8-r9s0-1234-8901-567890123456": {
+            "current": 0,
+            "required": 3,
+            "completed": false
+          }
+        },
+        "startedAt": 1754264768,
+        "completedAt": null
+      }
+    ],
+    [
+      "654cd374-91e3-480e-bf7c-d3bebc406dd2",
+      {
+        "id": "654cd374-91e3-480e-bf7c-d3bebc406dd2",
+        "playerId": "57be933a-5784-4399-980c-b0fc5a2cc97b",
+        "questId": "93df7808-c61e-4310-8c77-8a42ebdd8a39",
+        "status": "active",
+        "progress": {
+          "expedition_biome-floresta-001": {
+            "current": 0,
+            "required": 1,
+            "completed": false
+          }
+        },
+        "startedAt": 1754264769,
+        "completedAt": null
+      }
+    ],
+    [
+      "d437324d-0460-474b-afb7-4ad8a968a39a",
+      {
+        "id": "d437324d-0460-474b-afb7-4ad8a968a39a",
+        "playerId": "57be933a-5784-4399-980c-b0fc5a2cc97b",
+        "questId": "7bf0e045-114f-4f1d-9cbf-e2e4c69675d7",
+        "status": "active",
+        "progress": {
+          "craft_res-n5o6p7q8-r9s0-1234-8901-567890123456": {
+            "current": 0,
+            "required": 3,
+            "completed": false
+          }
+        },
+        "startedAt": 1754264771,
+        "completedAt": null
+      }
+    ]
+  ]
 }
