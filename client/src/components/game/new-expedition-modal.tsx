@@ -29,8 +29,7 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
   });
 
   // Ensure templates is always an array
-  const templates = Array.isArray(templatesData) ? templatesData : 
-                   (templatesData?.data && Array.isArray(templatesData.data)) ? templatesData.data : [];
+  const templates = Array.isArray(templatesData) ? templatesData : [];
 
   // Buscar expedições ativas do jogador
   const { data: activeExpeditions = [] } = useQuery<any[]>({
@@ -41,8 +40,7 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
   // Validar requisitos da expedição
   const { data: validation } = useQuery<{ valid: boolean; errors: string[] }>({
     queryKey: ['/api/expeditions/validate', player.id, selectedTemplate?.id],
-    enabled: !!selectedTemplate && !!player.id,
-    select: (data: any) => data?.data || { valid: false, errors: [] }
+    enabled: !!selectedTemplate && !!player.id
   });
 
   // Mutation para iniciar expedição
@@ -130,8 +128,11 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
 
         <div className="flex flex-1 overflow-hidden">
           {/* Lista de Templates */}
-          <div className="w-1/2 p-6 overflow-y-auto border-r">
-            <h3 className="text-lg font-semibold mb-4">Expedições Disponíveis</h3>
+          <div className="w-1/2 p-6 overflow-y-auto border-r bg-gray-50">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span className="text-xl">🗺️</span>
+              Expedições Disponíveis
+            </h3>
             
             {templatesLoading ? (
               <div className="space-y-4">
@@ -149,10 +150,10 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
                 {templates.map((template: ExpeditionTemplate) => (
                   <Card 
                     key={template.id}
-                    className={`cursor-pointer transition-all ${
+                    className={`cursor-pointer transition-all shadow-sm ${
                       selectedTemplate?.id === template.id 
-                        ? 'ring-2 ring-blue-500 bg-blue-50' 
-                        : 'hover:bg-gray-50'
+                        ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-200' 
+                        : 'hover:bg-white hover:shadow-md bg-white'
                     }`}
                     onClick={() => setSelectedTemplate(template)}
                   >
@@ -191,7 +192,7 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
           </div>
 
           {/* Detalhes da Expedição Selecionada */}
-          <div className="w-1/2 p-6 overflow-y-auto">
+          <div className="w-1/2 p-6 overflow-y-auto bg-white">
             {selectedTemplate ? (
               <div className="space-y-6">
                 <div>

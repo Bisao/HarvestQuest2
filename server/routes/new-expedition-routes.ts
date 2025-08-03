@@ -128,11 +128,8 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         const expedition = await storage.createExpedition({
           playerId,
           biomeId,
-          selectedResources: selectedResources.map(r => r.resourceId),
-          selectedEquipment: selectedEquipment || [],
-          duration,
-          autoRepeat: false,
-          maxRepeats: 1
+          selectedResources: selectedResources.map((r: any) => r.resourceId),
+          selectedEquipment: selectedEquipment || []
         });
 
         console.log(`🚀 CUSTOM-EXPEDITION: Started custom expedition ${expedition.id} for player ${playerId}`);

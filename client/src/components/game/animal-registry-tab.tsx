@@ -87,7 +87,7 @@ function AnimalCard({ animal, isDiscovered, onClick }: AnimalCardProps) {
       <CardContent className="p-3 md:p-4">
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <span className={`${getSizeColor(animal.size)} text-lg flex-shrink-0`}>
+            <span className={`${getSizeColor(animal.generalInfo.size)} text-lg flex-shrink-0`}>
               {animal.emoji}
             </span>
             <span className="font-semibold text-sm truncate">
@@ -161,7 +161,7 @@ function AnimalDetailModal({ animal, isOpen, onClose }: AnimalDetailModalProps) 
                 <p className="text-lg text-gray-600 italic mb-2">{animal.scientificName}</p>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className="text-sm">
-                    {ANIMAL_CATEGORIES[animal.category]}
+                    {(ANIMAL_CATEGORIES as any)[animal.category] || animal.category}
                   </Badge>
                   <span className="text-gray-400">•</span>
                   <span className="text-sm text-gray-600">Nível {animal.requiredLevel}+</span>

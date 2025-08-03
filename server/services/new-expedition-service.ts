@@ -154,7 +154,7 @@ export class NewExpeditionService {
     if (player.thirst < template.requirements.minThirst) {
       errors.push(`Sede mínima requerida: ${template.requirements.minThirst}%`);
     }
-    if (player.health < template.requirements.minHealth) {
+    if ((player.health ?? 100) < template.requirements.minHealth) {
       errors.push(`Saúde mínima requerida: ${template.requirements.minHealth}%`);
     }
 
@@ -219,19 +219,10 @@ export class NewExpeditionService {
 
     // Salvar expedição
     await this.storage.createExpedition({
-      id: expedition.id,
       playerId: expedition.playerId,
       biomeId: template.biomeId,
       selectedResources: Object.keys(template.rewards.guaranteed),
-      selectedEquipment: [],
-      status: 'in_progress',
-      startTime: Math.floor(expedition.startTime / 1000),
-      duration: duration * 60 * 1000,
-      progress: 0,
-      collectedResources: {},
-      autoRepeat: false,
-      repeatCount: 0,
-      maxRepeats: 1
+      selectedEquipment: []
     });
 
     console.log(`🚀 EXPEDITION: Started ${template.name} for player ${playerId}`);
@@ -243,8 +234,10 @@ export class NewExpeditionService {
     if (!expedition || expedition.status !== 'in_progress') return null;
 
     const currentTime = Date.now();
-    const elapsed = currentTime - (expedition.startTime * 1000);
-    const progress = Math.min(100, (elapsed / expedition.duration) * 100);
+    const startTime = expedition.startTime ?? Date.now();
+    const elapsed = currentTime - (startTime * 1000);
+    const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
+    const progress = Math.min(100, (elapsed / expeditionDuration) * 100);
 
     // Se completou, processar recompensas
     if (progress >= 100) {
@@ -258,8 +251,8 @@ export class NewExpeditionService {
       id: expedition.id,
       playerId: expedition.playerId,
       planId: expedition.biomeId,
-      startTime: expedition.startTime * 1000,
-      estimatedEndTime: expedition.startTime * 1000 + expedition.duration,
+      startTime: startTime * 1000,
+      estimatedEndTime: startTime * 1000 + expeditionDuration,
       currentPhase: this.getPhaseFromProgress(progress),
       progress,
       completedTargets: [],
@@ -300,12 +293,15 @@ export class NewExpeditionService {
     console.log(`✅ EXPEDITION: Completed ${template.name} for player ${expedition.playerId}`);
     console.log(`🎁 REWARDS: ${JSON.stringify(rewards)}`);
 
+    const startTime = expedition.startTime ?? Date.now();
+    const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
+    
     return {
       id: expedition.id,
       playerId: expedition.playerId,
       planId: template.id,
-      startTime: expedition.startTime * 1000,
-      estimatedEndTime: expedition.startTime * 1000 + expedition.duration,
+      startTime: startTime * 1000,
+      estimatedEndTime: startTime * 1000 + expeditionDuration,
       currentPhase: 'completed',
       progress: 100,
       completedTargets: [],
@@ -364,37 +360,45 @@ export class NewExpeditionService {
     const expeditions = await this.storage.getPlayerExpeditions(playerId);
     return expeditions
       .filter(exp => exp.status === 'in_progress')
-      .map(exp => ({
-        id: exp.id,
-        playerId: exp.playerId,
-        planId: exp.biomeId,
-        startTime: exp.startTime * 1000,
-        estimatedEndTime: exp.startTime * 1000 + exp.duration,
-        currentPhase: this.getPhaseFromProgress(exp.progress),
-        progress: exp.progress,
-        completedTargets: [],
-        collectedResources: exp.collectedResources,
-        events: [],
-        status: 'active'
-      }));
+      .map(exp => {
+        const startTime = exp.startTime ?? Date.now();
+        const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
+        return {
+          id: exp.id,
+          playerId: exp.playerId,
+          planId: exp.biomeId,
+          startTime: startTime * 1000,
+          estimatedEndTime: startTime * 1000 + expeditionDuration,
+          currentPhase: this.getPhaseFromProgress(exp.progress),
+          progress: exp.progress,
+          completedTargets: [],
+          collectedResources: exp.collectedResources,
+          events: [],
+          status: 'active'
+        };
+      });
   }
 
   async getExpeditionHistory(playerId: string): Promise<ActiveExpedition[]> {
     const expeditions = await this.storage.getPlayerExpeditions(playerId);
     return expeditions
       .filter(exp => exp.status === 'completed')
-      .map(exp => ({
-        id: exp.id,
-        playerId: exp.playerId,
-        planId: exp.biomeId,
-        startTime: exp.startTime * 1000,
-        estimatedEndTime: exp.startTime * 1000 + exp.duration,
-        currentPhase: 'completed' as const,
-        progress: 100,
-        completedTargets: [],
-        collectedResources: exp.collectedResources,
-        events: [],
-        status: 'completed' as const
-      }));
+      .map(exp => {
+        const startTime = exp.startTime ?? Date.now();
+        const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
+        return {
+          id: exp.id,
+          playerId: exp.playerId,
+          planId: exp.biomeId,
+          startTime: startTime * 1000,
+          estimatedEndTime: startTime * 1000 + expeditionDuration,
+          currentPhase: 'completed' as const,
+          progress: 100,
+          completedTargets: [],
+          collectedResources: exp.collectedResources,
+          events: [],
+          status: 'completed' as const
+        };
+      });
   }
 }
