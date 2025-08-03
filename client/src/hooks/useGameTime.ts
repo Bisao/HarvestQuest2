@@ -18,17 +18,39 @@ export function useGameTime(playerId?: string, biomeType: string = 'forest'): Us
     queryKey: ['gameTime'],
     queryFn: async () => {
       console.log('🕐 HOOK: Fetching game time from /api/time/current');
-      const response = await fetch('/api/time/current');
-      if (!response.ok) {
-        console.error('🕐 HOOK: Failed to fetch game time, status:', response.status);
-        throw new Error('Failed to fetch game time');
+      try {
+        const response = await fetch('/api/time/current', {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('🕐 HOOK: Failed to fetch game time, status:', response.status, 'Response:', errorText);
+          throw new Error(`Failed to fetch game time: ${response.status}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const responseText = await response.text();
+          console.error('🕐 HOOK: Expected JSON but got:', contentType, 'Response:', responseText);
+          throw new Error('Server returned non-JSON response');
+        }
+        
+        const data = await response.json();
+        console.log('🕐 HOOK: Game time received:', data);
+        return data;
+      } catch (fetchError) {
+        console.error('🕐 HOOK: Network or parsing error:', fetchError);
+        throw fetchError;
       }
-      const data = await response.json();
-      console.log('🕐 HOOK: Game time received:', data);
-      return data;
     },
     refetchInterval: 30000, // Sincronizar com servidor a cada 30 segundos
-    staleTime: 25000
+    staleTime: 25000,
+    retry: 3,
+    retryDelay: 1000
   });
 
   // Buscar temperatura se tiver playerId
@@ -40,18 +62,41 @@ export function useGameTime(playerId?: string, biomeType: string = 'forest'): Us
         return null;
       }
       console.log('🌡️ HOOK: Fetching temperature for player:', playerId, 'biome:', biomeType);
-      const response = await fetch(`/api/time/temperature?playerId=${playerId}&biome=${biomeType}`);
-      if (!response.ok) {
-        console.error('🌡️ HOOK: Failed to fetch temperature, status:', response.status);
-        throw new Error('Failed to fetch temperature');
+      
+      try {
+        const response = await fetch(`/api/time/temperature?playerId=${playerId}&biome=${biomeType}`, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('🌡️ HOOK: Failed to fetch temperature, status:', response.status, 'Response:', errorText);
+          throw new Error(`Failed to fetch temperature: ${response.status}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const responseText = await response.text();
+          console.error('🌡️ HOOK: Expected JSON but got:', contentType, 'Response:', responseText);
+          return null; // Retorna null em caso de erro para não quebrar a UI
+        }
+        
+        const data = await response.json();
+        console.log('🌡️ HOOK: Temperature received:', data);
+        return data;
+      } catch (fetchError) {
+        console.error('🌡️ HOOK: Network or parsing error:', fetchError);
+        return null; // Retorna null em caso de erro
       }
-      const data = await response.json();
-      console.log('🌡️ HOOK: Temperature received:', data);
-      return data;
     },
     enabled: !!playerId,
     refetchInterval: 60000, // Atualizar temperatura a cada minuto
-    staleTime: 55000
+    staleTime: 55000,
+    retry: 2,
+    retryDelay: 1000
   });
 
   // Atualizar tempo local a cada segundo

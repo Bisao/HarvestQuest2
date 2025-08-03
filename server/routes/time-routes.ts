@@ -12,10 +12,14 @@ export function createTimeRoutes(storage: IStorage): Router {
       console.log('🕐 TIME-ROUTE: Fetching current game time...');
       const gameTime = timeService.getCurrentGameTime();
       console.log('🕐 TIME-ROUTE: Game time fetched:', gameTime);
-      res.json(gameTime);
+      
+      // Garantir que retornamos JSON válido
+      res.setHeader('Content-Type', 'application/json');
+      return res.json(gameTime);
     } catch (error) {
       console.error('❌ TIME-ROUTE: Erro ao obter tempo do jogo:', error);
-      res.status(500).json({ error: 'Failed to get game time' });
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(500).json({ error: 'Failed to get game time' });
     }
   });
 
@@ -28,6 +32,7 @@ export function createTimeRoutes(storage: IStorage): Router {
 
       if (!playerId) {
         console.log('❌ TEMPERATURE-ROUTE: Player ID is required');
+        res.setHeader('Content-Type', 'application/json');
         return res.status(400).json({ error: 'Player ID is required' });
       }
 
@@ -38,10 +43,12 @@ export function createTimeRoutes(storage: IStorage): Router {
       const temperature = timeService.calculateTemperature(biome as string, gameTime);
 
       console.log('🌡️ TEMPERATURE-ROUTE: Temperature calculated:', temperature);
-      res.json(temperature);
+      res.setHeader('Content-Type', 'application/json');
+      return res.json(temperature);
     } catch (error) {
       console.error('❌ TEMPERATURE-ROUTE: Erro ao obter temperatura:', error);
-      res.status(500).json({ error: 'Failed to get temperature' });
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(500).json({ error: 'Failed to get temperature' });
     }
   });
 
