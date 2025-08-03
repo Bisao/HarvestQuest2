@@ -120,6 +120,33 @@ export const QUEST_IDS = {
   EXPLORADOR_INICIANTE: "quest-explorador-001"
 } as const;
 
+// ===================== SKILL IDs =====================
+export const SKILL_IDS = {
+  // === COLETA E EXPLORAÇÃO ===
+  COLETA: "skill-f1a2b3c4-d5e6-7890-abcd-123456789abc",
+  MINERACAO: "skill-g2b3c4d5-e6f7-8901-bcde-234567890bcd",
+  LENHADOR: "skill-h3c4d5e6-f7g8-9012-cdef-345678901cde",
+  PESCA: "skill-i4d5e6f7-g8h9-0123-def0-456789012def",
+  CACA: "skill-j5e6f7g8-h9i0-1234-ef01-567890123ef0",
+  EXPLORACAO: "skill-k6f7g8h9-i0j1-2345-f012-678901234f01",
+
+  // === CRIAÇÃO E ARTESANATO ===
+  ARTESANATO: "skill-l7g8h9i0-j1k2-3456-0123-789012345012",
+  FERRARIA: "skill-m8h9i0j1-k2l3-4567-1234-890123456123",
+  CULINARIA: "skill-n9i0j1k2-l3m4-5678-2345-901234567234",
+  ALQUIMIA: "skill-o0j1k2l3-m4n5-6789-3456-012345678345",
+
+  // === COMBATE E SOBREVIVÊNCIA ===
+  COMBATE: "skill-p1k2l3m4-n5o6-7890-4567-123456789456",
+  DEFESA: "skill-q2l3m4n5-o6p7-8901-5678-234567890567",
+  SOBREVIVENCIA: "skill-r3m4n5o6-p7q8-9012-6789-345678901678",
+
+  // === ESPECIALIZAÇÃO ===
+  RESISTENCIA: "skill-s4n5o6p7-q8r9-0123-7890-456789012789",
+  AGILIDADE: "skill-t5o6p7q8-r9s0-1234-8901-567890123890",
+  SORTE: "skill-u6p7q8r9-s0t1-2345-9012-678901234901"
+} as const;
+
 // ===================== VALIDATION HELPERS =====================
 export function isResourceId(id: string): boolean {
   return id.startsWith('res-');
@@ -141,13 +168,18 @@ export function isQuestId(id: string): boolean {
   return id.startsWith('quest-');
 }
 
+export function isSkillId(id: string): boolean {
+  return id.startsWith('skill-');
+}
+
 export function getAllValidIds(): string[] {
   return [
     ...Object.values(RESOURCE_IDS),
     ...Object.values(EQUIPMENT_IDS),
     ...Object.values(RECIPE_IDS),
     ...Object.values(BIOME_IDS),
-    ...Object.values(QUEST_IDS)
+    ...Object.values(QUEST_IDS),
+    ...Object.values(SKILL_IDS)
   ];
 }
 
@@ -157,5 +189,6 @@ export const ALL_GAME_IDS = {
   EQUIPMENT: EQUIPMENT_IDS,
   RECIPES: RECIPE_IDS,
   BIOMES: BIOME_IDS,
-  QUESTS: QUEST_IDS
+  QUESTS: QUEST_IDS,
+  SKILLS: SKILL_IDS
 } as const;

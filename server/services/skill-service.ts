@@ -4,7 +4,7 @@
 import type { IStorage } from '../storage.ts';
 import type { Player, PlayerSkill, Skill, SkillBonus } from '@shared/types';
 import { SKILL_DEFINITIONS } from '@shared/data/skill-definitions.ts';
-import { SKILL_IDS } from '@shared/constants/game-ids.ts';
+import { SKILL_IDS } from '@shared/constants/game-ids';
 
 export class SkillService {
   private storage: IStorage;
