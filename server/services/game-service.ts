@@ -232,7 +232,7 @@ export class GameService {
   // Add resource to player inventory (try inventory first, then storage if full)
   async addResourceToPlayer(playerId: string, resourceId: string, quantity: number): Promise<void> {
     console.log(`🎒 GAME-SERVICE: Adding ${quantity}x ${resourceId} to player ${playerId}`);
-    
+
     try {
       // Check if player exists
       const player = await this.storage.getPlayer(playerId);
@@ -298,7 +298,7 @@ export class GameService {
 
     } catch (error) {
       console.log(`🏪 GAME-SERVICE: Adding to storage instead. Reason:`, error instanceof Error ? error.message : error);
-      
+
       // Get resource info for storage
       const resource = await this.storage.getResource(resourceId);
       if (!resource) {
@@ -562,5 +562,65 @@ export class GameService {
       itemId: craftedResourceId,
       quantity: craftQuantity
     });
+  }
+
+  // Collect resource from biome
+  async collectResource(playerId: string, biomeId: string, resourceType: string): Promise<any> {
+    console.log(`🎯 COLLECT-SERVICE: Starting collection for player ${playerId}`);
+
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) throw new Error("Player not found");
+
+    const biomes = await this.storage.getAllBiomes();
+    const biome = biomes.find(b => b.id === biomeId);
+    if (!biome) throw new Error("Biome not found");
+
+    console.log(`🎯 COLLECT-SERVICE: Found biome ${biome.name}`);
+
+    // Check if player has required tool
+    const hasRequiredTool = await this.hasRequiredTool(playerId, resourceType);
+    if (!hasRequiredTool) {
+      throw new Error("You don't have the required tool for this resource");
+    }
+
+    console.log(`🎯 COLLECT-SERVICE: Player has required tool`);
+
+    // Get available resources for this biome and type
+    const availableResources = biome.resources
+      .filter(r => r.category === resourceType)
+      .filter(r => r.spawnRate > 0);
+
+    if (availableResources.length === 0) {
+      throw new Error("No resources of this type available in this biome");
+    }
+
+    console.log(`🎯 COLLECT-SERVICE: Found ${availableResources.length} available resources`);
+
+    // Select random resource based on spawn rates
+    const selectedResource = this.selectRandomResource(availableResources);
+    const quantity = Math.floor(Math.random() * 3) + 1; // 1-3 items
+
+    console.log(`🎯 COLLECT-SERVICE: Selected ${selectedResource.name}, quantity: ${quantity}`);
+
+    // Award experience
+    const experienceGained = selectedResource.experienceValue * quantity;
+    await this.storage.updatePlayer(playerId, {
+      experience: player.experience + experienceGained
+    });
+
+    console.log(`🎯 COLLECT-SERVICE: Awarded ${experienceGained} experience`);
+
+    // Add resource to inventory/storage
+    await this.addResourceToPlayer(playerId, selectedResource.id, quantity);
+
+    console.log(`🎯 COLLECT-SERVICE: Successfully added resource to player`);
+
+    return {
+      success: true,
+      resource: selectedResource,
+      quantity,
+      experienceGained,
+      message: `Collected ${quantity}x ${selectedResource.name}!`
+    };
   }
 }

@@ -1284,6 +1284,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Store reference in app for use in other routes  
   // WebSocket service will be initialized in index.ts
 
+  // Collect resource
+  app.post("/api/collect", async (req, res) => {
+    try {
+      const { playerId, biomeId, resourceType } = req.body;
+      console.log(`🎯 COLLECT: Player ${playerId} collecting ${resourceType} from ${biomeId}`);
+
+      const result = await gameService.collectResource(playerId, biomeId, resourceType);
+
+      console.log(`🎯 COLLECT: Result:`, result);
+
+      // Invalidate cache to ensure frontend sees updated data
+      const { invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateInventoryCache(playerId);
+      invalidatePlayerCache(playerId);
+
+      res.json(result);
+    } catch (error) {
+      console.error("Collection error:", error);
+      res.status(400).json({ message: error instanceof Error ? error.message : "Collection failed" });
+    }
+  });
+
   // WebSocket service will be initialized in index.ts
   app.use('/api/animal-registry', animalRegistryRoutes);
   app.use('/api/animals', animalRoutes);
