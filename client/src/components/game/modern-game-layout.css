@@ -222,6 +222,29 @@
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
+  
+  .sidebar {
+    width: 100vw !important;
+    max-width: 320px;
+  }
+  
+  .mobile-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .content-area {
+    padding: 0.5rem;
+  }
+  
+  .status-indicators {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  
+  .category-badge {
+    font-size: 0.6rem;
+    padding: 0.1rem 0.25rem;
+  }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
@@ -229,11 +252,73 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
+  
+  .sidebar {
+    width: 280px;
+  }
 }
 
 @media (min-width: 1025px) {
   .responsive-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
+  }
+  
+  .sidebar {
+    width: 320px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .sidebar {
+    width: 384px;
+  }
+  
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .sidebar-category button {
+    min-height: 44px;
+    padding: 0.75rem;
+  }
+  
+  .sidebar-category button:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .sidebar-category button:active {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: scale(0.98);
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .sidebar {
+    padding: 0.5rem;
+  }
+  
+  .sidebar-category {
+    margin-bottom: 0.25rem;
+  }
+  
+  .player-status-header {
+    padding: 0.75rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .shadow-soft {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+  
+  .shadow-medium {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   }
 }

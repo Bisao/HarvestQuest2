@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useGameContext } from '@/contexts/GameContext';
@@ -217,7 +216,7 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(({
   onTabChange 
 }) => {
   const CategoryIcon = category.icon;
-  
+
   return (
     <div className="sidebar-category">
       {/* Category Header */}
@@ -249,7 +248,7 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(({
           {category.subTabs.map((tab) => {
             const TabIcon = tab.icon;
             const isActive = activeTab === tab.id;
-            
+
             return (
               <button
                 key={tab.id}
@@ -293,7 +292,7 @@ interface StatusBarProps {
 
 const StatusBar: React.FC<StatusBarProps> = React.memo(({ label, current, max, color, icon }) => {
   const percentage = Math.min(100, Math.max(0, (current / max) * 100));
-  
+
   return (
     <div className="flex items-center space-x-2">
       <div className="flex items-center space-x-1 min-w-0">
@@ -349,6 +348,8 @@ export default function ModernGameLayout() {
   const [offlineReportOpen, setOfflineReportOpen] = useState(false);
   const [offlineReport, setOfflineReport] = useState<any>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(!useIsMobile());
+
 
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -357,7 +358,7 @@ export default function ModernGameLayout() {
   const gameState = useGameContext();
 
   const { player, activeExpedition, setActiveExpedition, resources, equipment, biomes, recipes } = gameState;
-  
+
   // Local state for auth warning and blocked status
   const authWarning = false; // TODO: implement auth warning logic
   const isBlocked = false; // TODO: implement blocked status logic
@@ -385,6 +386,10 @@ export default function ModernGameLayout() {
       setActiveTab(tabId);
     }
   }, []);
+
+    const toggleSidebar = useCallback(() => {
+        setIsSidebarOpen(prev => !prev);
+    }, []);
 
   const handleCategoryToggle = useCallback((categoryId: string) => {
     setExpandedCategories(prev => 
@@ -421,7 +426,7 @@ export default function ModernGameLayout() {
   // Verificação de atividade offline otimizada
   useEffect(() => {
     if (!player?.lastOnlineTime) return;
-    
+
     const lastSeenTime = new Date(player.lastOnlineTime).getTime();
     const currentTime = Date.now();
     const offlineTime = (currentTime - lastSeenTime) / 1000;
@@ -468,7 +473,11 @@ export default function ModernGameLayout() {
       {/* Layout Principal */}
       <div className="flex h-screen">
         {/* Sidebar */}
-        <div className="w-80 bg-white border-r border-gray-200 shadow-sm flex flex-col">
+        <div className={`
+          w-80 bg-white border-r border-gray-200 shadow-sm flex flex-col
+          ${isMobile ? 'fixed top-0 left-0 h-full z-50 transform transition-transform duration-300' : ''}
+          ${isMobile && !isSidebarOpen ? '-translate-x-full' : ''}
+        `}>
           {/* Player Status Header */}
           <div className="p-4 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center space-x-3 mb-3">
@@ -503,7 +512,7 @@ export default function ModernGameLayout() {
                 color="bg-orange-500"
                 icon="🍖"
               />
-              
+
               <StatusBar
                 label="Sede"
                 current={player?.thirst || 0}
@@ -514,7 +523,7 @@ export default function ModernGameLayout() {
 
               <div className="flex items-center justify-between pt-1">
                 <EquipmentIndicators player={player} />
-                
+
                 {player?.autoStorage && (
                   <Badge variant="outline" className="flex items-center space-x-1 text-xs">
                     <Moon className="w-3 h-3" />
@@ -545,16 +554,26 @@ export default function ModernGameLayout() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Content Header */}
-          <div className="bg-white border-b border-gray-200 p-4">
-            <div className="flex items-center space-x-3">
+          <div className={`bg-white border-b border-gray-200 p-3 sm:p-4 ${isMobile ? 'pt-2' : ''}`}>
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              {isMobile && (
+                <button
+                  onClick={toggleSidebar}
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors lg:hidden"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              )}
               <div className="p-2 rounded-lg bg-gray-50 border">
-                <TabIcon className={`w-5 h-5 ${currentTab?.color || 'text-gray-600'}`} />
+                <TabIcon className={`w-4 sm:w-5 h-4 sm:h-5 ${currentTab?.color || 'text-gray-600'}`} />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-800">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
                   {currentTab?.label || 'Carregando...'}
                 </h2>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-xs sm:text-sm truncate">
                   {currentTab?.description || 'Preparando conteúdo...'}
                 </p>
               </div>
@@ -562,7 +581,7 @@ export default function ModernGameLayout() {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-auto bg-gray-50 p-4">
+          <div className="flex-1 overflow-auto bg-gray-50 p-2 sm:p-4">
             {activeTab === 'status' && (
               <StatusTab 
                 player={player}
