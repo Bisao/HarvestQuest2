@@ -216,22 +216,23 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(({
   onTabChange 
 }) => {
   const CategoryIcon = category.icon;
+  const isMobile = useIsMobile();
 
   return (
     <div className="sidebar-category">
       {/* Category Header */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between p-3 hover:bg-gray-100 rounded-lg transition-colors group"
+        className={`w-full flex items-center justify-between ${isMobile ? 'p-2' : 'p-3'} hover:bg-gray-100 rounded-lg transition-colors group touch-friendly`}
       >
         <div className="flex items-center space-x-3">
-          <CategoryIcon className={`w-5 h-5 ${category.color}`} />
-          <span className="font-medium text-gray-700 group-hover:text-gray-900">
+          <CategoryIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} ${category.color}`} />
+          <span className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-gray-700 group-hover:text-gray-900 truncate`}>
             {category.label}
           </span>
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+        <div className="flex items-center space-x-2 flex-shrink-0">
+          <span className={`${isMobile ? 'text-xs px-1.5 py-0.5' : 'text-xs px-2 py-1'} bg-gray-200 text-gray-600 rounded-full`}>
             {category.count}
           </span>
           {isExpanded ? (
@@ -244,7 +245,7 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(({
 
       {/* Subcategories */}
       {isExpanded && (
-        <div className="ml-6 mt-2 space-y-1">
+        <div className={`${isMobile ? 'ml-4 mt-1' : 'ml-6 mt-2'} space-y-1`}>
           {category.subTabs.map((tab) => {
             const TabIcon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -255,7 +256,7 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(({
                 onClick={() => onTabChange(tab.id)}
                 disabled={tab.isDisabled}
                 className={`
-                  relative w-full flex items-center space-x-3 p-2 rounded-lg text-left transition-all
+                  relative w-full flex items-center space-x-3 ${isMobile ? 'p-2 min-h-[44px]' : 'p-2'} rounded-lg text-left transition-all touch-friendly
                   ${isActive 
                     ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700" 
                     : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
@@ -264,7 +265,7 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(({
                 `}
               >
                 <TabIcon className={`w-4 h-4 ${isActive ? 'text-blue-600' : tab.color} flex-shrink-0`} />
-                <span className="text-sm truncate">
+                <span className={`${isMobile ? 'text-sm' : 'text-sm'} truncate`}>
                   {tab.label}
                 </span>
                 {tab.hasNotification && (
@@ -292,16 +293,17 @@ interface StatusBarProps {
 
 const StatusBar: React.FC<StatusBarProps> = React.memo(({ label, current, max, color, icon }) => {
   const percentage = Math.min(100, Math.max(0, (current / max) * 100));
+  const isMobile = useIsMobile();
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className={`flex items-center ${isMobile ? 'space-x-1.5' : 'space-x-2'}`}>
       <div className="flex items-center space-x-1 min-w-0">
-        {icon && <span className="text-sm flex-shrink-0">{icon}</span>}
-        <span className="text-xs font-medium text-gray-700 truncate">
+        {icon && <span className={`${isMobile ? 'text-xs' : 'text-sm'} flex-shrink-0`}>{icon}</span>}
+        <span className={`${isMobile ? 'text-xs' : 'text-xs'} font-medium text-gray-700 truncate`}>
           {Math.round(current)}/{max}
         </span>
       </div>
-      <div className="w-16 bg-gray-200 rounded-full h-1.5 flex-shrink-0">
+      <div className={`${isMobile ? 'w-12' : 'w-16'} bg-gray-200 rounded-full h-1.5 flex-shrink-0`}>
         <div 
           className={`${color} h-1.5 rounded-full transition-all duration-300`}
           style={{ width: `${percentage}%` }}
@@ -348,7 +350,8 @@ export default function ModernGameLayout() {
   const [offlineReportOpen, setOfflineReportOpen] = useState(false);
   const [offlineReport, setOfflineReport] = useState<any>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(!useIsMobile());
+  const isMobile = useIsMobile();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
 
 
   const { toast } = useToast();
@@ -472,25 +475,48 @@ export default function ModernGameLayout() {
 
       {/* Layout Principal */}
       <div className="flex h-screen">
+        {/* Overlay para mobile */}
+        {isMobile && isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={toggleSidebar}
+          />
+        )}
+
         {/* Sidebar */}
         <div className={`
-          w-80 bg-white border-r border-gray-200 shadow-sm flex flex-col
-          ${isMobile ? 'fixed top-0 left-0 h-full z-50 transform transition-transform duration-300' : ''}
-          ${isMobile && !isSidebarOpen ? '-translate-x-full' : ''}
+          ${isMobile ? 'fixed top-0 left-0 h-full z-50 w-[85vw] max-w-[320px]' : 'w-80'} 
+          bg-white border-r border-gray-200 shadow-lg flex flex-col
+          transform transition-transform duration-300 ease-in-out
+          ${isMobile && !isSidebarOpen ? '-translate-x-full' : 'translate-x-0'}
+          safe-area-top
         `}>
           {/* Player Status Header */}
-          <div className="p-4 border-b border-gray-200 bg-gray-50">
+          <div className={`${isMobile ? 'p-3' : 'p-4'} border-b border-gray-200 bg-gray-50 safe-area-top`}>
+            {isMobile && (
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold text-gray-800">Menu</h2>
+                <button
+                  onClick={toggleSidebar}
+                  className="p-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
             <div className="flex items-center space-x-3 mb-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-base">
+              <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0`}>
+                <span className={`text-white font-bold ${isMobile ? 'text-sm' : 'text-base'}`}>
                   {player?.username?.charAt(0) || '?'}
                 </span>
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg font-bold text-gray-800 truncate">
+                <h1 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-800 truncate`}>
                   {player?.username || 'Carregando...'}
                 </h1>
-                <div className="flex items-center space-x-3 text-sm text-gray-600">
+                <div className={`flex items-center space-x-2 ${isMobile ? 'text-xs' : 'text-sm'} text-gray-600`}>
                   <div className="flex items-center space-x-1">
                     <Star className="w-3 h-3 text-yellow-500 flex-shrink-0" />
                     <span>Nv.{player?.level || 0}</span>
@@ -504,7 +530,7 @@ export default function ModernGameLayout() {
             </div>
 
             {/* Status Indicators Compactos */}
-            <div className="space-y-2">
+            <div className={`space-y-${isMobile ? '1.5' : '2'}`}>
               <StatusBar
                 label="Fome"
                 current={player?.hunger || 0}
@@ -521,11 +547,11 @@ export default function ModernGameLayout() {
                 icon="💧"
               />
 
-              <div className="flex items-center justify-between pt-1">
+              <div className={`flex items-center ${isMobile ? 'justify-center' : 'justify-between'} pt-1 ${isMobile ? 'flex-wrap gap-2' : ''}`}>
                 <EquipmentIndicators player={player} />
 
                 {player?.autoStorage && (
-                  <Badge variant="outline" className="flex items-center space-x-1 text-xs">
+                  <Badge variant="outline" className={`flex items-center space-x-1 ${isMobile ? 'text-xs px-2 py-1' : 'text-xs'}`}>
                     <Moon className="w-3 h-3" />
                     <span>Offline</span>
                   </Badge>
@@ -535,8 +561,8 @@ export default function ModernGameLayout() {
           </div>
 
           {/* Sidebar Navigation */}
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-2">
+          <ScrollArea className={`flex-1 ${isMobile ? 'p-2' : 'p-4'} mobile-scroll`}>
+            <div className={`space-y-${isMobile ? '1' : '2'}`}>
               {sidebarCategories.map((category) => (
                 <SidebarItem
                   key={category.id}
@@ -544,7 +570,12 @@ export default function ModernGameLayout() {
                   isExpanded={expandedCategories.includes(category.id)}
                   onToggle={() => handleCategoryToggle(category.id)}
                   activeTab={activeTab}
-                  onTabChange={handleTabChange}
+                  onTabChange={(tabId) => {
+                    handleTabChange(tabId);
+                    if (isMobile) {
+                      setIsSidebarOpen(false);
+                    }
+                  }}
                 />
               ))}
             </div>
@@ -554,26 +585,26 @@ export default function ModernGameLayout() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Content Header */}
-          <div className={`bg-white border-b border-gray-200 p-3 sm:p-4 ${isMobile ? 'pt-2' : ''}`}>
-            <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className={`bg-white border-b border-gray-200 safe-area-top ${isMobile ? 'p-3' : 'p-4'}`}>
+            <div className="flex items-center space-x-3">
               {isMobile && (
                 <button
                   onClick={toggleSidebar}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors lg:hidden"
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors touch-friendly"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
               )}
-              <div className="p-2 rounded-lg bg-gray-50 border">
-                <TabIcon className={`w-4 sm:w-5 h-4 sm:h-5 ${currentTab?.color || 'text-gray-600'}`} />
+              <div className={`p-2 rounded-lg bg-gray-50 border ${isMobile ? 'flex-shrink-0' : ''}`}>
+                <TabIcon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} ${currentTab?.color || 'text-gray-600'}`} />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
+                <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-gray-800 truncate`}>
                   {currentTab?.label || 'Carregando...'}
                 </h2>
-                <p className="text-gray-600 text-xs sm:text-sm truncate">
+                <p className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-sm'} truncate`}>
                   {currentTab?.description || 'Preparando conteúdo...'}
                 </p>
               </div>
@@ -581,7 +612,7 @@ export default function ModernGameLayout() {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-auto bg-gray-50 p-2 sm:p-4">
+          <div className={`flex-1 overflow-auto bg-gray-50 ${isMobile ? 'p-2' : 'p-4'} safe-area-bottom`}>
             {activeTab === 'status' && player && (
               <StatusTab 
                 player={player}

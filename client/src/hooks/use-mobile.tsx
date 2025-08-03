@@ -1,6 +1,6 @@
 import * as React from "react"
 
-const MOBILE_BREAKPOINT = 1024 // Aumentado para incluir tablets
+const MOBILE_BREAKPOINT = 768 // Otimizado para mobile real
 const TOUCH_DEVICE_QUERY = '(hover: none) and (pointer: coarse)'
 
 export function useIsMobile() {
