@@ -46,7 +46,11 @@ export const RESOURCE_IDS = {
   
   // Materiais de Crafting
   BARBANTE: "res-n5o6p7q8-r9s0-1234-8901-567890123456",
-  FERRO_FUNDIDO: "res-o6p7q8r9-s0t1-2345-9012-678901234567"
+  FERRO_FUNDIDO: "res-o6p7q8r9-s0t1-2345-9012-678901234567",
+  CARNE: "res-p7q8r9s0-t1u2-3456-0123-789012345678",
+  COURO: "res-q8r9s0t1-u2v3-4567-1234-890123456789",
+  ISCA_PESCA: "res-r9s0t1u2-v3w4-5678-2345-901234567890",
+  ARGILA: "res-s0t1u2v3-w4x5-6789-3456-012345678901"
 } as const;
 
 // ===================== EQUIPMENT IDs =====================
@@ -55,11 +59,22 @@ export const EQUIPMENT_IDS = {
   MACHADO: "eq-p7q8r9s0-t1u2-3456-0123-789012345678",
   PICARETA: "eq-q8r9s0t1-u2v3-4567-1234-890123456789",
   VARA_PESCA: "eq-r9s0t1u2-v3w4-5678-2345-901234567890",
+  FOICE: "eq-s0t1u2v3-w4x5-6789-3456-012345678902",
   
   // Armas
   FACA: "eq-s0t1u2v3-w4x5-6789-3456-012345678901",
   LANCA: "eq-t1u2v3w4-x5y6-7890-4567-123456789012",
-  ARCO: "eq-u2v3w4x5-y6z7-8901-5678-234567890123",
+  ARCO_FLECHA: "eq-u2v3w4x5-y6z7-8901-5678-234567890123",
+  
+  // Containers
+  BALDE_MADEIRA: "eq-v3w4x5y6-z7a8-9012-6789-345678901235",
+  GARRAFA_BAMBU: "eq-w4x5y6z7-a8b9-0123-7890-456789012346",
+  MOCHILA: "eq-x5y6z7a8-b9c0-1234-8901-567890123457",
+  CORDA: "eq-y6z7a8b9-c0d1-2345-9012-678901234568",
+  
+  // Utensílios de Cozinha
+  PANELA_BARRO: "eq-z7a8b9c0-d1e2-3456-0123-789012345679",
+  PANELA: "eq-a8b9c0d1-e2f3-4567-1234-890123456780",
   
   // Armaduras - Capacete
   CAPACETE_COURO: "eq-v3w4x5y6-z7a8-9012-6789-345678901234",
@@ -83,11 +98,27 @@ export const RECIPE_IDS = {
   // Materiais Básicos
   BARBANTE: "rec-barbante-001",
   TRONCO_PARA_MADEIRA: "rec-madeira-001",
+  CORDA: "rec-corda-001",
   
   // Ferramentas
-  MACHADO_MADEIRA: "rec-machado-001",
-  PICARETA_PEDRA: "rec-picareta-001",
-  VARA_PESCA_BAMBU: "rec-vara-001",
+  MACHADO: "rec-machado-001",
+  PICARETA: "rec-picareta-001",
+  VARA_PESCA: "rec-vara-001",
+  FACA: "rec-faca-001",
+  FOICE: "rec-foice-001",
+  
+  // Armas
+  ARCO_FLECHA: "rec-arco-flecha-001",
+  LANCA: "rec-lanca-001",
+  
+  // Containers
+  BALDE_MADEIRA: "rec-balde-madeira-001",
+  GARRAFA_BAMBU: "rec-garrafa-bambu-001",
+  MOCHILA: "rec-mochila-001",
+  
+  // Utensílios de Cozinha
+  PANELA_BARRO: "rec-panela-barro-001",
+  PANELA: "rec-panela-001",
   
   // Alimentos
   COGUMELOS_ASSADOS: "rec-cogumelos-001",
@@ -95,6 +126,7 @@ export const RECIPE_IDS = {
   PEIXE_GRELHADO: "rec-peixe-001",
   ENSOPADO_CARNE: "rec-ensopado-001",
   SUCO_FRUTAS: "rec-suco-001",
+  ISCA_PESCA: "rec-isca-pesca-001",
   
   // Equipamentos
   CAPACETE_COURO: "rec-capacete-couro-001",
