@@ -262,39 +262,7 @@ export default function StatusTab({ player }: StatusTabProps) {
       )}
     </div>
   );
-} 
-                            value={(stat.value / stat.max) * 100} 
-                            className="h-1"
-                          />
-                        </div>
-                      )}
-                      {stat.title === "Nível" && (
-                        <div className="w-6 mt-1">
-                          <Progress 
-                            value={getXPProgress()} 
-                            className="h-1"
-                          />
-                        </div>
-                      )}
-                    </div>
-                    <span className="font-medium">{stat.title}</span>
-                  </div>
-                  <Badge variant="secondary">
-                    {stat.description}
-                  </Badge>
-                </div>
-                
-                {stat.max && (
-                  <Progress 
-                    value={(stat.value / stat.max) * 100} 
-                    className="w-full h-2"
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+}
 
       {/* Inventory Stats */}
       <Card>

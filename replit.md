@@ -28,6 +28,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
+- **August 3, 2025**: UI REORGANIZATION COMPLETED
+  - **Acampamento tab**: Now the first/primary tab containing workshops and warehouse
+  - **Construction tab removed**: All building-related features consolidated into Camp tab
+  - **Skills tab added**: New dedicated skills interface in Player section
+  - **Status interface redesigned**: More intuitive design with detailed information and color-coded status levels
+  - **Inventory simplified**: Removed embedded player status and quick actions for cleaner interface
+  - **Tab structure streamlined**: Camp → Player (Status, Inventory, Skills) → Exploration → Quests → Settings
 - **August 3, 2025**: COMPLETE TIME SPEED CONTROL SYSTEM IMPLEMENTED
   - **Time speed control system**: Players can now set game day duration to 45, 60, 90, or 120 real minutes
   - **Complete temperature-based survival**: Cold increases hunger 150%, heat increases thirst 150%

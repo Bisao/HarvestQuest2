@@ -81,6 +81,29 @@ interface SidebarTab {
 // Configuração das categorias da sidebar
 const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedition | null): SidebarCategory[] => [
   {
+    id: 'acampamento',
+    label: 'Acampamento',
+    icon: Home,
+    color: 'text-indigo-600',
+    count: 2,
+    subTabs: [
+      {
+        id: 'workshops',
+        label: 'Oficinas',
+        icon: Hammer,
+        color: 'text-orange-600',
+        description: 'Processar materiais e criar itens'
+      },
+      {
+        id: 'storage',
+        label: 'Armazém',
+        icon: Package,
+        color: 'text-purple-600',
+        description: 'Armazenamento expandido de itens'
+      }
+    ]
+  },
+  {
     id: 'jogador',
     label: 'Jogador',
     icon: User,
@@ -131,36 +154,6 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
         icon: BookOpen,
         color: 'text-amber-600',
         description: 'Registro de animais descobertos'
-      }
-    ]
-  },
-  {
-    id: 'construcao',
-    label: 'Construção',
-    icon: Hammer,
-    color: 'text-orange-600',
-    count: 3,
-    subTabs: [
-      {
-        id: 'workshops',
-        label: 'Oficinas',
-        icon: Hammer,
-        color: 'text-orange-600',
-        description: 'Processar materiais e criar itens'
-      },
-      {
-        id: 'camp',
-        label: 'Acampamento',
-        icon: Home,
-        color: 'text-indigo-600',
-        description: 'Base, melhorias e construções'
-      },
-      {
-        id: 'storage',
-        label: 'Armazém',
-        icon: Package,
-        color: 'text-purple-600',
-        description: 'Armazenamento expandido de itens'
       }
     ]
   },
@@ -657,13 +650,7 @@ export default function ModernGameLayout() {
               />
             )}
 
-            {activeTab === 'camp' && (
-              <CampTab
-                player={player}
-                resources={resources}
-                equipment={equipment}
-              />
-            )}
+
 
             {activeTab === 'animals' && (
               <AnimalRegistryTab 
