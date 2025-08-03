@@ -1,0 +1,65 @@
+🕐 HOOK: Network or parsing error: 
+SyntaxError {}
+
+🕐 HOOK: Player data received: 
+Object {id: "ebf0905d-e92f-4986-9a5f-f818c2a388ec", username: "Bison", level: 1, experience: 0, coins: 100, …}
+Query data cannot be undefined. Please make sure to return a value other than undefined from your query function. Affected query key: ["player","Bison"]
+🕐 HOOK: Fetching player data for: 
+🕐 HOOK: Fetching player data for: Bison
+🕐 HOOK: Player data received: 
+Object {id: "ebf0905d-e92f-4986-9a5f-f818c2a388ec", username: "Bison", level: 1, experience: 0, coins: 100, …}
+Query data cannot be undefined. Please make sure to return a value other than undefined from your query function. Affected query key: ["player","Bison"]
+🕐 HOOK: Network or parsing error: 
+SyntaxError {}
+
+🕐 HOOK: Fetching player data for: 
+🕐 HOOK: Network or parsing error: 
+SyntaxError {}
+
+🕐 HOOK: Fetching player data for: Bison
+🕐 HOOK: Player data received: 
+Object {id: "ebf0905d-e92f-4986-9a5f-f818c2a388ec", username: "Bison", level: 1, experience: 0, coins: 100, …}
+Query data cannot be undefined. Please make sure to return a value other than undefined from your query function. Affected query key: ["player","Bison"]
+🕐 HOOK: Fetching player data for: 
+🕐 HOOK: Network or parsing error: 
+SyntaxError {}
+
+🕐 HOOK: Fetching player data for: Bison
+🕐 HOOK: Player data received: 
+Object {id: "ebf0905d-e92f-4986-9a5f-f818c2a388ec", username: "Bison", level: 1, experience: 0, coins: 100, …}
+Query data cannot be undefined. Please make sure to return a value other than undefined from your query function. Affected query key: ["player","Bison"]
+🕐 HOOK: Fetching player data for: Bison
+🕐 HOOK: Player data received: 
+Object {id: "ebf0905d-e92f-4986-9a5f-f818c2a388ec", username: "Bison", level: 1, experience: 0, coins: 100, …}
+Query data cannot be undefined. Please make sure to return a value other than undefined from your query function. Affected query key: ["player","Bison"]
+🕐 HOOK: Fetching player data for: 
+🕐 HOOK: Network or parsing error: 
+SyntaxError {}
+
+🕐 HOOK: Fetching player data for: Bison
+🕐 HOOK: Player data received: 
+Object {id: "ebf0905d-e92f-4986-9a5f-f818c2a388ec", username: "Bison", level: 1, experience: 0, coins: 100, …}
+Query data cannot be undefined. Please make sure to return a value other than undefined from your query function. Affected query key: ["player","Bison"]
+🕐 HOOK: Fetching player data for: 
+🕐 HOOK: Fetching player data for: Bison
+🕐 HOOK: Player data received: 
+Object {id: "ebf0905d-e92f-4986-9a5f-f818c2a388ec", username: "Bison", level: 1, experience: 0, coins: 100, …}
+Query data cannot be undefined. Please make sure to return a value other than undefined from your query function. Affected query key: ["player","Bison"]
+🕐 HOOK: Network or parsing error: 
+SyntaxError {}
+
+🕐 HOOK: Fetching player data for: 
+🕐 HOOK: Network or parsing error: 
+SyntaxError {}
+
+🕐 HOOK: Fetching player data for: Bison
+🕐 HOOK: Player data received: 
+Object {id: "ebf0905d-e92f-4986-9a5f-f818c2a388ec", username: "Bison", level: 1, experience: 0, coins: 100, …}
+Query data cannot be undefined. Please make sure to return a value other than undefined from your query function. Affected query key: ["player","Bison"]
+🕐 HOOK: Fetching player data for: 
+🕐 HOOK: Fetching player data for: Bison
+🕐 HOOK: Network or parsing error: 
+SyntaxError {}
+
+🕐 HOOK: Player data received: 
+Object {id: "ebf0905d-e92f-4986-9a5f-f818c2a388ec", username: "Bison", level: 1, experience: 0, coins: 100, …}
