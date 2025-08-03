@@ -466,6 +466,21 @@ export function getAnimalByResourceId(resourceId: string): AnimalRegistryEntry |
   return ANIMAL_REGISTRY.find(animal => animal.id === animalId);
 }
 
+// Animal categories for filtering and organization
+export const ANIMAL_CATEGORIES = [
+  'mammal_small',
+  'mammal_medium', 
+  'mammal_large',
+  'bird',
+  'fish_freshwater',
+  'fish_saltwater',
+  'reptile',
+  'amphibian',
+  'insect',
+  'arthropod',
+  'mythical'
+] as const;
+
 export function getDiscoverableAnimals(playerLevel: number): AnimalRegistryEntry[] {
   return ANIMAL_REGISTRY.filter(animal => animal.requiredLevel <= playerLevel);
 }
