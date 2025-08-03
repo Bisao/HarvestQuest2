@@ -24,11 +24,51 @@ export interface AnimalRegistryEntry {
     funFacts: string[];
   };
   
+  // Combat and interaction
+  combat: {
+    health: number;
+    defense: number;
+    attacks: AnimalAttack[];
+    abilities: AnimalAbility[];
+    weaknesses: string[];
+    resistances: string[];
+  };
+  
+  // Drops and rewards
+  drops: AnimalDrop[];
+  
   // Discovery and game mechanics
   discoveredAt?: number; // timestamp when first discovered
   discoveryMethod: 'hunting' | 'fishing' | 'observation' | 'special_event';
   requiredLevel: number;
   discoveryLocation: string[];
+}
+
+export interface AnimalAttack {
+  name: string;
+  damage: number;
+  type: 'physical' | 'poison' | 'fire' | 'ice' | 'electric' | 'psychic' | 'dark';
+  accuracy: number;
+  description: string;
+  cooldown?: number;
+}
+
+export interface AnimalAbility {
+  name: string;
+  type: 'passive' | 'active' | 'defensive' | 'offensive';
+  description: string;
+  effect: string;
+  trigger?: string;
+}
+
+export interface AnimalDrop {
+  itemId: string;
+  itemName: string;
+  emoji: string;
+  dropRate: number; // 0-100%
+  minQuantity: number;
+  maxQuantity: number;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 }
 
 export interface AnimalGenderInfo {
@@ -55,7 +95,13 @@ export type AnimalCategory =
   | 'amphibian'
   | 'insect'
   | 'arthropod'
-  | 'mythical';
+  | 'mythical'
+  | 'undead'
+  | 'demon'
+  | 'celestial'
+  | 'elemental'
+  | 'prehistoric'
+  | 'alien';
 
 export interface PlayerAnimalRegistry {
   playerId: string;

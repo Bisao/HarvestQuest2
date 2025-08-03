@@ -208,6 +208,124 @@ function AnimalDetailModal({ animal, isOpen, onClose, isDiscovered }: AnimalDeta
                   <div>Nível necessário: {animal.requiredLevel}</div>
                 </div>
               </div>
+
+              {/* Combat Information */}
+              <div>
+                <h3 className="font-semibold mb-2">Informações de Combate</h3>
+                <div className="text-sm space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>Vida: {animal.combat.health} HP</div>
+                    <div>Defesa: {animal.combat.defense}</div>
+                  </div>
+                  
+                  {animal.combat.weaknesses.length > 0 && (
+                    <div>
+                      <span className="font-medium text-red-600">Fraquezas: </span>
+                      {animal.combat.weaknesses.join(', ')}
+                    </div>
+                  )}
+                  
+                  {animal.combat.resistances.length > 0 && (
+                    <div>
+                      <span className="font-medium text-blue-600">Resistências: </span>
+                      {animal.combat.resistances.join(', ')}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Attacks */}
+              {animal.combat.attacks.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Ataques</h3>
+                  <div className="space-y-2">
+                    {animal.combat.attacks.map((attack, idx) => (
+                      <div key={idx} className="bg-red-50 p-2 rounded text-sm">
+                        <div className="font-medium flex justify-between items-center">
+                          <span>{attack.name}</span>
+                          <Badge variant="outline" className={`text-xs ${
+                            attack.type === 'physical' ? 'bg-gray-100' :
+                            attack.type === 'poison' ? 'bg-purple-100' :
+                            attack.type === 'fire' ? 'bg-red-100' :
+                            attack.type === 'ice' ? 'bg-blue-100' :
+                            attack.type === 'electric' ? 'bg-yellow-100' :
+                            attack.type === 'psychic' ? 'bg-pink-100' :
+                            'bg-gray-800 text-white'
+                          }`}>
+                            {attack.type}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          <div>Dano: {attack.damage} | Precisão: {attack.accuracy}%</div>
+                          <div>{attack.description}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Abilities */}
+              {animal.combat.abilities.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Habilidades</h3>
+                  <div className="space-y-2">
+                    {animal.combat.abilities.map((ability, idx) => (
+                      <div key={idx} className="bg-blue-50 p-2 rounded text-sm">
+                        <div className="font-medium flex justify-between items-center">
+                          <span>{ability.name}</span>
+                          <Badge variant="outline" className={`text-xs ${
+                            ability.type === 'passive' ? 'bg-green-100' :
+                            ability.type === 'active' ? 'bg-orange-100' :
+                            ability.type === 'defensive' ? 'bg-blue-100' :
+                            'bg-red-100'
+                          }`}>
+                            {ability.type}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          <div>{ability.description}</div>
+                          <div className="text-gray-500">Efeito: {ability.effect}</div>
+                          {ability.trigger && <div className="text-gray-500">Ativado: {ability.trigger}</div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Drops */}
+              {animal.drops.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Drops ao Morrer</h3>
+                  <div className="space-y-1">
+                    {animal.drops.map((drop, idx) => (
+                      <div key={idx} className="bg-yellow-50 p-2 rounded text-sm flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{drop.emoji}</span>
+                          <span className="font-medium">{drop.itemName}</span>
+                        </div>
+                        <div className="text-right text-xs">
+                          <div className={`font-medium ${
+                            drop.rarity === 'common' ? 'text-gray-600' :
+                            drop.rarity === 'uncommon' ? 'text-green-600' :
+                            drop.rarity === 'rare' ? 'text-blue-600' :
+                            drop.rarity === 'epic' ? 'text-purple-600' :
+                            'text-orange-600'
+                          }`}>
+                            {drop.dropRate}%
+                          </div>
+                          <div className="text-gray-500">
+                            {drop.minQuantity === drop.maxQuantity ? 
+                              drop.minQuantity : 
+                              `${drop.minQuantity}-${drop.maxQuantity}`}x
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
