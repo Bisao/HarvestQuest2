@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import type { Biome, Resource, Equipment, Player } from '@shared/types';
 import { NewExpeditionModal } from './new-expedition-modal';
-import { ManualExpeditionModal } from './manual-expedition-modal';
+import { ImprovedCustomExpeditionModal } from './improved-custom-expedition-modal';
 import { ExpeditionTracker } from './expedition-tracker';
 import { ExpeditionStatus } from './expedition-status';
 import { useActiveExpeditions } from '@/hooks/use-active-expeditions';
@@ -155,7 +155,7 @@ export default function EnhancedBiomesTab({
     if (searchTerm) {
       filtered = filtered.filter(biome => 
         biome.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        biome.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        false
       );
     }
 
@@ -293,9 +293,7 @@ export default function EnhancedBiomesTab({
                   </Badge>
                 </div>
                 
-                {biome.description && (
-                  <p className="text-sm text-gray-600 mt-2">{biome.description}</p>
-                )}
+                <p className="text-sm text-gray-600 mt-2">Explore {biome.name} para descobrir recursos únicos.</p>
               </CardHeader>
 
               <CardContent className="space-y-4">
@@ -440,7 +438,7 @@ export default function EnhancedBiomesTab({
 
       {/* Modal de expedição novo */}
       {selectedBiome && useManualSelection && (
-        <ManualExpeditionModal
+        <ImprovedCustomExpeditionModal
           isOpen={expeditionModalOpen}
           onClose={() => {
             setExpeditionModalOpen(false);

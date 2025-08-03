@@ -252,7 +252,7 @@ export class NewExpeditionService {
     }
 
     const elapsed = currentTime - startTimeMs;
-    const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
+    const expeditionDuration = expedition.duration || (30 * 60 * 1000); // Use expedition.duration or default
     const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
 
     console.log(`📈 EXPEDITION-PROGRESS: ${expeditionId} - elapsed: ${elapsed}ms, progress: ${Math.round(progress)}%`);
@@ -338,7 +338,7 @@ export class NewExpeditionService {
     console.log(`🎁 REWARDS: ${JSON.stringify(rewards)}`);
 
     const startTime = expedition.startTime ?? Date.now();
-    const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
+    const expeditionDuration = expedition.duration || (30 * 60 * 1000); // Use expedition.duration or default
 
     return {
       id: expedition.id,
@@ -423,7 +423,7 @@ export class NewExpeditionService {
           startTimeMs = currentTime; // Fallback to current time
         }
 
-        const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
+        const expeditionDuration = exp.duration || (30 * 60 * 1000); // Use expedition.duration or default
         const elapsed = currentTime - startTimeMs;
         const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
 
@@ -460,7 +460,7 @@ export class NewExpeditionService {
       .filter(exp => exp.status === 'completed')
       .map(exp => {
         const startTime = exp.startTime ?? Date.now();
-        const expeditionDuration = 30 * 60 * 1000; // default 30 minutes
+        const expeditionDuration = exp.duration || (30 * 60 * 1000); // Use expedition.duration or default
         return {
           id: exp.id,
           playerId: exp.playerId,
