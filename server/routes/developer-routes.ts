@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { storage } from '../storage';
 import { ANIMAL_REGISTRY } from '../data/animal-registry';
-import { logger } from '@shared/utils/logger';
+// Using console.log instead of logger for migration compatibility
 
 const router = Router();
 

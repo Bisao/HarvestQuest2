@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { AnimalDiscoveryService } from '../services/animal-discovery-service';
 import { ANIMAL_REGISTRY } from '@shared/data/animal-registry';
-import { logger } from '@shared/utils/logger';
+// Using console.log instead of logger for migration compatibility
 
 const router = Router();
 
@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
   try {
     res.json(ANIMAL_REGISTRY);
   } catch (error) {
-    logger.error('Error fetching animals:', error);
+    console.error('Error fetching animals:', error);
     res.status(500).json({ error: 'Failed to fetch animals' });
   }
 });
@@ -27,7 +27,7 @@ router.get('/discovered/:playerId', (req, res) => {
     const discoveredAnimals = AnimalDiscoveryService.getDiscoveredAnimals(playerId);
     res.json(discoveredAnimals);
   } catch (error) {
-    logger.error('Error fetching discovered animals:', error);
+    console.error('Error fetching discovered animals:', error);
     res.status(500).json({ error: 'Failed to fetch discovered animals' });
   }
 });

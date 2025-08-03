@@ -10,6 +10,7 @@ import { GameService } from "./services/game-service";
 import { createNewExpeditionRoutes } from './routes/new-expedition-routes';
 import { QuestService } from "./services/quest-service";
 import { OfflineActivityService } from "./services/offline-activity-service";
+import { NewExpeditionService } from "./services/new-expedition-service";
 import { randomUUID } from "crypto";
 import { registerHealthRoutes } from "./routes/health";
 import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
@@ -30,6 +31,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gameService = new GameService(storage);
   const questService = new QuestService(storage);
   const offlineActivityService = new OfflineActivityService(storage);
+  const expeditionService = new NewExpeditionService(storage);
 
   // Register health and monitoring routes
   registerHealthRoutes(app);
@@ -545,12 +547,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedEquipment: selectedEquipment || []
       });
 
-      const expedition = await expeditionService.startExpedition(
-        playerId,
-        biomeId,
-        validResources,
-        selectedEquipment || []
-      );
+      const expedition = await expeditionService.startExpedition(playerId, biomeId);
 
       if (!expedition || !expedition.id) {
         throw new Error('Falha ao criar expedição');
@@ -586,7 +583,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/player/:playerId/expeditions/active", async (req, res) => {
     try {
       const { playerId } = req.params;
-      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
+      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
+      const activeExpedition = activeExpeditions[0] || null;
 
       if (!activeExpedition) {
         return res.status(404).json({ message: "No active expedition found" });
@@ -603,10 +601,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/player/:playerId/expeditions", async (req, res) => {
     try {
       const { playerId } = req.params;
-      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
+      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
+      const activeExpedition = activeExpeditions[0] || null;
 
       if (activeExpedition) {
-        await expeditionService.cancelExpedition(activeExpedition.id);
+        // For now, directly update storage to cancel expedition
+        await storage.updateExpedition(activeExpedition.id, { status: 'cancelled' });
       }
 
       res.json({ success: true, message: "Expedition cancelled" });
@@ -881,7 +881,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Transfer from storage to inventory using service
-  app.post("/api/storage/withdraw", async (req, res){
+  app.post("/api/storage/withdraw", async (req, res) => {
     try {
       const { playerId, storageItemId, quantity } = req.body;
 
@@ -1078,7 +1078,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/player/:playerId/active-expedition", async (req, res) => {
     try {
       const { playerId } = req.params;
-      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
+      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
+      const activeExpedition = activeExpeditions[0] || null;
       res.json(activeExpedition);
     } catch (error) {
       res.status(500).json({ message: "Failed to get active expedition" });
@@ -1089,7 +1090,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/expeditions/:id/cancel", async (req, res) => {
     try {
       const { id } = req.params;
-      await expeditionService.cancelExpedition(id);
+      // For now, directly update storage to cancel expedition
+      await storage.updateExpedition(id, { status: 'cancelled' });
       res.json({ message: "Expedition cancelled successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to cancel expedition" });
