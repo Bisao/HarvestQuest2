@@ -29,12 +29,16 @@ import type { AnimalRegistryEntry } from '../../../../shared/types/animal-regist
 
 const ANIMAL_CATEGORIES = [
   { id: 'all', name: 'Todos', emoji: '🌍', description: 'Todos os animais' },
-  { id: 'mammal', name: 'Mamíferos', emoji: '🐾', description: 'Animais de sangue quente com pelos' },
+  { id: 'mammal_small', name: 'Mamíferos Pequenos', emoji: '🐰', description: 'Pequenos mamíferos' },
+  { id: 'mammal_medium', name: 'Mamíferos Médios', emoji: '🦌', description: 'Mamíferos de porte médio' },
+  { id: 'mammal_large', name: 'Mamíferos Grandes', emoji: '🐻', description: 'Grandes mamíferos' },
   { id: 'bird', name: 'Aves', emoji: '🐦', description: 'Criaturas voadoras com penas' },
-  { id: 'aquatic', name: 'Vida Aquática', emoji: '🐟', description: 'Criaturas que vivem na água' },
-  { id: 'insect', name: 'Insetos', emoji: '🦋', description: 'Pequenos artrópodes' },
+  { id: 'fish_freshwater', name: 'Peixes de Água Doce', emoji: '🐟', description: 'Peixes de rios e lagos' },
+  { id: 'fish_saltwater', name: 'Peixes de Água Salgada', emoji: '🐠', description: 'Peixes marinhos' },
   { id: 'reptile', name: 'Répteis', emoji: '🦎', description: 'Animais de sangue frio com escamas' },
   { id: 'amphibian', name: 'Anfíbios', emoji: '🐸', description: 'Criaturas que vivem na terra e água' },
+  { id: 'insect', name: 'Insetos', emoji: '🦋', description: 'Pequenos artrópodes' },
+  { id: 'arthropod', name: 'Artrópodes', emoji: '🦂', description: 'Artrópodes diversos' },
   { id: 'mythical', name: 'Criaturas Míticas', emoji: '🦄', description: 'Seres lendários e mágicos' }
 ];
 
@@ -224,6 +228,10 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
   const [filterRarity, setFilterRarity] = useState<string>('all');
   const [showModal, setShowModal] = useState(false);
 
+  // Para teste: alguns animais descobertos
+  const mockDiscoveredAnimals = ['animal-rabbit-001', 'animal-smallfish-001'];
+  const actualDiscoveredAnimals = discoveredAnimals.length > 0 ? discoveredAnimals : mockDiscoveredAnimals;
+
   // Filtrar animais
   const filteredAnimals = useMemo(() => {
     return ANIMAL_REGISTRY.filter(animal => {
@@ -238,7 +246,7 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
 
   // Estatísticas
   const totalAnimals = ANIMAL_REGISTRY.length;
-  const discoveredCount = discoveredAnimals.length;
+  const discoveredCount = actualDiscoveredAnimals.length;
   const discoveryPercentage = Math.round((discoveredCount / totalAnimals) * 100);
 
   const handleAnimalClick = (animal: AnimalRegistryEntry) => {
@@ -328,7 +336,7 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
           <AnimalCard
             key={animal.id}
             animal={animal}
-            isDiscovered={discoveredAnimals.includes(animal.id)}
+            isDiscovered={actualDiscoveredAnimals.includes(animal.id)}
             onClick={() => handleAnimalClick(animal)}
           />
         ))}
@@ -347,7 +355,7 @@ export default function AnimalRegistryTab({ discoveredAnimals, playerId }: Anima
         animal={selectedAnimal}
         isOpen={showModal}
         onClose={closeModal}
-        isDiscovered={discoveredAnimals.includes(selectedAnimal?.id || '')}
+        isDiscovered={actualDiscoveredAnimals.includes(selectedAnimal?.id || '')}
       />
     </div>
   );
