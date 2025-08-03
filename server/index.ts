@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
+import { registerRoutes, setupRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { corsMiddleware, securityHeaders } from "./middleware/cors";
 import { errorHandler, requestLogger } from "./middleware/error-handler";
@@ -10,6 +10,7 @@ import { createConsumptionRoutes } from "./routes/consumption";
 import { createModernRecipeData } from "./data/recipes-modern";
 import { GameService } from "./services/game-service";
 import { validateRecipeIngredients, validateGameDataConsistency } from "@shared/utils/id-validation";
+import { createNewExpeditionRoutes } from './routes/new-expedition-routes';
 
 const app = express();
 const port = Number(process.env.PORT) || 5000;
@@ -98,6 +99,12 @@ app.use((req, res, next) => {
 
   // Start auto consume system
   autoConsumeService.startAutoConsume();
+
+    // Register new expedition routes first (takes precedence)
+  app.use('/api/expeditions', createNewExpeditionRoutes(storage));
+
+  // Setup legacy routes
+  registerRoutes(app, storage);
 
   // Use the centralized error handler
   app.use(errorHandler);

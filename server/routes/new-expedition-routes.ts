@@ -192,6 +192,26 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
 
         const expedition = await expeditionService.completeExpedition(expeditionId);
         
+        // Update quest progress for expedition completion and resources collected
+        if (expedition && expedition.playerId) {
+          const { QuestService } = await import('../services/quest-service');
+          const questService = new QuestService(storage);
+          
+          // Get the expedition template to access biomeId
+          const template = expeditionService.getTemplateById(expedition.planId);
+          if (template) {
+            await questService.updateQuestProgress(expedition.playerId, 'expedition', { biomeId: template.biomeId });
+            
+            // Update quest progress for resources collected
+            for (const [resourceId, quantity] of Object.entries(expedition.collectedResources)) {
+              await questService.updateQuestProgress(expedition.playerId, 'collect', {
+                resourceId,
+                quantity
+              });
+            }
+          }
+        }
+        
         return successResponse(res, expedition, 'Expedição completada com sucesso');
       } catch (error: any) {
         console.error('❌ EXPEDITION-COMPLETE: Error:', error.message);

@@ -23,37 +23,29 @@ export function useActiveExpeditions(playerId: string) {
   const rawExpeditions = Array.isArray(rawData) ? rawData : 
                         (rawData?.data && Array.isArray(rawData.data)) ? rawData.data : [];
 
-  // Converter dados da API para o formato esperado
-  const activeExpeditions: ActiveExpedition[] = rawExpeditions
-    .filter(exp => exp.status === 'in_progress')
-    .map(exp => {
-      const startTime = exp.startTime * 1000; // Converter para milliseconds se necessário
-      const expeditionDuration = 30 * 60 * 1000; // 30 minutos padrão
-      const currentTime = Date.now();
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(100, (elapsed / expeditionDuration) * 100);
-      
-      console.log('🔍 Processing expedition:', {
-        id: exp.id,
-        biomeId: exp.biomeId,
-        progress,
-        collectedResources: exp.collectedResources
-      });
-      
-      return {
-        id: exp.id,
-        playerId: exp.playerId,
-        planId: exp.biomeId,
-        startTime: startTime,
-        estimatedEndTime: startTime + expeditionDuration,
-        currentPhase: getPhaseFromProgress(progress),
-        progress: progress,
-        completedTargets: [],
-        collectedResources: exp.collectedResources || {},
-        events: [],
-        status: 'active' as const
-      };
+  // Convert API data to expected format - server already processes active expeditions
+  const activeExpeditions: ActiveExpedition[] = rawExpeditions.map(exp => {
+    console.log('🔍 HOOK: Processing expedition:', {
+      id: exp.id,
+      biomeId: exp.biomeId,
+      progress: exp.progress,
+      collectedResources: exp.collectedResources
     });
+    
+    return {
+      id: exp.id,
+      playerId: exp.playerId,
+      planId: exp.biomeId,
+      startTime: exp.startTime,
+      estimatedEndTime: exp.startTime + (30 * 60 * 1000),
+      currentPhase: getPhaseFromProgress(exp.progress),
+      progress: exp.progress,
+      completedTargets: [],
+      collectedResources: exp.collectedResources || {},
+      events: [],
+      status: 'active' as const
+    };
+  });
 
   console.log('🎯 Active expeditions found:', activeExpeditions.length);
 

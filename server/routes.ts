@@ -616,55 +616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update expedition progress using service
-  app.patch("/api/expeditions/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const expedition = await expeditionService.updateExpeditionProgress(id);
-      res.json(expedition);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update expedition" });
-    }
-  });
-
-  // Complete expedition using service
-  app.post("/api/expeditions/:id/complete", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const expedition = await expeditionService.completeExpedition(id);
-
-      // Update quest progress for expedition completion and resources collected
-      if (expedition && expedition.playerId) {
-        // Get the expedition template to access biomeId
-        const template = expeditionService.getTemplateById(expedition.planId);
-        if (template) {
-          await questService.updateQuestProgress(expedition.playerId, 'expedition', { biomeId: template.biomeId });
-        }
-
-        // Update quest progress for resources collected during expedition
-        if (expedition.collectedResources) {
-          const collected = expedition.collectedResources as Record<string, any>;
-          for (const [resourceId, quantity] of Object.entries(collected)) {
-            await questService.updateQuestProgress(expedition.playerId, 'collect', { 
-              resourceId, 
-              quantity: Number(quantity) 
-            });
-          }
-        }
-      }
-
-      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
-      const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
-      invalidateStorageCache(expedition.playerId);
-      invalidateInventoryCache(expedition.playerId);
-      invalidatePlayerCache(expedition.playerId);
-
-      res.json(expedition);
-    } catch (error) {
-      console.error("Complete expedition error:", error);
-      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to complete expedition" });
-    }
-  });
+  // Legacy expedition endpoints removed - using new expedition system
 
   // Consume food or drink
   app.post("/api/player/:playerId/consume", async (req, res) => {
