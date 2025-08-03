@@ -85,8 +85,15 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     label: 'Acampamento',
     icon: Home,
     color: 'text-indigo-600',
-    count: 2,
+    count: 3,
     subTabs: [
+      {
+        id: 'camp',
+        label: 'Acampamento',
+        icon: Home,
+        color: 'text-indigo-600',
+        description: 'Base, melhorias e construções'
+      },
       {
         id: 'workshops',
         label: 'Oficinas',
@@ -335,8 +342,8 @@ EquipmentIndicators.displayName = 'EquipmentIndicators';
 
 // Componente principal refatorado
 export default function ModernGameLayout() {
-  const [activeTab, setActiveTab] = useState('workshops');
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['jogador']);
+  const [activeTab, setActiveTab] = useState('camp');
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['acampamento']);
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
   const [offlineReportOpen, setOfflineReportOpen] = useState(false);
@@ -639,6 +646,14 @@ export default function ModernGameLayout() {
                 resources={resources}
                 equipment={equipment}
                 onExpeditionStart={handleExpeditionStart}
+              />
+            )}
+
+            {activeTab === 'camp' && (
+              <CampTab
+                player={player}
+                resources={resources}
+                equipment={equipment}
               />
             )}
 
