@@ -21,7 +21,8 @@ import {
   Plus,
   Settings,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  Hammer
 } from 'lucide-react';
 import type { Player, Resource, Equipment } from '@shared/types';
 import EnhancedStorageTab from './enhanced-storage-tab';
@@ -103,7 +104,7 @@ const ANIMAL_TYPES = [
 ];
 
 export default function CampTab({ player, resources, equipment }: CampTabProps) {
-  const [selectedTab, setSelectedTab] = useState('storage');
+  const [selectedTab, setSelectedTab] = useState('workshops');
   const [plantations, setPlantations] = useState<any[]>([]);
   const [animals, setAnimals] = useState<any[]>([]);
 
@@ -156,7 +157,11 @@ export default function CampTab({ player, resources, equipment }: CampTabProps) 
 
       {/* Abas do Acampamento */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="workshops" className="flex items-center space-x-2">
+            <Hammer className="w-4 h-4" />
+            <span>Oficinas</span>
+          </TabsTrigger>
           <TabsTrigger value="storage" className="flex items-center space-x-2">
             <Warehouse className="w-4 h-4" />
             <span>Armazém</span>
@@ -174,6 +179,31 @@ export default function CampTab({ player, resources, equipment }: CampTabProps) 
             <span>Visão Geral</span>
           </TabsTrigger>
         </TabsList>
+
+        {/* Aba de Oficinas */}
+        <TabsContent value="workshops" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Hammer className="w-5 h-5" />
+                <span>Oficinas do Acampamento</span>
+              </CardTitle>
+              <CardDescription>
+                Processe recursos e crie itens em suas estações de trabalho
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* Aqui será integrado o componente UnifiedWorkshops */}
+              <div className="text-center py-8">
+                <div className="text-6xl text-gray-400 mb-4">🔨</div>
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">Oficinas em Desenvolvimento</h3>
+                <p className="text-gray-500">
+                  As oficinas de processamento e criação estarão disponíveis em breve!
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Aba do Armazém */}
         <TabsContent value="storage" className="space-y-4">
