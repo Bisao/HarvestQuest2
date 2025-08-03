@@ -76,21 +76,20 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
     }
   };
 
-  // Filter out crafted items and items without proper tools
+  // Filter out crafted items but show all collectible resources (even without tools)
   const filteredResources = useMemo(() => {
-    const excludedItems = [
-      'suco_frutas', 'cogumelo_assado', 'carne_cozida', 'sopa_legumes',
-      'po_ossos', 'barbante_refinado', 'madeira_tratada', 'ferro_purificado'
+    // Lista exata dos itens cozidos/processados para excluir
+    const excludedCookedItems = [
+      'suco_frutas',
+      'cogumelos_assados', 
+      'carne_assada',
+      'peixe_grelhado',
+      'ensopado_carne'
     ];
     
     return resources.filter(resource => {
-      // Exclude crafted items
-      if (excludedItems.some(excluded => resource.id.includes(excluded))) {
-        return false;
-      }
-      
-      // Check if player has required tools
-      if (!hasRequiredTools(resource)) {
+      // Exclude cooked/processed items
+      if (excludedCookedItems.includes(resource.id)) {
         return false;
       }
       
@@ -101,7 +100,7 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
       
       return true;
     });
-  }, [resources, searchTerm, player.equippedTool, player.equippedWeapon]);
+  }, [resources, searchTerm]);
 
   // Group resources by category
   const categorizedResources = useMemo(() => {
@@ -544,10 +543,20 @@ export function ImprovedCustomExpeditionModal({ isOpen, onClose, player, biome, 
                           onCheckedChange={() => handleResourceToggle(resource.id)}
                         />
                         <div className="flex-1">
-                          <div className="font-medium">{resource.name}</div>
+                          <div className="font-medium flex items-center gap-2">
+                            {resource.name}
+                            {resource.requiredTool && !hasRequiredTools(resource) && (
+                              <Badge variant="outline" className="text-xs text-orange-600 border-orange-200">
+                                🔧 Ferramenta necessária
+                              </Badge>
+                            )}
+                          </div>
                           {resource.requiredTool && (
                             <div className="text-sm text-gray-600">
-                              Ferramenta necessária: {resource.requiredTool}
+                              Precisa de: {resource.requiredTool}
+                              {!hasRequiredTools(resource) && (
+                                <span className="text-orange-600 ml-1">(não equipada)</span>
+                              )}
                             </div>
                           )}
                         </div>

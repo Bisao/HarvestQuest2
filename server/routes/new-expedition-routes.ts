@@ -125,12 +125,13 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
           return errorResponse(res, 400, `Sede insuficiente. Necessário: ${thirstCost}%, atual: ${player.thirst}%`);
         }
 
-        // Create expedition with custom parameters
+        // Create expedition with custom parameters including duration
         const expedition = await storage.createExpedition({
           playerId,
           biomeId,
           selectedResources: selectedResources.map((r: any) => r.resourceId),
-          selectedEquipment: selectedEquipment || []
+          selectedEquipment: selectedEquipment || [],
+          duration: duration // Pass the custom duration in milliseconds
         });
 
         console.log(`🚀 CUSTOM-EXPEDITION: Started custom expedition ${expedition.id} for player ${playerId}`);
