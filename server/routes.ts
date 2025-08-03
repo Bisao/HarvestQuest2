@@ -635,7 +635,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Update quest progress for expedition completion and resources collected
       if (expedition && expedition.playerId) {
-        await questService.updateQuestProgress(expedition.playerId, 'expedition', { biomeId: expedition.biomeId });
+        // Get the expedition template to access biomeId
+        const template = expeditionService.getTemplateById(expedition.planId);
+        if (template) {
+          await questService.updateQuestProgress(expedition.playerId, 'expedition', { biomeId: template.biomeId });
+        }
 
         // Update quest progress for resources collected during expedition
         if (expedition.collectedResources) {

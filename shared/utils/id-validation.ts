@@ -47,9 +47,6 @@ export function getItemType(itemId: string): 'resource' | 'equipment' | 'unknown
 }
 
 /**
-
-
-/**
  * Validate that all recipe ingredients use valid game IDs
  * This ensures consistency with shared/constants/game-ids.ts
  */
