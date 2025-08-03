@@ -43,7 +43,7 @@ export interface Player {
   hygiene: number; // 0 (filthy) to 100 (clean), default 100
   
   // Disease System
-  diseases: PlayerDisease[];
+  diseases: any[]; // PlayerDisease[];
   immunities: string[]; // disease IDs player is immune to
   resistances: { [diseaseId: string]: number }; // resistance level 0-100
   
@@ -105,7 +105,7 @@ export interface InsertPlayer {
   hygiene?: number;
   
   // Disease System
-  diseases?: PlayerDisease[];
+  diseases?: any[]; // PlayerDisease[];
   immunities?: string[];
   resistances?: { [diseaseId: string]: number };
   

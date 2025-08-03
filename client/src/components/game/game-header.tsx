@@ -15,12 +15,7 @@ const GameHeader = ({ player }: GameHeaderProps) => {
   // Usar hook de tempo do jogo
   const { gameTime, temperature, isLoading, error } = useGameTime(player?.id);
   
-  // Debug logs
-  console.log('GameHeader - Player ID:', player?.id);
-  console.log('GameHeader - Game Time:', gameTime);
-  console.log('GameHeader - Temperature:', temperature);
-  console.log('GameHeader - Loading:', isLoading);
-  console.log('GameHeader - Error:', error);
+  // Debug logs removidos para produção
 
   // Função para formatar hora
   const formatTime = (hour: number, minute: number) => {

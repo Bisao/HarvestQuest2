@@ -5,6 +5,8 @@
 export * from './types';
 export * from './inventory-types';
 export * from './skill-types';
+export * from './time-types';
+export * from './storage-types';
 
 // === TYPE GUARDS & UTILITIES ===
 export type { 
@@ -20,8 +22,6 @@ export type {
   Resource, 
   Equipment,
   Recipe,
-  StorageItem,
-  InventoryItem,
   Expedition,
   Quest,
   Biome,
@@ -29,12 +29,16 @@ export type {
   CraftingProcess
 } from './types';
 
+// Import specific types from their dedicated files
+export type { StorageItem } from './storage-types';
+export type { InventoryItem } from './inventory-types';
+
 // === CONFIGURATION TYPES ===  
 export type {
   GameConfig,
   ConsumptionConfig,
   HungerDegradationMode,
-  OfflineConfig
+  OfflineActivityConfig
 } from './types';
 
 // === VALIDATION SCHEMAS ===
