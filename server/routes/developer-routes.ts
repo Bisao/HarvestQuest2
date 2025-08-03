@@ -18,7 +18,7 @@ router.post('/unlock-animals', async (req, res) => {
       return res.status(400).json({ error: 'Player ID is required' });
     }
 
-    const player = storage.getPlayer(playerId);
+    const player = await storage.getPlayer(playerId);
     if (!player) {
       return res.status(404).json({ error: 'Player not found' });
     }
@@ -28,7 +28,7 @@ router.post('/unlock-animals', async (req, res) => {
       const allAnimalIds = ANIMAL_REGISTRY.map(animal => animal.id);
       player.discoveredAnimals = [...new Set([...(player.discoveredAnimals || []), ...allAnimalIds])];
       
-      logger.info(`🧪 DEV MODE: All animals unlocked for player ${playerId}`);
+      console.log(`🧪 DEV MODE: All animals unlocked for player ${playerId}`);
       
       res.json({ 
         success: true, 
@@ -40,7 +40,7 @@ router.post('/unlock-animals', async (req, res) => {
       // Reset to normal mode - clear discovered animals
       player.discoveredAnimals = [];
       
-      logger.info(`🧪 DEV MODE: Animals reset to normal for player ${playerId}`);
+      console.log(`🧪 DEV MODE: Animals reset to normal for player ${playerId}`);
       
       res.json({ 
         success: true, 
@@ -51,10 +51,10 @@ router.post('/unlock-animals', async (req, res) => {
     }
 
     // Save player data
-    storage.updatePlayer(playerId, player);
+    await storage.updatePlayer(playerId, player);
 
   } catch (error) {
-    logger.error('Error in developer unlock animals:', error);
+    console.error('Error in developer unlock animals:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -67,7 +67,7 @@ router.get('/status/:playerId', async (req, res) => {
   try {
     const { playerId } = req.params;
 
-    const player = storage.getPlayer(playerId);
+    const player = await storage.getPlayer(playerId);
     if (!player) {
       return res.status(404).json({ error: 'Player not found' });
     }
@@ -85,7 +85,7 @@ router.get('/status/:playerId', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Error getting developer status:', error);
+    console.error('Error getting developer status:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

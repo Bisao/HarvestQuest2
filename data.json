@@ -25,21 +25,29 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 96,
+        "hunger": 92,
         "maxHunger": 100,
-        "thirst": 99,
+        "thirst": 98,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 52,
-        "hygiene": 98,
+        "morale": 54,
+        "hygiene": 96,
         "diseases": [],
         "immunities": [],
         "resistances": {},
         "skills": {},
         "skillPoints": 0,
         "totalSkillPoints": 0,
-        "skillAchievements": []
+        "skillAchievements": [],
+        "discoveredAnimals": [
+          "animal-rabbit-001",
+          "animal-deer-001",
+          "animal-boar-001",
+          "animal-smallfish-001",
+          "animal-largefish-001",
+          "animal-salmon-001"
+        ]
       }
     ]
   ],
