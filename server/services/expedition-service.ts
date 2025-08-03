@@ -5,6 +5,8 @@ import { GameService } from "./game-service";
 import { QuestService } from "./quest-service";
 import { SkillService } from "./skill-service";
 import { EQUIPMENT_IDS, RESOURCE_IDS, SKILL_IDS } from "@shared/constants/game-ids";
+import { BiomeResourceCategorizer } from '../utils/biome-resource-categorizer';
+import { AnimalDiscoveryService } from './animal-discovery-service';
 
 export class ExpeditionService {
   private gameService: GameService;
@@ -74,10 +76,10 @@ export class ExpeditionService {
     for (const resourceId of biomeValidResources) {
       const resource = await this.storage.getResource(resourceId);
       console.log(`Checking tool requirements for resource: ${resource?.name} (${resourceId})`);
-      
+
       const hasRequiredTool = await this.gameService.hasRequiredTool(playerId, resourceId);
       console.log(`Player has required tool for ${resource?.name}: ${hasRequiredTool}`);
-      
+
       if (hasRequiredTool) {
         validResources.push(resourceId);
       } else {
@@ -134,7 +136,7 @@ export class ExpeditionService {
     const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
     const elapsedTime = currentTime - (expedition.startTime || currentTime);
     const totalDuration = 30; // 30 seconds for demo purposes
-    
+
     const progress = Math.min(100, Math.floor((elapsedTime / totalDuration) * 100));
 
     // Update progress
@@ -153,7 +155,7 @@ export class ExpeditionService {
   // Award skill experience based on expedition rewards
   private async awardSkillExperienceForExpedition(playerId: string, rewards: Record<string, number>): Promise<void> {
     const resources = await this.storage.getAllResources();
-    
+
     for (const [resourceId, quantity] of Object.entries(rewards)) {
       const resource = resources.find(r => r.id === resourceId);
       if (!resource) continue;
@@ -164,7 +166,7 @@ export class ExpeditionService {
 
       // Map resource categories to skills
       const categoryMatch = resource.category as string;
-      
+
       if (this.isFish(resource.name)) {
         skillId = SKILL_IDS.PESCA;
         context = 'fishing';
@@ -215,14 +217,14 @@ export class ExpeditionService {
 
     // Calculate rewards
     const rewards = await this.calculateExpeditionRewards(expedition);
-    
+
     // Add rewards to storage or inventory based on auto-storage setting
     await this.distributeRewards(expedition.playerId, rewards, player.autoStorage);
 
     // Calculate experience gain
     const resources = await this.storage.getAllResources();
     const expGain = this.gameService.calculateExperienceGain(rewards, resources);
-    
+
     // Update player stats with level up check
     const oldLevel = player.level;
     const levelData = this.gameService.calculateLevelUp(player.experience, expGain);
@@ -273,12 +275,12 @@ export class ExpeditionService {
 
     // Base reward calculation for each selected resource
     const selectedResources = Array.isArray(expedition.selectedResources) ? expedition.selectedResources : [];
-    
+
     // Process each selected resource
     for (const resourceId of selectedResources) {
       const resource = allResources.find(r => r.id === resourceId);
       if (!resource) continue;
-      
+
       // Special handling for fishing - consume bait
       if (this.isFish(resource.name)) {
         const baitConsumed = await this.consumeBaitForFishing(expedition.playerId);
@@ -287,7 +289,7 @@ export class ExpeditionService {
           continue; // Skip this fish if no bait
         }
       }
-      
+
       // Check if this is an animal that needs processing
       if (this.isAnimal(resource.name)) {
         // Process animal into component parts
@@ -301,31 +303,31 @@ export class ExpeditionService {
         rewards[resourceId] = (rewards[resourceId] || 0) + Math.max(1, baseQuantity);
       }
     }
-    
+
     // Apply pickaxe bonus for stone mining
     this.addPickaxeBonus(rewards, playerEquipment, allResources);
-    
+
     return rewards;
   }
-  
+
   // Check if a resource is an animal or fish
   private isAnimal(resourceName: string): boolean {
     return ["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
   }
-  
+
   // Check if a resource is a fish
   private isFish(resourceName: string): boolean {
     return ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(resourceName);
   }
-  
+
   // Consume bait from player inventory when fishing
   private async consumeBaitForFishing(playerId: string): Promise<boolean> {
     const inventoryItems = await this.storage.getPlayerInventory(playerId);
-    
+
     // Find bait in inventory (now it's a resource, not equipment)
     const baitItem = inventoryItems.find(item => item.resourceId === RESOURCE_IDS.ISCA_PESCA);
     if (!baitItem || baitItem.quantity <= 0) return false;
-    
+
     // Consume 1 bait
     if (baitItem.quantity === 1) {
       await this.storage.removeInventoryItem(baitItem.id);
@@ -334,21 +336,21 @@ export class ExpeditionService {
         quantity: baitItem.quantity - 1
       });
     }
-    
+
     console.log(`Consumed 1 bait for fishing. Remaining: ${baitItem.quantity - 1}`);
     return true;
   }
-  
+
   // Process animal into component resources
   private processAnimal(animalName: string, allResources: Resource[]): Record<string, number> {
     const parts: Record<string, number> = {};
-    
+
     // Find resource IDs for animal parts
     const carneResource = allResources.find(r => r.name === "Carne");
     const couroResource = allResources.find(r => r.name === "Couro");
     const ossosResource = allResources.find(r => r.name === "Ossos");
     const peloResource = allResources.find(r => r.name === "Pelo");
-    
+
     // Different animals give different quantities
     switch (animalName) {
       case "Coelho":
@@ -357,47 +359,47 @@ export class ExpeditionService {
         if (ossosResource) parts[ossosResource.id] = 2;
         if (peloResource) parts[peloResource.id] = 2;
         break;
-        
+
       case "Veado":
         if (carneResource) parts[carneResource.id] = 3;
         if (couroResource) parts[couroResource.id] = 2;
         if (ossosResource) parts[ossosResource.id] = 4;
         if (peloResource) parts[peloResource.id] = 1;
         break;
-        
+
       case "Javali":
         if (carneResource) parts[carneResource.id] = 4;
         if (couroResource) parts[couroResource.id] = 3;
         if (ossosResource) parts[ossosResource.id] = 6;
         if (peloResource) parts[peloResource.id] = 1;
         break;
-        
+
       // Fish processing - fish give meat and bones
       case "Peixe Pequeno":
         if (carneResource) parts[carneResource.id] = 1;
         if (ossosResource) parts[ossosResource.id] = 1;
         break;
-        
+
       case "Peixe Grande":
         if (carneResource) parts[carneResource.id] = 2;
         if (ossosResource) parts[ossosResource.id] = 2;
         break;
-        
+
       case "Salmão":
         if (carneResource) parts[carneResource.id] = 3;
         if (ossosResource) parts[ossosResource.id] = 2;
         break;
     }
-    
+
     return parts;
   }
-  
+
   // Check for pickaxe + stone mining -> add loose stones
   private addPickaxeBonus(rewards: Record<string, number>, playerEquipment: Equipment[], allResources: Resource[]): void {
     const hasPickaxe = playerEquipment.some(eq => eq.toolType === "pickaxe");
     const stoneResource = allResources.find(r => r.name === "Pedra");
     const looseStoneResource = allResources.find(r => r.name === "Pedras Soltas");
-    
+
     if (hasPickaxe && stoneResource && looseStoneResource && rewards[stoneResource.id]) {
       // Add loose stones equal to the amount of stone mined
       rewards[looseStoneResource.id] = (rewards[looseStoneResource.id] || 0) + rewards[stoneResource.id];
@@ -408,12 +410,12 @@ export class ExpeditionService {
   private async getBaseResourceQuantity(resourceId: string): Promise<number> {
     const allResources = await this.storage.getAllResources();
     const resource = allResources.find(r => r.id === resourceId);
-    
+
     // Special case for water - bucket collects 5 units
     if (resource && resource.name === "Água Fresca") {
       return 5;
     }
-    
+
     // This could be made more sophisticated based on resource rarity
     return Math.floor(Math.random() * 5) + 1; // 1-5 items
   }
@@ -444,7 +446,7 @@ export class ExpeditionService {
         // Add to storage
         const storageItems = await this.storage.getPlayerStorage(playerId);
         const existingItem = storageItems.find(item => item.resourceId === resourceId);
-        
+
         if (existingItem) {
           await this.storage.updateStorageItem(existingItem.id, {
             quantity: existingItem.quantity + quantity
@@ -466,7 +468,7 @@ export class ExpeditionService {
         if (canCarry) {
           const inventoryItems = await this.storage.getPlayerInventory(playerId);
           const existingItem = inventoryItems.find(item => item.resourceId === resourceId);
-          
+
           if (existingItem) {
             await this.storage.updateInventoryItem(existingItem.id, {
               quantity: existingItem.quantity + quantity
@@ -486,7 +488,7 @@ export class ExpeditionService {
           // Auto-move to storage if inventory is full
           const storageItems = await this.storage.getPlayerStorage(playerId);
           const existingStorage = storageItems.find(item => item.resourceId === resourceId);
-          
+
           if (existingStorage) {
             await this.storage.updateStorageItem(existingStorage.id, {
               quantity: existingStorage.quantity + quantity
@@ -525,14 +527,14 @@ export class ExpeditionService {
     if (!player) return;
 
     const statusService = new (await import('./player-status-service')).PlayerStatusService(this.storage);
-    
+
     // Completion effects - balance of positive and negative
     let moraleIncrease = 8; // Success boosts morale significantly
     let fatigueIncrease = 5; // Additional fatigue from completing work
     let hungerDecrease = 5; // More hungry after expedition
     let thirstDecrease = 3; // Slightly more thirsty
     let hygieneDecrease = 3; // A bit dirtier
-    
+
     // Bonus effects for successful resource gathering
     const resourceCount = Object.keys(expedition.collectedResources || {}).length;
     if (resourceCount > 2) {
@@ -563,7 +565,7 @@ export class ExpeditionService {
     if (!player) return;
 
     const statusService = new (await import('./player-status-service')).PlayerStatusService(this.storage);
-    
+
     // Base expedition effects - increase the impact
     let hungerDecrease = 8; // Expeditions consume energy
     let thirstDecrease = 10; // Physical activity increases thirst
@@ -630,7 +632,7 @@ export class ExpeditionService {
       morale: Math.max(0, Math.min(100, (player.morale || 50) + moraleChange)),
       hygiene: Math.max(0, Math.min(100, (player.hygiene || 100) - hygieneDecrease))
     };
-    
+
     if (temperatureChange !== 0) {
       updates.temperature = Math.max(-100, Math.min(100, (player.temperature || 20) + temperatureChange));
     }

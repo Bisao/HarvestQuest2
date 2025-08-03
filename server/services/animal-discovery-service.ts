@@ -193,3 +193,100 @@ export class AnimalDiscoveryService {
     }
   }
 }
+import { ANIMAL_REGISTRY, getAnimalByResourceId } from '../data/animal-registry';
+import type { AnimalRegistryEntry } from '@shared/types/animal-registry-types';
+
+export class AnimalDiscoveryService {
+  
+  /**
+   * Trigger animal discovery when player catches/hunts an animal
+   */
+  static async triggerDiscovery(
+    playerId: string, 
+    resourceId: string, 
+    location: string, 
+    method: 'hunting' | 'fishing'
+  ): Promise<{ discovered: boolean; animal?: AnimalRegistryEntry }> {
+    
+    const animal = getAnimalByResourceId(resourceId);
+    if (!animal) {
+      return { discovered: false };
+    }
+    
+    // Check if already discovered
+    const isAlreadyDiscovered = await this.isAnimalDiscovered(playerId, animal.id);
+    if (isAlreadyDiscovered) {
+      return { discovered: false, animal };
+    }
+    
+    // Record discovery
+    await this.recordDiscovery(playerId, animal.id, location, method);
+    
+    return { discovered: true, animal };
+  }
+  
+  /**
+   * Check if player has discovered an animal
+   */
+  static async isAnimalDiscovered(playerId: string, animalId: string): Promise<boolean> {
+    // TODO: Check in database
+    // For now, return mock data
+    const mockDiscovered = ["animal-rabbit-001", "animal-smallfish-001"];
+    return mockDiscovered.includes(animalId);
+  }
+  
+  /**
+   * Record animal discovery
+   */
+  static async recordDiscovery(
+    playerId: string, 
+    animalId: string, 
+    location: string, 
+    method: string
+  ): Promise<void> {
+    // TODO: Save to database
+    console.log(`🐾 DISCOVERY: Player ${playerId} discovered animal ${animalId} at ${location} via ${method}`);
+  }
+  
+  /**
+   * Get player's discovery statistics
+   */
+  static async getDiscoveryStats(playerId: string, playerLevel: number) {
+    const availableAnimals = ANIMAL_REGISTRY.filter(a => a.requiredLevel <= playerLevel);
+    const discoveredAnimals = ["animal-rabbit-001", "animal-smallfish-001"]; // TODO: Get from database
+    
+    const categoryStats: Record<string, { discovered: number; total: number }> = {};
+    
+    // Calculate stats by category
+    for (const animal of availableAnimals) {
+      if (!categoryStats[animal.category]) {
+        categoryStats[animal.category] = { discovered: 0, total: 0 };
+      }
+      categoryStats[animal.category].total++;
+      
+      if (discoveredAnimals.includes(animal.id)) {
+        categoryStats[animal.category].discovered++;
+      }
+    }
+    
+    return {
+      totalDiscovered: discoveredAnimals.length,
+      totalAvailable: availableAnimals.length,
+      completionPercentage: Math.round((discoveredAnimals.length / availableAnimals.length) * 100),
+      categoryStats
+    };
+  }
+  
+  /**
+   * Get random fun fact about an animal
+   */
+  static getRandomFunFact(animalId: string): string | null {
+    const animal = ANIMAL_REGISTRY.find(a => a.id === animalId);
+    if (!animal || animal.generalInfo.funFacts.length === 0) {
+      return null;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * animal.generalInfo.funFacts.length);
+    return animal.generalInfo.funFacts[randomIndex];
+  }
+}
