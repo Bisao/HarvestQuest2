@@ -13,11 +13,15 @@ interface ExpeditionFromAPI {
 }
 
 export function useActiveExpeditions(playerId: string) {
-  const { data: rawExpeditions = [], isLoading, error } = useQuery<ExpeditionFromAPI[]>({
+  const { data: rawData, isLoading, error } = useQuery<ExpeditionFromAPI[] | { data: ExpeditionFromAPI[] }>({
     queryKey: ['/api/expeditions/player', playerId, 'active'],
     refetchInterval: 5000, // Atualizar a cada 5 segundos
     enabled: !!playerId
   });
+
+  // Ensure rawExpeditions is always an array
+  const rawExpeditions = Array.isArray(rawData) ? rawData : 
+                        (rawData?.data && Array.isArray(rawData.data)) ? rawData.data : [];
 
   // Converter dados da API para o formato esperado
   const activeExpeditions: ActiveExpedition[] = rawExpeditions
