@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SoundButton } from "@/components/ui/sound-button";
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,7 +29,6 @@ import { ImprovedCustomExpeditionModal } from './improved-custom-expedition-moda
 import { ExpeditionTracker } from './expedition-tracker';
 import { ExpeditionStatus } from './expedition-status';
 import { useActiveExpeditions } from '@/hooks/use-active-expeditions';
-import { SoundButton } from '@/components/ui/sound-button'; // Assuming SoundButton component exists
 
 interface EnhancedBiomesTabProps {
   biomes: Biome[];

@@ -1,4 +1,3 @@
-
 import { useCallback, useRef } from 'react';
 
 interface SoundEffects {
@@ -21,7 +20,7 @@ export const useSoundEffects = (): SoundEffects => {
 
   const createBeep = useCallback((frequency: number, duration: number, volume: number = 0.1) => {
     const audioContext = getAudioContext();
-    
+
     if (audioContext.state === 'suspended') {
       audioContext.resume();
     }
@@ -52,24 +51,35 @@ export const useSoundEffects = (): SoundEffects => {
   }, [createBeep]);
 
   const playButtonClick = useCallback(() => {
-    createBeep(800, 0.1, 0.08);
+    createBeep(800, 0.1, 0.05);
   }, [createBeep]);
 
   const playSuccess = useCallback(() => {
-    createMultiToneBeep([523, 659, 784], 0.4, 0.06);
-  }, [createMultiToneBeep]);
+    // Success chord: C-E-G
+    createBeep(523, 0.2, 0.03); // C5
+    setTimeout(() => createBeep(659, 0.2, 0.03), 50); // E5
+    setTimeout(() => createBeep(784, 0.3, 0.03), 100); // G5
+  }, [createBeep]);
 
   const playError = useCallback(() => {
-    createMultiToneBeep([330, 277, 220], 0.3, 0.08);
-  }, [createMultiToneBeep]);
+    // Error sound: descending tone
+    createBeep(400, 0.15, 0.04);
+    setTimeout(() => createBeep(300, 0.15, 0.04), 100);
+  }, [createBeep]);
 
   const playCollect = useCallback(() => {
-    createMultiToneBeep([440, 554, 659], 0.3, 0.06);
-  }, [createMultiToneBeep]);
+    // Collect sound: ascending chime
+    createBeep(600, 0.1, 0.03);
+    setTimeout(() => createBeep(800, 0.1, 0.03), 50);
+    setTimeout(() => createBeep(1000, 0.15, 0.03), 100);
+  }, [createBeep]);
 
   const playCraft = useCallback(() => {
-    createMultiToneBeep([392, 493, 587, 698], 0.5, 0.05);
-  }, [createMultiToneBeep]);
+    // Craft sound: tool-like sequence
+    createBeep(440, 0.08, 0.03);
+    setTimeout(() => createBeep(550, 0.08, 0.03), 80);
+    setTimeout(() => createBeep(660, 0.12, 0.03), 160);
+  }, [createBeep]);
 
   return {
     playButtonClick,
