@@ -335,7 +335,7 @@ EquipmentIndicators.displayName = 'EquipmentIndicators';
 
 // Componente principal refatorado
 export default function ModernGameLayout() {
-  const [activeTab, setActiveTab] = useState('status');
+  const [activeTab, setActiveTab] = useState('workshops');
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['jogador']);
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
