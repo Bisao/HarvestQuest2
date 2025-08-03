@@ -1,0 +1,400 @@
+import type { IStorage } from '../storage';
+import type { Player, Biome } from '@shared/types';
+import { 
+  ExpeditionTemplate, 
+  ActiveExpedition, 
+  ExpeditionPlan, 
+  ExpeditionEvent,
+  ExpeditionTarget 
+} from '@shared/types/expedition-types';
+import { v4 as uuidv4 } from 'uuid';
+
+export class NewExpeditionService {
+  constructor(private storage: IStorage) {}
+
+  // ===================== TEMPLATES DE EXPEDIÇÃO =====================
+
+  getExpeditionTemplates(): ExpeditionTemplate[] {
+    return [
+      {
+        id: 'gathering-basic',
+        name: 'Coleta Básica',
+        description: 'Expedição simples para coletar recursos básicos da floresta',
+        biomeId: '61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47', // Floresta
+        category: 'gathering',
+        difficulty: 'beginner',
+        duration: { min: 5, max: 15 },
+        requirements: {
+          minLevel: 1,
+          requiredTools: [],
+          minHunger: 20,
+          minThirst: 20,
+          minHealth: 50
+        },
+        rewards: {
+          guaranteed: {
+            'res-8bd33b18-a241-4859-ae9f-870fab5673d0': 3 // Fibra
+          },
+          possible: [
+            {
+              resourceId: 'res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12', // Pedra
+              quantity: 2,
+              chance: 0.7
+            },
+            {
+              resourceId: 'res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23', // Gravetos
+              quantity: 4,
+              chance: 0.8
+            }
+          ],
+          experience: 10
+        }
+      },
+      {
+        id: 'hunting-small',
+        name: 'Caça Pequena',
+        description: 'Caçar pequenos animais na floresta',
+        biomeId: '61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47',
+        category: 'hunting',
+        difficulty: 'intermediate',
+        duration: { min: 10, max: 25 },
+        requirements: {
+          minLevel: 3,
+          requiredTools: ['weapon'], // Qualquer arma
+          minHunger: 30,
+          minThirst: 30,
+          minHealth: 70
+        },
+        rewards: {
+          guaranteed: {},
+          possible: [
+            {
+              resourceId: 'res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37', // Coelho
+              quantity: 1,
+              chance: 0.6
+            },
+            {
+              resourceId: 'res-8bd33b18-a241-4859-ae9f-870fab5673d0', // Fibra (pegadilhas)
+              quantity: 2,
+              chance: 0.4
+            }
+          ],
+          experience: 25
+        }
+      },
+      {
+        id: 'exploration-deep',
+        name: 'Exploração Profunda',
+        description: 'Aventure-se nas profundezas da floresta em busca de tesouros',
+        biomeId: '61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47',
+        category: 'exploration',
+        difficulty: 'advanced',
+        duration: { min: 30, max: 60 },
+        requirements: {
+          minLevel: 10,
+          requiredTools: ['tool'], // Qualquer ferramenta
+          minHunger: 60,
+          minThirst: 60,
+          minHealth: 90
+        },
+        rewards: {
+          guaranteed: {
+            'res-8bd33b18-a241-4859-ae9f-870fab5673d0': 5, // Fibra
+            'res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12': 3  // Pedra
+          },
+          possible: [
+            {
+              resourceId: 'res-6d3a8e5c-1f9b-4e72-8a05-4c7e9f2b1d59', // Bambu
+              quantity: 3,
+              chance: 0.5
+            },
+            {
+              resourceId: 'res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1d48', // Frutas silvestres
+              quantity: 2,
+              chance: 0.3
+            }
+          ],
+          experience: 50
+        }
+      }
+    ];
+  }
+
+  getTemplateById(templateId: string): ExpeditionTemplate | null {
+    return this.getExpeditionTemplates().find(t => t.id === templateId) || null;
+  }
+
+  getTemplatesForBiome(biomeId: string): ExpeditionTemplate[] {
+    return this.getExpeditionTemplates().filter(t => t.biomeId === biomeId);
+  }
+
+  // ===================== VALIDAÇÃO =====================
+
+  async validateExpeditionRequirements(
+    playerId: string, 
+    templateId: string
+  ): Promise<{ valid: boolean; errors: string[] }> {
+    const player = await this.storage.getPlayer(playerId);
+    const template = this.getTemplateById(templateId);
+    
+    if (!player) return { valid: false, errors: ['Jogador não encontrado'] };
+    if (!template) return { valid: false, errors: ['Template de expedição não encontrado'] };
+
+    const errors: string[] = [];
+
+    // Verificar level
+    if (player.level < template.requirements.minLevel) {
+      errors.push(`Nível mínimo requerido: ${template.requirements.minLevel}`);
+    }
+
+    // Verificar status básicos
+    if (player.hunger < template.requirements.minHunger) {
+      errors.push(`Fome mínima requerida: ${template.requirements.minHunger}%`);
+    }
+    if (player.thirst < template.requirements.minThirst) {
+      errors.push(`Sede mínima requerida: ${template.requirements.minThirst}%`);
+    }
+    if (player.health < template.requirements.minHealth) {
+      errors.push(`Saúde mínima requerida: ${template.requirements.minHealth}%`);
+    }
+
+    // Verificar ferramentas
+    if (template.requirements.requiredTools.length > 0) {
+      const hasRequiredTools = this.checkPlayerTools(player, template.requirements.requiredTools);
+      if (!hasRequiredTools) {
+        errors.push(`Ferramentas necessárias: ${template.requirements.requiredTools.join(', ')}`);
+      }
+    }
+
+    // Verificar se já tem expedição ativa
+    const activeExpeditions = await this.getPlayerActiveExpeditions(playerId);
+    if (activeExpeditions.length > 0) {
+      errors.push('Você já tem uma expedição ativa');
+    }
+
+    return { valid: errors.length === 0, errors };
+  }
+
+  private checkPlayerTools(player: Player, requiredTools: string[]): boolean {
+    // Simplificado: verifica se tem alguma ferramenta equipada
+    for (const toolType of requiredTools) {
+      if (toolType === 'weapon' && player.equippedWeapon) return true;
+      if (toolType === 'tool' && player.equippedTool) return true;
+    }
+    return requiredTools.length === 0;
+  }
+
+  // ===================== GESTÃO DE EXPEDIÇÕES =====================
+
+  async startExpedition(playerId: string, templateId: string): Promise<ActiveExpedition> {
+    const validation = await this.validateExpeditionRequirements(playerId, templateId);
+    if (!validation.valid) {
+      throw new Error(`Requisitos não atendidos: ${validation.errors.join(', ')}`);
+    }
+
+    const template = this.getTemplateById(templateId)!;
+    const player = await this.storage.getPlayer(playerId)!;
+
+    // Calcular duração real da expedição
+    const duration = Math.floor(
+      Math.random() * (template.duration.max - template.duration.min) + template.duration.min
+    );
+
+    const expedition: ActiveExpedition = {
+      id: uuidv4(),
+      playerId,
+      planId: templateId,
+      startTime: Date.now(),
+      estimatedEndTime: Date.now() + (duration * 60 * 1000),
+      currentPhase: 'preparing',
+      progress: 0,
+      completedTargets: [],
+      collectedResources: {},
+      events: [],
+      status: 'active'
+    };
+
+    // Aplicar custos imediatos
+    await this.applyExpeditionCosts(playerId, template);
+
+    // Salvar expedição
+    await this.storage.createExpedition({
+      id: expedition.id,
+      playerId: expedition.playerId,
+      biomeId: template.biomeId,
+      selectedResources: Object.keys(template.rewards.guaranteed),
+      selectedEquipment: [],
+      status: 'in_progress',
+      startTime: Math.floor(expedition.startTime / 1000),
+      duration: duration * 60 * 1000,
+      progress: 0,
+      collectedResources: {},
+      autoRepeat: false,
+      repeatCount: 0,
+      maxRepeats: 1
+    });
+
+    console.log(`🚀 EXPEDITION: Started ${template.name} for player ${playerId}`);
+    return expedition;
+  }
+
+  async updateExpeditionProgress(expeditionId: string): Promise<ActiveExpedition | null> {
+    const expedition = await this.storage.getExpedition(expeditionId);
+    if (!expedition || expedition.status !== 'in_progress') return null;
+
+    const currentTime = Date.now();
+    const elapsed = currentTime - (expedition.startTime * 1000);
+    const progress = Math.min(100, (elapsed / expedition.duration) * 100);
+
+    // Se completou, processar recompensas
+    if (progress >= 100) {
+      return await this.completeExpedition(expeditionId);
+    }
+
+    // Atualizar progresso
+    await this.storage.updateExpedition(expeditionId, { progress });
+    
+    return {
+      id: expedition.id,
+      playerId: expedition.playerId,
+      planId: expedition.biomeId,
+      startTime: expedition.startTime * 1000,
+      estimatedEndTime: expedition.startTime * 1000 + expedition.duration,
+      currentPhase: this.getPhaseFromProgress(progress),
+      progress,
+      completedTargets: [],
+      collectedResources: expedition.collectedResources,
+      events: [],
+      status: 'active'
+    };
+  }
+
+  private getPhaseFromProgress(progress: number): ActiveExpedition['currentPhase'] {
+    if (progress < 20) return 'preparing';
+    if (progress < 40) return 'traveling';
+    if (progress < 80) return 'exploring';
+    if (progress < 100) return 'returning';
+    return 'completed';
+  }
+
+  async completeExpedition(expeditionId: string): Promise<ActiveExpedition> {
+    const expedition = await this.storage.getExpedition(expeditionId);
+    if (!expedition) throw new Error('Expedição não encontrada');
+
+    const template = this.getTemplateById(expedition.biomeId); // Usando biomeId como templateId temporariamente
+    if (!template) throw new Error('Template de expedição não encontrado');
+
+    // Calcular recompensas
+    const rewards = this.calculateRewards(template);
+    
+    // Aplicar recompensas ao jogador
+    await this.applyRewards(expedition.playerId, rewards, template.rewards.experience);
+
+    // Marcar expedição como completa
+    await this.storage.updateExpedition(expeditionId, { 
+      status: 'completed',
+      progress: 100,
+      collectedResources: rewards
+    });
+
+    console.log(`✅ EXPEDITION: Completed ${template.name} for player ${expedition.playerId}`);
+    console.log(`🎁 REWARDS: ${JSON.stringify(rewards)}`);
+
+    return {
+      id: expedition.id,
+      playerId: expedition.playerId,
+      planId: template.id,
+      startTime: expedition.startTime * 1000,
+      estimatedEndTime: expedition.startTime * 1000 + expedition.duration,
+      currentPhase: 'completed',
+      progress: 100,
+      completedTargets: [],
+      collectedResources: rewards,
+      events: [],
+      status: 'completed'
+    };
+  }
+
+  private calculateRewards(template: ExpeditionTemplate): Record<string, number> {
+    const rewards: Record<string, number> = { ...template.rewards.guaranteed };
+
+    // Calcular recompensas possíveis
+    for (const possible of template.rewards.possible) {
+      if (Math.random() < possible.chance) {
+        rewards[possible.resourceId] = (rewards[possible.resourceId] || 0) + possible.quantity;
+      }
+    }
+
+    return rewards;
+  }
+
+  private async applyExpeditionCosts(playerId: string, template: ExpeditionTemplate): Promise<void> {
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) return;
+
+    // Aplicar custos de fome e sede
+    const hungerCost = Math.floor(template.duration.max * 0.5);
+    const thirstCost = Math.floor(template.duration.max * 0.4);
+    
+    await this.storage.updatePlayer(playerId, {
+      hunger: Math.max(0, player.hunger - hungerCost),
+      thirst: Math.max(0, player.thirst - thirstCost),
+      fatigue: Math.min(100, player.fatigue + Math.floor(template.duration.max * 0.3))
+    });
+  }
+
+  private async applyRewards(playerId: string, rewards: Record<string, number>, experience: number): Promise<void> {
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) return;
+
+    // Adicionar recursos ao inventário
+    for (const [resourceId, quantity] of Object.entries(rewards)) {
+      await this.storage.addPlayerResource(playerId, resourceId, quantity);
+    }
+
+    // Adicionar experiência
+    await this.storage.updatePlayer(playerId, {
+      experience: player.experience + experience
+    });
+  }
+
+  // ===================== CONSULTAS =====================
+
+  async getPlayerActiveExpeditions(playerId: string): Promise<ActiveExpedition[]> {
+    const expeditions = await this.storage.getPlayerExpeditions(playerId);
+    return expeditions
+      .filter(exp => exp.status === 'in_progress')
+      .map(exp => ({
+        id: exp.id,
+        playerId: exp.playerId,
+        planId: exp.biomeId,
+        startTime: exp.startTime * 1000,
+        estimatedEndTime: exp.startTime * 1000 + exp.duration,
+        currentPhase: this.getPhaseFromProgress(exp.progress),
+        progress: exp.progress,
+        completedTargets: [],
+        collectedResources: exp.collectedResources,
+        events: [],
+        status: 'active'
+      }));
+  }
+
+  async getExpeditionHistory(playerId: string): Promise<ActiveExpedition[]> {
+    const expeditions = await this.storage.getPlayerExpeditions(playerId);
+    return expeditions
+      .filter(exp => exp.status === 'completed')
+      .map(exp => ({
+        id: exp.id,
+        playerId: exp.playerId,
+        planId: exp.biomeId,
+        startTime: exp.startTime * 1000,
+        estimatedEndTime: exp.startTime * 1000 + exp.duration,
+        currentPhase: 'completed' as const,
+        progress: 100,
+        completedTargets: [],
+        collectedResources: exp.collectedResources,
+        events: [],
+        status: 'completed' as const
+      }));
+  }
+}

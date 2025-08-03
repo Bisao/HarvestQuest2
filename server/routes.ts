@@ -7,7 +7,7 @@ import { z } from "zod";
 import type { Player, HungerDegradationMode } from "@shared/types";
 import { validateParams, playerIdParamSchema } from "./middleware/validation";
 import { GameService } from "./services/game-service";
-import { ExpeditionService } from "./services/expedition-service";
+import { createNewExpeditionRoutes } from './routes/new-expedition-routes';
 import { QuestService } from "./services/quest-service";
 import { OfflineActivityService } from "./services/offline-activity-service";
 import { randomUUID } from "crypto";
@@ -25,7 +25,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Initialize services
   const gameService = new GameService(storage);
-  const expeditionService = new ExpeditionService(storage);
   const questService = new QuestService(storage);
   const offlineActivityService = new OfflineActivityService(storage);
 
@@ -33,11 +32,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerHealthRoutes(app);
 
   // Register enhanced game routes with full validation and caching
-  registerEnhancedGameRoutes(app, storage, gameService, expeditionService);
+  registerEnhancedGameRoutes(app, storage, gameService);
 
-  // Register expedition routes
-  const { createExpeditionRoutes } = await import('./routes/expedition-routes');
-  app.use('/api/expeditions', createExpeditionRoutes(storage, expeditionService, gameService));
+  // Register new expedition routes
+  app.use('/api/expeditions', createNewExpeditionRoutes(storage));
 
   // Register admin routes for development
   registerAdminRoutes(app);
