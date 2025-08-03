@@ -6,9 +6,9 @@
         "id": "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
         "username": "Bison",
         "level": 1,
-        "experience": 13,
+        "experience": 14,
         "coins": 100,
-        "inventoryWeight": 1140,
+        "inventoryWeight": 1200,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -25,14 +25,14 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 19,
+        "hunger": 6,
         "maxHunger": 100,
-        "thirst": 38,
+        "thirst": 25,
         "maxThirst": 100,
-        "temperature": 30,
-        "fatigue": 39,
-        "morale": 96,
-        "hygiene": 45,
+        "temperature": 35,
+        "fatigue": 56,
+        "morale": 100,
+        "hygiene": 34,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -50,7 +50,7 @@
         "id": "efbcdb0b-cf9e-4723-8630-f9c772673a44",
         "playerId": "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
         "resourceId": "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
-        "quantity": 10
+        "quantity": 11
       }
     ],
     [
@@ -132,13 +132,32 @@
         "id": "018d4bd8-c157-405f-a4eb-7b1aacdcf7f7",
         "playerId": "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
         "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "status": "completed",
+        "selectedResources": [
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0"
+        ],
+        "selectedEquipment": [],
+        "collectedResources": {
+          "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 1
+        },
+        "startTime": 1754210458149,
+        "endTime": 1754210582,
+        "progress": 100
+      }
+    ],
+    [
+      "30dbc87c-4bbc-4686-83e1-a8485d737470",
+      {
+        "id": "30dbc87c-4bbc-4686-83e1-a8485d737470",
+        "playerId": "369d1846-3d2e-4d12-a6f0-dbfc8b50e3fc",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
         "status": "in_progress",
         "selectedResources": [
           "res-8bd33b18-a241-4859-ae9f-870fab5673d0"
         ],
         "selectedEquipment": [],
         "collectedResources": {},
-        "startTime": 1754210458149,
+        "startTime": 1754210582381,
         "endTime": null,
         "progress": 0
       }
