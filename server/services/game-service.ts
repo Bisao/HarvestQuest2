@@ -6,25 +6,83 @@ import { SkillService } from "./skill-service";
 
 export class GameService {
   private skillService: SkillService;
+  private cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
 
   constructor(private storage: IStorage) {
     this.skillService = new SkillService(storage);
   }
 
-  // Calculate total inventory weight in grams
+  // Cache utilities
+  private getCacheKey(type: string, id: string): string {
+    return `${type}:${id}`;
+  }
+
+  private isExpired(timestamp: number, ttl: number): boolean {
+    return Date.now() - timestamp > ttl;
+  }
+
+  private getFromCache<T>(type: string, id: string): T | null {
+    const key = this.getCacheKey(type, id);
+    const cached = this.cache.get(key);
+    
+    if (!cached || this.isExpired(cached.timestamp, cached.ttl)) {
+      this.cache.delete(key);
+      return null;
+    }
+    
+    return cached.data as T;
+  }
+
+  private setCache<T>(type: string, id: string, data: T, ttl: number = 60000): void {
+    const key = this.getCacheKey(type, id);
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      ttl
+    });
+  }
+
+  private invalidateCache(type: string, id?: string): void {
+    if (id) {
+      const key = this.getCacheKey(type, id);
+      this.cache.delete(key);
+    } else {
+      // Clear all cache entries of this type
+      for (const [key] of this.cache) {
+        if (key.startsWith(`${type}:`)) {
+          this.cache.delete(key);
+        }
+      }
+    }
+  }
+
+  // Calculate total inventory weight in grams with caching
   async calculateInventoryWeight(playerId: string): Promise<number> {
-    const inventory = await this.storage.getPlayerInventory(playerId);
-    const resources = await this.storage.getAllResources();
-    const equipment = await this.storage.getAllEquipment();
+    // Check cache first
+    const cached = this.getFromCache<number>('weight', playerId);
+    if (cached !== null) {
+      return cached;
+    }
+
+    const [inventory, resources] = await Promise.all([
+      this.storage.getPlayerInventory(playerId),
+      this.storage.getAllResources()
+    ]);
 
     let totalWeightInGrams = 0;
 
+    // Create a resource map for O(1) lookups
+    const resourceMap = new Map(resources.map(r => [r.id, r]));
+
     for (const item of inventory) {
-      const resource = resources.find(r => r.id === item.resourceId);
+      const resource = resourceMap.get(item.resourceId);
       if (resource) {
         totalWeightInGrams += resource.weight * item.quantity;
       }
     }
+
+    // Cache result for 30 seconds
+    this.setCache('weight', playerId, totalWeightInGrams, 30000);
 
     return totalWeightInGrams;
   }

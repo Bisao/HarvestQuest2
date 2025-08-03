@@ -15,6 +15,7 @@ import EquipmentSelectorModal from "./equipment-selector-modal";
 import { ItemDetailsModal } from "./item-details-modal";
 import { isConsumable, getConsumableDescription, getConsumableEffects } from "@shared/utils/consumable-utils";
 import type { Resource, Equipment, Player } from "@shared/types";
+import React from "react";
 
 interface InventoryItem {
   id: string;
@@ -30,7 +31,7 @@ interface EnhancedInventoryProps {
   isBlocked?: boolean;
 }
 
-export default function EnhancedInventory({
+const EnhancedInventory = React.memo(function EnhancedInventory({
   playerId,
   resources,
   equipment,
@@ -51,7 +52,7 @@ export default function EnhancedInventory({
 
   // Initialize ItemFinder with current data
   ItemFinder.initialize(resources, equipment);
-  
+
   // Use unified game data hook
   const { inventory: inventoryData = [] } = useGameData({ playerId });
 
@@ -166,7 +167,7 @@ export default function EnhancedInventory({
     mutationFn: async (itemId: string) => {
       const item = inventory.find(i => i.id === itemId);
       if (!item) throw new Error("Item não encontrado");
-      
+
       const response = await apiRequest('POST', `/api/storage/store/${itemId}`, {
         playerId: player.id,
         quantity: item.quantity
@@ -196,12 +197,12 @@ export default function EnhancedInventory({
     mutationFn: async (itemId: string) => {
       const item = inventory.find(i => i.id === itemId);
       if (!item) throw new Error("Item não encontrado");
-      
+
       const itemData = getItemById(item.resourceId);
       if (!itemData) throw new Error("Dados do item não encontrados");
-      
+
       const effects = getConsumableEffects(itemData);
-      
+
       const response = await apiRequest('POST', `/api/player/${playerId}/consume`, {
         itemId: item.resourceId,
         inventoryItemId: item.id,
@@ -263,7 +264,7 @@ export default function EnhancedInventory({
 
   const renderEquipmentSlot = (slot: typeof equipmentSlots[0]) => {
     const equippedItem = slot.equipped ? getEquipmentById(slot.equipped) : null;
-    
+
     return (
       <TooltipProvider key={slot.id}>
         <Tooltip>
@@ -312,7 +313,7 @@ export default function EnhancedInventory({
   const renderInventorySlot = (slotIndex: number) => {
     const item = inventory[slotIndex];
     const itemData = item ? getItemById(item.resourceId) : null;
-    
+
     return (
       <TooltipProvider key={slotIndex}>
         <Tooltip>
@@ -460,25 +461,25 @@ export default function EnhancedInventory({
               <div></div>
               {renderEquipmentSlot(equipmentSlots[0])}
               <div></div>
-              
+
               {/* Row 1: Weapon, Chestplate, Tool */}
               {renderEquipmentSlot(equipmentSlots[4])}
               {renderEquipmentSlot(equipmentSlots[1])}
               {renderEquipmentSlot(equipmentSlots[5])}
-              
+
               {/* Row 2: Leggings */}
               <div></div>
               {renderEquipmentSlot(equipmentSlots[2])}
               <div></div>
-              
+
               {/* Row 3: Boots */}
               <div></div>
               {renderEquipmentSlot(equipmentSlots[3])}
               <div></div>
             </div>
-            
+
             <Separator className="my-4" />
-            
+
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-2">💡 Equipamentos ativos:</p>
               <div className="space-y-1">
@@ -676,4 +677,6 @@ export default function EnhancedInventory({
       />
     </div>
   );
-}
+});
+
+export default EnhancedInventory;

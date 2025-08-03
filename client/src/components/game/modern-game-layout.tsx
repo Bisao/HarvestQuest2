@@ -360,12 +360,11 @@ export default function ModernGameLayout({
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
-  // Use game data hook for real-time updates
-  const { 
-    inventory = [], 
-    storage = [], 
-    isLoading 
-  } = useGameData({ playerId: player?.id });
+  // Use optimized game state hook
+  const gameState = useGameState({ 
+    playerId: player?.id || '', 
+    enablePolling: !isBlocked 
+  });
 
   // Memoização das abas com notificações
   const gameTabs = useMemo(() => 
