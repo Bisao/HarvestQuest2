@@ -75,3 +75,31 @@ export function useInventoryUpdates(playerId: string) {
     removeInventoryItem
   };
 }
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+
+export function useInventoryUpdates(playerId: string) {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!playerId) return;
+
+    // Invalidar cache do inventário periodicamente para pegar atualizações
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/player', playerId.toLowerCase()] 
+      });
+    }, 3000); // A cada 3 segundos
+
+    return () => clearInterval(interval);
+  }, [playerId, queryClient]);
+
+  // Função para forçar atualização do inventário
+  const forceInventoryUpdate = () => {
+    queryClient.invalidateQueries({ 
+      queryKey: ['/api/player', playerId.toLowerCase()] 
+    });
+  };
+
+  return { forceInventoryUpdate };
+}

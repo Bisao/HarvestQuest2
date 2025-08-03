@@ -4,8 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Clock, CheckCircle, MapPin } from 'lucide-react';
-import ExpeditionModal from "./expedition-modal";
+import ExpeditionModal from "./new-expedition-modal";
 import { useActiveExpeditions } from "@/hooks/use-active-expeditions";
+import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
 import type { Biome, Resource, Equipment, Player } from "@shared/types";
 import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
 
@@ -35,6 +36,9 @@ export default function BiomesTab({
     getPhaseLabel 
   } = useActiveExpeditions(player.id);
 
+  // Hook para atualizações de inventário em tempo real
+  const { forceInventoryUpdate } = useInventoryUpdates(player.username);
+
   const getResourcesForBiome = (biome: Biome) => {
     const resourceIds = biome.availableResources as string[];
     return resourceIds.map(id => resources.find(r => r.id === id)).filter(Boolean) as Resource[];
@@ -53,6 +57,11 @@ export default function BiomesTab({
     setExpeditionModalOpen(false);
     setSelectedBiome(null);
     onExpeditionStart(expeditionData);
+    
+    // Forçar atualização do inventário
+    setTimeout(() => {
+      forceInventoryUpdate();
+    }, 1000);
   };
 
   return (
@@ -183,18 +192,20 @@ export default function BiomesTab({
       </div>
 
       {/* Expedition Modal */}
-      <ExpeditionModal
-        isOpen={expeditionModalOpen}
-        onClose={() => {
-          setExpeditionModalOpen(false);
-          setSelectedBiome(null);
-        }}
-        biome={selectedBiome}
-        resources={resources}
-        equipment={equipment}
-        player={player}
-        onExpeditionStart={handleExpeditionStart}
-      />
+      {selectedBiome && (
+        <ExpeditionModal
+          isOpen={expeditionModalOpen}
+          onClose={() => {
+            setExpeditionModalOpen(false);
+            setSelectedBiome(null);
+          }}
+          biome={selectedBiome}
+          resources={resources}
+          equipment={equipment}
+          player={player}
+          onExpeditionStart={handleExpeditionStart}
+        />
+      )}
     </>
   );
 }

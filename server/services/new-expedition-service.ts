@@ -348,15 +348,21 @@ export class NewExpeditionService {
     const player = await this.storage.getPlayer(playerId);
     if (!player) return;
 
+    console.log(`💰 EXPEDITION-REWARDS: Applying rewards to player ${playerId}:`, rewards);
+
     // Adicionar recursos ao inventário
     for (const [resourceId, quantity] of Object.entries(rewards)) {
+      console.log(`📦 EXPEDITION-REWARD: Adding ${quantity}x ${resourceId} to player inventory`);
       await this.storage.addPlayerResource(playerId, resourceId, quantity);
     }
 
     // Adicionar experiência
+    console.log(`⭐ EXPEDITION-REWARD: Adding ${experience} experience to player`);
     await this.storage.updatePlayer(playerId, {
       experience: player.experience + experience
     });
+
+    console.log(`✅ EXPEDITION-REWARDS: All rewards applied successfully`);
   }
 
   // ===================== CONSULTAS =====================
