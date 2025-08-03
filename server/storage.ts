@@ -611,13 +611,16 @@ export class MemStorage implements IStorage {
       id,
       playerId: insertExpedition.playerId,
       biomeId: insertExpedition.biomeId,
-      status: "in_progress",
       selectedResources: insertExpedition.selectedResources,
       selectedEquipment: insertExpedition.selectedEquipment,
-      collectedResources: {},
+      status: "in_progress",
       startTime: Date.now(),
-      endTime: null,
+      duration: insertExpedition.duration,
       progress: 0,
+      collectedResources: {},
+      autoRepeat: insertExpedition.autoRepeat ?? false,
+      repeatCount: 0,
+      maxRepeats: insertExpedition.maxRepeats ?? 1,
     };
 
     console.log('Storing expedition with ID:', id);

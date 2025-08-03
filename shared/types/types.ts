@@ -276,12 +276,27 @@ export interface Expedition {
   id: string;
   playerId: string;
   biomeId: string;
+  selectedResources: string[];
+  selectedEquipment: string[];
+  status: 'in_progress' | 'completed' | 'cancelled';
   startTime: number;
+  endTime?: number;
   duration: number;
-  status: 'active' | 'completed' | 'cancelled';
-  results?: ExpeditionResult[];
+  progress: number;
+  collectedResources?: Record<string, number>;
+  experienceGained?: number;
   autoRepeat?: boolean;
   repeatCount?: number;
+  maxRepeats?: number;
+}
+
+export interface InsertExpedition {
+  playerId: string;
+  biomeId: string;
+  selectedResources: string[];
+  selectedEquipment: string[];
+  duration: number;
+  autoRepeat?: boolean;
   maxRepeats?: number;
 }
 

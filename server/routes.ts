@@ -35,6 +35,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register enhanced game routes with full validation and caching
   registerEnhancedGameRoutes(app, storage, gameService, expeditionService);
 
+  // Register expedition routes
+  const { createExpeditionRoutes } = await import('./routes/expedition-routes');
+  app.use('/api/expeditions', createExpeditionRoutes(storage, expeditionService, gameService));
+
   // Register admin routes for development
   registerAdminRoutes(app);
 

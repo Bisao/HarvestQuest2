@@ -251,7 +251,7 @@ export class ExpeditionService {
     // Mark expedition as completed with timestamp in seconds
     return await this.storage.updateExpedition(expeditionId, {
       status: "completed",
-      endTime: Math.floor(Date.now() / 1000),
+      endTime: Date.now(),
       progress: 100,
       collectedResources: rewards
     });
@@ -512,11 +512,40 @@ export class ExpeditionService {
     return expeditions.find(exp => exp.status === "in_progress") || null;
   }
 
-  async cancelExpedition(expeditionId: string): Promise<void> {
+  async cancelExpedition(expeditionId: string): Promise<{ expeditionId: string; playerId: string }> {
+    const expedition = await this.storage.getExpedition(expeditionId);
+    if (!expedition) {
+      throw new Error("Expedition not found");
+    }
+
     await this.storage.updateExpedition(expeditionId, {
       status: "cancelled",
-      endTime: Math.floor(Date.now() / 1000)
+      endTime: Date.now()
     });
+
+    return { expeditionId, playerId: expedition.playerId };
+  }
+
+  async updateExpeditionProgress(expeditionId: string): Promise<Expedition> {
+    const expedition = await this.storage.getExpedition(expeditionId);
+    if (!expedition) {
+      throw new Error("Expedition not found");
+    }
+
+    if (expedition.status !== 'in_progress') {
+      throw new Error("Expedition is not in progress");
+    }
+
+    // Calculate progress based on elapsed time
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - expedition.startTime;
+    const progress = Math.min(100, (elapsedTime / expedition.duration) * 100);
+
+    const updatedExpedition = await this.storage.updateExpedition(expeditionId, {
+      progress
+    });
+
+    return updatedExpedition;
   }
 
   /**
