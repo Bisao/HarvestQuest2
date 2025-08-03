@@ -17,9 +17,15 @@ export function useGameTime(playerId?: string, biomeType: string = 'forest'): Us
   const { data: serverTime, isLoading, error } = useQuery({
     queryKey: ['gameTime'],
     queryFn: async () => {
+      console.log('🕐 HOOK: Fetching game time from /api/time/current');
       const response = await fetch('/api/time/current');
-      if (!response.ok) throw new Error('Failed to fetch game time');
-      return response.json();
+      if (!response.ok) {
+        console.error('🕐 HOOK: Failed to fetch game time, status:', response.status);
+        throw new Error('Failed to fetch game time');
+      }
+      const data = await response.json();
+      console.log('🕐 HOOK: Game time received:', data);
+      return data;
     },
     refetchInterval: 30000, // Sincronizar com servidor a cada 30 segundos
     staleTime: 25000
@@ -29,10 +35,19 @@ export function useGameTime(playerId?: string, biomeType: string = 'forest'): Us
   const { data: temperature } = useQuery({
     queryKey: ['temperature', playerId, biomeType],
     queryFn: async () => {
-      if (!playerId) return null;
+      if (!playerId) {
+        console.log('🌡️ HOOK: No player ID provided');
+        return null;
+      }
+      console.log('🌡️ HOOK: Fetching temperature for player:', playerId, 'biome:', biomeType);
       const response = await fetch(`/api/time/temperature?playerId=${playerId}&biome=${biomeType}`);
-      if (!response.ok) throw new Error('Failed to fetch temperature');
-      return response.json();
+      if (!response.ok) {
+        console.error('🌡️ HOOK: Failed to fetch temperature, status:', response.status);
+        throw new Error('Failed to fetch temperature');
+      }
+      const data = await response.json();
+      console.log('🌡️ HOOK: Temperature received:', data);
+      return data;
     },
     enabled: !!playerId,
     refetchInterval: 60000, // Atualizar temperatura a cada minuto
