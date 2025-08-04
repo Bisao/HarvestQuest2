@@ -6,8 +6,8 @@ import { validateParams, validateBody } from '../middleware/validation';
 import { successResponse, errorResponse } from '../utils/response-helpers';
 import { migrateLegacyCreatureId } from '../../shared/constants/creature-ids';
 
-// Schemas de validação
-const startExpeditionSchema = z.object({
+// Schemas de validação  
+const startExpeditionTemplateSchema = z.object({
   playerId: z.string().min(1, "Player ID é obrigatório"),
   templateId: z.string().min(1, "Template ID é obrigatório")
 });
@@ -70,7 +70,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
 
   // Validar se jogador pode iniciar expedição
   router.post('/validate', 
-    validateBody(startExpeditionSchema),
+    validateBody(startExpeditionTemplateSchema),
     async (req: Request, res: Response) => {
       try {
         const { playerId, templateId } = req.body;
@@ -182,7 +182,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
 
   // Iniciar nova expedição
   router.post('/start',
-    validateBody(startExpeditionSchema),
+    validateBody(startExpeditionTemplateSchema),
     async (req: Request, res: Response) => {
       try {
         const { playerId, templateId } = req.body;

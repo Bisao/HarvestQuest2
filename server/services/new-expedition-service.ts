@@ -450,7 +450,7 @@ export class NewExpeditionService {
     }
 
     const elapsed = currentTime - startTimeMs;
-    const expeditionDuration = expedition.duration || (30 * 60 * 1000); // Use expedition.duration or default
+    const expeditionDuration = (30 * 60 * 1000); // Default expedition duration: 30 minutes
     const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
 
     console.log(`📈 EXPEDITION-PROGRESS: ${expeditionId} - elapsed: ${elapsed}ms, progress: ${Math.round(progress)}%`);
@@ -609,7 +609,7 @@ export class NewExpeditionService {
     console.log(`🎁 FINAL REWARDS: ${JSON.stringify(rewards)}`);
 
     const startTime = expedition.startTime ?? Date.now();
-    const expeditionDuration = expedition.duration || (30 * 60 * 1000); // Use expedition.duration or default
+    const expeditionDuration = (30 * 60 * 1000); // Default expedition duration: 30 minutes
 
     return {
       id: expedition.id,
@@ -757,7 +757,7 @@ export class NewExpeditionService {
           startTimeMs = currentTime; // Fallback to current time
         }
 
-        const expeditionDuration = exp.duration || (5 * 60 * 1000); // Use expedition.duration or default to 5 minutes
+        const expeditionDuration = (5 * 60 * 1000); // Default expedition duration: 5 minutes
         const elapsed = currentTime - startTimeMs;
         const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
 
@@ -794,7 +794,7 @@ export class NewExpeditionService {
       .filter(exp => exp.status === 'completed')
       .map(exp => {
         const startTime = exp.startTime ?? Date.now();
-        const expeditionDuration = exp.duration || (5 * 60 * 1000); // Use expedition.duration or default to 5 minutes
+        const expeditionDuration = (5 * 60 * 1000); // Default expedition duration: 5 minutes
         return {
           id: exp.id,
           playerId: exp.playerId,
@@ -820,7 +820,7 @@ export class NewExpeditionService {
       const encounter = await this.combatService.tryGenerateEncounter(expeditionId, playerId, biomeId);
       
       if (encounter) {
-        console.log(`⚔️ EXPEDITION-COMBAT: Generated encounter ${encounter.id} with ${encounter.animal.commonName}`);
+        console.log(`⚔️ EXPEDITION-COMBAT: Generated encounter ${encounter.id} with ${encounter.animalId}`);
         return encounter.id;
       }
       

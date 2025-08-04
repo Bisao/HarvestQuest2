@@ -410,7 +410,11 @@ export function registerEnhancedGameRoutes(
           throw new InvalidOperationError("Already have an active expedition");
         }
 
-        const expedition = await expeditionService.startExpedition(
+        // Import and use expedition service
+        const { NewExpeditionService } = await import('../services/new-expedition-service');
+        const newExpeditionService = new NewExpeditionService(storage);
+        
+        const expedition = await newExpeditionService.startExpedition(
           playerId,
           biomeId,
           selectedResources,
