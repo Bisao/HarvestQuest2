@@ -108,6 +108,48 @@ export function ImprovedCustomExpeditionModal({
     }
   };
 
+  // Function to determine required tool for resource
+  const getRequiredTool = (resource: any): string | null => {
+    if (!resource || !resource.name) return null;
+
+    // Check if resource has explicit requiredTool property
+    if (resource.requiredTool) {
+      return resource.requiredTool;
+    }
+
+    // Fallback to name-based detection
+    const resourceName = resource.name.toLowerCase();
+
+    if (resourceName.includes('madeira') || resourceName.includes('bambu')) {
+      return 'Machado';
+    }
+    if (resourceName.includes('pedra') || resourceName.includes('ferro') || resourceName.includes('cristal')) {
+      return 'Picareta';
+    }
+    if (resourceName.includes('areia')) {
+      return 'Pá';
+    }
+    if (resourceName.includes('água') || resourceName.includes('agua')) {
+      return 'Balde';
+    }
+    if (resourceName.includes('peixe') || resourceName.includes('salmão') || resourceName.includes('salmao')) {
+      return 'Vara de Pesca';
+    }
+    if (resourceName.includes('coelho') || resourceName.includes('veado') || resourceName.includes('javali')) {
+      return 'Arma';
+    }
+    if (resourceName.includes('couro') || resourceName.includes('carne') || resourceName.includes('osso') || resourceName.includes('pelo')) {
+      return 'Faca';
+    }
+
+    // Resources that don't require tools
+    if (resourceName.includes('fibra') || resourceName.includes('graveto') || resourceName.includes('fruta') || resourceName.includes('cogumelo')) {
+      return null;
+    }
+
+    return null;
+  };
+
   // Categorizar recursos
   const categorizedResources = useMemo(() => {
     const filtered = resources.filter(resource => {
@@ -126,7 +168,7 @@ export function ImprovedCustomExpeditionModal({
 
     filtered.forEach(resource => {
       let category = resource.category || 'Outros';
-      
+
       // Filtrar apenas consumíveis básicos na categoria Alimentos
       if (category === 'Alimentos') {
         // Apenas frutas silvestres, cogumelos crus e água são consumíveis básicos
@@ -135,7 +177,7 @@ export function ImprovedCustomExpeditionModal({
           return; // Pular itens processados/cozidos
         }
       }
-      
+
       if (!categories[category]) {
         categories[category] = [];
       }

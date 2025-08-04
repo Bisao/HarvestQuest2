@@ -198,31 +198,51 @@ export class NewExpeditionService {
     playerId: string, 
     resourceIds: string[]
   ): Promise<{ valid: boolean; errors: string[] }> {
-    const player = await this.storage.getPlayer(playerId);
-    const allResources = await this.storage.getAllResources();
-    const allEquipment = await this.storage.getAllEquipment();
-    const errors: string[] = [];
+    try {
+      const player = await this.storage.getPlayer(playerId);
+      const allResources = await this.storage.getAllResources();
+      const allEquipment = await this.storage.getAllEquipment();
+      const errors: string[] = [];
 
-    if (!player) {
-      return { valid: false, errors: ['Jogador não encontrado'] };
-    }
-
-    for (const resourceId of resourceIds) {
-      const resource = allResources.find(r => r.id === resourceId);
-      if (!resource) continue;
-
-      // Verificar se o recurso requer ferramentas específicas
-      const requiredTool = this.getRequiredToolForResource(resource);
-      if (!requiredTool) continue; // Recurso não requer ferramenta
-
-      const hasRequiredTool = await this.playerHasRequiredTool(player, requiredTool, allEquipment);
-      if (!hasRequiredTool) {
-        const toolName = this.getToolDisplayName(requiredTool);
-        errors.push(`${resource.name} requer ${toolName} equipado`);
+      if (!player) {
+        return { valid: false, errors: ['Jogador não encontrado'] };
       }
-    }
 
-    return { valid: errors.length === 0, errors };
+      console.log(`🔍 EXPEDITION-VALIDATION: Checking equipment for ${resourceIds.length} resources`);
+      console.log(`🔍 EXPEDITION-VALIDATION: Player equipped - Tool: ${player.equippedTool}, Weapon: ${player.equippedWeapon}`);
+
+      for (const resourceId of resourceIds) {
+        const resource = allResources.find(r => r.id === resourceId);
+        if (!resource) {
+          console.warn(`⚠️ EXPEDITION-VALIDATION: Resource not found: ${resourceId}`);
+          continue;
+        }
+
+        // Verificar se o recurso requer ferramentas específicas
+        const requiredTool = this.getRequiredToolForResource(resource);
+        if (!requiredTool) {
+          console.log(`✅ EXPEDITION-VALIDATION: ${resource.name} doesn't require specific tools`);
+          continue; // Recurso não requer ferramenta
+        }
+
+        console.log(`🔧 EXPEDITION-VALIDATION: ${resource.name} requires ${requiredTool}`);
+
+        const hasRequiredTool = await this.playerHasRequiredTool(player, requiredTool, allEquipment);
+        if (!hasRequiredTool) {
+          const toolName = this.getToolDisplayName(requiredTool);
+          errors.push(`${resource.name} requer ${toolName} equipado`);
+          console.error(`❌ EXPEDITION-VALIDATION: Missing ${toolName} for ${resource.name}`);
+        } else {
+          console.log(`✅ EXPEDITION-VALIDATION: Player has required tool for ${resource.name}`);
+        }
+      }
+
+      console.log(`📋 EXPEDITION-VALIDATION: Validation complete - ${errors.length} errors found`);
+      return { valid: errors.length === 0, errors };
+    } catch (error) {
+      console.error('❌ EXPEDITION-VALIDATION: Error validating equipment:', error);
+      return { valid: false, errors: ['Erro ao validar equipamentos'] };
+    }
   }
 
   /**

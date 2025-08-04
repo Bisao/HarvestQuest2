@@ -106,16 +106,37 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     async (req: Request, res: Response) => {
       try {
         const { playerId, biomeId, selectedResources, duration, selectedEquipment } = req.body;
+        console.log(`🚀 CUSTOM-EXPEDITION-START: Starting for player ${playerId}, biome ${biomeId}`);
 
-        // Get player
+        // Get player using ID directly 
         const player = await storage.getPlayer(playerId);
         if (!player) {
+          console.error(`❌ CUSTOM-EXPEDITION-START: Player not found: ${playerId}`);
           return errorResponse(res, 404, 'Jogador não encontrado');
         }
 
+        // Validate biome exists
+        const biomes = await storage.getAllBiomes();
+        const biome = biomes.find(b => b.id === biomeId);
+        if (!biome) {
+          console.error(`❌ CUSTOM-EXPEDITION-START: Biome not found: ${biomeId}`);
+          return errorResponse(res, 404, 'Bioma não encontrado');
+        }
+
+        // Validate selected resources exist
+        const allResources = await storage.getAllResources();
+        for (const resource of selectedResources) {
+          const resourceExists = allResources.find(r => r.id === resource.resourceId);
+          if (!resourceExists) {
+            console.error(`❌ CUSTOM-EXPEDITION-START: Resource not found: ${resource.resourceId}`);
+            return errorResponse(res, 400, `Recurso não encontrado: ${resource.resourceId}`);
+          }
+        }
+
         // Basic validation
-        const hungerCost = Math.floor((duration / (60 * 1000)) * 0.8); // Duration in minutes * 0.8
-        const thirstCost = Math.floor((duration / (60 * 1000)) * 0.6); // Duration in minutes * 0.6
+        const durationMinutes = duration / (60 * 1000);
+        const hungerCost = Math.floor(durationMinutes * 0.8);
+        const thirstCost = Math.floor(durationMinutes * 0.6);
 
         if (player.hunger < hungerCost) {
           return errorResponse(res, 400, `Fome insuficiente. Necessário: ${hungerCost}%, atual: ${player.hunger}%`);
@@ -129,23 +150,31 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         await storage.updatePlayer(playerId, {
           hunger: Math.max(0, player.hunger - hungerCost),
           thirst: Math.max(0, player.thirst - thirstCost),
-          fatigue: Math.min(100, player.fatigue + Math.floor((duration / (60 * 1000)) * 0.3))
+          fatigue: Math.min(100, player.fatigue + Math.floor(durationMinutes * 0.3))
         });
 
-        // Create expedition with custom parameters including duration
-        const expedition = await storage.createExpedition({
-          playerId,
+        // Create expedition with custom parameters
+        const expeditionData = {
+          id: `exp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          playerId: player.id, // Use player.id to ensure consistency
           biomeId,
           selectedResources: selectedResources.map((r: any) => r.resourceId),
           selectedEquipment: selectedEquipment || [],
-          duration: duration // Pass the custom duration in milliseconds
-        });
+          duration: duration,
+          startTime: Math.floor(Date.now() / 1000), // Store as seconds
+          status: 'in_progress' as const,
+          progress: 0,
+          collectedResources: {}
+        };
 
-        console.log(`🚀 CUSTOM-EXPEDITION: Started custom expedition ${expedition.id} for player ${playerId}`);
+        const expedition = await storage.createExpedition(expeditionData);
+
+        console.log(`✅ CUSTOM-EXPEDITION: Started expedition ${expedition.id} for player ${player.username}`);
 
         return successResponse(res, expedition, 'Expedição customizada iniciada com sucesso');
       } catch (error: any) {
         console.error('❌ CUSTOM-EXPEDITION-START: Error:', error.message);
+        console.error('❌ CUSTOM-EXPEDITION-START: Stack:', error.stack);
         return errorResponse(res, 500, error.message);
       }
     }
