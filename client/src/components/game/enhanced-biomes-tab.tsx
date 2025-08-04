@@ -27,12 +27,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import type { Biome, Resource, Equipment, Player } from '@shared/types';
-import { NewExpeditionModal } from './new-expedition-modal';
 import { ImprovedCustomExpeditionModal } from './improved-custom-expedition-modal';
-import { ExpeditionTracker } from './expedition-tracker';
-import { ExpeditionStatus } from './expedition-status';
-import { useActiveExpeditions } from '@/hooks/use-active-expeditions';
-
 interface EnhancedBiomesTabProps {
   biomes: Biome[];
   resources: Resource[];
@@ -70,8 +65,8 @@ export default function EnhancedBiomesTab({
   player,
   onExpeditionStart
 }: EnhancedBiomesTabProps) {
-  const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
-  const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
+  // Expedition states removed
+
   const [useManualSelection, setUseManualSelection] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -209,17 +204,7 @@ export default function EnhancedBiomesTab({
     return BIOME_THEMES[key as keyof typeof BIOME_THEMES] || BIOME_THEMES.floresta;
   };
 
-  const handleExploreBiome = (biome: Biome) => {
-    if (!isUnlocked(biome)) return;
-    setSelectedBiome(biome);
-    setExpeditionModalOpen(true);
-  };
-
-  const handleExpeditionStart = (expeditionData: any) => {
-    setExpeditionModalOpen(false);
-    setSelectedBiome(null);
-    onExpeditionStart(expeditionData);
-  };
+  // Expedition functions removed
 
   const getResourceCountByCategory = (categorizedResources: Record<string, Resource[]>) => {
     return Object.entries(categorizedResources).reduce((acc, [category, resources]) => {
@@ -405,14 +390,17 @@ export default function EnhancedBiomesTab({
                   </div>
                 </div>
 
-                {/* Sistema de expedição em tempo real */}
-                <ExpeditionStatus 
-                  biome={biome}
-                  player={player}
-                  resources={resources}
-                  unlocked={unlocked}
-                  onExploreBiome={handleExploreBiome}
-                />
+                {/* Expedition system removed - biome exploration disabled */}
+                <div className="pt-2">
+                  <Button 
+                    disabled={true}
+                    className="w-full"
+                    variant="secondary"
+                    size="lg"
+                  >
+                    Sistema de Expedições Removido
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           );
@@ -476,45 +464,7 @@ export default function EnhancedBiomesTab({
       {/* Tracker de expedições ativas */}
       <ExpeditionTracker player={player} />
 
-      {/* Modal de expedição novo */}
-      {selectedBiome && useManualSelection && (
-        <ImprovedCustomExpeditionModal
-          isOpen={expeditionModalOpen}
-          onClose={() => {
-            setExpeditionModalOpen(false);
-            setSelectedBiome(null);
-          }}
-          onStartExpedition={async (selectedResources, duration) => {
-            try {
-              await startExpedition.mutateAsync({
-                biomeId: selectedBiome.id,
-                selectedResources: selectedResources.map(r => r.resourceId),
-                duration
-              });
-              setExpeditionModalOpen(false);
-              setSelectedBiome(null);
-            } catch (error) {
-              console.error('Erro ao iniciar expedição:', error);
-            }
-          }}
-          resources={resources}
-          selectedBiome={selectedBiome}
-          player={player}
-          equipment={equipment}
-        />
-      )}
-
-      {selectedBiome && !useManualSelection && (
-        <NewExpeditionModal
-          isOpen={expeditionModalOpen}
-          onClose={() => {
-            setExpeditionModalOpen(false);
-            setSelectedBiome(null);
-          }}
-          player={player}
-          biome={selectedBiome}
-        />
-      )}
+      {/* Expedition modals removed */}
     </div>
   );
 }

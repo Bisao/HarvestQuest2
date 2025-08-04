@@ -7,7 +7,6 @@ import { z } from "zod";
 import type { Player, HungerDegradationMode } from "@shared/types";
 import { validateParams, playerIdParamSchema } from "./middleware/validation";
 import { GameService } from "./services/game-service";
-import { createNewExpeditionRoutes } from './routes/new-expedition-routes';
 import { QuestService } from "./services/quest-service";
 import { OfflineActivityService } from "./services/offline-activity-service";
 import { NewExpeditionService } from "./services/new-expedition-service";
@@ -40,8 +39,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register enhanced game routes with full validation and caching
   registerEnhancedGameRoutes(app, storage, gameService);
 
-  // Register new expedition routes
-  app.use('/api/expeditions', createNewExpeditionRoutes(storage));
+  // Expeditions system removed
 
   // Register admin routes for development
   registerAdminRoutes(app);
@@ -515,107 +513,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // REMOVED: Legacy craft API - use /api/v2/craft instead for modern attribute-based crafting
-
-  // Create expedition using service
-  app.post("/api/expeditions", async (req, res) => {
-    try {
-      const { playerId, biomeId, selectedResources, selectedEquipment } = req.body;
-
-      // Validações detalhadas
-      if (!playerId || typeof playerId !== 'string') {
-        return res.status(400).json({ message: "ID do jogador inválido" });
-      }
-
-      if (!biomeId || typeof biomeId !== 'string') {
-        return res.status(400).json({ message: "ID do bioma inválido" });
-      }
-
-      if (!selectedResources || !Array.isArray(selectedResources) || selectedResources.length === 0) {
-        return res.status(400).json({ message: "Recursos selecionados inválidos" });
-      }
-
-      // Verificar se todos os recursos são strings válidas
-      const invalidResources = selectedResources.filter(id => !id || typeof id !== 'string');
-      if (invalidResources.length > 0) {
-        return res.status(400).json({ message: "IDs de recursos inválidos" });
-      }
-       const validResources = selectedResources.filter(id => id && typeof id === 'string');
-
-      console.log('Creating expedition with data:', {
-        playerId,
-        biomeId,
-        selectedResources,
-        selectedEquipment: selectedEquipment || []
-      });
-
-      const expedition = await expeditionService.startExpedition(playerId, biomeId);
-
-      if (!expedition || !expedition.id) {
-        throw new Error('Falha ao criar expedição');
-      }
-
-      console.log('Expedition created successfully:', expedition.id);
-      res.json(expedition);
-    } catch (error) {
-      console.error("Create expedition error:", error);
-
-      let errorMessage = "Erro interno ao criar expedição";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      res.status(500).json({ message: errorMessage });
-    }
-  });
-
-  // Get player expeditions
-  app.get("/api/player/:playerId/expeditions", async (req, res) => {
-    try {
-      const { playerId } = req.params;
-      const expeditions = await storage.getPlayerExpeditions(playerId);
-      res.json(expeditions);
-    } catch (error) {
-      console.error("Get player expeditions error:", error);
-      res.status(500).json({ message: "Failed to get expeditions" });
-    }
-  });
-
-  // Get active expedition for player
-  app.get("/api/player/:playerId/expeditions/active", async (req, res) => {
-    try {
-      const { playerId } = req.params;
-      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
-      const activeExpedition = activeExpeditions[0] || null;
-
-      if (!activeExpedition) {
-        return res.status(404).json({ message: "No active expedition found" });
-      }
-
-      res.json(activeExpedition);
-    } catch (error) {
-      console.error("Get active expedition error:", error);
-      res.status(500).json({ message: "Failed to get active expedition" });
-    }
-  });
-
-  // Delete/cancel player expedition
-  app.delete("/api/player/:playerId/expeditions", async (req, res) => {
-    try {
-      const { playerId } = req.params;
-      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
-      const activeExpedition = activeExpeditions[0] || null;
-
-      if (activeExpedition) {
-        // For now, directly update storage to cancel expedition
-        await storage.updateExpedition(activeExpedition.id, { status: 'cancelled' });
-      }
-
-      res.json({ success: true, message: "Expedition cancelled" });
-    } catch (error) {
-      console.error("Cancel expedition error:", error);
-      res.status(500).json({ message: "Failed to cancel expedition" });
-    }
-  });
 
   // Legacy expedition endpoints removed - using new expedition system
 
