@@ -9,8 +9,6 @@ import {
   type InsertInventoryItem,
   type StorageItem,
   type InsertStorageItem,
-  type Expedition,
-  type InsertExpedition,
   type Equipment,
   type InsertEquipment,
   type Recipe,
@@ -63,12 +61,6 @@ export interface IStorage {
   addWaterToPlayer(playerId: string, quantity: number): Promise<Player>;
   consumeWaterFromPlayer(playerId: string, quantity: number): Promise<Player>;
 
-  // Expedition methods
-  getPlayerExpeditions(playerId: string): Promise<Expedition[]>;
-  getExpedition(id: string): Promise<Expedition | undefined>;
-  createExpedition(expedition: InsertExpedition): Promise<Expedition>;
-  updateExpedition(id: string, updates: Partial<Expedition>): Promise<Expedition>;
-
   // Equipment methods
   getAllEquipment(): Promise<Equipment[]>;
 
@@ -99,7 +91,6 @@ interface StorageData {
   players: Array<[string, Player]>;
   inventoryItems: Array<[string, InventoryItem]>;
   storageItems: Array<[string, StorageItem]>;
-  expeditions: Array<[string, Expedition]>;
   playerQuests: Array<[string, PlayerQuest]>;
 }
 
@@ -109,7 +100,6 @@ export class MemStorage implements IStorage {
   private biomes: Map<string, Biome>;
   private inventoryItems: Map<string, InventoryItem>;
   private storageItems: Map<string, StorageItem>;
-  private expeditions: Map<string, Expedition>;
   private equipment: Map<string, Equipment>;
   private recipes: Map<string, Recipe>;
   private quests: Map<string, Quest>;
@@ -124,7 +114,6 @@ export class MemStorage implements IStorage {
     this.biomes = new Map();
     this.inventoryItems = new Map();
     this.storageItems = new Map();
-    this.expeditions = new Map();
     this.equipment = new Map();
     this.recipes = new Map();
     this.quests = new Map();
@@ -139,7 +128,6 @@ export class MemStorage implements IStorage {
         players: Array.from(this.players.entries()),
         inventoryItems: Array.from(this.inventoryItems.entries()),
         storageItems: Array.from(this.storageItems.entries()),
-        expeditions: Array.from(this.expeditions.entries()),
         playerQuests: Array.from(this.playerQuests.entries())
       };
 
@@ -174,13 +162,6 @@ export class MemStorage implements IStorage {
         if (data.storageItems) {
           for (const [id, item] of data.storageItems) {
             this.storageItems.set(id, item);
-          }
-        }
-
-        // Load expeditions
-        if (data.expeditions) {
-          for (const [id, expedition] of data.expeditions) {
-            this.expeditions.set(id, expedition);
           }
         }
 
@@ -340,7 +321,6 @@ export class MemStorage implements IStorage {
       equippedHelmet: insertPlayer.equippedHelmet || null,
       equippedChestplate: insertPlayer.equippedChestplate || null,
       equippedLeggings: insertPlayer.equippedLeggings || null,
-      equippedBoots: insertPlayer.equippedBoots || null,
       equippedWeapon: insertPlayer.equippedWeapon || null,
       equippedTool: insertPlayer.equippedTool || null,
       autoCompleteQuests: insertPlayer.autoCompleteQuests ?? true,
@@ -406,11 +386,6 @@ export class MemStorage implements IStorage {
     const playerStorage = await this.getPlayerStorage(id);
     for (const item of playerStorage) {
       await this.removeStorageItem(item.id);
-    }
-
-    const playerExpeditions = await this.getPlayerExpeditions(id);
-    for (const expedition of playerExpeditions) {
-      this.expeditions.delete(expedition.id);
     }
 
     const playerQuests = await this.getPlayerQuests(id);
@@ -595,48 +570,6 @@ export class MemStorage implements IStorage {
     return await this.updatePlayer(playerId, { 
       waterStorage: player.waterStorage - quantity 
     });
-  }
-
-  // Expedition methods
-  async getPlayerExpeditions(playerId: string): Promise<Expedition[]> {
-    return Array.from(this.expeditions.values()).filter(
-      (expedition) => expedition.playerId === playerId,
-    );
-  }
-
-  async getExpedition(id: string): Promise<Expedition | undefined> {
-    return this.expeditions.get(id);
-  }
-
-  async createExpedition(expeditionData: InsertExpedition): Promise<Expedition> {
-    const id = randomUUID();
-    const expedition: Expedition = {
-      id,
-      playerId: expeditionData.playerId,
-      biomeId: expeditionData.biomeId,
-      selectedResources: expeditionData.selectedResources,
-      selectedEquipment: expeditionData.selectedEquipment,
-      status: "in_progress",
-      startTime: Date.now(),
-      progress: 0,
-      collectedResources: {},
-      duration: expeditionData.duration
-    };
-
-    console.log('Storing expedition with ID:', id);
-    this.expeditions.set(id, expedition);
-    await this.saveData();
-    return expedition;
-  }
-
-  async updateExpedition(id: string, updates: Partial<Expedition>): Promise<Expedition> {
-    const expedition = this.expeditions.get(id);
-    if (!expedition) throw new Error("Expedition not found");
-
-    const updated = { ...expedition, ...updates };
-    this.expeditions.set(id, updated);
-    await this.saveData();
-    return updated;
   }
 
   // Equipment methods
