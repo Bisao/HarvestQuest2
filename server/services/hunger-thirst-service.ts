@@ -28,10 +28,10 @@ export class HungerThirstService {
     this.isRunning = true;
     console.log('🍖💧 Starting passive hunger/thirst degradation system');
 
-    // Degrade every 2 minutes (120,000ms)
+    // Degrade every 18 minutes (1,080,000ms)
     this.degradationTimer = setInterval(async () => {
       await this.degradeAllPlayers();
-    }, 120000); // 2 minutes
+    }, 1080000); // 18 minutes
   }
 
   /**
@@ -369,7 +369,7 @@ export class HungerThirstService {
   getStatus(): { isRunning: boolean; intervalMs: number } {
     return {
       isRunning: this.isRunning,
-      intervalMs: 120000 // 2 minutes (120 seconds)
+      intervalMs: 1080000 // 18 minutes (1080 seconds)
     };
   }
 

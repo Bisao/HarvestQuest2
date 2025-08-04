@@ -272,7 +272,7 @@ export default function PlayerSettings({ player, isOpen, onClose, isBlocked = fa
                 <span className="text-lg">🍖</span>
                 <div>
                   <p className="font-medium text-gray-800">Modo de Degradação de Fome/Sede</p>
-                  <p className="text-sm text-gray-600">Controla a velocidade de perda de fome e sede (tempo alterado para 2 minutos)</p>
+                  <p className="text-sm text-gray-600">Controla a velocidade de perda de fome e sede (tempo alterado para 18 minutos)</p>
                 </div>
               </div>
               <Select value={hungerDegradationMode} onValueChange={(value: HungerDegradationMode) => setHungerDegradationMode(value)} disabled={isBlocked}>
