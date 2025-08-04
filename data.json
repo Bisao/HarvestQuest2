@@ -6,7 +6,7 @@
         "id": "57be933a-5784-4399-980c-b0fc5a2cc97b",
         "username": "Bison",
         "level": 1,
-        "experience": 10,
+        "experience": 20,
         "coins": 100,
         "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
@@ -23,16 +23,16 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": false,
-        "health": 100,
+        "health": 1,
         "maxHealth": 100,
-        "hunger": 52,
+        "hunger": 0,
         "maxHunger": 100,
-        "thirst": 80,
+        "thirst": 1,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 54,
-        "hygiene": 91,
+        "morale": 21,
+        "hygiene": 53,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -67,6 +67,30 @@
           "res-8bd33b18-a241-4859-ae9f-870fab5673d0": 3,
           "res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12": 2,
           "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23": 4
+        },
+        "duration": 300000
+      }
+    ],
+    [
+      "64722ce0-1c58-4b66-9e95-0691e28f9826",
+      {
+        "id": "64722ce0-1c58-4b66-9e95-0691e28f9826",
+        "playerId": "57be933a-5784-4399-980c-b0fc5a2cc97b",
+        "biomeId": "biome-floresta-001",
+        "selectedResources": [
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "res-b3c4d5e6-f7g8-9012-cdef-345678901234",
+          "res-d5e6f7g8-h9i0-1234-ef01-567890123456",
+          "res-h9i0j1k2-l3m4-5678-2345-901234567890",
+          "res-i0j1k2l3-m4n5-6789-3456-012345678901"
+        ],
+        "selectedEquipment": [],
+        "status": "completed",
+        "startTime": 1754265954814,
+        "progress": 100,
+        "collectedResources": {
+          "res-fibra-001": 3,
+          "res-pedra-001": 2
         },
         "duration": 300000
       }

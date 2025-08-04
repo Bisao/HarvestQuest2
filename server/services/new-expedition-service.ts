@@ -482,6 +482,12 @@ export class NewExpeditionService {
 
         await gameService.addResourceToPlayer(playerId, resourceId, quantity);
         console.log(`✅ EXPEDITION-REWARD: Successfully added ${quantity}x ${resourceId} (${resource.name}) to player`);
+        
+        // Force cache invalidation
+        const { invalidatePlayerCache, invalidateInventoryCache, invalidateStorageCache } = await import('../cache/memory-cache');
+        invalidatePlayerCache(playerId);
+        invalidateInventoryCache(playerId);
+        invalidateStorageCache(playerId);
       } catch (error) {
         console.error(`❌ EXPEDITION-REWARD: Failed to add ${quantity}x ${resourceId}:`, error);
 
@@ -505,6 +511,12 @@ export class NewExpeditionService {
             });
           }
           console.log(`✅ EXPEDITION-REWARD: Added ${quantity}x ${resourceId} to storage as fallback`);
+          
+          // Force cache invalidation for fallback too
+          const { invalidatePlayerCache, invalidateInventoryCache, invalidateStorageCache } = await import('../cache/memory-cache');
+          invalidatePlayerCache(playerId);
+          invalidateInventoryCache(playerId);
+          invalidateStorageCache(playerId);
         } catch (fallbackError) {
           console.error(`❌ EXPEDITION-REWARD: Fallback also failed for ${resourceId}:`, fallbackError);
         }

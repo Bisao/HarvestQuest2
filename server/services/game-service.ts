@@ -295,6 +295,12 @@ export class GameService {
 
       // Invalidate cache
       this.invalidateCache('weight', playerId);
+      
+      // Also invalidate memory cache
+      const { invalidatePlayerCache, invalidateInventoryCache, invalidateStorageCache } = await import('../cache/memory-cache');
+      invalidatePlayerCache(playerId);
+      invalidateInventoryCache(playerId);
+      invalidateStorageCache(playerId);
 
     } catch (error) {
       console.log(`🏪 GAME-SERVICE: Adding to storage instead. Reason:`, error instanceof Error ? error.message : error);
@@ -327,6 +333,12 @@ export class GameService {
         });
         console.log(`📦 GAME-SERVICE: Added new storage item with ID ${newStorageItem.id} (${quantity}x ${resource.name})`);
       }
+      
+      // Invalidate cache for storage path too
+      const { invalidatePlayerCache, invalidateInventoryCache, invalidateStorageCache } = await import('../cache/memory-cache');
+      invalidatePlayerCache(playerId);
+      invalidateInventoryCache(playerId);
+      invalidateStorageCache(playerId);
 
       console.log(`✅ GAME-SERVICE: Successfully added ${quantity}x ${resource.name} to storage`);
     }

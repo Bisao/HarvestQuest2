@@ -31,7 +31,7 @@ import {
 import { MusicControl } from "@/components/ui/music-control";
 
 // Import all tab components
-import NewInventorySystem from './new-inventory-system';
+import UnifiedInventorySystem from './unified-inventory-system';
 import EnhancedStorageTab from './enhanced-storage-tab';
 import EnhancedBiomesTab from './enhanced-biomes-tab';
 import UnifiedWorkshops from './unified-workshops';
@@ -622,7 +622,7 @@ export default function ModernGameLayout() {
             )}
 
             {activeTab === 'inventory' && (
-              <NewInventorySystem
+              <UnifiedInventorySystem
                 playerId={player.id}
                 resources={resources}
                 equipment={equipment}
