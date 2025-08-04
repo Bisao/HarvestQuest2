@@ -6,9 +6,9 @@
         "id": "4052378e-ff24-48e3-a204-fcd8ab30d8d9",
         "username": "Bison",
         "level": 1,
-        "experience": 0,
+        "experience": 10,
         "coins": 100,
-        "inventoryWeight": 0,
+        "inventoryWeight": 445,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -43,7 +43,26 @@
       }
     ]
   ],
-  "inventoryItems": [],
+  "inventoryItems": [
+    [
+      "20417574-4140-4b85-a1a6-3455ee04c8f4",
+      {
+        "id": "20417574-4140-4b85-a1a6-3455ee04c8f4",
+        "playerId": "4052378e-ff24-48e3-a204-fcd8ab30d8d9",
+        "resourceId": "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "quantity": 3
+      }
+    ],
+    [
+      "575d7086-b477-4b6d-af8e-ca8d632cb227",
+      {
+        "id": "575d7086-b477-4b6d-af8e-ca8d632cb227",
+        "playerId": "4052378e-ff24-48e3-a204-fcd8ab30d8d9",
+        "resourceId": "res-d5e6f7g8-h9i0-1234-ef01-567890123456",
+        "quantity": 4
+      }
+    ]
+  ],
   "storageItems": [],
   "expeditions": [
     [
@@ -56,10 +75,13 @@
           "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
         ],
         "selectedEquipment": [],
-        "status": "in_progress",
+        "status": "completed",
         "startTime": 1754325055071,
-        "progress": 0,
-        "collectedResources": {}
+        "progress": 100,
+        "collectedResources": {
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890": 3,
+          "res-d5e6f7g8-h9i0-1234-ef01-567890123456": 4
+        }
       }
     ]
   ],
