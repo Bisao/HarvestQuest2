@@ -100,19 +100,31 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     selectedEquipment: z.array(z.string()).optional().default([])
   });
 
-  // Iniciar expedição customizada
-  router.post('/custom/start',
+  // Iniciar expedição customizada - rota corrigida
+  router.post('/start-custom',
     validateBody(customExpeditionSchema),
     async (req: Request, res: Response) => {
       try {
         const { playerId, biomeId, selectedResources, duration, selectedEquipment } = req.body;
         console.log(`🚀 CUSTOM-EXPEDITION-START: Starting for player ${playerId}, biome ${biomeId}`);
 
+        // Validar se playerId está presente
+        if (!playerId) {
+          return errorResponse(res, 400, 'Player ID é obrigatório');
+        }
+
         // Get player using ID directly 
         const player = await storage.getPlayer(playerId);
         if (!player) {
           console.error(`❌ CUSTOM-EXPEDITION-START: Player not found: ${playerId}`);
           return errorResponse(res, 404, 'Jogador não encontrado');
+        }
+
+        // Verificar se já tem expedição ativa
+        const activeExpeditions = await storage.getPlayerExpeditions(playerId);
+        const hasActive = activeExpeditions.some(exp => exp.status === 'in_progress');
+        if (hasActive) {
+          return errorResponse(res, 400, 'Você já tem uma expedição ativa');
         }
 
         // Validate biome exists
@@ -416,6 +428,50 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
       res.status(500).json({ 
         success: false, 
         message: error instanceof Error ? error.message : 'Failed to complete expedition' 
+      });
+    }
+  });
+
+  // Debug route to check expedition status
+  router.get('/debug/:expeditionId', async (req, res) => {
+    try {
+      const { expeditionId } = req.params;
+      
+      const expedition = await storage.getExpedition(expeditionId);
+      
+      if (!expedition) {
+        return res.status(404).json({
+          success: false,
+          message: 'Expedition not found'
+        });
+      }
+
+      const currentTime = Date.now();
+      const startTimeMs = expedition.startTime < 2000000000 ? expedition.startTime * 1000 : expedition.startTime;
+      const duration = expedition.duration || (30 * 60 * 1000);
+      const elapsed = currentTime - startTimeMs;
+      const progress = Math.min(100, Math.max(0, (elapsed / duration) * 100));
+
+      res.json({
+        success: true,
+        data: {
+          expedition,
+          debug: {
+            currentTime,
+            startTimeMs,
+            duration,
+            elapsed,
+            progress: Math.round(progress),
+            isComplete: progress >= 100
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ ROUTE: Debug expedition error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error instanceof Error ? error.message : 'Failed to debug expedition' 
       });
     }
   });

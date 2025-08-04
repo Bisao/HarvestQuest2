@@ -259,6 +259,21 @@ export function ImprovedCustomExpeditionModal({
 
     setIsLoading(true);
     try {
+      const response = await fetch('/api/expeditions/start-custom', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          resources: selectedResources,
+          duration: duration,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Expedition started:', data);
       await onStartExpedition(selectedResources, duration);
       onClose();
     } catch (error) {
