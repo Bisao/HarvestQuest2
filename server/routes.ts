@@ -305,19 +305,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all biomes with caching
-  app.get("/api/biomes", async (req, res) => {
-    try {
-      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
-      const biomes = await cacheGetOrSet(
-        CACHE_KEYS.ALL_BIOMES,
-        () => storage.getAllBiomes(),
-        CACHE_TTL.STATIC_DATA
-      );
-      res.json(biomes);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to get biomes" });
-    }
-  });
 
   // Get player inventory with caching
   app.get("/api/inventory/:playerId", async (req, res) => {
@@ -886,74 +873,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get biome resources - simple route for frontend
-  app.get("/api/biomes/:biomeId/resources", async (req, res) => {
-    try {
-      const { biomeId } = req.params;
-      const biome = await storage.getBiome(biomeId);
-
-      if (!biome) {
-        return res.status(404).json({ message: "Biome not found" });
-      }
-
-      const resources = await storage.getAllResources();
-      const availableResources = Array.isArray(biome.availableResources) 
-        ? biome.availableResources : [];
-
-      const biomeResources = resources.filter(r => 
-        availableResources.includes(r.id)
-      );
-
-      res.json(biomeResources);
-    } catch (error) {
-      console.error("Error getting biome resources:", error);
-      res.status(500).json({ message: "Failed to get biome resources" });
-    }
-  });
 
   // Get biome details with enhanced information
-  app.get("/api/biomes/:id/details", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const biome = await storage.getBiome(id);
-
-      if (!biome) {
-        return res.status(404).json({ message: "Biome not found" });
-      }
-
-      const resources = await storage.getAllResources();
-      const availableResources = Array.isArray(biome.availableResources) 
-        ? biome.availableResources : [];
-
-      const biomeResources = resources.filter(r => 
-        availableResources.includes(r.id)
-      );
-
-      // Categorize resources for better UI display
-      const categorizedResources = {
-        basic: biomeResources.filter(r => r.type === "basic"),
-        animals: biomeResources.filter(r => 
-          ["Coelho", "Veado", "Javali"].includes(r.name)
-        ),
-        fish: biomeResources.filter(r => 
-          ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(r.name)
-        ),
-        plants: biomeResources.filter(r => 
-          ["Cogumelos", "Frutas Silvestres"].includes(r.name)
-        ),
-        unique: biomeResources.filter(r => 
-          r.type === "unique" && !["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão", "Cogumelos", "Frutas Silvestres"].includes(r.name)
-        )
-      };
-
-      res.json({
-        ...biome,
-        resources: categorizedResources,
-        totalResources: biomeResources.length
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to get biome details" });
-    }
-  });
 
   // Check player equipment and ability to collect specific resources
   app.get("/api/player/:playerId/can-collect/:resourceId", async (req, res) => {
@@ -969,7 +890,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let canCollect = false;
 
       // Special check for fishing resources
-      if (resource.requiredTool === "fishing_rod") {
+      if (resource.requiredTool === "fishing_rod"){
         canCollect = await gameService.hasFishingRequirements(playerId);
       } else {
         // Regular tool check for other resources
@@ -989,7 +910,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  
+
 
   // Import and setup quest routes
   const { setupQuestRoutes } = await import("./routes/quest-routes");

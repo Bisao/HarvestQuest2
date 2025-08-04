@@ -24,7 +24,6 @@ export type {
   Recipe,
   Expedition,
   Quest,
-  Biome,
   Workshop,
   CraftingProcess
 } from './types';

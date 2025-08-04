@@ -31,7 +31,6 @@ import {
 // Import all tab components
 import UnifiedInventorySystem from './unified-inventory-system';
 import EnhancedStorageTab from './enhanced-storage-tab';
-import EnhancedBiomesTab from './enhanced-biomes-tab';
 import UnifiedWorkshops from './unified-workshops';
 import CampTab from './camp-tab';
 import AnimalRegistryTab from './animal-registry-tab';
@@ -46,7 +45,7 @@ import NewInventoryInterface from '@/components/game/new-inventory-interface';
 import { NewExpeditionModal } from './new-expedition-modal';
 import { OfflineActivityReportDialog } from './offline-activity-report';
 
-import type { Player, Biome, Resource, Equipment, Recipe } from '@shared/types';
+import type { Player, Resource, Equipment, Recipe, Quest, QuestProgress, Workshop, WorkshopProcess, InventoryItem, StorageItem } from '@shared/types';
 
 
 interface ActiveExpedition {
@@ -148,14 +147,14 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     color: 'text-emerald-600',
     count: 2,
     subTabs: [
-      {
-        id: 'biomes',
-        label: 'Expedições',
-        icon: TreePine,
-        color: 'text-emerald-600',
-        description: 'Explorar biomas e coletar recursos',
-        hasNotification: !!activeExpedition
-      },
+      // {
+      //   id: 'biomes',
+      //   label: 'Expedições',
+      //   icon: TreePine,
+      //   color: 'text-emerald-600',
+      //   description: 'Explorar biomas e coletar recursos',
+      //   hasNotification: !!activeExpedition
+      // },
       {
         id: 'animals',
         label: 'Bestiário',
@@ -637,16 +636,6 @@ export default function ModernGameLayout() {
                 equipment={equipment}
                 player={player}
                 isBlocked={isBlocked}
-              />
-            )}
-
-            {activeTab === 'biomes' && (
-              <EnhancedBiomesTab
-                player={player}
-                biomes={biomes}
-                resources={resources}
-                equipment={equipment}
-                onExpeditionStart={handleExpeditionStart}
               />
             )}
 

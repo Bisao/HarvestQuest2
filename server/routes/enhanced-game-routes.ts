@@ -392,18 +392,15 @@ export function registerEnhancedGameRoutes(
         }
 
         // Validate biome exists and level requirement
-        const biome = await storage.getBiome(biomeId);
-        if (!biome) {
-          throw new NotFoundError("Biome");
-        }
+        // Biome system removed
 
-        if (player.level < biome.requiredLevel) {
+        if (player.level < 1) { // biome.requiredLevel
           throw new InvalidOperationError(
-            `Level ${biome.requiredLevel} required for ${biome.name}`
+            `Level  required for ` // ${biome.name}
           );
         }
 
-        
+
 
         // Invalidate player cache
         invalidatePlayerCache(playerId);

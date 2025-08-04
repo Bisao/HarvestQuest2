@@ -3,8 +3,6 @@ import {
   type InsertPlayer,
   type Resource,
   type InsertResource,
-  type Biome,
-  type InsertBiome,
   type InventoryItem,
   type InsertInventoryItem,
   type StorageItem,
@@ -22,7 +20,6 @@ import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { getAllGameItems } from "./data/items-modern";
 import { ALL_EQUIPMENT } from "./data/equipment";
-import { createBiomeData } from "./data/biomes";
 import { createModernRecipeData } from "./data/recipes-modern";
 import { ALL_QUESTS } from "./data/quests";
 
@@ -41,9 +38,7 @@ export interface IStorage {
   createResource(resource: InsertResource): Promise<Resource>;
 
   // Biome methods
-  getAllBiomes(): Promise<Biome[]>;
-  getBiome(id: string): Promise<Biome | undefined>;
-  createBiome(biome: InsertBiome): Promise<Biome>;
+  // Biome system removed
 
   // Inventory methods
   getPlayerInventory(playerId: string): Promise<InventoryItem[]>;
@@ -226,10 +221,7 @@ export class MemStorage implements IStorage {
     }
 
     // Initialize biomes using modular data
-    const biomesData = createBiomeData();
-    for (const biome of biomesData) {
-      await this.createBiome(biome);
-    }
+    // Biome system removed
 
     // Initialize equipment using modular data
     for (const equip of ALL_EQUIPMENT) {
@@ -449,27 +441,7 @@ export class MemStorage implements IStorage {
   }
 
   // Biome methods
-  async getAllBiomes(): Promise<Biome[]> {
-    return Array.from(this.biomes.values());
-  }
-
-  async getBiome(id: string): Promise<Biome | undefined> {
-    return this.biomes.get(id);
-  }
-
-  async createBiome(insertBiome: InsertBiome): Promise<Biome> {
-    // Use predefined ID if provided, otherwise generate random UUID
-    const id = insertBiome.id || randomUUID();
-    const biome: Biome = {
-      id,
-      name: insertBiome.name,
-      emoji: insertBiome.emoji,
-      requiredLevel: insertBiome.requiredLevel ?? 1,
-      availableResources: insertBiome.availableResources,
-    };
-    this.biomes.set(id, biome);
-    return biome;
-  }
+  // Biome system removed
 
   // Inventory methods
   async getPlayerInventory(playerId: string): Promise<InventoryItem[]> {

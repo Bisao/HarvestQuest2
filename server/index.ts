@@ -100,7 +100,7 @@ app.use((req, res, next) => {
   // Start auto consume system
   autoConsumeService.startAutoConsume();
 
-    
+
 
   // Setup legacy routes
   registerRoutes(app, storage);
