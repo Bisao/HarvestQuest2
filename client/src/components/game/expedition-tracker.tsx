@@ -8,7 +8,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Clock, Play, Pause, CheckCircle, MapPin } from 'lucide-react';
 import type { ActiveExpedition } from '@shared/types/expedition-types';
 import type { Player } from '@shared/types';
-import { usePlayer } from '@/hooks/use-player';
 import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
 
 interface ExpeditionTrackerProps {
@@ -18,7 +17,6 @@ interface ExpeditionTrackerProps {
 export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { player } = usePlayer();
   const playerId = player?.id;
   const { invalidateInventoryData } = useInventoryUpdates(playerId || '');
 
@@ -31,7 +29,7 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
 
   // Ensure activeExpeditions is always an array
   const activeExpeditions = Array.isArray(expeditionsData) ? expeditionsData : 
-                            (expeditionsData?.data && Array.isArray(expeditionsData.data)) ? expeditionsData.data : [];
+                            (expeditionsData && typeof expeditionsData === 'object' && 'data' in expeditionsData && Array.isArray((expeditionsData as any).data)) ? (expeditionsData as any).data : [];
 
   // Mutation para completar expedição
   const completeExpeditionMutation = useMutation({
@@ -184,7 +182,7 @@ export function ExpeditionTracker({ player }: ExpeditionTrackerProps) {
   }
 
   // Check if there are problematic expeditions (0% progress for a long time)
-  const hasProblematicExpeditions = activeExpeditions.some(exp => 
+  const hasProblematicExpeditions = activeExpeditions.some((exp: ActiveExpedition) => 
     exp.progress === 0 && (Date.now() - exp.startTime) > 5 * 60 * 1000 // 5 minutes
   );
 
