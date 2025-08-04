@@ -15,7 +15,17 @@ import { ANIMAL_REGISTRY } from '../data/animal-registry';
 export class CombatService {
   constructor(private storage: IStorage) {}
 
-  // Biome system removed
+  private getBiomeName(biomeId: string): string {
+    // Mapear IDs de bioma para nomes
+    const biomeMap: { [key: string]: string } = {
+      '61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47': 'Floresta',
+      'biome-floresta': 'Floresta',
+      'floresta': 'Floresta',
+      'Floresta': 'Floresta'
+    };
+    
+    return biomeMap[biomeId] || 'Floresta'; // Default para floresta
+  }
 
   // ===================== ENCOUNTER GENERATION =====================
 
@@ -24,7 +34,7 @@ export class CombatService {
     if (Math.random() > 0.3) return null;
 
     // Filtrar animais do bioma (melhorar correspondência)
-    const biomeName = 'Floresta'; //this.getBiomeName(biomeId);
+    const biomeName = this.getBiomeName(biomeId);
     const biomeAnimals = ANIMAL_REGISTRY.filter(animal => 
       animal.habitat?.some(h => h.toLowerCase().includes(biomeName.toLowerCase())) || 
       animal.discoveryLocation?.some(l => l.toLowerCase().includes(biomeName.toLowerCase())) ||

@@ -4,7 +4,7 @@
 import type { Express } from "express";
 import type { IStorage } from "../storage";
 import { GameService } from "../services/game-service";
-
+import { NewExpeditionService } from "../services/new-expedition-service";
 
 // Route registrations
 export { registerHealthRoutes } from "./health";

@@ -392,20 +392,39 @@ export function registerEnhancedGameRoutes(
         }
 
         // Validate biome exists and level requirement
-        // Biome system removed
+        const biome = await storage.getBiome(biomeId);
+        if (!biome) {
+          throw new NotFoundError("Biome");
+        }
 
-        if (player.level < 1) { // biome.requiredLevel
+        if (player.level < biome.requiredLevel) {
           throw new InvalidOperationError(
-            `Level  required for ` // ${biome.name}
+            `Level ${biome.requiredLevel} required for ${biome.name}`
           );
         }
 
+        // Check for active expedition
+        const expeditions = await storage.getPlayerExpeditions(playerId);
+        const activeExpedition = expeditions.find(exp => exp.status === 'in_progress');
+        if (activeExpedition) {
+          throw new InvalidOperationError("Already have an active expedition");
+        }
 
+        // Import and use expedition service
+        const { NewExpeditionService } = await import('../services/new-expedition-service');
+        const newExpeditionService = new NewExpeditionService(storage);
+        
+        const expedition = await newExpeditionService.startExpedition(
+          playerId,
+          biomeId,
+          selectedResources,
+          selectedEquipment
+        );
 
         // Invalidate player cache
         invalidatePlayerCache(playerId);
 
-        successResponse(res, { message: "Expedition system temporarily disabled" });
+        successResponse(res, expedition, "Expedition started successfully");
       } catch (error) {
         next(error);
       }

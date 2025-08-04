@@ -7,8 +7,10 @@ import { z } from "zod";
 import type { Player, HungerDegradationMode } from "@shared/types";
 import { validateParams, playerIdParamSchema } from "./middleware/validation";
 import { GameService } from "./services/game-service";
+import { createNewExpeditionRoutes } from './routes/new-expedition-routes';
 import { QuestService } from "./services/quest-service";
 import { OfflineActivityService } from "./services/offline-activity-service";
+import { NewExpeditionService } from "./services/new-expedition-service";
 import { randomUUID } from "crypto";
 import { registerHealthRoutes } from "./routes/health";
 import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
@@ -21,7 +23,6 @@ import animalRegistryRoutes from './routes/animal-registry-routes';
 import animalRoutes from './routes/animal-routes';
 import developerRoutes from './routes/developer-routes';
 import equipmentRoutes from './routes/equipment-routes';
-import biomesRoutes from './routes/biomes-routes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -31,6 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gameService = new GameService(storage);
   const questService = new QuestService(storage);
   const offlineActivityService = new OfflineActivityService(storage);
+  const expeditionService = new NewExpeditionService(storage);
 
   // Register health and monitoring routes
   registerHealthRoutes(app);
@@ -38,7 +40,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register enhanced game routes with full validation and caching
   registerEnhancedGameRoutes(app, storage, gameService);
 
-  // Expeditions system removed
+  // Register new expedition routes
+  app.use('/api/expeditions', createNewExpeditionRoutes(storage));
 
   // Register admin routes for development
   registerAdminRoutes(app);
@@ -306,6 +309,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all biomes with caching
+  app.get("/api/biomes", async (req, res) => {
+    try {
+      const { cacheGetOrSet, CACHE_KEYS, CACHE_TTL } = await import("./cache/memory-cache");
+      const biomes = await cacheGetOrSet(
+        CACHE_KEYS.ALL_BIOMES,
+        () => storage.getAllBiomes(),
+        CACHE_TTL.STATIC_DATA
+      );
+      res.json(biomes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get biomes" });
+    }
+  });
 
   // Get player inventory with caching
   app.get("/api/inventory/:playerId", async (req, res) => {
@@ -499,6 +515,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // REMOVED: Legacy craft API - use /api/v2/craft instead for modern attribute-based crafting
+
+  // Create expedition using service
+  app.post("/api/expeditions", async (req, res) => {
+    try {
+      const { playerId, biomeId, selectedResources, selectedEquipment } = req.body;
+
+      // Validações detalhadas
+      if (!playerId || typeof playerId !== 'string') {
+        return res.status(400).json({ message: "ID do jogador inválido" });
+      }
+
+      if (!biomeId || typeof biomeId !== 'string') {
+        return res.status(400).json({ message: "ID do bioma inválido" });
+      }
+
+      if (!selectedResources || !Array.isArray(selectedResources) || selectedResources.length === 0) {
+        return res.status(400).json({ message: "Recursos selecionados inválidos" });
+      }
+
+      // Verificar se todos os recursos são strings válidas
+      const invalidResources = selectedResources.filter(id => !id || typeof id !== 'string');
+      if (invalidResources.length > 0) {
+        return res.status(400).json({ message: "IDs de recursos inválidos" });
+      }
+       const validResources = selectedResources.filter(id => id && typeof id === 'string');
+
+      console.log('Creating expedition with data:', {
+        playerId,
+        biomeId,
+        selectedResources,
+        selectedEquipment: selectedEquipment || []
+      });
+
+      const expedition = await expeditionService.startExpedition(playerId, biomeId);
+
+      if (!expedition || !expedition.id) {
+        throw new Error('Falha ao criar expedição');
+      }
+
+      console.log('Expedition created successfully:', expedition.id);
+      res.json(expedition);
+    } catch (error) {
+      console.error("Create expedition error:", error);
+
+      let errorMessage = "Erro interno ao criar expedição";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
+  // Get player expeditions
+  app.get("/api/player/:playerId/expeditions", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const expeditions = await storage.getPlayerExpeditions(playerId);
+      res.json(expeditions);
+    } catch (error) {
+      console.error("Get player expeditions error:", error);
+      res.status(500).json({ message: "Failed to get expeditions" });
+    }
+  });
+
+  // Get active expedition for player
+  app.get("/api/player/:playerId/expeditions/active", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
+      const activeExpedition = activeExpeditions[0] || null;
+
+      if (!activeExpedition) {
+        return res.status(404).json({ message: "No active expedition found" });
+      }
+
+      res.json(activeExpedition);
+    } catch (error) {
+      console.error("Get active expedition error:", error);
+      res.status(500).json({ message: "Failed to get active expedition" });
+    }
+  });
+
+  // Delete/cancel player expedition
+  app.delete("/api/player/:playerId/expeditions", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
+      const activeExpedition = activeExpeditions[0] || null;
+
+      if (activeExpedition) {
+        // For now, directly update storage to cancel expedition
+        await storage.updateExpedition(activeExpedition.id, { status: 'cancelled' });
+      }
+
+      res.json({ success: true, message: "Expedition cancelled" });
+    } catch (error) {
+      console.error("Cancel expedition error:", error);
+      res.status(500).json({ message: "Failed to cancel expedition" });
+    }
+  });
 
   // Legacy expedition endpoints removed - using new expedition system
 
@@ -874,8 +991,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get biome resources - simple route for frontend
+  app.get("/api/biomes/:biomeId/resources", async (req, res) => {
+    try {
+      const { biomeId } = req.params;
+      const biome = await storage.getBiome(biomeId);
+
+      if (!biome) {
+        return res.status(404).json({ message: "Biome not found" });
+      }
+
+      const resources = await storage.getAllResources();
+      const availableResources = Array.isArray(biome.availableResources) 
+        ? biome.availableResources : [];
+
+      const biomeResources = resources.filter(r => 
+        availableResources.includes(r.id)
+      );
+
+      res.json(biomeResources);
+    } catch (error) {
+      console.error("Error getting biome resources:", error);
+      res.status(500).json({ message: "Failed to get biome resources" });
+    }
+  });
 
   // Get biome details with enhanced information
+  app.get("/api/biomes/:id/details", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const biome = await storage.getBiome(id);
+
+      if (!biome) {
+        return res.status(404).json({ message: "Biome not found" });
+      }
+
+      const resources = await storage.getAllResources();
+      const availableResources = Array.isArray(biome.availableResources) 
+        ? biome.availableResources : [];
+
+      const biomeResources = resources.filter(r => 
+        availableResources.includes(r.id)
+      );
+
+      // Categorize resources for better UI display
+      const categorizedResources = {
+        basic: biomeResources.filter(r => r.type === "basic"),
+        animals: biomeResources.filter(r => 
+          ["Coelho", "Veado", "Javali"].includes(r.name)
+        ),
+        fish: biomeResources.filter(r => 
+          ["Peixe Pequeno", "Peixe Grande", "Salmão"].includes(r.name)
+        ),
+        plants: biomeResources.filter(r => 
+          ["Cogumelos", "Frutas Silvestres"].includes(r.name)
+        ),
+        unique: biomeResources.filter(r => 
+          r.type === "unique" && !["Coelho", "Veado", "Javali", "Peixe Pequeno", "Peixe Grande", "Salmão", "Cogumelos", "Frutas Silvestres"].includes(r.name)
+        )
+      };
+
+      res.json({
+        ...biome,
+        resources: categorizedResources,
+        totalResources: biomeResources.length
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get biome details" });
+    }
+  });
 
   // Check player equipment and ability to collect specific resources
   app.get("/api/player/:playerId/can-collect/:resourceId", async (req, res) => {
@@ -891,7 +1074,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let canCollect = false;
 
       // Special check for fishing resources
-      if (resource.requiredTool === "fishing_rod"){
+      if (resource.requiredTool === "fishing_rod") {
         canCollect = await gameService.hasFishingRequirements(playerId);
       } else {
         // Regular tool check for other resources
@@ -911,7 +1094,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get player's active expedition
+  app.get("/api/player/:playerId/active-expedition", async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
+      const activeExpedition = activeExpeditions[0] || null;
+      res.json(activeExpedition);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get active expedition" });
+    }
+  });
 
+  // Cancel expedition
+  app.post("/api/expeditions/:id/cancel", async (req, res) => {
+    try {
+      const { id } = req.params;
+      // For now, directly update storage to cancel expedition
+      await storage.updateExpedition(id, { status: 'cancelled' });
+      res.json({ message: "Expedition cancelled successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to cancel expedition" });
+    }
+  });
 
   // Import and setup quest routes
   const { setupQuestRoutes } = await import("./routes/quest-routes");
@@ -1109,7 +1314,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Developer routes
   app.use('/api/developer', developerRoutes);
-  app.use('/api/biomes', biomesRoutes);
 
   return httpServer;
 }

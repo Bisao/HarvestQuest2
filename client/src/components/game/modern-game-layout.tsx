@@ -31,6 +31,7 @@ import {
 // Import all tab components
 import UnifiedInventorySystem from './unified-inventory-system';
 import EnhancedStorageTab from './enhanced-storage-tab';
+import EnhancedBiomesTab from './enhanced-biomes-tab';
 import UnifiedWorkshops from './unified-workshops';
 import CampTab from './camp-tab';
 import AnimalRegistryTab from './animal-registry-tab';
@@ -40,52 +41,14 @@ import QuestsTab from './quests-tab';
 import PlayerSettings from './player-settings';
 import ExpeditionPanel from './expedition-panel';
 import NewInventoryInterface from '@/components/game/new-inventory-interface';
-import BiomesTab from '@/components/game/biomes-tab';
 
 // Import modals
+import { NewExpeditionModal } from './new-expedition-modal';
 import { OfflineActivityReportDialog } from './offline-activity-report';
 
-import type { Player, Resource, Equipment, Recipe, Quest, InventoryItem, StorageItem } from '@shared/types';
+import type { Player, Biome, Resource, Equipment, Recipe } from '@shared/types';
 
-// Define missing types locally for this component
-interface QuestProgress {
-  questId: string;
-  progress: Record<string, number>;
-  status: 'available' | 'active' | 'completed' | 'failed';
-}
-
-interface Workshop {
-  id: string;
-  name: string;
-  type: string;
-  level: number;
-}
-
-interface WorkshopProcess {
-  id: string;
-  name: string;
-  workshopId: string;
-  inputs: { resourceId: string; quantity: number }[];
-  outputs: { resourceId: string; quantity: number }[];
-  processingTime: number;
-}
-
-interface Biome {
-  id: string;
-  name: string;
-  displayName?: string;
-  description?: string;
-  emoji?: string;
-  difficulty?: number;
-  requiredLevel?: number;
-  dangerLevel?: number;
-  explorationTime?: number;
-  discoverable?: boolean;
-  category?: string;
-  resources?: any[];
-  specialFeatures?: string[];
-}
-
+// Define ActiveExpedition type locally since it's not in shared types
 interface ActiveExpedition {
   id: string;
   biome: string;
@@ -438,13 +401,10 @@ export default function ModernGameLayout() {
     );
   }, []);
 
-  const handleExpeditionStart = useCallback((biomeId: string) => {
-    const biome = biomes?.find(b => b.id === biomeId);
-    if (biome) {
-      setSelectedBiome(biome);
-      setExpeditionModalOpen(true);
-    }
-  }, [biomes]);
+  const handleExpeditionStart = useCallback((biome: Biome) => {
+    setSelectedBiome(biome);
+    setExpeditionModalOpen(true);
+  }, []);
 
   const handleExpeditionComplete = useCallback((expeditionData: any) => {
     setActiveExpedition(expeditionData);
@@ -680,6 +640,16 @@ export default function ModernGameLayout() {
               />
             )}
 
+            {activeTab === 'biomes' && (
+              <EnhancedBiomesTab
+                player={player}
+                biomes={biomes}
+                resources={resources}
+                equipment={equipment}
+                onExpeditionStart={handleExpeditionStart}
+              />
+            )}
+
             {activeTab === 'camp' && (
               <CampTab
                 player={player}
@@ -696,14 +666,7 @@ export default function ModernGameLayout() {
               />
             )}
 
-            {activeTab === 'biomes' && (
-              <BiomesTab
-                player={player}
-                resources={resources}
-                equipment={equipment}
-                onStartExpedition={handleExpeditionStart}
-              />
-            )}
+
 
             {activeTab === 'animals' && (
               <AnimalRegistryTab 
@@ -745,7 +708,14 @@ export default function ModernGameLayout() {
       </div>
 
       {/* Modals */}
-      {/* Note: NewExpeditionModal has been removed - expedition system discontinued */}
+      {player && selectedBiome && (
+        <NewExpeditionModal
+          isOpen={expeditionModalOpen}
+          onClose={handleExpeditionModalClose}
+          biome={selectedBiome}
+          player={player}
+        />
+      )}
 
       <OfflineActivityReportDialog
         isOpen={offlineReportOpen}
