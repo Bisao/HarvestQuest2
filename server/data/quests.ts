@@ -18,8 +18,9 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "expedition",
-        biomeId: BIOME_IDS.FLORESTA,
+        target: BIOME_IDS.FLORESTA,
         amount: 1,
+        biomeId: BIOME_IDS.FLORESTA,
         description: "Complete 1 expedição na Floresta"
       }
     ],
@@ -42,8 +43,9 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "expedition",
-        biomeId: BIOME_IDS.FLORESTA,
+        target: BIOME_IDS.FLORESTA,
         amount: 5,
+        biomeId: BIOME_IDS.FLORESTA,
         description: "Complete 5 expedições na Floresta"
       }
     ],
@@ -66,8 +68,9 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "expedition",
-        biomeId: BIOME_IDS.FLORESTA,
+        target: BIOME_IDS.FLORESTA,
         amount: 15,
+        biomeId: BIOME_IDS.FLORESTA,
         description: "Complete 15 expedições na Floresta"
       }
     ],
@@ -92,12 +95,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
+        target: RESOURCE_IDS.FIBRA,
+        amount: 5,
         resourceId: RESOURCE_IDS.FIBRA,
         quantity: 5,
         description: "Colete 5 fibras"
       },
       {
         type: "collect", 
+        target: RESOURCE_IDS.GRAVETOS,
+        amount: 3,
         resourceId: RESOURCE_IDS.GRAVETOS,
         quantity: 3,
         description: "Colete 3 gravetos"
@@ -122,12 +129,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect", 
+        target: RESOURCE_IDS.MADEIRA,
+        amount: 10,
         resourceId: RESOURCE_IDS.MADEIRA,
         quantity: 10,
         description: "Colete 10 madeiras"
       },
       {
         type: "collect",
+        target: RESOURCE_IDS.PEDRA,
+        amount: 15,
         resourceId: RESOURCE_IDS.PEDRA,
         quantity: 15,
         description: "Colete 15 pedras (requer picareta equipada)"
@@ -152,6 +163,8 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
+        target: RESOURCE_IDS.PEDRA,
+        amount: 20,
         resourceId: RESOURCE_IDS.PEDRA,
         quantity: 20,
         description: "Colete 20 pedras (requer picareta)"
@@ -176,12 +189,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
+        target: RESOURCE_IDS.FERRO_FUNDIDO,
+        amount: 5,
         resourceId: RESOURCE_IDS.FERRO_FUNDIDO,
         quantity: 5,
         description: "Colete 5 ferro fundido"
       },
       {
         type: "collect",
+        target: RESOURCE_IDS.ARGILA,
+        amount: 25,
         resourceId: RESOURCE_IDS.ARGILA,
         quantity: 25,
         description: "Colete 25 argilas"
@@ -208,12 +225,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
+        target: RESOURCE_IDS.COGUMELOS,
+        amount: 5,
         resourceId: RESOURCE_IDS.COGUMELOS,
         quantity: 5,
         description: "Colete 5 cogumelos (prática para observação)"
       },
       {
         type: "collect",
+        target: RESOURCE_IDS.FRUTAS_SILVESTRES,
+        amount: 8,
         resourceId: RESOURCE_IDS.FRUTAS_SILVESTRES,
         quantity: 8,
         description: "Colete 8 frutas silvestres (desenvolva paciência)"
@@ -238,6 +259,8 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
+        target: RESOURCE_IDS.COELHO,
+        amount: 2,
         resourceId: RESOURCE_IDS.COELHO,
         quantity: 2,
         description: "Caçe 2 coelhos (requer faca equipada)"
@@ -263,6 +286,8 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
+        target: EQUIPMENT_IDS.VARA_PESCA,
+        amount: 1,
         itemId: EQUIPMENT_IDS.VARA_PESCA,
         quantity: 1,
         description: "Crie 1 vara de pesca"
@@ -287,6 +312,8 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
+        target: RESOURCE_IDS.PEIXE_PEQUENO,
+        amount: 5,
         resourceId: RESOURCE_IDS.PEIXE_PEQUENO,
         quantity: 5,
         description: "Pesque 5 peixes pequenos (requer vara de pesca equipada)"
@@ -312,6 +339,8 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
+        target: RESOURCE_IDS.VEADO,
+        amount: 1,
         resourceId: RESOURCE_IDS.VEADO,
         quantity: 1,
         description: "Caçe 1 veado (requer arma + faca equipadas)"
@@ -337,12 +366,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "collect",
+        target: RESOURCE_IDS.PEIXE_GRANDE,
+        amount: 3,
         resourceId: RESOURCE_IDS.PEIXE_GRANDE,
         quantity: 3,
         description: "Pesque 3 peixes grandes"
       },
       {
         type: "collect",
+        target: RESOURCE_IDS.SALMAO,
+        amount: 1,
         resourceId: RESOURCE_IDS.SALMAO,
         quantity: 1,
         description: "Pesque 1 salmão (mais raro)"
@@ -370,6 +403,8 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
+        target: RESOURCE_IDS.BARBANTE,
+        amount: 3,
         resourceId: RESOURCE_IDS.BARBANTE,
         quantity: 3,
         description: "Crie 3 barbantes"
@@ -394,12 +429,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
+        target: EQUIPMENT_IDS.PICARETA,
+        amount: 1,
         itemId: EQUIPMENT_IDS.PICARETA,
         quantity: 1,
         description: "Crie 1 picareta"
       },
       {
         type: "craft",
+        target: EQUIPMENT_IDS.MACHADO,
+        amount: 1,
         itemId: EQUIPMENT_IDS.MACHADO,
         quantity: 1,
         description: "Crie 1 machado"
@@ -424,12 +463,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
+        target: EQUIPMENT_IDS.PICARETA,
+        amount: 1,
         itemId: EQUIPMENT_IDS.PICARETA,
         quantity: 1,
         description: "Crie 1 picareta"
       },
       {
         type: "craft",
+        target: EQUIPMENT_IDS.VARA_PESCA,
+        amount: 1,
         itemId: EQUIPMENT_IDS.VARA_PESCA,
         quantity: 1,
         description: "Crie 1 vara de pesca"
@@ -454,12 +497,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
+        target: RESOURCE_IDS.COGUMELOS_ASSADOS,
+        amount: 5,
         resourceId: RESOURCE_IDS.COGUMELOS_ASSADOS,
         quantity: 5,
         description: "Cozinhe 5 cogumelos assados"
       },
       {
         type: "craft",
+        target: RESOURCE_IDS.CARNE_ASSADA,
+        amount: 3,
         resourceId: RESOURCE_IDS.CARNE_ASSADA,
         quantity: 3,
         description: "Cozinhe 3 carnes assadas"
@@ -484,12 +531,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
+        target: RESOURCE_IDS.ENSOPADO_CARNE,
+        amount: 2,
         resourceId: RESOURCE_IDS.ENSOPADO_CARNE,
         quantity: 2,
         description: "Cozinhe 2 ensopados de carne"
       },
       {
         type: "craft",
+        target: RESOURCE_IDS.SUCO_FRUTAS,
+        amount: 5,
         resourceId: RESOURCE_IDS.SUCO_FRUTAS,
         quantity: 5,
         description: "Prepare 5 sucos de frutas"
@@ -514,12 +565,16 @@ export const ALL_QUESTS: InsertQuest[] = [
     objectives: [
       {
         type: "craft",
+        target: EQUIPMENT_IDS.MOCHILA,
+        amount: 1,
         itemId: EQUIPMENT_IDS.MOCHILA,
         quantity: 1,
         description: "Crie 1 mochila"
       },
       {
         type: "craft",
+        target: EQUIPMENT_IDS.ARCO_FLECHA,
+        amount: 1,
         itemId: EQUIPMENT_IDS.ARCO_FLECHA,
         quantity: 1,
         description: "Crie 1 arco e flecha"

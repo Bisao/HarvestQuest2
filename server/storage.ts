@@ -38,7 +38,9 @@ export interface IStorage {
   createResource(resource: InsertResource): Promise<Resource>;
 
   // Biome methods
-  // Biome system removed
+  getAllBiomes(): Promise<any[]>;
+  getBiome(id: string): Promise<any | undefined>; 
+  createBiome(biome: any): Promise<any>;
 
   // Inventory methods
   getPlayerInventory(playerId: string): Promise<InventoryItem[]>;
@@ -446,7 +448,20 @@ export class MemStorage implements IStorage {
   }
 
   // Biome methods
-  // Biome system removed
+  async getAllBiomes(): Promise<any[]> {
+    return Array.from(this.biomes.values());
+  }
+
+  async getBiome(id: string): Promise<any | undefined> {
+    return this.biomes.get(id);
+  }
+
+  async createBiome(biome: any): Promise<any> {
+    const id = biome.id || randomUUID();
+    const biomeWithId = { ...biome, id };
+    this.biomes.set(id, biomeWithId);
+    return biomeWithId;
+  }
 
   // Inventory methods
   async getPlayerInventory(playerId: string): Promise<InventoryItem[]> {

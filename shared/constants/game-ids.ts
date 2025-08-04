@@ -49,7 +49,11 @@ export const RESOURCE_IDS = {
   CARNE: "res-p7q8r9s0-t1u2-3456-0123-789012345678",
   COURO: "res-q8r9s0t1-u2v3-4567-1234-890123456789",
   ISCA_PESCA: "res-r9s0t1u2-v3w4-5678-2345-901234567890",
-  ARGILA: "res-s0t1u2v3-w4x5-6789-3456-012345678901"
+  ARGILA: "res-s0t1u2v3-w4x5-6789-3456-012345678901",
+  
+  // Missing resources referenced in quests
+  CRISTAIS: "res-t1u2v3w4-x5y6-7890-4567-123456789012",
+  OSSOS: "res-u2v3w4x5-y6z7-8901-5678-234567890123"
 } as const;
 
 // ===================== EQUIPMENT IDs =====================
@@ -133,7 +137,15 @@ export const RECIPE_IDS = {
   FACA_FERRO: "rec-faca-ferro-001"
 } as const;
 
-// Biome system removed
+// ===================== BIOME IDs =====================
+export const BIOME_IDS = {
+  FLORESTA: "temperate_forest",
+  MONTANHA: "rocky_mountains", 
+  DESERTO: "scorching_desert",
+  OCEANO: "deep_ocean",
+  CAVERNA: "dark_cavern",
+  PLANICIE: "grassland_plains"
+} as const;
 
 // ===================== QUEST IDs =====================
 export const QUEST_IDS = {
@@ -207,5 +219,6 @@ export const ALL_GAME_IDS = {
   EQUIPMENT: EQUIPMENT_IDS,
   RECIPES: RECIPE_IDS,
   QUESTS: QUEST_IDS,
-  SKILLS: SKILL_IDS
+  SKILLS: SKILL_IDS,
+  BIOMES: BIOME_IDS
 } as const;
