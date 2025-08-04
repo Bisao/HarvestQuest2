@@ -6,9 +6,9 @@
         "id": "4052378e-ff24-48e3-a204-fcd8ab30d8d9",
         "username": "Bison",
         "level": 1,
-        "experience": 10,
+        "experience": 20,
         "coins": 100,
-        "inventoryWeight": 445,
+        "inventoryWeight": 890,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -25,14 +25,14 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 81,
+        "hunger": 64.5,
         "maxHunger": 100,
-        "thirst": 85,
+        "thirst": 73,
         "maxThirst": 100,
         "temperature": 0,
-        "fatigue": 8,
-        "morale": 50,
-        "hygiene": 100,
+        "fatigue": 6,
+        "morale": 51,
+        "hygiene": 97,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -50,7 +50,7 @@
         "id": "20417574-4140-4b85-a1a6-3455ee04c8f4",
         "playerId": "4052378e-ff24-48e3-a204-fcd8ab30d8d9",
         "resourceId": "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "quantity": 3
+        "quantity": 6
       }
     ],
     [
@@ -59,7 +59,7 @@
         "id": "575d7086-b477-4b6d-af8e-ca8d632cb227",
         "playerId": "4052378e-ff24-48e3-a204-fcd8ab30d8d9",
         "resourceId": "res-d5e6f7g8-h9i0-1234-ef01-567890123456",
-        "quantity": 4
+        "quantity": 8
       }
     ]
   ],
@@ -96,8 +96,37 @@
           "res-d5e6f7g8-h9i0-1234-ef01-567890123456"
         ],
         "selectedEquipment": [],
-        "status": "in_progress",
+        "status": "completed",
         "startTime": 1754326866702,
+        "progress": 100,
+        "collectedResources": {
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890": 3,
+          "res-d5e6f7g8-h9i0-1234-ef01-567890123456": 4
+        },
+        "duration": 900000
+      }
+    ],
+    [
+      "c3065068-f635-4388-97a0-1770850d50c8",
+      {
+        "id": "c3065068-f635-4388-97a0-1770850d50c8",
+        "playerId": "4052378e-ff24-48e3-a204-fcd8ab30d8d9",
+        "biomeId": "biome-floresta-001",
+        "selectedResources": [
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "res-b3c4d5e6-f7g8-9012-cdef-345678901234",
+          "res-d5e6f7g8-h9i0-1234-ef01-567890123456",
+          "res-i0j1k2l3-m4n5-6789-3456-012345678901",
+          "res-h9i0j1k2-l3m4-5678-2345-901234567890",
+          "res-j1k2l3m4-n5o6-7890-4567-123456789012",
+          "res-k2l3m4n5-o6p7-8901-5678-234567890123",
+          "res-g8h9i0j1-k2l3-4567-1234-890123456789",
+          "res-l3m4n5o6-p7q8-9012-6789-345678901234",
+          "res-m4n5o6p7-q8r9-0123-7890-456789012345"
+        ],
+        "selectedEquipment": [],
+        "status": "in_progress",
+        "startTime": 1754328546864,
         "progress": 0,
         "collectedResources": {},
         "duration": 900000
