@@ -359,71 +359,12 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     try {
       const { expeditionId } = req.params;
 
-      console.log(`🏁 ROUTE: [STEP 1] Completing expedition ${expeditionId}`);
-      console.log(`🏁 ROUTE: [STEP 1] Request method: ${req.method}, URL: ${req.originalUrl}`);
-      console.log(`🏁 ROUTE: [STEP 1] Headers:`, JSON.stringify(req.headers, null, 2));
-      console.log(`🏁 ROUTE: [STEP 1] Body:`, JSON.stringify(req.body, null, 2));
+      console.log(`🏁 ROUTE: Completing expedition ${expeditionId}`);
 
-      // First check if expedition exists
-      const expedition = await storage.getExpedition(expeditionId);
-      if (!expedition) {
-        console.error(`❌ ROUTE: [STEP 1] Expedition ${expeditionId} not found in database`);
-        return res.status(404).json({ 
-          success: false, 
-          message: 'Expedition not found' 
-        });
-      }
-
-      console.log(`📋 ROUTE: [STEP 2] Found expedition:`, JSON.stringify(expedition, null, 2));
-
-      // Check if player exists
-      const player = await storage.getPlayer(expedition.playerId);
-      if (!player) {
-        console.error(`❌ ROUTE: [STEP 2] Player ${expedition.playerId} not found`);
-        return res.status(404).json({ 
-          success: false, 
-          message: 'Player not found' 
-        });
-      }
-
-      console.log(`👤 ROUTE: [STEP 3] Found player: ${player.username} (${player.id})`);
-
-      // Check current inventory before completion
-      const inventoryBefore = await storage.getPlayerInventory(expedition.playerId);
-      const storageBefore = await storage.getPlayerStorage(expedition.playerId);
-      console.log(`📦 ROUTE: [STEP 4] Inventory before completion:`, inventoryBefore.length, 'items');
-      console.log(`🏪 ROUTE: [STEP 4] Storage before completion:`, storageBefore.length, 'items');
-
-      console.log(`🏁 ROUTE: [STEP 5] Calling expeditionService.completeExpedition()`);
       const completedExpedition = await expeditionService.completeExpedition(expeditionId);
 
-      // Check inventory after completion
-      const inventoryAfter = await storage.getPlayerInventory(expedition.playerId);
-      const storageAfter = await storage.getPlayerStorage(expedition.playerId);
-      console.log(`📦 ROUTE: [STEP 6] Inventory after completion:`, inventoryAfter.length, 'items');
-      console.log(`🏪 ROUTE: [STEP 6] Storage after completion:`, storageAfter.length, 'items');
-      
-      // Log detailed inventory changes
-      if (inventoryAfter.length > inventoryBefore.length) {
-        console.log(`✅ ROUTE: [STEP 6] NEW INVENTORY ITEMS:`, inventoryAfter.slice(inventoryBefore.length));
-      }
-      if (storageAfter.length > storageBefore.length) {
-        console.log(`✅ ROUTE: [STEP 6] NEW STORAGE ITEMS:`, storageAfter.slice(storageBefore.length));
-      }
-
-      console.log(`✅ ROUTE: [STEP 7] Expedition ${expeditionId} completed successfully`);
-      console.log(`🎁 ROUTE: [STEP 7] Final rewards in response:`, completedExpedition.collectedResources);
-
-      // Force all caches to invalidate
-      try {
-        const { invalidatePlayerCache, invalidateInventoryCache, invalidateStorageCache } = await import('../cache/memory-cache');
-        invalidatePlayerCache(expedition.playerId);
-        invalidateInventoryCache(expedition.playerId);
-        invalidateStorageCache(expedition.playerId);
-        console.log(`🔄 ROUTE: [STEP 8] Cache invalidated for player ${expedition.playerId}`);
-      } catch (error) {
-        console.warn('⚠️ ROUTE: [STEP 8] Cache invalidation failed:', error);
-      }
+      console.log(`✅ ROUTE: Expedition ${expeditionId} completed successfully`);
+      console.log(`🎁 ROUTE: Final rewards applied:`, completedExpedition.collectedResources);
 
       res.json({ 
         success: true, 
@@ -433,7 +374,6 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
 
     } catch (error) {
       console.error('❌ ROUTE: Complete expedition error:', error);
-      console.error('❌ ROUTE: Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       res.status(500).json({ 
         success: false, 
         message: error instanceof Error ? error.message : 'Failed to complete expedition' 

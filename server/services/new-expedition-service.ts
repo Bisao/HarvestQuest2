@@ -40,16 +40,16 @@ export class NewExpeditionService {
         },
         rewards: {
           guaranteed: {
-            'res-fibra-001': 3 // Fibra
+            'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890': 3 // Fibra
           },
           possible: [
             {
-              resourceId: 'res-pedra-001', // Pedra
+              resourceId: 'res-a2b3c4d5-e6f7-8901-bcde-f23456789012', // Pedra
               quantity: 2,
               chance: 0.7
             },
             {
-              resourceId: 'res-gravetos-001', // Gravetos
+              resourceId: 'res-d5e6f7g8-h9i0-1234-ef01-567890123456', // Gravetos
               quantity: 4,
               chance: 0.8
             }
@@ -76,13 +76,13 @@ export class NewExpeditionService {
           guaranteed: {},
           possible: [
             {
-              resourceId: 'res-coelho-001', // Coelho
-              quantity: 1,
+              resourceId: 'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890', // Fibra (pegadilhas)
+              quantity: 2,
               chance: 0.6
             },
             {
-              resourceId: 'res-fibra-001', // Fibra (pegadilhas)
-              quantity: 2,
+              resourceId: 'res-a2b3c4d5-e6f7-8901-bcde-f23456789012', // Pedra
+              quantity: 1,
               chance: 0.4
             }
           ],

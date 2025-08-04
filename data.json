@@ -23,16 +23,58 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": true,
-        "health": 46,
+        "health": 31,
         "maxHealth": 100,
         "hunger": 0,
         "maxHunger": 100,
-        "thirst": 31,
+        "thirst": 25,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 36,
-        "hygiene": 76,
+        "morale": 33,
+        "hygiene": 73,
+        "diseases": [],
+        "immunities": [],
+        "resistances": {},
+        "skills": {},
+        "skillPoints": 0,
+        "totalSkillPoints": 0,
+        "skillAchievements": []
+      }
+    ],
+    [
+      "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
+      {
+        "id": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
+        "username": "Dudu",
+        "level": 1,
+        "experience": 20,
+        "coins": 100,
+        "inventoryWeight": 2645,
+        "maxInventoryWeight": 50000,
+        "autoStorage": false,
+        "craftedItemsDestination": "storage",
+        "hungerDegradationMode": "automatic",
+        "waterStorage": 0,
+        "maxWaterStorage": 500,
+        "waterTanks": 0,
+        "equippedHelmet": null,
+        "equippedChestplate": null,
+        "equippedLeggings": null,
+        "equippedBoots": null,
+        "equippedWeapon": null,
+        "equippedTool": null,
+        "autoCompleteQuests": true,
+        "health": 100,
+        "maxHealth": 100,
+        "hunger": 79,
+        "maxHunger": 100,
+        "thirst": 84,
+        "maxThirst": 100,
+        "temperature": 0,
+        "fatigue": 8,
+        "morale": 53,
+        "hygiene": 97,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -43,7 +85,26 @@
       }
     ]
   ],
-  "inventoryItems": [],
+  "inventoryItems": [
+    [
+      "423f803a-85e8-467d-b0cc-4c794b860095",
+      {
+        "id": "423f803a-85e8-467d-b0cc-4c794b860095",
+        "playerId": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
+        "resourceId": "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "quantity": 3
+      }
+    ],
+    [
+      "c560334e-550f-407b-9a65-77eea16c4a36",
+      {
+        "id": "c560334e-550f-407b-9a65-77eea16c4a36",
+        "playerId": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
+        "resourceId": "res-a2b3c4d5-e6f7-8901-bcde-f23456789012",
+        "quantity": 2
+      }
+    ]
+  ],
   "storageItems": [],
   "expeditions": [
     [
@@ -82,6 +143,44 @@
           "res-gravetos-001": 4
         },
         "duration": 300000
+      }
+    ],
+    [
+      "7316c1a4-89d0-4780-b0e4-3142f27a5707",
+      {
+        "id": "7316c1a4-89d0-4780-b0e4-3142f27a5707",
+        "playerId": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "selectedResources": [
+          "res-fibra-001"
+        ],
+        "selectedEquipment": [],
+        "status": "completed",
+        "startTime": 1754279776311,
+        "progress": 100,
+        "collectedResources": {
+          "res-fibra-001": 3,
+          "res-gravetos-001": 4
+        }
+      }
+    ],
+    [
+      "9b21bd96-ea31-4144-8ecd-37b966e4b323",
+      {
+        "id": "9b21bd96-ea31-4144-8ecd-37b966e4b323",
+        "playerId": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "selectedResources": [
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        ],
+        "selectedEquipment": [],
+        "status": "completed",
+        "startTime": 1754279829603,
+        "progress": 100,
+        "collectedResources": {
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890": 3,
+          "res-a2b3c4d5-e6f7-8901-bcde-f23456789012": 2
+        }
       }
     ]
   ],
