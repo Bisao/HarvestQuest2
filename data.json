@@ -1,14 +1,14 @@
 {
   "players": [
     [
-      "18440af6-aa00-4598-91e8-e54f6a73b019",
+      "e01b80af-5568-461e-811c-d370674821fe",
       {
-        "id": "18440af6-aa00-4598-91e8-e54f6a73b019",
-        "username": "Rdt",
+        "id": "e01b80af-5568-461e-811c-d370674821fe",
+        "username": "Opa",
         "level": 1,
         "experience": 10,
         "coins": 100,
-        "inventoryWeight": 0,
+        "inventoryWeight": 3045,
         "maxInventoryWeight": 50000,
         "autoStorage": false,
         "craftedItemsDestination": "storage",
@@ -23,58 +23,16 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": true,
-        "health": 31,
+        "health": 15,
         "maxHealth": 100,
         "hunger": 0,
         "maxHunger": 100,
-        "thirst": 25,
+        "thirst": 19,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 33,
-        "hygiene": 73,
-        "diseases": [],
-        "immunities": [],
-        "resistances": {},
-        "skills": {},
-        "skillPoints": 0,
-        "totalSkillPoints": 0,
-        "skillAchievements": []
-      }
-    ],
-    [
-      "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
-      {
-        "id": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
-        "username": "Dudu",
-        "level": 1,
-        "experience": 20,
-        "coins": 100,
-        "inventoryWeight": 2645,
-        "maxInventoryWeight": 50000,
-        "autoStorage": false,
-        "craftedItemsDestination": "storage",
-        "hungerDegradationMode": "automatic",
-        "waterStorage": 0,
-        "maxWaterStorage": 500,
-        "waterTanks": 0,
-        "equippedHelmet": null,
-        "equippedChestplate": null,
-        "equippedLeggings": null,
-        "equippedBoots": null,
-        "equippedWeapon": null,
-        "equippedTool": null,
-        "autoCompleteQuests": true,
-        "health": 100,
-        "maxHealth": 100,
-        "hunger": 79,
-        "maxHunger": 100,
-        "thirst": 84,
-        "maxThirst": 100,
-        "temperature": 0,
-        "fatigue": 8,
-        "morale": 53,
-        "hygiene": 97,
+        "morale": 29,
+        "hygiene": 70,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -87,100 +45,71 @@
   ],
   "inventoryItems": [
     [
-      "423f803a-85e8-467d-b0cc-4c794b860095",
+      "39c462dc-c182-4b7f-b9ab-bf1d9d2ff721",
       {
-        "id": "423f803a-85e8-467d-b0cc-4c794b860095",
-        "playerId": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
+        "id": "39c462dc-c182-4b7f-b9ab-bf1d9d2ff721",
+        "playerId": "e01b80af-5568-461e-811c-d370674821fe",
         "resourceId": "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890",
         "quantity": 3
       }
     ],
     [
-      "c560334e-550f-407b-9a65-77eea16c4a36",
+      "0170055a-fe81-454d-883b-b4b11fa436aa",
       {
-        "id": "c560334e-550f-407b-9a65-77eea16c4a36",
-        "playerId": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
+        "id": "0170055a-fe81-454d-883b-b4b11fa436aa",
+        "playerId": "e01b80af-5568-461e-811c-d370674821fe",
         "resourceId": "res-a2b3c4d5-e6f7-8901-bcde-f23456789012",
         "quantity": 2
+      }
+    ],
+    [
+      "2d932896-416f-4c67-a018-a440b71fa874",
+      {
+        "id": "2d932896-416f-4c67-a018-a440b71fa874",
+        "playerId": "e01b80af-5568-461e-811c-d370674821fe",
+        "resourceId": "res-d5e6f7g8-h9i0-1234-ef01-567890123456",
+        "quantity": 4
       }
     ]
   ],
   "storageItems": [],
   "expeditions": [
     [
-      "0159d929-3937-45f4-9cae-bd53b466facc",
+      "dcd774be-8967-45fe-92aa-35bbb9df4398",
       {
-        "id": "0159d929-3937-45f4-9cae-bd53b466facc",
-        "playerId": "18440af6-aa00-4598-91e8-e54f6a73b019",
+        "id": "dcd774be-8967-45fe-92aa-35bbb9df4398",
+        "playerId": "e01b80af-5568-461e-811c-d370674821fe",
         "biomeId": "biome-floresta-001",
         "selectedResources": [
           "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
         ],
         "selectedEquipment": [],
         "status": "in_progress",
-        "startTime": 1754278711474,
+        "startTime": 1754279987786,
         "progress": 0,
         "collectedResources": {},
         "duration": 1800000
       }
     ],
     [
-      "802d21be-fcfb-4d74-bbea-6b3997fdc945",
+      "0672357c-9d7e-4121-888d-6f16fab86744",
       {
-        "id": "802d21be-fcfb-4d74-bbea-6b3997fdc945",
-        "playerId": "18440af6-aa00-4598-91e8-e54f6a73b019",
+        "id": "0672357c-9d7e-4121-888d-6f16fab86744",
+        "playerId": "e01b80af-5568-461e-811c-d370674821fe",
         "biomeId": "biome-floresta-001",
         "selectedResources": [
           "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
         ],
         "selectedEquipment": [],
         "status": "completed",
-        "startTime": 1754279251508,
-        "progress": 100,
-        "collectedResources": {
-          "res-fibra-001": 3,
-          "res-pedra-001": 2,
-          "res-gravetos-001": 4
-        },
-        "duration": 300000
-      }
-    ],
-    [
-      "7316c1a4-89d0-4780-b0e4-3142f27a5707",
-      {
-        "id": "7316c1a4-89d0-4780-b0e4-3142f27a5707",
-        "playerId": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
-        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
-        "selectedResources": [
-          "res-fibra-001"
-        ],
-        "selectedEquipment": [],
-        "status": "completed",
-        "startTime": 1754279776311,
-        "progress": 100,
-        "collectedResources": {
-          "res-fibra-001": 3,
-          "res-gravetos-001": 4
-        }
-      }
-    ],
-    [
-      "9b21bd96-ea31-4144-8ecd-37b966e4b323",
-      {
-        "id": "9b21bd96-ea31-4144-8ecd-37b966e4b323",
-        "playerId": "6c87f134-df81-47f0-8ce7-93aa0ab520a2",
-        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
-        "selectedResources": [
-          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
-        ],
-        "selectedEquipment": [],
-        "status": "completed",
-        "startTime": 1754279829603,
+        "startTime": 1754280028207,
         "progress": 100,
         "collectedResources": {
           "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890": 3,
-          "res-a2b3c4d5-e6f7-8901-bcde-f23456789012": 2
-        }
+          "res-a2b3c4d5-e6f7-8901-bcde-f23456789012": 2,
+          "res-d5e6f7g8-h9i0-1234-ef01-567890123456": 4
+        },
+        "duration": 300000
       }
     ]
   ],
