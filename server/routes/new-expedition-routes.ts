@@ -159,6 +159,16 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
         const { playerId, templateId } = req.body;
         console.log(`🚀 EXPEDITION-START: Starting expedition for player ${playerId}, template ${templateId}`);
 
+        // Validar requisitos incluindo recursos selecionados
+        const validation = await expeditionService.validateExpeditionRequirements(
+          playerId,
+          templateId
+        );
+
+        if (!validation.valid) {
+          return errorResponse(res, 400, 'Requisitos não atendidos');
+        }
+
         const expedition = await expeditionService.startExpedition(playerId, templateId);
 
         return successResponse(res, expedition, 'Expedição iniciada com sucesso');

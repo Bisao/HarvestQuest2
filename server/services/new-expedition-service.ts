@@ -139,7 +139,8 @@ export class NewExpeditionService {
 
   async validateExpeditionRequirements(
     playerId: string, 
-    templateId: string
+    templateId: string,
+    selectedResources?: string[]
   ): Promise<{ valid: boolean; errors: string[] }> {
     const player = await this.storage.getPlayer(playerId);
     const template = this.getTemplateById(templateId);
@@ -165,11 +166,19 @@ export class NewExpeditionService {
       errors.push(`Saúde mínima requerida: ${template.requirements.minHealth}%`);
     }
 
-    // Verificar ferramentas
+    // Verificar ferramentas do template
     if (template.requirements.requiredTools.length > 0) {
-      const hasRequiredTools = this.checkPlayerTools(player, template.requirements.requiredTools);
+      const hasRequiredTools = await this.checkPlayerTools(player, template.requirements.requiredTools);
       if (!hasRequiredTools) {
         errors.push(`Ferramentas necessárias: ${template.requirements.requiredTools.join(', ')}`);
+      }
+    }
+
+    // Verificar ferramentas necessárias para recursos selecionados
+    if (selectedResources && selectedResources.length > 0) {
+      const resourceValidation = await this.validateSelectedResourcesEquipment(playerId, selectedResources);
+      if (!resourceValidation.valid) {
+        errors.push(...resourceValidation.errors);
       }
     }
 
@@ -182,13 +191,182 @@ export class NewExpeditionService {
     return { valid: errors.length === 0, errors };
   }
 
-  private checkPlayerTools(player: Player, requiredTools: string[]): boolean {
-    // Simplificado: verifica se tem alguma ferramenta equipada
-    for (const toolType of requiredTools) {
-      if (toolType === 'weapon' && player.equippedWeapon) return true;
-      if (toolType === 'tool' && player.equippedTool) return true;
+  /**
+   * Validar se o jogador tem as ferramentas necessárias para coletar os recursos selecionados
+   */
+  private async validateSelectedResourcesEquipment(
+    playerId: string, 
+    resourceIds: string[]
+  ): Promise<{ valid: boolean; errors: string[] }> {
+    const player = await this.storage.getPlayer(playerId);
+    const allResources = await this.storage.getAllResources();
+    const allEquipment = await this.storage.getAllEquipment();
+    const errors: string[] = [];
+
+    if (!player) {
+      return { valid: false, errors: ['Jogador não encontrado'] };
     }
-    return requiredTools.length === 0;
+
+    for (const resourceId of resourceIds) {
+      const resource = allResources.find(r => r.id === resourceId);
+      if (!resource) continue;
+
+      // Verificar se o recurso requer ferramentas específicas
+      const requiredTool = this.getRequiredToolForResource(resource);
+      if (!requiredTool) continue; // Recurso não requer ferramenta
+
+      const hasRequiredTool = await this.playerHasRequiredTool(player, requiredTool, allEquipment);
+      if (!hasRequiredTool) {
+        const toolName = this.getToolDisplayName(requiredTool);
+        errors.push(`${resource.name} requer ${toolName} equipado`);
+      }
+    }
+
+    return { valid: errors.length === 0, errors };
+  }
+
+  /**
+   * Determinar que ferramenta é necessária para um recurso específico
+   */
+  private getRequiredToolForResource(resource: any): string | null {
+    // Baseado no requiredTool do recurso ou no nome/tipo
+    if (resource.requiredTool) {
+      return resource.requiredTool;
+    }
+
+    // Regras baseadas no nome/ID do recurso
+    switch (resource.name) {
+      case 'Madeira':
+      case 'Bambu':
+        return 'axe';
+      case 'Pedra':
+      case 'Ferro Fundido':
+      case 'Cristais':
+        return 'pickaxe';
+      case 'Areia':
+        return 'shovel';
+      case 'Água Fresca':
+        return 'bucket';
+      case 'Peixe Pequeno':
+      case 'Peixe Grande':
+      case 'Salmão':
+        return 'fishing_rod';
+      case 'Coelho':
+      case 'Veado':
+      case 'Javali':
+        return 'weapon';
+      case 'Couro':
+      case 'Carne':
+      case 'Ossos':
+      case 'Pelo':
+        return 'knife';
+      default:
+        return null; // Não requer ferramenta específica
+    }
+  }
+
+  /**
+   * Verificar se o jogador tem a ferramenta necessária equipada
+   */
+  private async playerHasRequiredTool(
+    player: any, 
+    requiredTool: string, 
+    allEquipment: any[]
+  ): Promise<boolean> {
+    switch (requiredTool) {
+      case 'axe':
+        if (!player.equippedTool) return false;
+        const equippedAxe = allEquipment.find(eq => 
+          eq.id === player.equippedTool && eq.toolType === 'axe'
+        );
+        return !!equippedAxe;
+
+      case 'pickaxe':
+        if (!player.equippedTool) return false;
+        const equippedPickaxe = allEquipment.find(eq => 
+          eq.id === player.equippedTool && eq.toolType === 'pickaxe'
+        );
+        return !!equippedPickaxe;
+
+      case 'shovel':
+        if (!player.equippedTool) return false;
+        const equippedShovel = allEquipment.find(eq => 
+          eq.id === player.equippedTool && eq.toolType === 'shovel'
+        );
+        return !!equippedShovel;
+
+      case 'bucket':
+        if (!player.equippedTool) return false;
+        const equippedBucket = allEquipment.find(eq => 
+          eq.id === player.equippedTool && (eq.toolType === 'bucket' || eq.toolType === 'bamboo_bottle')
+        );
+        return !!equippedBucket;
+
+      case 'fishing_rod':
+        if (!player.equippedTool) return false;
+        const equippedRod = allEquipment.find(eq => 
+          eq.id === player.equippedTool && eq.toolType === 'fishing_rod'
+        );
+        return !!equippedRod;
+
+      case 'weapon':
+        if (!player.equippedWeapon) return false;
+        const equippedWeapon = allEquipment.find(eq => 
+          eq.id === player.equippedWeapon && eq.category === 'weapons'
+        );
+        return !!equippedWeapon;
+
+      case 'knife':
+        // Faca pode estar equipada como ferramenta ou arma
+        const knifeAsTool = player.equippedTool && allEquipment.find(eq => 
+          eq.id === player.equippedTool && eq.toolType === 'knife'
+        );
+        const knifeAsWeapon = player.equippedWeapon && allEquipment.find(eq => 
+          eq.id === player.equippedWeapon && eq.toolType === 'knife'
+        );
+        return !!(knifeAsTool || knifeAsWeapon);
+
+      default:
+        return true; // Ferramenta não reconhecida, permitir
+    }
+  }
+
+  /**
+   * Obter nome de exibição da ferramenta
+   */
+  private getToolDisplayName(toolType: string): string {
+    switch (toolType) {
+      case 'axe': return 'Machado';
+      case 'pickaxe': return 'Picareta';
+      case 'shovel': return 'Pá';
+      case 'bucket': return 'Balde ou Garrafa de Bambu';
+      case 'fishing_rod': return 'Vara de Pesca';
+      case 'weapon': return 'Arma';
+      case 'knife': return 'Faca';
+      default: return toolType;
+    }
+  }
+
+  private async checkPlayerTools(player: Player, requiredTools: string[]): Promise<boolean> {
+    if (requiredTools.length === 0) return true;
+
+    const allEquipment = await this.storage.getAllEquipment();
+    
+    for (const toolType of requiredTools) {
+      if (toolType === 'weapon' && player.equippedWeapon) {
+        const hasWeapon = allEquipment.find(eq => 
+          eq.id === player.equippedWeapon && eq.category === 'weapons'
+        );
+        if (hasWeapon) return true;
+      }
+      if (toolType === 'tool' && player.equippedTool) {
+        const hasTool = allEquipment.find(eq => 
+          eq.id === player.equippedTool && eq.category === 'tools'
+        );
+        if (hasTool) return true;
+      }
+    }
+    return false;
   }
 
   // ===================== GESTÃO DE EXPEDIÇÕES =====================
