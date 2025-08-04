@@ -20,9 +20,11 @@ interface SelectedResource {
 interface ImprovedCustomExpeditionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onStartExpedition: (resources: SelectedResource[], duration: number) => Promise<void>;
+  onStartExpedition: (selectedResources: SelectedResource[], duration: number) => Promise<void>;
   resources: Resource[];
   selectedBiome: Biome | null;
+  player?: any;
+  equipment?: any[];
 }
 
 export function ImprovedCustomExpeditionModal({
@@ -30,7 +32,9 @@ export function ImprovedCustomExpeditionModal({
   onClose,
   onStartExpedition,
   resources,
-  selectedBiome
+  selectedBiome,
+  player,
+  equipment = []
 }: ImprovedCustomExpeditionModalProps) {
   const [selectedResources, setSelectedResources] = useState<SelectedResource[]>([]);
   const [duration, setDuration] = useState(30);
@@ -41,16 +45,97 @@ export function ImprovedCustomExpeditionModal({
 
   const isMobile = useIsMobile();
 
+  // Verificar se jogador tem equipamento necessário
+  const hasRequiredEquipment = useCallback((resourceName: string): boolean => {
+    if (!player || !equipment) return true;
+
+    const requiredTool = getRequiredToolForResource(resourceName);
+    if (!requiredTool) return true;
+
+    return checkPlayerHasEquipment(player, requiredTool, equipment);
+  }, [player, equipment]);
+
+  // Determinar ferramenta necessária para recurso
+  const getRequiredToolForResource = (resourceName: string): string | null => {
+    switch (resourceName.toLowerCase()) {
+      case 'madeira':
+      case 'bambu':
+        return 'axe';
+      case 'pedra':
+      case 'ferro fundido':
+      case 'cristais':
+        return 'pickaxe';
+      case 'areia':
+        return 'shovel';
+      case 'água fresca':
+        return 'bucket';
+      case 'peixe pequeno':
+      case 'peixe grande':
+      case 'salmão':
+        return 'fishing_rod';
+      case 'coelho':
+      case 'veado':
+      case 'javali':
+        return 'weapon';
+      default:
+        return null;
+    }
+  };
+
+  // Verificar se jogador tem equipamento
+  const checkPlayerHasEquipment = (player: any, toolType: string, equipment: any[]): boolean => {
+    switch (toolType) {
+      case 'axe':
+        if (!player.equippedTool) return false;
+        return equipment.some(eq => eq.id === player.equippedTool && eq.toolType === 'axe');
+      case 'pickaxe':
+        if (!player.equippedTool) return false;
+        return equipment.some(eq => eq.id === player.equippedTool && eq.toolType === 'pickaxe');
+      case 'shovel':
+        if (!player.equippedTool) return false;
+        return equipment.some(eq => eq.id === player.equippedTool && eq.toolType === 'shovel');
+      case 'bucket':
+        if (!player.equippedTool) return false;
+        return equipment.some(eq => eq.id === player.equippedTool && (eq.toolType === 'bucket' || eq.toolType === 'bamboo_bottle'));
+      case 'fishing_rod':
+        if (!player.equippedTool) return false;
+        return equipment.some(eq => eq.id === player.equippedTool && eq.toolType === 'fishing_rod');
+      case 'weapon':
+        if (!player.equippedWeapon) return false;
+        return equipment.some(eq => eq.id === player.equippedWeapon && eq.category === 'weapons');
+      default:
+        return true;
+    }
+  };
+
   // Categorizar recursos
   const categorizedResources = useMemo(() => {
-    const filtered = resources.filter(resource =>
-      resource.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = resources.filter(resource => {
+      // Filtro de busca
+      const matchesSearch = resource.name.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!matchesSearch) return false;
+
+      // Verificar se jogador tem equipamento necessário
+      const hasEquipment = hasRequiredEquipment(resource.name);
+      if (!hasEquipment) return false;
+
+      return true;
+    });
 
     const categories: { [key: string]: Resource[] } = {};
 
     filtered.forEach(resource => {
-      const category = resource.category || 'Outros';
+      let category = resource.category || 'Outros';
+      
+      // Filtrar apenas consumíveis básicos na categoria Alimentos
+      if (category === 'Alimentos') {
+        // Apenas frutas silvestres, cogumelos crus e água são consumíveis básicos
+        const basicConsumables = ['frutas silvestres', 'cogumelos', 'água fresca'];
+        if (!basicConsumables.some(name => resource.name.toLowerCase().includes(name.toLowerCase()))) {
+          return; // Pular itens processados/cozidos
+        }
+      }
+      
       if (!categories[category]) {
         categories[category] = [];
       }
@@ -63,7 +148,7 @@ export function ImprovedCustomExpeditionModal({
     }
 
     return categories;
-  }, [resources, searchTerm, activeCategory]);
+  }, [resources, searchTerm, activeCategory, hasRequiredEquipment]);
 
   const getResourceIcon = (category: string) => {
     const icons: { [key: string]: string } = {
@@ -99,6 +184,18 @@ export function ImprovedCustomExpeditionModal({
       prev.map(r => r.resourceId === resourceId ? { ...r, quantity: Math.max(1, quantity) } : r)
     );
   }, []);
+
+  const getToolDisplayName = (toolType: string): string => {
+    switch (toolType) {
+      case 'axe': return 'Machado';
+      case 'pickaxe': return 'Picareta';
+      case 'shovel': return 'Pá';
+      case 'bucket': return 'Balde/Garrafa';
+      case 'fishing_rod': return 'Vara de Pesca';
+      case 'weapon': return 'Arma';
+      default: return toolType;
+    }
+  };
 
   const getResourceById = (id: string) => resources.find(r => r.id === id);
 
@@ -231,6 +328,11 @@ export function ImprovedCustomExpeditionModal({
                                           resource.rarity === "common" ? "Comum" : 
                                           resource.rarity === "uncommon" ? "Incomum" : "Raro"
                                         }
+                                        {getRequiredToolForResource(resource.name) && (
+                                          <span className="ml-1 text-blue-600">
+                                            • Requer {getToolDisplayName(getRequiredToolForResource(resource.name) || '')}
+                                          </span>
+                                        )}
                                       </p>
                                     </div>
                                   </div>

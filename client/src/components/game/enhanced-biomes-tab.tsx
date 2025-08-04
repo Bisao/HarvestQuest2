@@ -445,9 +445,23 @@ export default function EnhancedBiomesTab({
             setExpeditionModalOpen(false);
             setSelectedBiome(null);
           }}
-          player={player}
-          biome={selectedBiome}
+          onStartExpedition={async (selectedResources, duration) => {
+            try {
+              await startExpedition.mutateAsync({
+                biomeId: selectedBiome.id,
+                selectedResources: selectedResources.map(r => r.resourceId),
+                duration
+              });
+              setExpeditionModalOpen(false);
+              setSelectedBiome(null);
+            } catch (error) {
+              console.error('Erro ao iniciar expedição:', error);
+            }
+          }}
           resources={resources}
+          selectedBiome={selectedBiome}
+          player={player}
+          equipment={equipment}
         />
       )}
 
