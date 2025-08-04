@@ -28,8 +28,6 @@ import {
   ChevronDown,
   ChevronRight
 } from 'lucide-react';
-import { MusicControl } from "@/components/ui/music-control";
-
 // Import all tab components
 import UnifiedInventorySystem from './unified-inventory-system';
 import EnhancedStorageTab from './enhanced-storage-tab';
@@ -734,7 +732,6 @@ export default function ModernGameLayout() {
         onClose={() => setSettingsOpen(false)}
         isBlocked={isBlocked}
       />
-      <MusicControl />
     </div>
   );
 }
