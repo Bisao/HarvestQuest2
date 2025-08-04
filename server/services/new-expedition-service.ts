@@ -464,14 +464,23 @@ export class NewExpeditionService {
       let collectedResources = expedition.collectedResources || {};
 
       if (progress > 50 && Object.keys(collectedResources).length === 0) {
-        // Start collecting resources at 50% progress
-        const templates = this.getTemplatesForBiome(expedition.biomeId);
-        const template = templates.length > 0 ? templates[0] : this.getTemplateById('gathering-basic');
-        if (template) {
-          const rewards = this.calculateRewards(template);
-          collectedResources = rewards;
-          console.log(`📦 EXPEDITION-PROGRESS: Resources collected at ${Math.round(progress)}%:`, rewards);
+        // Start collecting basic resources at 50% progress based on selected resources
+        if (expedition.selectedResources && expedition.selectedResources.length > 0) {
+          // For custom expeditions, collect some of the selected resources
+          for (const resourceId of expedition.selectedResources.slice(0, 3)) {
+            const quantity = Math.floor(Math.random() * 3) + 1; // 1-3 random quantity
+            collectedResources[resourceId] = quantity;
+          }
+        } else {
+          // Fallback to template-based rewards
+          const templates = this.getTemplatesForBiome(expedition.biomeId);
+          const template = templates.length > 0 ? templates[0] : this.getTemplateById('gathering-basic');
+          if (template) {
+            const rewards = this.calculateRewards(template);
+            collectedResources = rewards;
+          }
         }
+        console.log(`📦 EXPEDITION-PROGRESS: Resources collected at ${Math.round(progress)}%:`, collectedResources);
       }
 
       // Verificar por encontros de combate durante a expedição (apenas uma vez entre 25% e 75%)
@@ -588,8 +597,19 @@ export class NewExpeditionService {
 
     // Se não há recursos coletados ou estão vazios, calcular novas recompensas
     if (!rewards || Object.keys(rewards).length === 0) {
-      rewards = this.calculateRewards(activeTemplate);
-      console.log(`🎲 EXPEDITION-COMPLETE: Calculated new rewards since none existed:`, rewards);
+      if (expedition.selectedResources && expedition.selectedResources.length > 0) {
+        // For custom expeditions, give some of the selected resources
+        rewards = {};
+        for (const resourceId of expedition.selectedResources) {
+          const quantity = Math.floor(Math.random() * 5) + 1; // 1-5 random quantity
+          rewards[resourceId] = quantity;
+        }
+        console.log(`🎲 EXPEDITION-COMPLETE: Calculated custom expedition rewards:`, rewards);
+      } else {
+        // Template-based rewards
+        rewards = this.calculateRewards(activeTemplate);
+        console.log(`🎲 EXPEDITION-COMPLETE: Calculated template rewards:`, rewards);
+      }
     } else {
       console.log(`📦 EXPEDITION-COMPLETE: Using existing collected resources:`, rewards);
     }
@@ -599,8 +619,8 @@ export class NewExpeditionService {
       console.log(`⚠️ EXPEDITION-COMPLETE: No valid rewards to apply, creating basic rewards`);
       // Garantir que pelo menos alguns recursos básicos sejam dados
       rewards = {
-        'res-fibra-001': 2, // Fibra
-        'res-pedra-001': 1  // Pedra
+        'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890': 2, // Fibra
+        'res-a2b3c4d5-e6f7-8901-bcde-f23456789012': 1  // Pedra
       };
     }
 
