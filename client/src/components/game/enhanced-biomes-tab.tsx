@@ -75,38 +75,7 @@ export default function EnhancedBiomesTab({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Create expedition mutation
-  const startExpedition = useMutation({
-    mutationFn: async (expeditionData: { biomeId: string; selectedResources: string[]; duration: number }) => {
-      return apiRequest('/api/expeditions/custom/start', {
-        method: 'POST',
-        body: JSON.stringify({
-          playerId: player.id,
-          biomeId: expeditionData.biomeId,
-          selectedResources: expeditionData.selectedResources,
-          duration: expeditionData.duration,
-          selectedEquipment: []
-        })
-      });
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Expedição Iniciada!",
-        description: `Expedição ${data.data.id} iniciada com sucesso.`,
-      });
-      // Invalidate relevant queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/expeditions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/player'] });
-    },
-    onError: (error: any) => {
-      console.error('Erro ao iniciar expedição:', error);
-      toast({
-        title: "Erro ao Iniciar Expedição",
-        description: error.message || "Ocorreu um erro inesperado.",
-        variant: "destructive"
-      });
-    }
-  });
+  
 
   // Sistema robusto de categorização de recursos
   const categorizeResource = (resource: Resource): string => {
@@ -461,8 +430,7 @@ export default function EnhancedBiomesTab({
         </CardContent>
       </Card>
 
-      {/* Tracker de expedições ativas */}
-      <ExpeditionTracker player={player} />
+      er={player} />
 
       {/* Expedition modals removed */}
     </div>

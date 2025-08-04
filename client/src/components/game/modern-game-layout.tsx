@@ -48,7 +48,7 @@ import { OfflineActivityReportDialog } from './offline-activity-report';
 
 import type { Player, Biome, Resource, Equipment, Recipe } from '@shared/types';
 
-// Define ActiveExpedition type locally since it's not in shared types
+
 interface ActiveExpedition {
   id: string;
   biome: string;

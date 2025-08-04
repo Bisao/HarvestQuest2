@@ -403,28 +403,12 @@ export function registerEnhancedGameRoutes(
           );
         }
 
-        // Check for active expedition
-        const expeditions = await storage.getPlayerExpeditions(playerId);
-        const activeExpedition = expeditions.find(exp => exp.status === 'in_progress');
-        if (activeExpedition) {
-          throw new InvalidOperationError("Already have an active expedition");
-        }
-
-        // Import and use expedition service
-        const { NewExpeditionService } = await import('../services/new-expedition-service');
-        const newExpeditionService = new NewExpeditionService(storage);
         
-        const expedition = await newExpeditionService.startExpedition(
-          playerId,
-          biomeId,
-          selectedResources,
-          selectedEquipment
-        );
 
         // Invalidate player cache
         invalidatePlayerCache(playerId);
 
-        successResponse(res, expedition, "Expedition started successfully");
+        successResponse(res, { message: "Expedition system temporarily disabled" });
       } catch (error) {
         next(error);
       }

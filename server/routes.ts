@@ -9,7 +9,6 @@ import { validateParams, playerIdParamSchema } from "./middleware/validation";
 import { GameService } from "./services/game-service";
 import { QuestService } from "./services/quest-service";
 import { OfflineActivityService } from "./services/offline-activity-service";
-import { NewExpeditionService } from "./services/new-expedition-service";
 import { randomUUID } from "crypto";
 import { registerHealthRoutes } from "./routes/health";
 import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
@@ -31,7 +30,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gameService = new GameService(storage);
   const questService = new QuestService(storage);
   const offlineActivityService = new OfflineActivityService(storage);
-  const expeditionService = new NewExpeditionService(storage);
 
   // Register health and monitoring routes
   registerHealthRoutes(app);
@@ -991,29 +989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get player's active expedition
-  app.get("/api/player/:playerId/active-expedition", async (req, res) => {
-    try {
-      const { playerId } = req.params;
-      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
-      const activeExpedition = activeExpeditions[0] || null;
-      res.json(activeExpedition);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to get active expedition" });
-    }
-  });
-
-  // Cancel expedition
-  app.post("/api/expeditions/:id/cancel", async (req, res) => {
-    try {
-      const { id } = req.params;
-      // For now, directly update storage to cancel expedition
-      await storage.updateExpedition(id, { status: 'cancelled' });
-      res.json({ message: "Expedition cancelled successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to cancel expedition" });
-    }
-  });
+  
 
   // Import and setup quest routes
   const { setupQuestRoutes } = await import("./routes/quest-routes");

@@ -4,11 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Clock, CheckCircle, MapPin } from 'lucide-react';
-import ExpeditionModal from "./new-expedition-modal";
-import { useActiveExpeditions } from "@/hooks/use-active-expeditions";
-import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
 import type { Biome, Resource, Equipment, Player } from "@shared/types";
-import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
 
 interface BiomesTabProps {
   biomes: Biome[];
@@ -105,30 +101,7 @@ export default function BiomesTab({
               </CardHeader>
 
               <CardContent className="space-y-4">
-                {/* Expedition Progress */}
-                {isExpeditionActive && (
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-blue-800">Expedição Ativa</span>
-                      <div className="flex items-center space-x-2 text-sm text-blue-700">
-                        {isExpeditionCompleted ? (
-                          <CheckCircle className="w-4 h-4" />
-                        ) : (
-                          <>
-                            <Clock className="w-4 h-4" />
-                            <span>{formatTimeRemaining(activeExpedition.estimatedEndTime)}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Progresso</span>
-                      <span>{Math.round(activeExpedition.progress)}%</span>
-                    </div>
-                    <Progress 
-                      value={activeExpedition.progress} 
-                      className="h-2 mb-2"
+                
                     />
 
                     {Object.keys(activeExpedition.collectedResources).length > 0 && (
