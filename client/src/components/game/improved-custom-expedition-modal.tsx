@@ -255,7 +255,7 @@ export function ImprovedCustomExpeditionModal({
   };
 
   const handleStart = async () => {
-    if (selectedResources.length === 0) return;
+    if (selectedResources.length === 0 || !selectedBiome || !player) return;
 
     setIsLoading(true);
     try {
@@ -265,19 +265,29 @@ export function ImprovedCustomExpeditionModal({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          resources: selectedResources,
-          duration: duration,
+          playerId: player.id,
+          biomeId: selectedBiome.id,
+          selectedResources: selectedResources.map(sel => ({
+            resourceId: sel.resourceId,
+            targetQuantity: sel.quantity
+          })),
+          duration: duration * 60 * 1000, // Convert minutes to milliseconds
+          selectedEquipment: []
         }),
       });
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || `HTTP error! status: ${response.status}`);
       }
+      
       const data = await response.json();
       console.log('Expedition started:', data);
       await onStartExpedition(selectedResources, duration);
       onClose();
     } catch (error) {
       console.error('Erro ao iniciar expedição:', error);
+      alert(`Erro ao iniciar expedição: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
