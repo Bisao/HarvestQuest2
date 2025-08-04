@@ -1,10 +1,10 @@
 
 interface LoadingScreenProps {
-  message?: string;
+  message: string;
   subMessage?: string;
 }
 
-export default function LoadingScreen({ message = "Carregando Coletor Adventures...", subMessage = "Preparando sua aventura" }: LoadingScreenProps) {
+export default function LoadingScreen({ message, subMessage }: LoadingScreenProps) {
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center z-50">
       <div className="text-center">

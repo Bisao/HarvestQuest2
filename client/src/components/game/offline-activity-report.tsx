@@ -20,9 +20,6 @@ export function OfflineActivityReportDialog({
   report,
   onConfigureOffline 
 }: OfflineActivityReportProps) {
-  // Early return if no report or not open
-  if (!report || !isOpen) return null;
-  
   const { data: resources } = useQuery({
     queryKey: ['/api/resources']
   });
@@ -60,17 +57,13 @@ export function OfflineActivityReportDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden" aria-describedby="offline-report-description">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-blue-500" />
             Bem-vindo de volta, Aventureiro!
           </DialogTitle>
         </DialogHeader>
-
-        <div id="offline-report-description" className="sr-only">
-          Relatório de atividade offline mostrando o progresso e recursos coletados enquanto o jogador esteve ausente
-        </div>
 
         <ScrollArea className="max-h-[70vh] pr-4">
           <div className="space-y-6">
@@ -84,28 +77,28 @@ export function OfflineActivityReportDialog({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {formatDuration(report?.hoursOffline || 0)}
+                    {formatDuration(report.hoursOffline)}
                   </div>
                   <div className="text-sm text-muted-foreground">Tempo Offline</div>
                 </div>
                 
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {report?.expeditionsCompleted || 0}
+                    {report.expeditionsCompleted}
                   </div>
                   <div className="text-sm text-muted-foreground">Expedições</div>
                 </div>
                 
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    +{report?.experienceGained || 0}
+                    +{report.experienceGained}
                   </div>
                   <div className="text-sm text-muted-foreground">Experiência</div>
                 </div>
                 
                 <div className="text-center">
-                  <div className={`text-2xl font-bold ${getEfficiencyColor(report?.efficiency || 0)}`}>
-                    {report?.efficiency || 0}%
+                  <div className={`text-2xl font-bold ${getEfficiencyColor(report.efficiency)}`}>
+                    {report.efficiency}%
                   </div>
                   <div className="text-sm text-muted-foreground">Eficiência</div>
                 </div>
