@@ -255,10 +255,20 @@ export function ImprovedCustomExpeditionModal({
   };
 
   const handleStart = async () => {
-    if (selectedResources.length === 0 || !selectedBiome || !player) return;
+    if (selectedResources.length === 0 || !selectedBiome || !player) {
+      alert('Por favor, selecione recursos e certifique-se de que os dados do jogador estão carregados.');
+      return;
+    }
 
     setIsLoading(true);
     try {
+      console.log('🚀 Starting custom expedition with data:', {
+        playerId: player.id,
+        biomeId: selectedBiome.id,
+        selectedResources,
+        duration: duration * 60 * 1000
+      });
+
       const response = await fetch('/api/expeditions/start-custom', {
         method: 'POST',
         headers: {
@@ -276,18 +286,29 @@ export function ImprovedCustomExpeditionModal({
         }),
       });
       
+      const responseText = await response.text();
+      console.log('🔍 Response received:', responseText);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || errorData.message || `HTTP error! status: ${response.status}`);
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch (parseError) {
+          errorMessage = responseText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
       
-      const data = await response.json();
-      console.log('Expedition started:', data);
+      const data = JSON.parse(responseText);
+      console.log('✅ Expedition started successfully:', data);
+      
+      // Call the parent callback
       await onStartExpedition(selectedResources, duration);
       onClose();
     } catch (error) {
-      console.error('Erro ao iniciar expedição:', error);
-      alert(`Erro ao iniciar expedição: ${error.message}`);
+      console.error('❌ Erro ao iniciar expedição:', error);
+      alert(`Erro ao iniciar expedição: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     } finally {
       setIsLoading(false);
     }

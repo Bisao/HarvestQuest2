@@ -474,12 +474,16 @@ export class NewExpeditionService {
         }
       }
 
-      // Verificar por encontros de combate durante a expedição
-      if (progress >= 25 && progress < 75) {
+      // Verificar por encontros de combate durante a expedição (apenas uma vez entre 25% e 75%)
+      if (progress >= 25 && progress < 75 && !expedition.combatEncounterChecked) {
         try {
           const encounterId = await this.checkForCombatEncounter(expeditionId, expedition.playerId, expedition.biomeId);
           if (encounterId) {
             console.log(`⚔️ EXPEDITION-ENCOUNTER: Combat encounter ${encounterId} triggered at ${Math.round(progress)}% progress`);
+            // Mark that we've checked for combat to avoid repeated checks
+            await this.storage.updateExpedition(expeditionId, { 
+              combatEncounterChecked: true 
+            });
           }
         } catch (encounterError) {
           console.warn(`⚠️ EXPEDITION-PROGRESS: Combat encounter check failed:`, encounterError);
@@ -669,7 +673,10 @@ export class NewExpeditionService {
 
   private async applyRewards(playerId: string, rewards: Record<string, number>, experience: number): Promise<void> {
     const player = await this.storage.getPlayer(playerId);
-    if (!player) return;
+    if (!player) {
+      console.error(`❌ EXPEDITION-REWARDS: Player ${playerId} not found`);
+      return;
+    }
 
     console.log(`💰 EXPEDITION-REWARDS: Applying rewards to player ${playerId}:`, rewards);
 
@@ -679,12 +686,32 @@ export class NewExpeditionService {
       return;
     }
 
+    // Validate that all reward resources exist in the database
+    const allResources = await this.storage.getAllResources();
+    const validRewards: Record<string, number> = {};
+
+    for (const [resourceId, quantity] of Object.entries(rewards)) {
+      const resource = allResources.find(r => r.id === resourceId);
+      if (resource && quantity > 0) {
+        validRewards[resourceId] = quantity;
+      } else {
+        console.warn(`⚠️ EXPEDITION-REWARDS: Invalid resource ${resourceId} or quantity ${quantity}, skipping`);
+      }
+    }
+
+    if (Object.keys(validRewards).length === 0) {
+      console.log(`⚠️ EXPEDITION-REWARDS: No valid resources to apply after validation`);
+      return;
+    }
+
+    console.log(`✅ EXPEDITION-REWARDS: Valid rewards to apply:`, validRewards);
+
     // Import GameService to use addResourceToPlayer method
     const { GameService } = await import('./game-service');
     const gameService = new GameService(this.storage);
 
     // Adicionar recursos ao inventário (tenta inventário primeiro, depois storage)
-    for (const [resourceId, quantity] of Object.entries(rewards)) {
+    for (const [resourceId, quantity] of Object.entries(validRewards)) {
       if (quantity <= 0) {
         console.log(`⚠️ EXPEDITION-REWARD: Skipping ${resourceId} with quantity ${quantity}`);
         continue;

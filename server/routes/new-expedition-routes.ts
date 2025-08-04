@@ -107,10 +107,24 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
       try {
         const { playerId, biomeId, selectedResources, duration, selectedEquipment } = req.body;
         console.log(`🚀 CUSTOM-EXPEDITION-START: Starting for player ${playerId}, biome ${biomeId}`);
+        console.log(`📋 CUSTOM-EXPEDITION-START: Request data:`, { 
+          playerId, 
+          biomeId, 
+          selectedResourcesCount: selectedResources?.length,
+          duration,
+          selectedEquipmentCount: selectedEquipment?.length
+        });
 
         // Validar se playerId está presente
         if (!playerId) {
+          console.error(`❌ CUSTOM-EXPEDITION-START: Missing playerId`);
           return errorResponse(res, 400, 'Player ID é obrigatório');
+        }
+
+        // Validar se selectedResources está presente e é um array válido
+        if (!selectedResources || !Array.isArray(selectedResources) || selectedResources.length === 0) {
+          console.error(`❌ CUSTOM-EXPEDITION-START: Invalid selectedResources:`, selectedResources);
+          return errorResponse(res, 400, 'Recursos selecionados são obrigatórios');
         }
 
         // Get player using ID directly 
@@ -119,6 +133,9 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
           console.error(`❌ CUSTOM-EXPEDITION-START: Player not found: ${playerId}`);
           return errorResponse(res, 404, 'Jogador não encontrado');
         }
+
+        console.log(`✅ CUSTOM-EXPEDITION-START: Player found: ${player.username} (Level ${player.level})`);
+        console.log(`📊 CUSTOM-EXPEDITION-START: Player status - Hunger: ${player.hunger}%, Thirst: ${player.thirst}%, Health: ${player.health}%`);
 
         // Verificar se já tem expedição ativa
         const activeExpeditions = await storage.getPlayerExpeditions(playerId);
@@ -179,11 +196,30 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
           collectedResources: {}
         };
 
+        console.log(`🔧 CUSTOM-EXPEDITION: Creating expedition with data:`, expeditionData);
+
         const expedition = await storage.createExpedition(expeditionData);
+
+        if (!expedition || !expedition.id) {
+          console.error(`❌ CUSTOM-EXPEDITION: Failed to create expedition`);
+          return errorResponse(res, 500, 'Falha ao criar expedição');
+        }
 
         console.log(`✅ CUSTOM-EXPEDITION: Started expedition ${expedition.id} for player ${player.username}`);
 
-        return successResponse(res, expedition, 'Expedição customizada iniciada com sucesso');
+        // Return expedition data in the expected format
+        const responseData = {
+          id: expedition.id,
+          playerId: expedition.playerId,
+          biomeId: expedition.biomeId,
+          startTime: expedition.startTime,
+          duration: expedition.duration,
+          status: expedition.status,
+          progress: expedition.progress || 0,
+          collectedResources: expedition.collectedResources || {}
+        };
+
+        return successResponse(res, responseData, 'Expedição customizada iniciada com sucesso');
       } catch (error: any) {
         console.error('❌ CUSTOM-EXPEDITION-START: Error:', error.message);
         console.error('❌ CUSTOM-EXPEDITION-START: Stack:', error.stack);
@@ -462,7 +498,9 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
             duration,
             elapsed,
             progress: Math.round(progress),
-            isComplete: progress >= 100
+            isComplete: progress >= 100,
+            timeUntilComplete: duration - elapsed,
+            combatChecked: expedition.combatEncounterChecked || false
           }
         }
       });

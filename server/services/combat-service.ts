@@ -30,8 +30,8 @@ export class CombatService {
   // ===================== ENCOUNTER GENERATION =====================
 
   async tryGenerateEncounter(expeditionId: string, playerId: string, biomeId: string): Promise<CombatEncounter | null> {
-    // 100% chance de encontrar uma criatura durante a expedição
-    if (Math.random() > 1.0) return null;
+    // 30% chance de encontrar uma criatura durante a expedição
+    if (Math.random() > 0.3) return null;
 
     // Filtrar animais do bioma (melhorar correspondência)
     const biomeName = this.getBiomeName(biomeId);
