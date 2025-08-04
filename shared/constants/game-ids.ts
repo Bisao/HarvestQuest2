@@ -1,195 +1,132 @@
-
-// ⭐ ARQUIVO CENTRAL DE IDs DO JOGO - SISTEMA UNIFICADO ⭐
-// Este arquivo é a fonte única da verdade para TODOS os IDs do jogo
+// ⭐ ARQUIVO CENTRAL DE IDs - NEVER HARDCODE IDs ⭐
+// Este é o ÚNICO local onde IDs devem ser definidos no projeto
+// TODOS os outros arquivos DEVEM importar IDs deste arquivo
+// 
+// 🚫 NUNCA faça: const id = "res-abc123..."
+// ✅ SEMPRE faça: import { RESOURCE_IDS } from '@shared/constants/game-ids'
 //
-// 🔥 SISTEMA MODULAR: Organização clara por categoria
-// 📊 VALIDAÇÃO CENTRALIZADA: Todos os sistemas usam estes IDs
-//
-// REGRA: Todos os IDs são UUIDs v4 no formato apropriado
+// Este sistema garante consistência total entre backend e frontend
 
-// Re-exportar IDs de criaturas
-export * from './creature-ids';
-
-// ===================== RESOURCE IDs =====================
 export const RESOURCE_IDS = {
-  // Materiais Básicos
-  FIBRA: "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  PEDRA: "res-a2b3c4d5-e6f7-8901-bcde-f23456789012",
-  PEDRAS_SOLTAS: "res-b3c4d5e6-f7g8-9012-cdef-345678901234",
-  MADEIRA: "res-c4d5e6f7-g8h9-0123-def0-456789012345",
-  GRAVETOS: "res-d5e6f7g8-h9i0-1234-ef01-567890123456",
-  BAMBU: "res-e6f7g8h9-i0j1-2345-f012-678901234567",
-  
-  // Líquidos
-  AGUA_FRESCA: "res-f7g8h9i0-j1k2-3456-0123-789012345678",
-  
-  // Animais (mantidos para compatibilidade)
+  // Basic resources
+  FIBRA: "res-8bd33b18-a241-4859-ae9f-870fab5673d0",
+  PEDRA: "res-7c2a1f95-b8e3-4d72-9a01-6f5d8e4c9b12",
+  PEDRAS_SOLTAS: "res-5e9d8c7a-3f2b-4e61-8a90-1c4b7e5f9d23",
+  GRAVETOS: "res-2a8f5c1e-9b7d-4a63-8e52-9c1a6f8e4b37",
+  AGUA_FRESCA: "res-4b7e1a9c-5d8f-4e32-9a76-8c2e5f1b9d48",
+  BAMBU: "res-6d3a8e5c-1f9b-4e72-8a05-4c7e9f2b1d59",
+  MADEIRA: "res-8e5c2a9f-7b1d-4e63-9a84-6f1c8e5a2b6a",
+  ARGILA: "res-1c9e5a7b-3f8d-4e52-9a73-8e2c6f9b1d7b",
+  FERRO_FUNDIDO: "res-9f7b3e1a-5d8c-4e41-9a62-2c6e8f1b5d8c",
+  COURO: "res-3e1a9f7b-8d5c-4e30-9a51-6c8e2f9b3d9d",
+  CARNE: "res-7b5e3a1f-1d9c-4e29-9a40-8c2e6f7b5dae",
+  OSSOS: "res-5a3f7b1e-9d8c-4e18-9a39-2c6e8f3b7dbf",
+  PELO: "res-1f7b5a3e-8c9d-4e17-9a28-6c2e8f5b1dc0",
+  BARBANTE: "res-9d5a1f3e-7b8c-4e16-9a27-8c6e2f9b5dd1",
+
+  // Consumables
+  ISCA_PESCA: "eq-tool-bait-fishing-001", // Isca movida para recursos
+
+  // Animals 
   COELHO: "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
-  VEADO: "res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3", 
+  VEADO: "res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3",
   JAVALI: "res-f7a1c9e5-3d8b-4e13-9a24-8c6e2f9b7de4",
-  
-  // Peixes
   PEIXE_PEQUENO: "res-a1c9f7e5-8b3d-4e12-9a23-2c8e6f5b9df5",
   PEIXE_GRANDE: "res-c9e5a1f7-3d8b-4e11-9a22-6c2e8f9b5de6",
   SALMAO: "res-e5a1c9f7-8b3d-4e10-9a21-8c6e2f7b9df7",
-  PEIXE_GRELHADO: "res-g8h9i0j1-k2l3-4567-1234-890123456789",
-  
-  // Plantas Silvestres
-  COGUMELOS: "res-h9i0j1k2-l3m4-5678-2345-901234567890",
-  FRUTAS_SILVESTRES: "res-i0j1k2l3-m4n5-6789-3456-012345678901",
-  COGUMELOS_ASSADOS: "res-j1k2l3m4-n5o6-7890-4567-123456789012",
-  
-  // Alimentos Processados
-  CARNE_ASSADA: "res-k2l3m4n5-o6p7-8901-5678-234567890123",
-  ENSOPADO_CARNE: "res-l3m4n5o6-p7q8-9012-6789-345678901234",
-  SUCO_FRUTAS: "res-m4n5o6p7-q8r9-0123-7890-456789012345",
-  
-  // Materiais de Crafting
-  BARBANTE: "res-n5o6p7q8-r9s0-1234-8901-567890123456",
-  FERRO_FUNDIDO: "res-o6p7q8r9-s0t1-2345-9012-678901234567",
-  CARNE: "res-p7q8r9s0-t1u2-3456-0123-789012345678",
-  COURO: "res-q8r9s0t1-u2v3-4567-1234-890123456789",
-  ISCA_PESCA: "res-r9s0t1u2-v3w4-5678-2345-901234567890",
-  ARGILA: "res-s0t1u2v3-w4x5-6789-3456-012345678901"
+  COGUMELOS: "res-a1f7c9e5-3b8d-4e09-9a20-2c8e6f9b5de8",
+  FRUTAS_SILVESTRES: "res-f7c9a1e5-8d3b-4e08-9a19-6c2e8f5b9df9",
+
+  // Unique resources
+  MADEIRA_FLORESTA: "res-c9a1f7e5-3d8b-4e07-9a18-8c6e2f9b7dea",
+  AREIA: "res-a1e5f7c9-8b3d-4e06-9a17-2c8e6f7b5deb",
+  CRISTAIS: "res-e5f7a1c9-3d8b-4e05-9a16-6c2e8f9b7dec",
+  CONCHAS: "res-f7a1e5c9-8b3d-4e04-9a15-8c6e2f5b9ded",
+
+  // Food resources (consumables)
+  SUCO_FRUTAS: "res-suco-frutas-001",
+  COGUMELOS_ASSADOS: "res-cogumelos-assados-001", 
+  PEIXE_GRELHADO: "res-peixe-grelhado-001",
+  CARNE_ASSADA: "res-carne-assada-001",
+  ENSOPADO_CARNE: "res-ensopado-carne-001"
 } as const;
 
-// ===================== EQUIPMENT IDs =====================
 export const EQUIPMENT_IDS = {
-  // Ferramentas
-  MACHADO: "eq-p7q8r9s0-t1u2-3456-0123-789012345678",
-  PICARETA: "eq-q8r9s0t1-u2v3-4567-1234-890123456789",
-  VARA_PESCA: "eq-r9s0t1u2-v3w4-5678-2345-901234567890",
-  FOICE: "eq-s0t1u2v3-w4x5-6789-3456-012345678902",
-  
-  // Armas
-  FACA: "eq-s0t1u2v3-w4x5-6789-3456-012345678901",
-  LANCA: "eq-t1u2v3w4-x5y6-7890-4567-123456789012",
-  ARCO_FLECHA: "eq-u2v3w4x5-y6z7-8901-5678-234567890123",
-  
-  // Containers
-  BALDE_MADEIRA: "eq-v3w4x5y6-z7a8-9012-6789-345678901235",
-  GARRAFA_BAMBU: "eq-w4x5y6z7-a8b9-0123-7890-456789012346",
-  MOCHILA: "eq-x5y6z7a8-b9c0-1234-8901-567890123457",
-  CORDA: "eq-y6z7a8b9-c0d1-2345-9012-678901234568",
-  
-  // Utensílios de Cozinha
-  PANELA_BARRO: "eq-z7a8b9c0-d1e2-3456-0123-789012345679",
-  PANELA: "eq-a8b9c0d1-e2f3-4567-1234-890123456780",
-  
-  // Armaduras - Capacete
-  CAPACETE_COURO: "eq-v3w4x5y6-z7a8-9012-6789-345678901234",
-  CAPACETE_FERRO: "eq-w4x5y6z7-a8b9-0123-7890-456789012345",
-  
-  // Armaduras - Peitorais
-  PEITORAL_COURO: "eq-x5y6z7a8-b9c0-1234-8901-567890123456",
-  PEITORAL_FERRO: "eq-y6z7a8b9-c0d1-2345-9012-678901234567",
-  
-  // Armaduras - Pernas
-  PERNEIRAS_COURO: "eq-z7a8b9c0-d1e2-3456-0123-789012345678",
-  PERNEIRAS_FERRO: "eq-a8b9c0d1-e2f3-4567-1234-890123456789",
-  
-  // Armaduras - Botas
-  BOTAS_COURO: "eq-b9c0d1e2-f3g4-5678-2345-901234567890",
-  BOTAS_FERRO: "eq-c0d1e2f3-g4h5-6789-3456-012345678901"
+  // Tools
+  PICARETA: "eq-tool-1a2b3c4d-5e6f-7890-abcd-ef1234567890",
+  MACHADO: "eq-tool-2b3c4d5e-6f78-9012-bcde-f12345678901",
+  PA: "eq-tool-3c4d5e6f-7890-1234-cdef-123456789012",
+  VARA_PESCA: "eq-tool-4d5e6f78-9012-3456-def1-234567890123",
+  FOICE: "eq-tool-5e6f7890-1234-5678-ef12-345678901234",
+  FACA: "eq-tool-6f789012-3456-7890-f123-456789012345",
+  BALDE_MADEIRA: "eq-tool-7890123a-4567-8901-1234-567890123456",
+  GARRAFA_BAMBU: "eq-tool-890123ab-5678-9012-2345-678901234567",
+  CORDA: "eq-tool-0123abcd-789a-1234-4567-89012345678a",
+  PANELA_BARRO: "eq-tool-clay-pot-001",
+  PANELA: "eq-tool-metal-pot-001",
+
+  // Weapons
+  ARCO_FLECHA: "eq-weap-a1b2c3d4-5e6f-7890-abcd-ef1234567890",
+  LANCA: "eq-weap-b2c3d4e5-6f78-9012-bcde-f12345678901",
+  ESPADA_PEDRA: "eq-weap-stone-sword-001",
+
+  // Armor
+  CAPACETE_COURO: "eq-armor-c3d4e5f6-7890-1234-cdef-123456789012",
+  PEITORAL_COURO: "eq-armor-d4e5f678-9012-3456-def1-234567890123",
+  CALCAS_COURO: "eq-armor-e5f67890-1234-5678-ef12-345678901234",
+  BOTAS_COURO: "eq-armor-f6789012-3456-7890-f123-456789012345",
+  CAPACETE_FERRO: "eq-armor-iron-helmet-001",
+
+  // Storage/Utility
+  MOCHILA: "eq-util-78901234-5678-9012-1234-567890123456",
+  BARRIL_IMPROVISADO: "eq-container-makeshift-barrel-001",
 } as const;
 
-// ===================== RECIPE IDs =====================
+// Update BIOME_IDS with correct actual database IDs
+export const BIOME_IDS = {
+  FLORESTA: "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+  DESERTO: "1680de81-559a-4115-9bd5-b3ac92e7f678", 
+  MONTANHA: "f89038af-b3af-4246-b563-eb992f7b2f50",
+  OCEANO: "829bd63f-69f7-49f8-a10e-925c122e32c6"
+} as const;
+
+export const QUEST_IDS = {
+  PRIMEIRO_EXPLORADOR: "8d5b36f3-12cf-47e6-8283-cd73b9e8c85c",
+  PRIMEIRO_PASSO: "e5184b00-3c28-4b30-8b64-f16a7f10c49b",
+  PRIMEIRO_ARTESAO: "6028baa4-bbdc-4fc4-801c-741ed9c5b3ee"
+} as const;
+
 export const RECIPE_IDS = {
-  // Materiais Básicos
   BARBANTE: "rec-barbante-001",
-  TRONCO_PARA_MADEIRA: "rec-madeira-001",
-  CORDA: "rec-corda-001",
-  
-  // Ferramentas
-  MACHADO: "rec-machado-001",
+  MACHADO: "rec-machado-001", 
   PICARETA: "rec-picareta-001",
-  VARA_PESCA: "rec-vara-001",
-  FACA: "rec-faca-001",
   FOICE: "rec-foice-001",
-  
-  // Armas
+  BALDE_MADEIRA: "rec-balde-madeira-001",
+  FACA: "rec-faca-001",
+  VARA_PESCA: "rec-vara-pesca-001",
   ARCO_FLECHA: "rec-arco-flecha-001",
   LANCA: "rec-lanca-001",
-  
-  // Containers
-  BALDE_MADEIRA: "rec-balde-madeira-001",
-  GARRAFA_BAMBU: "rec-garrafa-bambu-001",
   MOCHILA: "rec-mochila-001",
-  
-  // Utensílios de Cozinha
+  CORDA: "rec-corda-001",
+  ISCA_PESCA: "rec-isca-pesca-001",
   PANELA_BARRO: "rec-panela-barro-001",
   PANELA: "rec-panela-001",
-  
-  // Alimentos
-  COGUMELOS_ASSADOS: "rec-cogumelos-001",
-  CARNE_ASSADA: "rec-carne-001",
-  PEIXE_GRELHADO: "rec-peixe-001",
-  ENSOPADO_CARNE: "rec-ensopado-001",
-  SUCO_FRUTAS: "rec-suco-001",
-  ISCA_PESCA: "rec-isca-pesca-001",
-  
-  // Equipamentos
-  CAPACETE_COURO: "rec-capacete-couro-001",
-  PEITORAL_COURO: "rec-peitoral-couro-001",
-  FACA_FERRO: "rec-faca-ferro-001"
+  GARRAFA_BAMBU: "rec-garrafa-bambu-001",
+  SUCO_FRUTAS: "rec-suco-frutas-001",
+  COGUMELOS_ASSADOS: "rec-cogumelos-assados-001",
+  PEIXE_GRELHADO: "rec-peixe-grelhado-001",
+  CARNE_ASSADA: "rec-carne-assada-001",
+  ENSOPADO_CARNE: "rec-ensopado-carne-001",
+  BARRIL_IMPROVISADO: "rec-barril-improvisado-001"
 } as const;
 
-// ===================== BIOME IDs =====================
-export const BIOME_IDS = {
-  FLORESTA: "biome-floresta-001",
-  MONTANHA: "biome-montanha-001", 
-  PRAIA: "biome-praia-001",
-  LAGO: "biome-lago-001",
-  CAVERNA: "biome-caverna-001",
-  PLANICIE: "biome-planicie-001"
-} as const;
-
-// ===================== QUEST IDs =====================
-export const QUEST_IDS = {
-  TUTORIAL_COLETA: "quest-tutorial-001",
-  PRIMEIRA_FERRAMENTA: "quest-ferramenta-001",
-  PRIMEIRA_CACA: "quest-caca-001",
-  EXPLORADOR_INICIANTE: "quest-explorador-001"
-} as const;
-
-// ===================== SKILL IDs =====================
-export const SKILL_IDS = {
-  // === COLETA E EXPLORAÇÃO ===
-  COLETA: "skill-f1a2b3c4-d5e6-7890-abcd-123456789abc",
-  MINERACAO: "skill-g2b3c4d5-e6f7-8901-bcde-234567890bcd",
-  LENHADOR: "skill-h3c4d5e6-f7g8-9012-cdef-345678901cde",
-  PESCA: "skill-i4d5e6f7-g8h9-0123-def0-456789012def",
-  CACA: "skill-j5e6f7g8-h9i0-1234-ef01-567890123ef0",
-  EXPLORACAO: "skill-k6f7g8h9-i0j1-2345-f012-678901234f01",
-
-  // === CRIAÇÃO E ARTESANATO ===
-  ARTESANATO: "skill-l7g8h9i0-j1k2-3456-0123-789012345012",
-  FERRARIA: "skill-m8h9i0j1-k2l3-4567-1234-890123456123",
-  CULINARIA: "skill-n9i0j1k2-l3m4-5678-2345-901234567234",
-  ALQUIMIA: "skill-o0j1k2l3-m4n5-6789-3456-012345678345",
-
-  // === COMBATE E SOBREVIVÊNCIA ===
-  COMBATE: "skill-p1k2l3m4-n5o6-7890-4567-123456789456",
-  DEFESA: "skill-q2l3m4n5-o6p7-8901-5678-234567890567",
-  SOBREVIVENCIA: "skill-r3m4n5o6-p7q8-9012-6789-345678901678",
-
-  // === ESPECIALIZAÇÃO ===
-  RESISTENCIA: "skill-s4n5o6p7-q8r9-0123-7890-456789012789",
-  AGILIDADE: "skill-t5o6p7q8-r9s0-1234-8901-567890123890",
-  SORTE: "skill-u6p7q8r9-s0t1-2345-9012-678901234901"
-} as const;
-
-// ===================== VALIDATION HELPERS =====================
+// Helper functions for type safety
 export function isResourceId(id: string): boolean {
   return id.startsWith('res-');
 }
 
 export function isEquipmentId(id: string): boolean {
   return id.startsWith('eq-');
-}
-
-export function isRecipeId(id: string): boolean {
-  return id.startsWith('rec-');
 }
 
 export function isBiomeId(id: string): boolean {
@@ -200,27 +137,25 @@ export function isQuestId(id: string): boolean {
   return id.startsWith('quest-');
 }
 
-export function isSkillId(id: string): boolean {
-  return id.startsWith('skill-');
+export function isRecipeId(id: string): boolean {
+  return id.startsWith('recipe-');
 }
 
-export function getAllValidIds(): string[] {
-  return [
+// Get all IDs for validation
+export const ALL_RESOURCE_IDS = Object.values(RESOURCE_IDS);
+export const ALL_EQUIPMENT_IDS = Object.values(EQUIPMENT_IDS);
+export const ALL_BIOME_IDS = Object.values(BIOME_IDS);
+export const ALL_QUEST_IDS = Object.values(QUEST_IDS);
+export const ALL_RECIPE_IDS = Object.values(RECIPE_IDS);
+
+// Master ID validation  
+export function isValidGameId(id: string): boolean {
+  const allIds = [
     ...Object.values(RESOURCE_IDS),
-    ...Object.values(EQUIPMENT_IDS),
-    ...Object.values(RECIPE_IDS),
+    ...Object.values(EQUIPMENT_IDS), 
     ...Object.values(BIOME_IDS),
     ...Object.values(QUEST_IDS),
-    ...Object.values(SKILL_IDS)
+    ...Object.values(RECIPE_IDS)
   ];
+  return allIds.includes(id as any);
 }
-
-// ===================== EXPORTS =====================
-export const ALL_GAME_IDS = {
-  RESOURCES: RESOURCE_IDS,
-  EQUIPMENT: EQUIPMENT_IDS,
-  RECIPES: RECIPE_IDS,
-  BIOMES: BIOME_IDS,
-  QUESTS: QUEST_IDS,
-  SKILLS: SKILL_IDS
-} as const;

@@ -2,7 +2,23 @@
 // All game constants and configuration values in one place for easy maintenance
 
 export const GAME_CONFIG = {
-  
+  // Hunger and Thirst system
+  HUNGER_THIRST: {
+    HUNGER_DECAY_RATE: 1,      // Points per cycle
+    THIRST_DECAY_RATE: 1,      // Points per cycle  
+    UPDATE_INTERVAL: 40000,    // 40 seconds in milliseconds
+    MIN_HUNGER: 0,
+    MAX_HUNGER: 100,
+    MIN_THIRST: 0,
+    MAX_THIRST: 100,
+    CRITICAL_THRESHOLD: 20,    // Below this = critical status
+    EMERGENCY_THRESHOLD: 5,    // Below this = emergency status
+    NATURAL_REGEN_CHANCE: 0.2, // 20% chance for natural regeneration
+    NIGHT_MULTIPLIER: 1.1,     // 10% more degradation at night
+    EQUIPMENT_REDUCTION: 0.9,  // 10% less degradation with equipment
+    MAX_DEGRADATION_RATE: 3,   // Maximum degradation per cycle
+    MIN_DEGRADATION_RATE: 0.25 // Minimum degradation per cycle
+  },
 
   POLLING: {
     INTERVAL: 2000, // 2 seconds - much more reliable than WebSocket
@@ -159,6 +175,7 @@ export const validateConfig = (): boolean => {
 
 // Export individual sections for convenience
 // WebSocket removed - using polling system for real-time updates
+export const HUNGER_THIRST_CONFIG = GAME_CONFIG.HUNGER_THIRST;
 export const EXPEDITION_CONFIG = GAME_CONFIG.EXPEDITIONS;
 export const API_CONFIG = GAME_CONFIG.API;
 export const UI_CONFIG = GAME_CONFIG.UI;

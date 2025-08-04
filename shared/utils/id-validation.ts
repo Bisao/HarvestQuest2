@@ -1,6 +1,5 @@
 
 import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS, BIOME_IDS, QUEST_IDS } from '../constants/game-ids';
-import { CREATURE_IDS, isValidCreatureId } from '../constants/creature-ids';
 
 /**
  * Centralized ID validation and conversion utilities
@@ -10,7 +9,7 @@ import { CREATURE_IDS, isValidCreatureId } from '../constants/creature-ids';
 export interface StandardizedItemReference {
   itemId: string;          // The standardized game item ID
   recordId?: string;       // Database record ID (for inventory/storage entries)
-  type: 'resource' | 'equipment' | 'creature' | 'consumable';
+  type: 'resource' | 'equipment' | 'consumable';
 }
 
 export function isValidResourceId(id: string): boolean {
@@ -38,16 +37,17 @@ export function isValidGameId(id: string): boolean {
          isValidEquipmentId(id) || 
          isValidRecipeId(id) || 
          isValidBiomeId(id) || 
-         isValidQuestId(id) ||
-         isValidCreatureId(id);
+         isValidQuestId(id);
 }
 
-export function getItemType(itemId: string): 'resource' | 'equipment' | 'creature' | 'unknown' {
+export function getItemType(itemId: string): 'resource' | 'equipment' | 'unknown' {
   if (isValidResourceId(itemId)) return 'resource';
   if (isValidEquipmentId(itemId)) return 'equipment';
-  if (isValidCreatureId(itemId)) return 'creature';
   return 'unknown';
 }
+
+/**
+
 
 /**
  * Validate that all recipe ingredients use valid game IDs
@@ -109,8 +109,7 @@ export function validateGameDataConsistency(): {
     ...Object.values(EQUIPMENT_IDS),
     ...Object.values(RECIPE_IDS),
     ...Object.values(BIOME_IDS),
-    ...Object.values(QUEST_IDS),
-    ...Object.values(CREATURE_IDS)
+    ...Object.values(QUEST_IDS)
   ];
   
   const duplicates = allIds.filter((id, index) => allIds.indexOf(id) !== index);
@@ -142,7 +141,7 @@ export function standardizeItemReference(
   return {
     itemId,
     recordId,
-    type: type as 'resource' | 'equipment' | 'creature'
+    type: type as 'resource' | 'equipment'
   };
 }
 
@@ -153,5 +152,5 @@ export function validateItemReference(ref: any): ref is StandardizedItemReferenc
   return ref && 
          typeof ref.itemId === 'string' && 
          isValidGameId(ref.itemId) &&
-         ['resource', 'equipment', 'creature', 'consumable'].includes(ref.type);
+         ['resource', 'equipment', 'consumable'].includes(ref.type);
 }

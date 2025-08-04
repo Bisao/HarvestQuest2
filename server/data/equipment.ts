@@ -1,13 +1,12 @@
 // Equipment data management module
 import type { InsertEquipment } from "@shared/types";
 import { EQUIPMENT_IDS } from "@shared/constants/game-ids";
-import { v4 as uuidv4 } from 'uuid';
 
 export function createEquipmentWithIds(): InsertEquipment[] {
   return [
     // Tools
     {
-      id: EQUIPMENT_IDS.PICARETA || uuidv4(),
+      id: EQUIPMENT_IDS.PICARETA,
       name: "Picareta",
       emoji: "⛏️",
       category: "tools",

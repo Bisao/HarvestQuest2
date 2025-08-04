@@ -1,19 +1,13 @@
 // Hunger and Thirst Degradation Service for Coletor Adventures
-import { GAME_CONFIG } from '@shared/config/game-config';
-import { TimeService } from './time-service';
-import type { IStorage } from '../storage';
+import type { IStorage } from "../storage";
 import type { HungerDegradationMode } from "@shared/types";
 import { CONSUMPTION_CONFIG } from "@shared/config/consumption-config";
-import { PlayerStatusService } from "./player-status-service";
 
 export class HungerThirstService {
   private degradationTimer: NodeJS.Timeout | null = null;
   private isRunning = false;
-  private statusService: PlayerStatusService;
 
-  constructor(private storage: IStorage) {
-    this.statusService = new PlayerStatusService(storage);
-  }
+  constructor(private storage: IStorage) {}
 
   /**
    * Start passive hunger/thirst degradation for all players
@@ -28,10 +22,10 @@ export class HungerThirstService {
     this.isRunning = true;
     console.log('🍖💧 Starting passive hunger/thirst degradation system');
 
-    // Degrade every 18 minutes (1,080,000ms)
+    // Degrade every 2 minutes (120,000ms)
     this.degradationTimer = setInterval(async () => {
       await this.degradeAllPlayers();
-    }, 1080000); // 18 minutes
+    }, 120000); // 2 minutes
   }
 
   /**
@@ -54,12 +48,6 @@ export class HungerThirstService {
       const players = await this.storage.getAllPlayers();
 
       for (const player of players) {
-        // Ensure player has valid status values
-        if (!player.hunger && player.hunger !== 0) player.hunger = 100;
-        if (!player.thirst && player.thirst !== 0) player.thirst = 100;
-        if (!player.maxHunger) player.maxHunger = 100;
-        if (!player.maxThirst) player.maxThirst = 100;
-
         // Skip if player has very low hunger/thirst to avoid going negative
         if (player.hunger <= 2 && player.thirst <= 2) {
           continue;
@@ -67,11 +55,8 @@ export class HungerThirstService {
 
         // Calculate degradation based on player's selected mode
         const baseDegradation = this.calculateDegradationByMode(player);
-
-        // Apply temperature modifiers to degradation
-        const temperatureModifiers = await this.getTemperatureModifiers(player);
-        const hungerDecrease = Math.min((baseDegradation.hunger || 1) * temperatureModifiers.hunger, player.hunger); 
-        const thirstDecrease = Math.min((baseDegradation.thirst || 1) * temperatureModifiers.thirst, player.thirst);
+        const hungerDecrease = Math.min(baseDegradation.hunger, player.hunger); 
+        const thirstDecrease = Math.min(baseDegradation.thirst, player.thirst);
 
         const newHunger = Math.max(0, player.hunger - hungerDecrease);
         const newThirst = Math.max(0, player.thirst - thirstDecrease);
@@ -91,28 +76,24 @@ export class HungerThirstService {
         const finalHunger = Math.min(player.maxHunger, newHunger + naturalHungerRegen);
         const finalThirst = Math.min(player.maxThirst, newThirst + naturalThirstRegen);
 
-        // Only update if there's actually a change and values are valid
-        if ((finalHunger !== player.hunger || finalThirst !== player.thirst) && 
-            !isNaN(finalHunger) && !isNaN(finalThirst)) {
+        // Only update if there's actually a change
+        if (finalHunger !== player.hunger || finalThirst !== player.thirst) {
           // Calculate penalties for low hunger/thirst
           const penalties = this.calculateStatusPenalties(newHunger, newThirst);
 
           const updateData: any = {
-            hunger: Math.max(0, Math.min(player.maxHunger || 100, finalHunger)),
-            thirst: Math.max(0, Math.min(player.maxThirst || 100, finalThirst))
+            hunger: newHunger,
+            thirst: newThirst
           };
 
-          // Apply other status degradations
-          const statusDegradation = this.calculateStatusDegradation(player);
-          Object.assign(updateData, statusDegradation);
-
           // Apply penalties if any
-          if (penalties.healthPenalty > 0) {
-            updateData.health = Math.max(1, (player.health || 100) - penalties.healthPenalty);
+          if (penalties.healthPenalty > 0 && player.health !== undefined) {
+            const newHealth = Math.max(1, player.health - penalties.healthPenalty);
+            updateData.health = newHealth;
             console.log(`🩺 Player ${player.id} lost ${penalties.healthPenalty} health due to low hunger/thirst`);
           }
 
-          await this.statusService.updatePlayerStatus(player.id, updateData);
+          await this.storage.updatePlayer(player.id, updateData);
 
           // Log degradation with throttling to reduce spam
           if (process.env.NODE_ENV === 'development' && Math.random() < 0.1) {
@@ -169,15 +150,15 @@ export class HungerThirstService {
    */
   private calculateDegradationByMode(player: any): { hunger: number; thirst: number } {
     const mode: HungerDegradationMode = player.hungerDegradationMode || 'automatic';
-
+    
     // Disabled mode - no degradation
     if (mode === 'disabled') {
       return { hunger: 0, thirst: 0 };
     }
-
+    
     let hungerRate = 1; // Base rate
     let thirstRate = 1; // Base rate
-
+    
     // Apply mode-specific multipliers
     switch (mode) {
       case 'slow':
@@ -197,34 +178,11 @@ export class HungerThirstService {
         // Use dynamic calculation for automatic mode
         return this.calculateDynamicDegradation(player);
     }
-
+    
     return {
       hunger: Math.ceil(hungerRate),
       thirst: Math.ceil(thirstRate)
     };
-  }
-
-  /**
-   * Get temperature modifiers for hunger/thirst degradation
-   */
-  private async getTemperatureModifiers(player: any): Promise<{ hunger: number; thirst: number }> {
-    try {
-      const timeService = TimeService.getInstance();
-      const gameTime = timeService.getCurrentGameTime();
-
-      // Get player's current biome (default to forest if not specified)
-      const biome = player.currentBiome || 'forest';
-
-      // Calculate temperature
-      const temperatureData = timeService.calculateTemperature(biome, gameTime, player);
-      const temperature = temperatureData.current;
-
-      // Apply temperature modifiers
-      return timeService.getTemperatureModifiers(temperature);
-    } catch (error) {
-      console.warn('Failed to get temperature modifiers:', error);
-      return { hunger: 1, thirst: 1 };
-    }
   }
 
   /**
@@ -329,57 +287,12 @@ export class HungerThirstService {
    */
 
   /**
-   * Calculate degradation for other status values
-   */
-  private calculateStatusDegradation(player: any): any {
-    const updates: any = {};
-
-    // Fatigue naturally decreases when not on expedition (rest)
-    if (!player.onExpedition && player.fatigue > 0) {
-      const fatigueRecovery = Math.min(2, player.fatigue); // Recover 2 fatigue per cycle when resting
-      updates.fatigue = Math.max(0, player.fatigue - fatigueRecovery);
-    }
-
-    // Hygiene naturally decreases over time
-    if (player.hygiene > 0) {
-      const hygieneDecrease = 1; // Lose 1 hygiene per cycle
-      updates.hygiene = Math.max(0, player.hygiene - hygieneDecrease);
-    }
-
-    // Temperature moves toward neutral (20°C) slowly
-    const currentTemp = player.temperature || 20;
-    if (currentTemp !== 20) {
-      const tempChange = currentTemp > 20 ? -1 : 1; // Move 1 degree toward 20
-      updates.temperature = Math.max(-100, Math.min(100, currentTemp + tempChange));
-    }
-
-    // Morale slowly decreases if low hunger/thirst, slowly increases if well-fed
-    if (player.hunger < 30 || player.thirst < 30) {
-      updates.morale = Math.max(0, player.morale - 1); // Lose morale when hungry/thirsty
-    } else if (player.hunger > 80 && player.thirst > 80 && player.morale < 100) {
-      updates.morale = Math.min(100, player.morale + 1); // Gain morale when well-fed
-    }
-
-    return updates;
-  }
-
-  /**
    * Get current status of the degradation system
    */
   getStatus(): { isRunning: boolean; intervalMs: number } {
     return {
       isRunning: this.isRunning,
-      intervalMs: 1080000 // 18 minutes (1080 seconds)
+      intervalMs: 120000 // 2 minutes (120 seconds)
     };
-  }
-
-  private logDegradation(playerId: string, oldHunger: number, newHunger: number, oldThirst: number, newThirst: number, timeModifiers?: { hunger: number; thirst: number }) {
-    const hungerDrop = oldHunger - newHunger;
-    const thirstDrop = oldThirst - newThirst;
-
-    if (hungerDrop > 0 || thirstDrop > 0) {
-      const modifierInfo = timeModifiers ? ` (Mods: H${timeModifiers.hunger.toFixed(1)}x T${timeModifiers.thirst.toFixed(1)}x)` : '';
-      console.log(`🍖💧 DEGRADATION: Player ${playerId} - Hunger: ${oldHunger}→${newHunger} (-${hungerDrop.toFixed(1)}), Thirst: ${oldThirst}→${newThirst} (-${thirstDrop.toFixed(1)})${modifierInfo}`);
-    }
   }
 }

@@ -20,82 +20,82 @@ export class QuestService {
 
     for (const objective of objectives) {
       const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId || objective.target);
-
+      
       switch (objective.type) {
         case 'collect': {
           const collectProgress = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
           const required = objective.quantity || objective.amount || 1;
-
+          
           progress[progressKey] = {
             current: collectProgress.current || 0,
             required: required,
             completed: (collectProgress.current || 0) >= required
           };
-
+          
           if ((collectProgress.current || 0) < required) {
             allCompleted = false;
           }
           break;
         }
-
+        
         case 'craft': {
           const craftProgress = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
           const required = objective.quantity || objective.amount || 1;
-
+          
           progress[progressKey] = {
             current: craftProgress.current || 0,
             required: required,
             completed: (craftProgress.current || 0) >= required
           };
-
+          
           if ((craftProgress.current || 0) < required) {
             allCompleted = false;
           }
           break;
         }
-
+        
         case 'kill': {
           const killProgress = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
           const required = objective.quantity || objective.amount || 1;
-
+          
           progress[progressKey] = {
             current: killProgress.current || 0,
             required: required,
             completed: (killProgress.current || 0) >= required
           };
-
+          
           if ((killProgress.current || 0) < required) {
             allCompleted = false;
           }
           break;
         }
-
+        
         case 'level': {
           const player = await this.storage.getPlayer(playerId);
           const required = objective.level || 1;
-
+          
           progress[objective.type] = {
             current: player?.level || 1,
             required: required,
             completed: (player?.level || 1) >= required
           };
-
+          
           if ((player?.level || 1) < required) {
             allCompleted = false;
           }
           break;
         }
-
+        
         case 'expedition': {
           const expeditionProgress = (playerQuest.progress as any)?.[progressKey] || { current: 0 };
           const required = objective.amount || objective.quantity || 1;
-
+          
           progress[progressKey] = {
             current: expeditionProgress.current || 0,
             required: required,
             completed: (expeditionProgress.current || 0) >= required
           };
-
+          
           if ((expeditionProgress.current || 0) < required) {
             allCompleted = false;
           }
@@ -124,7 +124,7 @@ export class QuestService {
 
       for (const objective of objectives) {
         const progressKey = objective.type + '_' + (objective.resourceId || objective.itemId || objective.creatureId || objective.biomeId || objective.target);
-
+        
         switch (action) {
           case 'collect':
             if (objective.type === 'collect' && (objective.resourceId === data.resourceId || objective.target === data.resourceId)) {
@@ -141,7 +141,7 @@ export class QuestService {
               progressUpdated = true;
             }
             break;
-
+            
           case 'craft':
             if (objective.type === 'craft' && (objective.itemId === data.itemId || objective.resourceId === data.resourceId || objective.target === data.itemId || objective.target === data.resourceId)) {
               if (!currentProgress[progressKey]) {
@@ -157,7 +157,7 @@ export class QuestService {
               progressUpdated = true;
             }
             break;
-
+            
           case 'expedition':
             if (objective.type === 'expedition' && (objective.biomeId === data.biomeId || objective.target === data.biomeId)) {
               const required = objective.amount || objective.quantity || 1;
@@ -174,7 +174,7 @@ export class QuestService {
               progressUpdated = true;
             }
             break;
-
+            
           case 'kill':
             if (objective.type === 'kill' && (objective.creatureId === data.creatureId || objective.target === data.creatureId)) {
               if (!currentProgress[progressKey]) {
@@ -225,26 +225,16 @@ export class QuestService {
     // Distribute rewards
     if (quest.rewards) {
       const rewards = quest.rewards as any;
-
-      // Award rewards and handle level up
-      if (rewards.experience > 0) {
-        const newExperience = player.experience + rewards.experience;
-        const newLevel = Math.floor(Math.sqrt(newExperience / 100)) + 1;
-
+      
+      // Give experience points
+      if (rewards.experience) {
+        const newExp = player.experience + rewards.experience;
+        const levelData = await this.calculateLevelUp(player.experience, rewards.experience);
         await this.storage.updatePlayer(playerId, {
-          experience: newExperience,
-          level: Math.max(player.level, newLevel)
+          experience: levelData.newExp,
+          level: levelData.newLevel
         });
-
-        // Handle level up
-        if (newLevel > player.level) {
-          console.log(`🎉 LEVEL-UP: Player ${playerId} leveled up to ${newLevel} from quest completion!`);
-
-          // Award skill points for level up
-          const { SkillService } = await import('./skill-service');
-          const skillService = new SkillService(this.storage);
-          await skillService.handlePlayerLevelUp(playerId, newLevel);
-        }
+        console.log(`[QUEST REWARD] Player ${playerId} gained ${rewards.experience} XP from quest ${quest.name}`);
       }
 
       // Give coins
@@ -258,10 +248,10 @@ export class QuestService {
       // Give items to storage
       if (rewards.items && typeof rewards.items === 'object') {
         const storageItems = await this.storage.getPlayerStorage(playerId);
-
+        
         for (const [resourceId, quantity] of Object.entries(rewards.items)) {
           const existingStorageItem = storageItems.find(item => item.resourceId === resourceId);
-
+          
           if (existingStorageItem) {
             await this.storage.updateStorageItem(existingStorageItem.id, {
               quantity: existingStorageItem.quantity + Number(quantity)
@@ -274,7 +264,7 @@ export class QuestService {
               itemType: 'resource'
             });
           }
-
+          
           console.log(`[QUEST REWARD] Player ${playerId} received ${quantity}x ${resourceId} from quest ${quest.name}`);
         }
       }
@@ -288,12 +278,12 @@ export class QuestService {
     const newExp = currentExp + expGain;
     let newLevel = 1;
     let requiredExp = 100; // Base experience for level 2
-
+    
     while (newExp >= requiredExp) {
       newLevel++;
       requiredExp += newLevel * 50; // Increasing experience requirement
     }
-
+    
     return { newExp, newLevel };
   }
 }

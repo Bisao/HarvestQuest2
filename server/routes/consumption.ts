@@ -113,18 +113,10 @@ export function createConsumptionRoutes(storage: IStorage): Router {
       const newHunger = Math.min(player.hunger + totalHungerRestore, player.maxHunger);
       const newThirst = Math.min(player.thirst + totalThirstRestore, player.maxThirst);
 
-      // Calculate health restoration if consumable has health effect
-      let healthUpdate = {};
-      if (consumableEffect?.type === 'health' && consumableEffect.value > 0) {
-        const newHealth = Math.min(player.maxHealth, player.health + consumableEffect.value);
-        healthUpdate = { health: newHealth };
-      }
-
       // Update player stats
       await storage.updatePlayer(playerId, {
         hunger: newHunger,
-        thirst: newThirst,
-        ...healthUpdate
+        thirst: newThirst
       });
 
       // Remove consumed quantity of the item

@@ -7,22 +7,16 @@ import { z } from "zod";
 import type { Player, HungerDegradationMode } from "@shared/types";
 import { validateParams, playerIdParamSchema } from "./middleware/validation";
 import { GameService } from "./services/game-service";
-import { createNewExpeditionRoutes } from './routes/new-expedition-routes';
+import { ExpeditionService } from "./services/expedition-service";
 import { QuestService } from "./services/quest-service";
 import { OfflineActivityService } from "./services/offline-activity-service";
-import { NewExpeditionService } from "./services/new-expedition-service";
 import { randomUUID } from "crypto";
 import { registerHealthRoutes } from "./routes/health";
 import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
 import { registerAdminRoutes } from "./routes/admin";
 import { registerStorageRoutes } from "./routes/storage-routes";
 import { createConsumptionRoutes } from "./routes/consumption";
-import { createSkillRoutes } from "./routes/skill-routes";
 import savesRouter from "./routes/saves";
-import animalRegistryRoutes from './routes/animal-registry-routes';
-import animalRoutes from './routes/animal-routes';
-import developerRoutes from './routes/developer-routes';
-import equipmentRoutes from './routes/equipment-routes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -30,18 +24,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Initialize services
   const gameService = new GameService(storage);
+  const expeditionService = new ExpeditionService(storage);
   const questService = new QuestService(storage);
   const offlineActivityService = new OfflineActivityService(storage);
-  const expeditionService = new NewExpeditionService(storage);
 
   // Register health and monitoring routes
   registerHealthRoutes(app);
 
   // Register enhanced game routes with full validation and caching
-  registerEnhancedGameRoutes(app, storage, gameService);
-
-  // Register new expedition routes
-  app.use('/api/expeditions', createNewExpeditionRoutes(storage));
+  registerEnhancedGameRoutes(app, storage, gameService, expeditionService);
 
   // Register admin routes for development
   registerAdminRoutes(app);
@@ -51,17 +42,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register consumption routes
   app.use('/api', createConsumptionRoutes(storage));
-
-  // Register skill routes
-  app.use('/api/skills', createSkillRoutes(storage));
-
-  // Register time routes
-  const { createTimeRoutes } = await import('./routes/time-routes');
-  app.use('/api/time', createTimeRoutes(storage));
-
-  // Register time speed routes
-  const timeSpeedRoutes = await import('./routes/time-speed');
-  app.use('/api/time/speed', timeSpeedRoutes.default);
 
   // Register saves routes  
   app.use('/api/saves', savesRouter);
@@ -516,55 +496,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // REMOVED: Legacy craft API - use /api/v2/craft instead for modern attribute-based crafting
 
-  // Create expedition using service
+  // Start expedition using service
   app.post("/api/expeditions", async (req, res) => {
     try {
       const { playerId, biomeId, selectedResources, selectedEquipment } = req.body;
 
-      // Validações detalhadas
-      if (!playerId || typeof playerId !== 'string') {
-        return res.status(400).json({ message: "ID do jogador inválido" });
+      console.log('Starting expedition:', { playerId, biomeId, selectedResources, selectedEquipment });
+
+      if (!playerId || !biomeId) {
+        return res.status(400).json({ message: "playerId and biomeId are required" });
       }
 
-      if (!biomeId || typeof biomeId !== 'string') {
-        return res.status(400).json({ message: "ID do bioma inválido" });
+      if (!selectedResources || selectedResources.length === 0) {
+        return res.status(400).json({ message: "At least one resource must be selected" });
       }
 
-      if (!selectedResources || !Array.isArray(selectedResources) || selectedResources.length === 0) {
-        return res.status(400).json({ message: "Recursos selecionados inválidos" });
-      }
+      const expedition = await expeditionService.startExpedition(
+        playerId, 
+        biomeId, 
+        selectedResources || [], 
+        selectedEquipment || []
+      );
 
-      // Verificar se todos os recursos são strings válidas
-      const invalidResources = selectedResources.filter(id => !id || typeof id !== 'string');
-      if (invalidResources.length > 0) {
-        return res.status(400).json({ message: "IDs de recursos inválidos" });
-      }
-       const validResources = selectedResources.filter(id => id && typeof id === 'string');
+      console.log('Expedition created successfully:', expedition);
 
-      console.log('Creating expedition with data:', {
-        playerId,
-        biomeId,
-        selectedResources,
-        selectedEquipment: selectedEquipment || []
-      });
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately (hunger/thirst change)
+      const { invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidatePlayerCache(playerId);
 
-      const expedition = await expeditionService.startExpedition(playerId, biomeId);
-
-      if (!expedition || !expedition.id) {
-        throw new Error('Falha ao criar expedição');
-      }
-
-      console.log('Expedition created successfully:', expedition.id);
       res.json(expedition);
     } catch (error) {
-      console.error("Create expedition error:", error);
-
-      let errorMessage = "Erro interno ao criar expedição";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      res.status(500).json({ message: errorMessage });
+      console.error('Expedition creation error:', error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to create expedition";
+      res.status(400).json({ 
+        message: errorMessage,
+        error: process.env.NODE_ENV === 'development' ? error : undefined 
+      });
     }
   });
 
@@ -584,8 +551,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/player/:playerId/expeditions/active", async (req, res) => {
     try {
       const { playerId } = req.params;
-      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
-      const activeExpedition = activeExpeditions[0] || null;
+      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
 
       if (!activeExpedition) {
         return res.status(404).json({ message: "No active expedition found" });
@@ -602,12 +568,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/player/:playerId/expeditions", async (req, res) => {
     try {
       const { playerId } = req.params;
-      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
-      const activeExpedition = activeExpeditions[0] || null;
+      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
 
       if (activeExpedition) {
-        // For now, directly update storage to cancel expedition
-        await storage.updateExpedition(activeExpedition.id, { status: 'cancelled' });
+        await expeditionService.cancelExpedition(activeExpedition.id);
       }
 
       res.json({ success: true, message: "Expedition cancelled" });
@@ -617,7 +581,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Legacy expedition endpoints removed - using new expedition system
+  // Update expedition progress using service
+  app.patch("/api/expeditions/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const expedition = await expeditionService.updateExpeditionProgress(id);
+      res.json(expedition);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update expedition" });
+    }
+  });
+
+  // Complete expedition using service
+  app.post("/api/expeditions/:id/complete", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const expedition = await expeditionService.completeExpedition(id);
+
+      // Update quest progress for expedition completion and resources collected
+      if (expedition && expedition.playerId) {
+        await questService.updateQuestProgress(expedition.playerId, 'expedition', { biomeId: expedition.biomeId });
+
+        // Update quest progress for resources collected during expedition
+        if (expedition.collectedResources) {
+          const collected = expedition.collectedResources as Record<string, any>;
+          for (const [resourceId, quantity] of Object.entries(collected)) {
+            await questService.updateQuestProgress(expedition.playerId, 'collect', { 
+              resourceId, 
+              quantity: Number(quantity) 
+            });
+          }
+        }
+      }
+
+      // CRITICAL: Invalidate cache to ensure frontend sees updated data immediately
+      const { invalidateStorageCache, invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
+      invalidateStorageCache(expedition.playerId);
+      invalidateInventoryCache(expedition.playerId);
+      invalidatePlayerCache(expedition.playerId);
+
+      res.json(expedition);
+    } catch (error) {
+      console.error("Complete expedition error:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to complete expedition" });
+    }
+  });
 
   // Consume food or drink
   app.post("/api/player/:playerId/consume", async (req, res) => {
@@ -887,69 +895,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Move item to storage endpoint
-  app.post("/api/inventory/move-to-storage", async (req, res) => {
-    try {
-      const { playerId, itemId, quantity } = req.body;
-
-      if (!playerId || !itemId || !quantity) {
-        return res.status(400).json({ error: "Missing required fields" });
-      }
-
-      const player = await storage.getPlayer(playerId);
-      if (!player) {
-        return res.status(404).json({ error: "Player not found" });
-      }
-
-      // Get inventory item
-      const inventory = await storage.getPlayerInventory(playerId);
-      const inventoryItem = inventory.find(item => item.resourceId === itemId);
-
-      if (!inventoryItem || inventoryItem.quantity < quantity) {
-        return res.status(400).json({ error: "Insufficient items in inventory" });
-      }
-
-      // Get or create storage item
-      const storageItems = await storage.getPlayerStorage(playerId);
-      let storageItem = storageItems.find(item => item.resourceId === itemId);
-
-      if (storageItem) {
-        // Update existing storage item
-        await storage.updateStorageItem(storageItem.id, {
-          quantity: storageItem.quantity + quantity
-        });
-      } else {
-        // Create new storage item
-        await storage.addStorageItem({
-          playerId,
-          resourceId: itemId,
-          quantity,
-          itemType: inventoryItem.itemType || 'resource'
-        });
-      }
-
-      // Update or remove inventory item
-      if (inventoryItem.quantity === quantity) {
-        await storage.removeInventoryItem(inventoryItem.id);
-      } else {
-        await storage.updateInventoryItem(inventoryItem.id, {
-          quantity: inventoryItem.quantity - quantity
-        });
-      }
-
-      // Invalidate caches
-      const { invalidatePlayerCache, invalidateCache, CACHE_KEYS } = await import("./cache/memory-cache");
-      invalidatePlayerCache(playerId);
-      invalidateCache(CACHE_KEYS.PLAYER_INVENTORY(playerId));
-      invalidateCache(CACHE_KEYS.PLAYER_STORAGE(playerId));
-
-      res.json({ success: true, message: "Item moved to storage successfully" });
-    } catch (error) {
-      console.error("Move to storage error:", error);
-      res.status(500).json({ error: "Failed to move item to storage" });
-    }
-  });
-
   // Get resources by category (hunting, fishing, etc.)
   app.get("/api/resources/category/:category", async (req, res) => {
     try {
@@ -1098,8 +1043,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/player/:playerId/active-expedition", async (req, res) => {
     try {
       const { playerId } = req.params;
-      const activeExpeditions = await expeditionService.getPlayerActiveExpeditions(playerId);
-      const activeExpedition = activeExpeditions[0] || null;
+      const activeExpedition = await expeditionService.getActiveExpedition(playerId);
       res.json(activeExpedition);
     } catch (error) {
       res.status(500).json({ message: "Failed to get active expedition" });
@@ -1110,8 +1054,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/expeditions/:id/cancel", async (req, res) => {
     try {
       const { id } = req.params;
-      // For now, directly update storage to cancel expedition
-      await storage.updateExpedition(id, { status: 'cancelled' });
+      await expeditionService.cancelExpedition(id);
       res.json({ message: "Expedition cancelled successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to cancel expedition" });
@@ -1285,35 +1228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Store reference in app for use in other routes  
   // WebSocket service will be initialized in index.ts
 
-  // Collect resource
-  app.post("/api/collect", async (req, res) => {
-    try {
-      const { playerId, biomeId, resourceType } = req.body;
-      console.log(`🎯 COLLECT: Player ${playerId} collecting ${resourceType} from ${biomeId}`);
-
-      const result = await gameService.collectResource(playerId, biomeId, resourceType);
-
-      console.log(`🎯 COLLECT: Result:`, result);
-
-      // Invalidate cache to ensure frontend sees updated data
-      const { invalidateInventoryCache, invalidatePlayerCache } = await import("./cache/memory-cache");
-      invalidateInventoryCache(playerId);
-      invalidatePlayerCache(playerId);
-
-      res.json(result);
-    } catch (error) {
-      console.error("Collection error:", error);
-      res.status(400).json({ message: error instanceof Error ? error.message : "Collection failed" });
-    }
-  });
-
-  app.use('/api/equipment', equipmentRoutes);
   // WebSocket service will be initialized in index.ts
-  app.use('/api/animal-registry', animalRegistryRoutes);
-  app.use('/api/animals', animalRoutes);
-
-  // Developer routes
-  app.use('/api/developer', developerRoutes);
 
   return httpServer;
 }

@@ -17,13 +17,14 @@ import {
 import { usernameParamSchema, playerIdParamSchema, idParamSchema } from "../middleware/validation";
 import type { IStorage } from "../storage";
 import { GameService } from "../services/game-service";
-// ExpeditionService removido - usando novo sistema
+import { ExpeditionService } from "../services/expedition-service";
 import { RESOURCE_IDS, EQUIPMENT_IDS, BIOME_IDS, RECIPE_IDS } from "@shared/constants/game-ids";
 
 export function registerEnhancedGameRoutes(
   app: Express, 
   storage: IStorage,
-  gameService: GameService
+  gameService: GameService,
+  expeditionService: ExpeditionService
 ) {
 
   // Enhanced player routes with validation and caching
@@ -410,11 +411,7 @@ export function registerEnhancedGameRoutes(
           throw new InvalidOperationError("Already have an active expedition");
         }
 
-        // Import and use expedition service
-        const { NewExpeditionService } = await import('../services/new-expedition-service');
-        const newExpeditionService = new NewExpeditionService(storage);
-        
-        const expedition = await newExpeditionService.startExpedition(
+        const expedition = await expeditionService.startExpedition(
           playerId,
           biomeId,
           selectedResources,

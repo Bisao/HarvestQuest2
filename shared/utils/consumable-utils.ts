@@ -9,24 +9,26 @@ export interface ConsumableEffects {
 }
 
 /**
- * Check if an item is consumable (can be eaten/drunk)
+ * Check if an item is consumable using modern system only
  */
 export function isConsumable(item: any): boolean {
   if (!item) return false;
 
-  // PRIORITY 1: Modern system - check specific consumable resource IDs
-  // Only basic consumables, not processed/cooked items
-  const basicConsumableIds = [
-    RESOURCE_IDS.AGUA_FRESCA,    // Água Fresca
-    RESOURCE_IDS.COGUMELOS,      // Cogumelos (cru)
-    RESOURCE_IDS.FRUTAS_SILVESTRES // Frutas Silvestres
-  ];
-
-  if (basicConsumableIds.includes(item.id)) {
+  // Primary: Check by category (modern system)
+  if (item.category === 'consumable') {
     return true;
   }
 
-  return false;
+  // Secondary: Check by attributes (modern system priority)
+  if (item.attributes && (
+    (item.attributes.hunger_restore && item.attributes.hunger_restore > 0) || 
+    (item.attributes.thirst_restore && item.attributes.thirst_restore > 0)
+  )) {
+    return true;
+  }
+
+  // Modern consumable IDs only (from items-modern.ts)
+  return getAllModernConsumableIds().includes(item.id);
 }
 
 export function getConsumableEffects(item: any): ConsumableEffects {
