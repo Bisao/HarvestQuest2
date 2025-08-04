@@ -15,18 +15,34 @@ import { ANIMAL_REGISTRY } from '../data/animal-registry';
 export class CombatService {
   constructor(private storage: IStorage) {}
 
+  private getBiomeName(biomeId: string): string {
+    // Mapear IDs de bioma para nomes
+    const biomeMap: { [key: string]: string } = {
+      '61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47': 'Floresta',
+      'biome-floresta': 'Floresta',
+      'floresta': 'Floresta',
+      'Floresta': 'Floresta'
+    };
+    
+    return biomeMap[biomeId] || 'Floresta'; // Default para floresta
+  }
+
   // ===================== ENCOUNTER GENERATION =====================
 
   async tryGenerateEncounter(expeditionId: string, playerId: string, biomeId: string): Promise<CombatEncounter | null> {
-    // 15% chance de encontrar uma criatura durante a expedição
-    if (Math.random() > 0.15) return null;
+    // 100% chance de encontrar uma criatura durante a expedição
+    if (Math.random() > 1.0) return null;
 
-    // Filtrar animais do bioma
+    // Filtrar animais do bioma (melhorar correspondência)
+    const biomeName = this.getBiomeName(biomeId);
     const biomeAnimals = ANIMAL_REGISTRY.filter(animal => 
-      animal.habitat?.includes(biomeId) || 
-      animal.discoveryLocation?.includes(biomeId) ||
-      animal.biome === biomeId
+      animal.habitat?.some(h => h.toLowerCase().includes(biomeName.toLowerCase())) || 
+      animal.discoveryLocation?.some(l => l.toLowerCase().includes(biomeName.toLowerCase())) ||
+      animal.habitat?.includes('Floresta') // Fallback para floresta
     );
+
+    console.log(`🎯 COMBAT: Found ${biomeAnimals.length} animals for biome ${biomeName}:`, 
+      biomeAnimals.map(a => `${a.emoji} ${a.commonName} (${a.rarity})`));
 
     if (biomeAnimals.length === 0) return null;
 

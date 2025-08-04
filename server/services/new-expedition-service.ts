@@ -271,6 +271,14 @@ export class NewExpeditionService {
       }
     }
 
+    // Verificar por encontros de combate durante a expedição
+    if (progress >= 25 && progress < 75) {
+      const encounterId = await this.checkForCombatEncounter(expeditionId, expedition.playerId, expedition.biomeId);
+      if (encounterId) {
+        console.log(`⚔️ EXPEDITION-ENCOUNTER: Combat encounter ${encounterId} triggered at ${Math.round(progress)}% progress`);
+      }
+    }
+
     // Se completou, processar recompensas
     if (progress >= 100) {
       return await this.completeExpedition(expeditionId);
@@ -609,7 +617,16 @@ export class NewExpeditionService {
 
   async checkForCombatEncounter(expeditionId: string, playerId: string, biomeId: string): Promise<string | null> {
     try {
-
+      console.log(`🎯 EXPEDITION-COMBAT: Checking for encounter in ${biomeId} for player ${playerId}`);
+      
+      const encounter = await this.combatService.tryGenerateEncounter(expeditionId, playerId, biomeId);
+      
+      if (encounter) {
+        console.log(`⚔️ EXPEDITION-COMBAT: Generated encounter ${encounter.id} with ${encounter.animal.commonName}`);
+        return encounter.id;
+      }
+      
+      console.log(`🎯 EXPEDITION-COMBAT: No encounter generated this time`);
       return null;
     } catch (error) {
       console.error('❌ COMBAT-INTEGRATION: Error generating encounter:', error);
