@@ -42,6 +42,7 @@ import SkillsTab from './skills-tab';
 import QuestsTab from './quests-tab';
 import PlayerSettings from './player-settings';
 import ExpeditionPanel from './expedition-panel';
+import NewInventoryInterface from '@/components/game/new-inventory-interface';
 
 // Import modals
 import { NewExpeditionModal } from './new-expedition-modal';
@@ -622,7 +623,7 @@ export default function ModernGameLayout() {
             )}
 
             {activeTab === 'inventory' && (
-              <UnifiedInventorySystem
+              <NewInventoryInterface
                 playerId={player.id}
                 resources={resources}
                 equipment={equipment}

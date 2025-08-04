@@ -22,6 +22,7 @@ import savesRouter from "./routes/saves";
 import animalRegistryRoutes from './routes/animal-registry-routes';
 import animalRoutes from './routes/animal-routes';
 import developerRoutes from './routes/developer-routes';
+import equipmentRoutes from './routes/equipment-routes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -1306,6 +1307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.use('/api/equipment', equipmentRoutes);
   // WebSocket service will be initialized in index.ts
   app.use('/api/animal-registry', animalRegistryRoutes);
   app.use('/api/animals', animalRoutes);
