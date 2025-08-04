@@ -75,7 +75,7 @@ export default function EnhancedBiomesTab({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  
+
 
   // Sistema robusto de categorização de recursos
   const categorizeResource = (resource: Resource): string => {
@@ -429,8 +429,6 @@ export default function EnhancedBiomesTab({
           </div>
         </CardContent>
       </Card>
-
-      er={player} />
 
       {/* Expedition modals removed */}
     </div>
