@@ -25,7 +25,7 @@ interface ImprovedCustomExpeditionModalProps {
   selectedBiome: Biome | null;
 }
 
-export default function ImprovedCustomExpeditionModal({
+export function ImprovedCustomExpeditionModal({
   isOpen,
   onClose,
   onStartExpedition,
@@ -389,3 +389,5 @@ export default function ImprovedCustomExpeditionModal({
     </Dialog>
   );
 }
+
+export default ImprovedCustomExpeditionModal;
