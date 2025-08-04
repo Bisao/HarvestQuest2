@@ -1,10 +1,10 @@
 {
   "players": [
     [
-      "57d35c26-c5af-49bc-a69f-8fa3d20d74a9",
+      "18440af6-aa00-4598-91e8-e54f6a73b019",
       {
-        "id": "57d35c26-c5af-49bc-a69f-8fa3d20d74a9",
-        "username": "Dudu",
+        "id": "18440af6-aa00-4598-91e8-e54f6a73b019",
+        "username": "Rdt",
         "level": 1,
         "experience": 10,
         "coins": 100,
@@ -23,16 +23,16 @@
         "equippedWeapon": null,
         "equippedTool": null,
         "autoCompleteQuests": true,
-        "health": 16,
+        "health": 46,
         "maxHealth": 100,
         "hunger": 0,
         "maxHunger": 100,
-        "thirst": 8,
+        "thirst": 31,
         "maxThirst": 100,
         "temperature": 0,
         "fatigue": 0,
-        "morale": 31,
-        "hygiene": 55,
+        "morale": 36,
+        "hygiene": 76,
         "diseases": [],
         "immunities": [],
         "resistances": {},
@@ -47,20 +47,38 @@
   "storageItems": [],
   "expeditions": [
     [
-      "62fbea9b-52db-4fc7-b945-8bcf7482f396",
+      "0159d929-3937-45f4-9cae-bd53b466facc",
       {
-        "id": "62fbea9b-52db-4fc7-b945-8bcf7482f396",
-        "playerId": "57d35c26-c5af-49bc-a69f-8fa3d20d74a9",
+        "id": "0159d929-3937-45f4-9cae-bd53b466facc",
+        "playerId": "18440af6-aa00-4598-91e8-e54f6a73b019",
+        "biomeId": "biome-floresta-001",
+        "selectedResources": [
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        ],
+        "selectedEquipment": [],
+        "status": "in_progress",
+        "startTime": 1754278711474,
+        "progress": 0,
+        "collectedResources": {},
+        "duration": 1800000
+      }
+    ],
+    [
+      "802d21be-fcfb-4d74-bbea-6b3997fdc945",
+      {
+        "id": "802d21be-fcfb-4d74-bbea-6b3997fdc945",
+        "playerId": "18440af6-aa00-4598-91e8-e54f6a73b019",
         "biomeId": "biome-floresta-001",
         "selectedResources": [
           "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
         ],
         "selectedEquipment": [],
         "status": "completed",
-        "startTime": 1754276888016,
+        "startTime": 1754279251508,
         "progress": 100,
         "collectedResources": {
           "res-fibra-001": 3,
+          "res-pedra-001": 2,
           "res-gravetos-001": 4
         },
         "duration": 300000
