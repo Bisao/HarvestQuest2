@@ -21,6 +21,7 @@ import animalRegistryRoutes from './routes/animal-registry-routes';
 import animalRoutes from './routes/animal-routes';
 import developerRoutes from './routes/developer-routes';
 import equipmentRoutes from './routes/equipment-routes';
+import biomesRoutes from './routes/biomes-routes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize game data
@@ -1108,6 +1109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Developer routes
   app.use('/api/developer', developerRoutes);
+  app.use('/api/biomes', biomesRoutes);
 
   return httpServer;
 }

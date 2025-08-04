@@ -221,7 +221,12 @@ export class MemStorage implements IStorage {
     }
 
     // Initialize biomes using modular data
-    // Biome system removed
+    const { BiomeManager, convertToLegacyBiome } = await import('./data/biomes');
+    const biomeData = BiomeManager.getAllBiomes();
+    for (const biome of biomeData) {
+      const legacyBiome = convertToLegacyBiome(biome);
+      await this.createBiome(legacyBiome);
+    }
 
     // Initialize equipment using modular data
     for (const equip of ALL_EQUIPMENT) {

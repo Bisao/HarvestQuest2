@@ -40,6 +40,7 @@ import QuestsTab from './quests-tab';
 import PlayerSettings from './player-settings';
 import ExpeditionPanel from './expedition-panel';
 import NewInventoryInterface from '@/components/game/new-inventory-interface';
+import BiomesTabNew from '@/components/game/biomes-tab-new';
 
 // Import modals
 import { NewExpeditionModal } from './new-expedition-modal';
@@ -147,14 +148,14 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     color: 'text-emerald-600',
     count: 2,
     subTabs: [
-      // {
-      //   id: 'biomes',
-      //   label: 'Expedições',
-      //   icon: TreePine,
-      //   color: 'text-emerald-600',
-      //   description: 'Explorar biomas e coletar recursos',
-      //   hasNotification: !!activeExpedition
-      // },
+      {
+        id: 'biomes',
+        label: 'Expedições',
+        icon: TreePine,
+        color: 'text-emerald-600',
+        description: 'Explorar biomas e coletar recursos',
+        hasNotification: !!activeExpedition
+      },
       {
         id: 'animals',
         label: 'Bestiário',
@@ -655,7 +656,16 @@ export default function ModernGameLayout() {
               />
             )}
 
-
+            {activeTab === 'biomes' && (
+              <BiomesTabNew
+                player={player}
+                activeExpedition={activeExpedition}
+                biomes={biomes}
+                resources={resources}
+                equipment={equipment}
+                onExpeditionStart={handleExpeditionStart}
+              />
+            )}
 
             {activeTab === 'animals' && (
               <AnimalRegistryTab 
