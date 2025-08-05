@@ -22,7 +22,7 @@
         "equippedBoots": null,
         "equippedWeapon": null,
         "equippedTool": null,
-        "autoCompleteQuests": true,
+        "autoCompleteQuests": false,
         "health": 100,
         "maxHealth": 100,
         "hunger": 100,

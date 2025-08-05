@@ -6,6 +6,15 @@ Coletor Adventures is a web-based survival/adventure game built with modern web 
 
 Preferred communication style: Simple, everyday language.
 
+# Recent Changes (Updated: 05/08/2025)
+
+## ✅ Major Cleanup & Consolidation Completed
+- **Shared Directory**: Complete reorganization and cleanup of duplicate types and utilities
+- **ID System**: Clear separation between RESOURCE_IDS (collectibles) and CREATURE_IDS (living entities)
+- **Type Safety**: Consolidated all core types into shared/types.ts as single source of truth
+- **Performance**: Eliminated duplicate exports and optimized barrel files
+- **Documentation**: Created comprehensive README and cleanup reports
+
 # System Architecture
 
 ## Frontend Architecture

@@ -1,65 +1,11 @@
-// Core Game Types - Re-exports from main types.ts to avoid duplication
-// Import all types from the main types file to ensure consistency
+// This file has been consolidated - all core types are now in shared/types.ts
+// This file is kept for backward compatibility but should not be used for new imports
 
-export type { 
-  Player, 
-  PlayerSkill, 
-  InsertPlayer,
-  HungerDegradationMode,
-  OfflineActivityConfig 
-} from '../types';
+// Re-export from main types file
+export * from '../types';
 
-// Import types from skill-types.ts
-export type { PlayerDisease } from './skill-types';
-
-// Import types from time-types.ts
-export type { GameTime, TimeConfig, TemperatureSystem } from './time-types';
-
-export interface InsertPlayer {
-  username: string;
-  level?: number;
-  experience?: number;
-  coins?: number;
-  inventoryWeight?: number;
-  maxInventoryWeight?: number;
-  autoStorage?: boolean;
-  autoCompleteQuests?: boolean;
-  craftedItemsDestination?: 'inventory' | 'storage';
-  hungerDegradationMode?: HungerDegradationMode;
-  onExpedition?: boolean;
-  waterStorage?: number;
-  maxWaterStorage?: number;
-  waterTanks?: number;
-  equippedHelmet?: string | null;
-  equippedChestplate?: string | null;
-  equippedLeggings?: string | null;
-  equippedBoots?: string | null;
-  equippedWeapon?: string | null;
-  equippedTool?: string | null;
-
-  // Enhanced Status System
-  health?: number;
-  maxHealth?: number;
-  hunger?: number;
-  maxHunger?: number;
-  thirst?: number;
-  maxThirst?: number;
-  temperature?: number;
-  fatigue?: number;
-  morale?: number;
-  hygiene?: number;
-
-  // Disease System
-  diseases?: any[]; // PlayerDisease[];
-  immunities?: string[];
-  resistances?: { [diseaseId: string]: number };
-
-  // Skill System
-  skills?: { [skillId: string]: PlayerSkill };
-  skillPoints?: number;
-  totalSkillPoints?: number;
-  skillAchievements?: string[];
-}
+// InsertPlayer removed from here - this file is deprecated
+// Use shared/types/index.ts for proper imports
 
 // Rest of types from original types.ts...
 export type HungerDegradationMode = 'fast' | 'normal' | 'slow' | 'disabled';

@@ -6,18 +6,7 @@
  * Oferece utilitários para validação, migração e resolução de IDs de criaturas.
  */
 
-import { 
-  CREATURE_IDS,
-  CREATURE_CATEGORIES,
-  LEGACY_CREATURE_MAPPING,
-  isCreatureId,
-  isValidCreatureId,
-  getCreatureCategory,
-  getCreaturesByCategory,
-  getAllCreatureIds,
-  migrateLegacyCreatureId,
-  validateCreatureData
-} from '../constants/creature-ids';
+import { CREATURE_IDS } from '../constants/creature-ids';
 
 import { generateUUID } from './uuid-generator';
 
@@ -51,7 +40,7 @@ export function validateCreatureIdFormat(id: string): boolean {
  * Verifica se um ID de criatura existe no sistema
  */
 export function creatureExists(creatureId: string): boolean {
-  return isValidCreatureId(creatureId);
+  return Object.values(CREATURE_IDS).includes(creatureId as any);
 }
 
 /**
