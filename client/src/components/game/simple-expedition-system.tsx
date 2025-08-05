@@ -135,14 +135,32 @@ export default function SimpleExpeditionSystem({
       if (!response.ok) throw new Error('Falha ao completar expedição');
       return response.json();
     },
-    onSuccess: () => {
+    retry: false, // Don't retry to prevent duplicate calls
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/expeditions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/player'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/inventory'] });
+
+      if (result.data?.collectedResources) {
+        const resourcesList = Object.entries(result.data.collectedResources)
+          .map(([id, qty]) => `${qty}x ${id}`)
+          .join(', ');
+
+        toast({
+          title: "🎉 Expedição Concluída!",
+          description: `Recursos coletados: ${resourcesList}`,
+          duration: 5000,
+        });
+      }
+    },
+    onError: (error: any) => {
+      console.error('Error completing expedition:', error);
       toast({
-        title: "Expedição Concluída!",
-        description: "Você coletou recursos com sucesso!"
+        title: "❌ Erro",
+        description: "Falha ao completar expedição",
+        variant: "destructive",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/expeditions/player', player.id] });
-      queryClient.invalidateQueries({ queryKey: ['/api/inventory', player.id] });
-    }
+    },
   });
 
   // Cancelar expedição
@@ -177,10 +195,13 @@ export default function SimpleExpeditionSystem({
     return `${seconds}s`;
   };
 
-  // Auto-completar expedições quando o tempo acabar
+  // Auto-completar expedições quando o progresso atingir 100%
   useEffect(() => {
     activeExpeditions.forEach(expedition => {
+      // Check if progress is complete or more and status is active
       if (expedition.progress >= 100 && expedition.status === 'active') {
+        // Use a debounced function or check to ensure it's not called multiple times for the same expedition
+        // For simplicity here, we directly call the mutation. A more robust solution might involve a state to track completion attempts.
         completeExpeditionMutation.mutate(expedition.id);
       }
     });
@@ -205,6 +226,29 @@ export default function SimpleExpeditionSystem({
 
   // Iniciar seleção de recursos
   const handleBiomeSelect = (biome: Biome) => {
+    // Ensure only one expedition is active per player for this biome or globally
+    // This check should ideally happen before calling startExpeditionMutation, 
+    // or the backend should enforce it. For now, we'll check activeExpeditions.
+    const hasActiveExpeditionInBiome = activeExpeditions.some(exp => exp.biomeId === biome.id);
+    if (hasActiveExpeditionInBiome) {
+      toast({
+        title: "Expedição em Andamento",
+        description: "Você já tem uma expedição ativa neste bioma.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Simple check for any active expedition. A more complex system might allow multiple expeditions if designed that way.
+    if (activeExpeditions.length >= 1) { // Assuming max 1 expedition at a time
+      toast({
+        title: "Expedição em Andamento",
+        description: "Você já tem uma expedição ativa. Conclua ou cancele-a primeiro.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setSelectedBiome(biome);
     setSelectedResources([]);
     setShowResourceSelection(true);
@@ -235,6 +279,18 @@ export default function SimpleExpeditionSystem({
     setSelectedResources([]);
     setShowResourceSelection(false);
   };
+
+  // Handler para completar expedição com debouncing/prevention
+  const handleCompleteExpedition = (expeditionId: string) => {
+        // Prevent multiple calls by checking if already completing
+        if (completeExpeditionMutation.isPending) {
+          console.log('🛑 Already completing expedition, skipping duplicate call');
+          return;
+        }
+
+        completeExpeditionMutation.mutate(expeditionId);
+      };
+
 
   if (!isVisible) return null;
 
@@ -276,7 +332,7 @@ export default function SimpleExpeditionSystem({
                       {expedition.progress >= 100 ? (
                         <Button
                           size="sm"
-                          onClick={() => completeExpeditionMutation.mutate(expedition.id)}
+                          onClick={() => handleCompleteExpedition(expedition.id)} // Use the safe handler
                           disabled={completeExpeditionMutation.isPending}
                           className="bg-green-600 hover:bg-green-700"
                         >
@@ -346,14 +402,15 @@ export default function SimpleExpeditionSystem({
             const theme = getBiomeTheme(biome.name);
             const IconComponent = theme.icon;
             const hasActiveExpedition = activeExpeditions.some(exp => exp.biomeId === biome.id);
+            const hasAnyActiveExpedition = activeExpeditions.length > 0; // Check if any expedition is active
 
             return (
               <Card 
                 key={biome.id} 
                 className={`cursor-pointer transition-all hover:shadow-md ${
-                  hasActiveExpedition ? 'opacity-50' : 'hover:scale-105'
+                  hasActiveExpedition || hasAnyActiveExpedition ? 'opacity-50' : 'hover:scale-105'
                 } ${selectedBiome?.id === biome.id ? 'ring-2 ring-blue-500' : ''}`}
-                onClick={() => !hasActiveExpedition && setSelectedBiome(biome)}
+                onClick={() => !hasActiveExpedition && !hasAnyActiveExpedition && handleBiomeSelect(biome)} // Only allow selection if no expedition is active
               >
                 <CardHeader className={`pb-3 ${theme.bgColor}`}>
                   <div className="flex items-center gap-3">
@@ -382,7 +439,7 @@ export default function SimpleExpeditionSystem({
                     <Button
                       className="w-full"
                       size="sm"
-                      disabled={startExpeditionMutation.isPending}
+                      disabled={startExpeditionMutation.isPending || hasAnyActiveExpedition} // Disable if any expedition is active
                       onClick={(e) => {
                         e.stopPropagation();
                         handleBiomeSelect(biome);

@@ -41,16 +41,16 @@ export class NewExpeditionService {
         },
         rewards: {
           guaranteed: {
-            'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890': 3 // Fibra
+            [RESOURCE_IDS.FIBRA]: 3
           },
           possible: [
             {
-              resourceId: 'res-a2b3c4d5-e6f7-8901-bcde-f23456789012', // Pedra
+              resourceId: RESOURCE_IDS.PEDRA,
               quantity: 2,
               chance: 0.7
             },
             {
-              resourceId: 'res-d5e6f7g8-h9i0-1234-ef01-567890123456', // Gravetos
+              resourceId: RESOURCE_IDS.GRAVETOS,
               quantity: 4,
               chance: 0.8
             }
@@ -77,12 +77,12 @@ export class NewExpeditionService {
           guaranteed: {},
           possible: [
             {
-              resourceId: 'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890', // Fibra (pegadilhas)
+              resourceId: RESOURCE_IDS.FIBRA,
               quantity: 2,
               chance: 0.6
             },
             {
-              resourceId: 'res-a2b3c4d5-e6f7-8901-bcde-f23456789012', // Pedra
+              resourceId: RESOURCE_IDS.PEDRA,
               quantity: 1,
               chance: 0.4
             }
@@ -107,17 +107,17 @@ export class NewExpeditionService {
         },
         rewards: {
           guaranteed: {
-            'res-fibra-001': 5, // Fibra
-            'res-pedra-001': 3  // Pedra
+            [RESOURCE_IDS.FIBRA]: 5,
+            [RESOURCE_IDS.PEDRA]: 3
           },
           possible: [
             {
-              resourceId: 'res-bambu-001', // Bambu
+              resourceId: RESOURCE_IDS.BAMBU,
               quantity: 3,
               chance: 0.5
             },
             {
-              resourceId: 'res-frutas-silvestres-001', // Frutas silvestres
+              resourceId: RESOURCE_IDS.FRUTAS_SILVESTRES,
               quantity: 2,
               chance: 0.3
             }
@@ -496,19 +496,27 @@ export class NewExpeditionService {
       }
     }
 
-    // Verificar por encontros de combate durante a expedição
+    // Verificar por encontros de combate durante a expedição (máximo 1 por expedição)
     const player = await this.storage.getPlayer(expedition.playerId);
     const forceEncounters = (player as any)?.developerSettings?.forceCreatureEncounters || false;
     
-    // Check for encounters more frequently if forced encounters are enabled
-    const shouldCheckEncounter = forceEncounters ? 
+    // Check if expedition already had an encounter
+    const hasEncounterFlag = (expedition as any).hasHadEncounter || false;
+    
+    // Check for encounters more frequently if forced encounters are enabled, but only once per expedition
+    const shouldCheckEncounter = !hasEncounterFlag && (forceEncounters ? 
       (progress >= 20 && progress < 90) : // Check more often with forced encounters
-      (progress >= 25 && progress < 75);   // Normal encounter window
+      (progress >= 25 && progress < 75));   // Normal encounter window
     
     if (shouldCheckEncounter) {
       const encounterId = await this.checkForCombatEncounter(expeditionId, expedition.playerId, expedition.biomeId);
       if (encounterId) {
         console.log(`⚔️ EXPEDITION-ENCOUNTER: Combat encounter ${encounterId} triggered at ${Math.round(progress)}% progress (forced: ${forceEncounters})`);
+        
+        // Mark expedition as having had an encounter
+        await this.storage.updateExpedition(expeditionId, { 
+          hasHadEncounter: true
+        });
       }
     }
 
@@ -617,8 +625,8 @@ export class NewExpeditionService {
       console.log(`⚠️ EXPEDITION-COMPLETE: No valid rewards to apply, creating basic rewards`);
       // Garantir que pelo menos alguns recursos básicos sejam dados
       rewards = {
-        'res-fibra-001': 2, // Fibra
-        'res-pedra-001': 1  // Pedra
+        [RESOURCE_IDS.FIBRA]: 2,
+        [RESOURCE_IDS.PEDRA]: 1
       };
     }
 

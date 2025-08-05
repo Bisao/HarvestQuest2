@@ -236,6 +236,18 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     async (req: Request, res: Response) => {
       try {
         const { expeditionId } = req.params;
+        
+        // Check if expedition is already completed to prevent duplicates
+        const existingExpedition = await storage.getExpedition(expeditionId);
+        if (!existingExpedition) {
+          return errorResponse(res, 404, 'Expedição não encontrada');
+        }
+        
+        if (existingExpedition.status === 'completed') {
+          console.log(`⚠️ EXPEDITION-COMPLETE: Expedition ${expeditionId} already completed, returning existing data`);
+          return successResponse(res, existingExpedition, 'Expedição já foi concluída anteriormente');
+        }
+        
         console.log(`🏁 EXPEDITION-COMPLETE: Completing expedition ${expeditionId}`);
 
         const expedition = await expeditionService.completeExpedition(expeditionId);

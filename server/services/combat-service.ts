@@ -19,6 +19,10 @@ export class CombatService {
     // Mapear IDs de bioma para nomes
     const biomeMap: { [key: string]: string } = {
       '61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47': 'Floresta',
+      'biome-floresta-001': 'Floresta',
+      'biome-deserto-001': 'Deserto', 
+      'biome-montanha-001': 'Montanha',
+      'biome-oceano-001': 'Oceano',
       'biome-floresta': 'Floresta',
       'floresta': 'Floresta',
       'Floresta': 'Floresta'
@@ -32,6 +36,13 @@ export class CombatService {
   async tryGenerateEncounter(expeditionId: string, playerId: string, biomeId: string): Promise<CombatEncounter | null> {
     const player = await this.storage.getPlayer(playerId);
     if (!player) throw new Error('Player not found');
+
+    // Check if expedition already had an encounter
+    const expedition = await this.storage.getExpedition(expeditionId);
+    if ((expedition as any)?.hasHadEncounter) {
+      console.log(`🎯 COMBAT: Expedition ${expeditionId} already had an encounter, skipping`);
+      return null;
+    }
 
     // Check if player has forced encounters enabled
     const forceEncounters = (player as any).developerSettings?.forceCreatureEncounters || false;
