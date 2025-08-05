@@ -1,319 +1,168 @@
 /**
- * STRICT ID VALIDATION SYSTEM
+ * STRICT ID VALIDATOR
  * 
- * This is the authoritative ID validation system that ensures ALL game data
- * uses ONLY IDs from the central game-ids.ts file. No exceptions.
- * 
- * RULES:
- * 1. game-ids.ts is the MASTER source of truth for ALL IDs
- * 2. Any ID not in game-ids.ts is INVALID and must be removed
- * 3. No hardcoded IDs allowed anywhere in the codebase
- * 4. All data files must import and use IDs from game-ids.ts
+ * Validação rigorosa de IDs do sistema de jogo.
+ * Garante que todos os IDs estejam em conformidade com os padrões UUID.
  */
 
-import { 
-  RESOURCE_IDS, 
-  EQUIPMENT_IDS, 
-  RECIPE_IDS, 
-  BIOME_IDS, 
-  QUEST_IDS 
-} from '@shared/constants/game-ids';
-
-// Create sets for fast lookup
-const VALID_RESOURCE_IDS = new Set(Object.values(RESOURCE_IDS));
-const VALID_EQUIPMENT_IDS = new Set(Object.values(EQUIPMENT_IDS));
-const VALID_RECIPE_IDS = new Set(Object.values(RECIPE_IDS));
-const VALID_BIOME_IDS = new Set(Object.values(BIOME_IDS));
-const VALID_QUEST_IDS = new Set(Object.values(QUEST_IDS));
-const ALL_VALID_IDS = new Set([
-  ...Array.from(VALID_RESOURCE_IDS),
-  ...Array.from(VALID_EQUIPMENT_IDS),
-  ...Array.from(VALID_RECIPE_IDS),
-  ...Array.from(VALID_BIOME_IDS),
-  ...Array.from(VALID_QUEST_IDS)
-]);
-
-export interface ValidationResult {
-  isValid: boolean;
-  invalidIds: string[];
-  missingIds: string[];
-  errors: string[];
-  warnings: string[];
-}
+import { getAllMasterIds } from './id-resolver';
+import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS } from '../constants/game-ids';
 
 /**
- * Validates that an ID exists in game-ids.ts
+ * Verifica se um ID é válido no sistema
  */
 export function isValidGameId(id: string): boolean {
-  return ALL_VALID_IDS.has(id as any);
+  const masterIds = getAllMasterIds();
+  return masterIds.includes(id);
 }
 
 /**
- * Validates a resource ID specifically
+ * Valida todos os dados do jogo
  */
-export function isValidResourceId(id: string): boolean {
-  return VALID_RESOURCE_IDS.has(id as any);
-}
-
-/**
- * Validates an equipment ID specifically
- */
-export function isValidEquipmentId(id: string): boolean {
-  return VALID_EQUIPMENT_IDS.has(id as any);
-}
-
-/**
- * Validates a recipe ID specifically
- */
-export function isValidRecipeId(id: string): boolean {
-  return VALID_RECIPE_IDS.has(id as any);
-}
-
-/**
- * Validates a biome ID specifically
- */
-export function isValidBiomeId(id: string): boolean {
-  return VALID_BIOME_IDS.has(id as any);
-}
-
-/**
- * Validates a quest ID specifically
- */
-export function isValidQuestId(id: string): boolean {
-  return VALID_QUEST_IDS.has(id as any);
-}
-
-/**
- * Validates an array of items, checking all IDs against game-ids.ts
- */
-export function validateItemIds(items: any[]): ValidationResult {
+export function validateAllGameData(gameData: any): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
-  const invalidIds: string[] = [];
-  const warnings: string[] = [];
 
-  for (const item of items) {
-    if (!item.id) {
-      errors.push(`Item missing ID: ${JSON.stringify(item)}`);
-      continue;
-    }
-
-    if (!isValidGameId(item.id)) {
-      errors.push(`Invalid ID found: ${item.id} (not in game-ids.ts)`);
-      invalidIds.push(item.id);
-    }
-
-    // Check ingredient IDs for recipes
-    if (item.ingredients) {
-      for (const ingredient of item.ingredients) {
-        if (!isValidGameId(ingredient.itemId)) {
-          errors.push(`Invalid ingredient ID in ${item.id}: ${ingredient.itemId}`);
-          invalidIds.push(ingredient.itemId);
-        }
-      }
-    }
-
-    // Check output IDs for recipes
-    if (item.outputs) {
-      for (const output of item.outputs) {
-        if (!isValidGameId(output.itemId)) {
-          errors.push(`Invalid output ID in ${item.id}: ${output.itemId}`);
-          invalidIds.push(output.itemId);
-        }
-      }
-    }
+  if (!gameData) {
+    errors.push('Dados do jogo não fornecidos');
+    return { isValid: false, errors };
   }
 
-  return {
-    isValid: errors.length === 0,
-    invalidIds: Array.from(new Set(invalidIds)),
-    missingIds: [],
-    errors,
-    warnings
-  };
-}
-
-/**
- * Validates recipe data specifically
- */
-export function validateRecipeData(recipes: any[]): ValidationResult {
-  const errors: string[] = [];
-  const invalidIds: string[] = [];
-  const warnings: string[] = [];
-
-  for (const recipe of recipes) {
-    // Validate recipe ID
-    if (!isValidRecipeId(recipe.id)) {
-      errors.push(`Invalid recipe ID: ${recipe.id} (not in RECIPE_IDS)`);
-      invalidIds.push(recipe.id);
-    }
-
-    // Validate ingredient IDs
-    if (recipe.ingredients) {
-      for (const ingredient of recipe.ingredients) {
-        if (!isValidResourceId(ingredient.itemId) && !isValidEquipmentId(ingredient.itemId)) {
-          errors.push(`Invalid ingredient ID in recipe ${recipe.id}: ${ingredient.itemId}`);
-          invalidIds.push(ingredient.itemId);
+  // Validar inventário se existir
+  if (gameData.players) {
+    for (const player of gameData.players) {
+      if (player.inventory) {
+        for (const item of player.inventory) {
+          if (item.resourceId && !isValidGameId(item.resourceId)) {
+            errors.push(`ID de recurso inválido no inventário: ${item.resourceId}`);
+          }
         }
       }
-    }
 
-    // Validate output IDs
-    if (recipe.outputs) {
-      for (const output of recipe.outputs) {
-        if (!isValidResourceId(output.itemId) && !isValidEquipmentId(output.itemId)) {
-          errors.push(`Invalid output ID in recipe ${recipe.id}: ${output.itemId}`);
-          invalidIds.push(output.itemId);
+      // Validar equipamentos equipados
+      const equippedItems = [
+        player.equippedWeapon,
+        player.equippedTool,
+        player.equippedHelmet,
+        player.equippedChestplate,
+        player.equippedLeggings,
+        player.equippedBoots
+      ].filter(Boolean);
+
+      for (const equipmentId of equippedItems) {
+        if (!isValidGameId(equipmentId)) {
+          errors.push(`ID de equipamento equipado inválido: ${equipmentId}`);
         }
       }
     }
   }
 
-  return {
-    isValid: errors.length === 0,
-    invalidIds: Array.from(new Set(invalidIds)),
-    missingIds: [],
-    errors,
-    warnings
-  };
-}
-
-/**
- * Validates storage/inventory data
- */
-export function validateStorageData(items: any[]): ValidationResult {
-  const errors: string[] = [];
-  const invalidIds: string[] = [];
-  const warnings: string[] = [];
-
-  for (const item of items) {
-    if (item.resourceId && !isValidResourceId(item.resourceId) && !isValidEquipmentId(item.resourceId)) {
-      errors.push(`Invalid resource ID in storage: ${item.resourceId}`);
-      invalidIds.push(item.resourceId);
-    }
-  }
-
-  return {
-    isValid: errors.length === 0,
-    invalidIds: Array.from(new Set(invalidIds)),
-    missingIds: [],
-    errors,
-    warnings
-  };
-}
-
-/**
- * Comprehensive validation of all game data
- */
-export function validateAllGameData(gameData: {
-  resources?: any[];
-  equipment?: any[];
-  recipes?: any[];
-  biomes?: any[];
-  quests?: any[];
-  storage?: any[];
-  inventory?: any[];
-}): ValidationResult {
-  const allErrors: string[] = [];
-  const allInvalidIds: string[] = [];
-  const allWarnings: string[] = [];
-
-  // Validate each data type
-  if (gameData.resources) {
-    const result = validateItemIds(gameData.resources);
-    allErrors.push(...result.errors);
-    allInvalidIds.push(...result.invalidIds);
-    allWarnings.push(...result.warnings);
-  }
-
-  if (gameData.equipment) {
-    const result = validateItemIds(gameData.equipment);
-    allErrors.push(...result.errors);
-    allInvalidIds.push(...result.invalidIds);
-    allWarnings.push(...result.warnings);
-  }
-
+  // Validar receitas se existirem
   if (gameData.recipes) {
-    const result = validateRecipeData(gameData.recipes);
-    allErrors.push(...result.errors);
-    allInvalidIds.push(...result.invalidIds);
-    allWarnings.push(...result.warnings);
-  }
+    for (const recipe of gameData.recipes) {
+      if (recipe.id && !isValidGameId(recipe.id)) {
+        errors.push(`ID de receita inválido: ${recipe.id}`);
+      }
 
-  if (gameData.biomes) {
-    const result = validateItemIds(gameData.biomes);
-    allErrors.push(...result.errors);
-    allInvalidIds.push(...result.invalidIds);
-    allWarnings.push(...result.warnings);
-  }
+      if (recipe.requirements) {
+        for (const req of recipe.requirements) {
+          if (req.resourceId && !isValidGameId(req.resourceId)) {
+            errors.push(`ID de recurso em receita inválido: ${req.resourceId}`);
+          }
+        }
+      }
 
-  if (gameData.quests) {
-    const result = validateItemIds(gameData.quests);
-    allErrors.push(...result.errors);
-    allInvalidIds.push(...result.invalidIds);
-    allWarnings.push(...result.warnings);
-  }
-
-  if (gameData.storage) {
-    const result = validateStorageData(gameData.storage);
-    allErrors.push(...result.errors);
-    allInvalidIds.push(...result.invalidIds);
-    allWarnings.push(...result.warnings);
-  }
-
-  if (gameData.inventory) {
-    const result = validateStorageData(gameData.inventory);
-    allErrors.push(...result.errors);
-    allInvalidIds.push(...result.invalidIds);
-    allWarnings.push(...result.warnings);
+      if (recipe.results) {
+        for (const result of recipe.results) {
+          if (result.resourceId && !isValidGameId(result.resourceId)) {
+            errors.push(`ID de resultado de receita inválido: ${result.resourceId}`);
+          }
+        }
+      }
+    }
   }
 
   return {
-    isValid: allErrors.length === 0,
-    invalidIds: Array.from(new Set(allInvalidIds)),
-    missingIds: [],
-    errors: allErrors,
-    warnings: allWarnings
+    isValid: errors.length === 0,
+    errors
   };
 }
 
 /**
- * Get all valid IDs for reference
+ * Valida formato UUID específico por categoria
  */
-export function getAllValidIds(): {
-  resources: string[];
-  equipment: string[];
-  recipes: string[];
-  biomes: string[];
-  quests: string[];
-  all: string[];
-} {
-  return {
-    resources: Array.from(VALID_RESOURCE_IDS),
-    equipment: Array.from(VALID_EQUIPMENT_IDS),
-    recipes: Array.from(VALID_RECIPE_IDS),
-    biomes: Array.from(VALID_BIOME_IDS),
-    quests: Array.from(VALID_QUEST_IDS),
-    all: Array.from(ALL_VALID_IDS)
+export function validateIdByCategory(id: string, category: 'resource' | 'equipment' | 'recipe' | 'biome' | 'quest' | 'skill'): boolean {
+  const patterns = {
+    resource: /^res-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    equipment: /^eq-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    recipe: /^rec-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    biome: /^biome-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    quest: /^quest-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    skill: /^skill-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
   };
+
+  return patterns[category]?.test(id) || false;
 }
 
 /**
- * Reports all invalid IDs found in the system
+ * Busca IDs inválidos em uma estrutura de dados
  */
-export function generateIdReport(): string {
-  const validIds = getAllValidIds();
-  let report = "\n=== GAME ID VALIDATION REPORT ===\n\n";
+export function findInvalidIds(data: any, path = ''): Array<{ path: string; id: string; reason: string }> {
+  const invalid: Array<{ path: string; id: string; reason: string }> = [];
+
+  function traverse(obj: any, currentPath: string) {
+    if (typeof obj === 'string' && obj.includes('-') && obj.length > 10) {
+      // Possível ID, validar
+      if (!isValidGameId(obj)) {
+        invalid.push({
+          path: currentPath,
+          id: obj,
+          reason: 'ID não encontrado no sistema mestre'
+        });
+      }
+    } else if (typeof obj === 'object' && obj !== null) {
+      if (Array.isArray(obj)) {
+        obj.forEach((item, index) => {
+          traverse(item, `${currentPath}[${index}]`);
+        });
+      } else {
+        Object.entries(obj).forEach(([key, value]) => {
+          traverse(value, currentPath ? `${currentPath}.${key}` : key);
+        });
+      }
+    }
+  }
+
+  traverse(data, path);
+  return invalid;
+}
+
+/**
+ * Relatório completo de validação
+ */
+export function generateValidationReport(gameData: any) {
+  const startTime = Date.now();
   
-  report += "VALID IDs FROM game-ids.ts:\n";
-  report += `- Resources: ${validIds.resources.length} IDs\n`;
-  report += `- Equipment: ${validIds.equipment.length} IDs\n`;
-  report += `- Recipes: ${validIds.recipes.length} IDs\n`;
-  report += `- Biomes: ${validIds.biomes.length} IDs\n`;
-  report += `- Quests: ${validIds.quests.length} IDs\n`;
-  report += `- TOTAL: ${validIds.all.length} valid IDs\n\n`;
+  const masterIds = getAllMasterIds();
+  const validation = validateAllGameData(gameData);
+  const invalidIds = findInvalidIds(gameData);
   
-  report += "RULE: Any ID not listed above is INVALID and must be removed.\n";
-  report += "RULE: All data files must import IDs from @shared/constants/game-ids\n";
-  
+  const report = {
+    timestamp: new Date().toISOString(),
+    validationTimeMs: Date.now() - startTime,
+    summary: {
+      totalMasterIds: masterIds.length,
+      isValid: validation.isValid,
+      totalErrors: validation.errors.length,
+      invalidIdsFound: invalidIds.length
+    },
+    errors: validation.errors,
+    invalidIds: invalidIds.slice(0, 20), // Limita para não sobrecarregar
+    idStatistics: {
+      resources: Object.keys(RESOURCE_IDS).length,
+      equipment: Object.keys(EQUIPMENT_IDS).length,
+      recipes: Object.keys(RECIPE_IDS).length
+    }
+  };
+
   return report;
 }

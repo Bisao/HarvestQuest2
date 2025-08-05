@@ -50,6 +50,7 @@ Preferred communication style: Simple, everyday language.
 - **Module Pattern**: Feature-based organization with barrel exports
 - **Middleware**: Layered middleware for validation, authentication, and error handling
 - **Route Organization**: Feature-based routing with proper separation of concerns
+- **Scripts Architecture**: Consolidated utility scripts with modular core functions for maintenance and migration
 
 # External Dependencies
 
