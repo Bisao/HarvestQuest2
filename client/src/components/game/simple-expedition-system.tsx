@@ -68,11 +68,18 @@ export default function SimpleExpeditionSystem({
   const queryClient = useQueryClient();
 
   // Buscar expedições ativas
-  const { data: activeExpeditions = [], isLoading } = useQuery<ActiveExpedition[]>({
+  const { data: activeExpeditionsData, isLoading } = useQuery<ActiveExpedition[] | { data: ActiveExpedition[] }>({
     queryKey: ['/api/expeditions/player', player.id, 'active'],
     refetchInterval: 2000,
     enabled: isVisible && !!player.id
   });
+
+  // Garantir que activeExpeditions seja sempre um array
+  const activeExpeditions = Array.isArray(activeExpeditionsData) 
+    ? activeExpeditionsData 
+    : (activeExpeditionsData?.data && Array.isArray(activeExpeditionsData.data)) 
+      ? activeExpeditionsData.data 
+      : [];
 
   // Iniciar expedição
   const startExpeditionMutation = useMutation({

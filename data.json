@@ -1,9 +1,9 @@
 {
   "players": [
     [
-      "9933f817-9dc8-4d2c-8a19-f29ab0631732",
+      "89aa8042-ec5e-418d-8bb3-b4657622b573",
       {
-        "id": "9933f817-9dc8-4d2c-8a19-f29ab0631732",
+        "id": "89aa8042-ec5e-418d-8bb3-b4657622b573",
         "username": "Bison",
         "level": 1,
         "experience": 0,
@@ -25,12 +25,12 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 100,
+        "hunger": 93,
         "maxHunger": 100,
-        "thirst": 100,
+        "thirst": 94,
         "maxThirst": 100,
         "temperature": 0,
-        "fatigue": 0,
+        "fatigue": 4,
         "morale": 50,
         "hygiene": 100,
         "diseases": [],
@@ -45,6 +45,23 @@
   ],
   "inventoryItems": [],
   "storageItems": [],
-  "expeditions": [],
+  "expeditions": [
+    [
+      "dd7f3e1c-ebf7-46ca-b4be-fdb6c7da4f34",
+      {
+        "id": "dd7f3e1c-ebf7-46ca-b4be-fdb6c7da4f34",
+        "playerId": "89aa8042-ec5e-418d-8bb3-b4657622b573",
+        "biomeId": "61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47",
+        "selectedResources": [
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        ],
+        "selectedEquipment": [],
+        "status": "in_progress",
+        "startTime": 1754373211536,
+        "progress": 0,
+        "collectedResources": {}
+      }
+    ]
+  ],
   "playerQuests": []
 }
