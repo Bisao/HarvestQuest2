@@ -25,12 +25,12 @@
         "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
-        "hunger": 86,
+        "hunger": 79,
         "maxHunger": 100,
-        "thirst": 88,
+        "thirst": 82,
         "maxThirst": 100,
         "temperature": 0,
-        "fatigue": 8,
+        "fatigue": 12,
         "morale": 50,
         "hygiene": 100,
         "diseases": [],
@@ -74,6 +74,22 @@
         "selectedEquipment": [],
         "status": "cancelled",
         "startTime": 1754373306238,
+        "progress": 0,
+        "collectedResources": {}
+      }
+    ],
+    [
+      "aa4431ab-b72d-43f7-923c-6f60016c9967",
+      {
+        "id": "aa4431ab-b72d-43f7-923c-6f60016c9967",
+        "playerId": "89aa8042-ec5e-418d-8bb3-b4657622b573",
+        "biomeId": "biome-floresta-001",
+        "selectedResources": [
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        ],
+        "selectedEquipment": [],
+        "status": "in_progress",
+        "startTime": 1754375869579,
         "progress": 0,
         "collectedResources": {}
       }
