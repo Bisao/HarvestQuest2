@@ -319,7 +319,7 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
                         <div className="space-y-1">
                           {Object.entries(selectedTemplate.rewards.guaranteed).map(([resourceId, quantity]) => (
                             <div key={resourceId} className="text-sm flex justify-between">
-                              <span>Item {resourceId.slice(-6)}:</span>
+                              <span>Recurso {resourceId.split('-')[1] || 'unknown'}:</span>
                               <span className="font-medium">{quantity}x</span>
                             </div>
                           ))}
@@ -333,7 +333,7 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
                         <div className="space-y-1">
                           {selectedTemplate.rewards.possible.map((reward, index) => (
                             <div key={index} className="text-sm flex justify-between">
-                              <span>Item {reward.resourceId.slice(-6)}:</span>
+                              <span>Recurso {reward.resourceId.split('-')[1] || 'unknown'}:</span>
                               <span>{reward.quantity}x ({Math.round(reward.chance * 100)}%)</span>
                             </div>
                           ))}

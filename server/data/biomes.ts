@@ -45,7 +45,7 @@ export const BIOME_CONFIGS: BiomeConfig[] = [
 export function createBiomeData(): InsertBiome[] {
   return [
     {
-      id: BIOME_IDS.FLORESTA,
+      id: 'biome-floresta-001',
       name: "Floresta",
       emoji: "🌲",
       requiredLevel: 1,
@@ -72,7 +72,7 @@ export function createBiomeData(): InsertBiome[] {
       ],
     },
     {
-      id: BIOME_IDS.DESERTO,
+      id: 'biome-deserto-001',
       name: "Deserto",
       emoji: "🏜️",
       requiredLevel: 20,
@@ -86,7 +86,7 @@ export function createBiomeData(): InsertBiome[] {
       availableCreatures: [],
     },
     {
-      id: BIOME_IDS.MONTANHA,
+      id: 'biome-montanha-001',
       name: "Montanha",
       emoji: "🏔️",
       requiredLevel: 50,
@@ -100,7 +100,7 @@ export function createBiomeData(): InsertBiome[] {
       availableCreatures: [],
     },
     {
-      id: BIOME_IDS.OCEANO,
+      id: 'biome-oceano-001',
       name: "Oceano",
       emoji: "🌊",
       requiredLevel: 75,

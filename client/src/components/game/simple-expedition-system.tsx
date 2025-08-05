@@ -84,6 +84,12 @@ export default function SimpleExpeditionSystem({
       ? activeExpeditionsData.data 
       : [];
 
+  // Buscar todos os recursos para mapeamento
+  const { data: allResources = [] } = useQuery<any[]>({
+    queryKey: ['/api/resources'],
+    enabled: isVisible // Only enable when the component is visible
+  });
+
   // Iniciar expedição
   const startExpeditionMutation = useMutation({
     mutationFn: async (data: { biomeId: string; selectedResources: string[] }) => {
@@ -164,7 +170,7 @@ export default function SimpleExpeditionSystem({
     const remaining = Math.max(0, endTime - Date.now());
     const minutes = Math.floor(remaining / (1000 * 60));
     const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-    
+
     if (minutes > 0) {
       return `${minutes}m ${seconds}s`;
     }
@@ -180,12 +186,21 @@ export default function SimpleExpeditionSystem({
     });
   }, [activeExpeditions, completeExpeditionMutation]);
 
-  // Obter recursos disponíveis no bioma selecionado
+  // Função para obter recursos de um bioma
   const getBiomeResources = (biome: Biome) => {
     if (!biome.availableResources) return [];
-    return biome.availableResources
-      .map(resourceId => resources.find(r => r.id === resourceId))
-      .filter(Boolean) as typeof resources;
+
+    // Mapear os IDs de recursos para objetos completos
+    return biome.availableResources.map((resourceId: string) => {
+      // Buscar o recurso completo do contexto de recursos carregados
+      const resource = allResources?.find((r: any) => r.id === resourceId);
+      return resource || { 
+        id: resourceId, 
+        name: `Recurso ${resourceId.split('-')[1] || 'unknown'}`, 
+        emoji: '📦',
+        description: 'Recurso disponível no bioma'
+      };
+    });
   };
 
   // Iniciar seleção de recursos
@@ -198,7 +213,7 @@ export default function SimpleExpeditionSystem({
   // Confirmar expedição com recursos selecionados
   const handleConfirmExpedition = () => {
     if (!selectedBiome) return;
-    
+
     if (selectedResources.length === 0) {
       toast({
         title: "Nenhum Recurso Selecionado",
@@ -232,15 +247,15 @@ export default function SimpleExpeditionSystem({
             <Clock className="w-5 h-5" />
             Expedições Ativas
           </h3>
-          
+
           {activeExpeditions.map(expedition => {
             const theme = getBiomeTheme(expedition.biomeName);
             const IconComponent = theme.icon;
-            
+
             // Encontrar o bioma correspondente
             const biome = biomes.find(b => b.id === expedition.biomeId);
             const biomeName = expedition.biomeName || biome?.name || 'Bioma Desconhecido';
-            
+
             return (
               <Card key={expedition.id} className="overflow-hidden">
                 <CardHeader className={`pb-3 ${theme.bgColor}`}>
@@ -256,7 +271,7 @@ export default function SimpleExpeditionSystem({
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-2">
                       {expedition.progress >= 100 ? (
                         <Button
@@ -282,7 +297,7 @@ export default function SimpleExpeditionSystem({
                     </div>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="pt-4">
                   <div className="space-y-3">
                     <div>
@@ -292,7 +307,7 @@ export default function SimpleExpeditionSystem({
                       </div>
                       <Progress value={expedition.progress} className="h-2" />
                     </div>
-                    
+
                     {Object.keys(expedition.collectedResources || {}).length > 0 && (
                       <div>
                         <p className="text-sm font-medium mb-2 flex items-center gap-1">
@@ -325,13 +340,13 @@ export default function SimpleExpeditionSystem({
           <MapPin className="w-5 h-5" />
           Iniciar Nova Expedição
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {biomes.map(biome => {
             const theme = getBiomeTheme(biome.name);
             const IconComponent = theme.icon;
             const hasActiveExpedition = activeExpeditions.some(exp => exp.biomeId === biome.id);
-            
+
             return (
               <Card 
                 key={biome.id} 
@@ -353,12 +368,12 @@ export default function SimpleExpeditionSystem({
                     </div>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="pt-4">
                   <p className="text-sm text-muted-foreground mb-3">
                     Explorar este bioma em busca de recursos.
                   </p>
-                  
+
                   {hasActiveExpedition ? (
                     <Badge variant="secondary" className="w-full justify-center">
                       Expedição em Andamento
@@ -397,7 +412,7 @@ export default function SimpleExpeditionSystem({
                 Escolha quais recursos você quer focar em coletar
               </p>
             </CardHeader>
-            
+
             <CardContent className="space-y-4">
               {getBiomeResources(selectedBiome).length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
@@ -433,7 +448,7 @@ export default function SimpleExpeditionSystem({
                 </div>
               )}
             </CardContent>
-            
+
             <div className="flex gap-2 p-4 border-t">
               <Button
                 variant="outline"
@@ -463,7 +478,7 @@ export default function SimpleExpeditionSystem({
           </Card>
         </div>
       )}
-      
+
       {/* Informações do Jogador */}
       <Card>
         <CardHeader>

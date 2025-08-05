@@ -28,7 +28,7 @@ export class NewExpeditionService {
         id: 'gathering-basic',
         name: 'Coleta Básica',
         description: 'Expedição simples para coletar recursos básicos da floresta',
-        biomeId: '61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47', // Floresta
+        biomeId: 'biome-floresta-001', // Floresta
         category: 'gathering',
         difficulty: 'beginner',
         duration: { min: 5, max: 15 },
@@ -62,7 +62,7 @@ export class NewExpeditionService {
         id: 'hunting-small',
         name: 'Caça Pequena',
         description: 'Caçar pequenos animais na floresta',
-        biomeId: '61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47',
+        biomeId: 'biome-floresta-001',
         category: 'hunting',
         difficulty: 'intermediate',
         duration: { min: 10, max: 25 },
@@ -94,7 +94,7 @@ export class NewExpeditionService {
         id: 'exploration-deep',
         name: 'Exploração Profunda',
         description: 'Aventure-se nas profundezas da floresta em busca de tesouros',
-        biomeId: '61b1e6d2-b284-4c11-a5e0-dbc4d46ebd47',
+        biomeId: 'biome-floresta-001',
         category: 'exploration',
         difficulty: 'advanced',
         duration: { min: 30, max: 60 },
@@ -372,7 +372,7 @@ export class NewExpeditionService {
     if (requiredTools.length === 0) return true;
 
     const allEquipment = await this.storage.getAllEquipment();
-    
+
     for (const toolType of requiredTools) {
       if (toolType === 'weapon' && player.equippedWeapon) {
         const hasWeapon = allEquipment.find(eq => 
@@ -654,7 +654,7 @@ export class NewExpeditionService {
   private addCreatureDropsToRewards(rewards: Record<string, number>, biomeId: string): void {
     const biomes = this.createBiomeData();
     const biome = biomes.find(b => b.id === biomeId);
-    
+
     if (!biome || !biome.availableCreatures) return;
 
     // Para cada criatura disponível no bioma, chance de obter drops
@@ -724,7 +724,7 @@ export class NewExpeditionService {
 
         await gameService.addResourceToPlayer(playerId, resourceId, quantity);
         console.log(`✅ EXPEDITION-REWARD: Successfully added ${quantity}x ${resourceId} (${resource.name}) to player`);
-        
+
         // Force cache invalidation
         const { invalidatePlayerCache, invalidateInventoryCache, invalidateStorageCache } = await import('../cache/memory-cache');
         invalidatePlayerCache(playerId);
@@ -753,7 +753,7 @@ export class NewExpeditionService {
             });
           }
           console.log(`✅ EXPEDITION-REWARD: Added ${quantity}x ${resourceId} to storage as fallback`);
-          
+
           // Force cache invalidation for fallback too
           const { invalidatePlayerCache, invalidateInventoryCache, invalidateStorageCache } = await import('../cache/memory-cache');
           invalidatePlayerCache(playerId);
@@ -852,14 +852,14 @@ export class NewExpeditionService {
   async checkForCombatEncounter(expeditionId: string, playerId: string, biomeId: string): Promise<string | null> {
     try {
       console.log(`🎯 EXPEDITION-COMBAT: Checking for encounter in ${biomeId} for player ${playerId}`);
-      
+
       const encounter = await this.combatService.tryGenerateEncounter(expeditionId, playerId, biomeId);
-      
+
       if (encounter) {
         console.log(`⚔️ EXPEDITION-COMBAT: Generated encounter ${encounter.id} with ${encounter.animal.commonName}`);
         return encounter.id;
       }
-      
+
       console.log(`🎯 EXPEDITION-COMBAT: No encounter generated this time`);
       return null;
     } catch (error) {
