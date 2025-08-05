@@ -65,6 +65,8 @@ export default function SimpleExpeditionSystem({
   isVisible 
 }: SimpleExpeditionSystemProps) {
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
+  const [selectedResources, setSelectedResources] = useState<string[]>([]);
+  const [showResourceSelection, setShowResourceSelection] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -84,14 +86,15 @@ export default function SimpleExpeditionSystem({
 
   // Iniciar expedição
   const startExpeditionMutation = useMutation({
-    mutationFn: async (biomeId: string) => {
+    mutationFn: async (data: { biomeId: string; selectedResources: string[] }) => {
       const response = await fetch(`/api/expeditions/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           playerId: player.id,
           templateId: 'gathering-basic', // Template padrão simples
-          biomeId 
+          biomeId: data.biomeId,
+          selectedResources: data.selectedResources
         })
       });
       if (!response.ok) throw new Error('Falha ao iniciar expedição');
@@ -104,6 +107,8 @@ export default function SimpleExpeditionSystem({
       });
       queryClient.invalidateQueries({ queryKey: ['/api/expeditions/player', player.id] });
       setSelectedBiome(null);
+      setSelectedResources([]);
+      setShowResourceSelection(false);
     },
     onError: (error: any) => {
       toast({
@@ -174,6 +179,47 @@ export default function SimpleExpeditionSystem({
       }
     });
   }, [activeExpeditions, completeExpeditionMutation]);
+
+  // Obter recursos disponíveis no bioma selecionado
+  const getBiomeResources = (biome: Biome) => {
+    if (!biome.availableResources) return [];
+    return biome.availableResources
+      .map(resourceId => resources.find(r => r.id === resourceId))
+      .filter(Boolean) as typeof resources;
+  };
+
+  // Iniciar seleção de recursos
+  const handleBiomeSelect = (biome: Biome) => {
+    setSelectedBiome(biome);
+    setSelectedResources([]);
+    setShowResourceSelection(true);
+  };
+
+  // Confirmar expedição com recursos selecionados
+  const handleConfirmExpedition = () => {
+    if (!selectedBiome) return;
+    
+    if (selectedResources.length === 0) {
+      toast({
+        title: "Nenhum Recurso Selecionado",
+        description: "Selecione pelo menos um recurso para coletar.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    startExpeditionMutation.mutate({ 
+      biomeId: selectedBiome.id, 
+      selectedResources 
+    });
+  };
+
+  // Cancelar seleção
+  const handleCancelSelection = () => {
+    setSelectedBiome(null);
+    setSelectedResources([]);
+    setShowResourceSelection(false);
+  };
 
   if (!isVisible) return null;
 
@@ -324,11 +370,11 @@ export default function SimpleExpeditionSystem({
                       disabled={startExpeditionMutation.isPending}
                       onClick={(e) => {
                         e.stopPropagation();
-                        startExpeditionMutation.mutate(biome.id);
+                        handleBiomeSelect(biome);
                       }}
                     >
                       <Play className="w-4 h-4 mr-1" />
-                      Iniciar Expedição
+                      Selecionar Recursos
                     </Button>
                   )}
                 </CardContent>
@@ -337,6 +383,86 @@ export default function SimpleExpeditionSystem({
           })}
         </div>
       </div>
+
+      {/* Modal de Seleção de Recursos */}
+      {showResourceSelection && selectedBiome && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                Selecionar Recursos - {selectedBiome.name}
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Escolha quais recursos você quer focar em coletar
+              </p>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              {getBiomeResources(selectedBiome).length === 0 ? (
+                <p className="text-center text-muted-foreground py-4">
+                  Nenhum recurso disponível neste bioma
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {getBiomeResources(selectedBiome).map(resource => (
+                    <label 
+                      key={resource.id} 
+                      className="flex items-center space-x-3 p-3 rounded-lg border cursor-pointer hover:bg-gray-50"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedResources.includes(resource.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedResources(prev => [...prev, resource.id]);
+                          } else {
+                            setSelectedResources(prev => prev.filter(id => id !== resource.id));
+                          }
+                        }}
+                        className="w-4 h-4 text-blue-600 rounded"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium">{resource.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {resource.description || 'Recurso disponível no bioma'}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+            
+            <div className="flex gap-2 p-4 border-t">
+              <Button
+                variant="outline"
+                onClick={handleCancelSelection}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleConfirmExpedition}
+                disabled={selectedResources.length === 0 || startExpeditionMutation.isPending}
+                className="flex-1"
+              >
+                {startExpeditionMutation.isPending ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Iniciando...
+                  </div>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 mr-1" />
+                    Iniciar ({selectedResources.length} recursos)
+                  </>
+                )}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
       
       {/* Informações do Jogador */}
       <Card>
