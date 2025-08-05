@@ -25,9 +25,7 @@ import {
 } from 'lucide-react';
 import type { Biome, Resource, Equipment, Player } from '@shared/types';
 import { NewExpeditionModal } from './new-expedition-modal';
-import { ImprovedCustomExpeditionModal } from './improved-custom-expedition-modal';
-import { ExpeditionTracker } from './expedition-tracker';
-import { ExpeditionStatus } from './expedition-status';
+// Removed obsolete imports - these components were deleted during cleanup
 import { useActiveExpeditions } from '@/hooks/use-active-expeditions';
 
 interface EnhancedBiomesTabProps {
@@ -366,14 +364,10 @@ export default function EnhancedBiomesTab({
                   </div>
                 </div>
 
-                {/* Sistema de expedição em tempo real */}
-                <ExpeditionStatus 
-                  biome={biome}
-                  player={player}
-                  resources={resources}
-                  unlocked={unlocked}
-                  onExploreBiome={handleExploreBiome}
-                />
+                {/* Sistema de expedição em tempo real - temporarily disabled during cleanup */}
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-800">Sistema de expedição disponível - use o botão "Explorar" acima</p>
+                </div>
               </CardContent>
             </Card>
           );
@@ -434,36 +428,14 @@ export default function EnhancedBiomesTab({
         </CardContent>
       </Card>
 
-      {/* Tracker de expedições ativas */}
-      <ExpeditionTracker player={player} />
+      {/* Tracker de expedições ativas - temporarily disabled during cleanup */}
+      <Card>
+        <CardContent className="p-4">
+          <p className="text-sm text-gray-600">Sistema de tracking de expedições será reativado após limpeza do código</p>
+        </CardContent>
+      </Card>
 
-      {/* Modal de expedição novo */}
-      {selectedBiome && useManualSelection && (
-        <ImprovedCustomExpeditionModal
-          isOpen={expeditionModalOpen}
-          onClose={() => {
-            setExpeditionModalOpen(false);
-            setSelectedBiome(null);
-          }}
-          onStartExpedition={async (selectedResources, duration) => {
-            try {
-              await startExpedition.mutateAsync({
-                biomeId: selectedBiome.id,
-                selectedResources: selectedResources.map(r => r.resourceId),
-                duration
-              });
-              setExpeditionModalOpen(false);
-              setSelectedBiome(null);
-            } catch (error) {
-              console.error('Erro ao iniciar expedição:', error);
-            }
-          }}
-          resources={resources}
-          selectedBiome={selectedBiome}
-          player={player}
-          equipment={equipment}
-        />
-      )}
+      {/* Modal de expedição novo - using only working modal during cleanup */}
 
       {selectedBiome && !useManualSelection && (
         <NewExpeditionModal
