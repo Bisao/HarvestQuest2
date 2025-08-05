@@ -30,8 +30,21 @@ export class CombatService {
   // ===================== ENCOUNTER GENERATION =====================
 
   async tryGenerateEncounter(expeditionId: string, playerId: string, biomeId: string): Promise<CombatEncounter | null> {
-    // 100% chance de encontrar uma criatura durante a expedição
-    if (Math.random() > 1.0) return null;
+    const player = await this.storage.getPlayer(playerId);
+    if (!player) throw new Error('Player not found');
+
+    // Check if player has forced encounters enabled
+    const forceEncounters = (player as any).developerSettings?.forceCreatureEncounters || false;
+    
+    // Base chance: 30% normally, 100% if forced
+    const encounterChance = forceEncounters ? 1.0 : 0.3;
+    
+    console.log(`🎲 COMBAT: Encounter chance for player ${playerId}: ${Math.round(encounterChance * 100)}% (forced: ${forceEncounters})`);
+    
+    if (Math.random() > encounterChance) {
+      console.log(`🎯 COMBAT: No encounter this time (rolled above ${Math.round(encounterChance * 100)}%)`);
+      return null;
+    }
 
     // Filtrar animais do bioma (melhorar correspondência)
     const biomeName = this.getBiomeName(biomeId);
@@ -48,9 +61,6 @@ export class CombatService {
 
     // Selecionar animal aleatório
     const selectedAnimal = biomeAnimals[Math.floor(Math.random() * biomeAnimals.length)];
-
-    const player = await this.storage.getPlayer(playerId);
-    if (!player) throw new Error('Player not found');
 
     // Criar encontro de combate
     const encounter: CombatEncounter = {

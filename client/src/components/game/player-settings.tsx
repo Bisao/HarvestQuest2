@@ -31,8 +31,40 @@ export default function PlayerSettings({ player, isOpen, onClose, isBlocked = fa
   const [autoConsume, setAutoConsume] = useState(player.autoConsume ?? false);
   const [selectedTimeOfDay, setSelectedTimeOfDay] = useState<GameTime['timeOfDay']>('dawn');
   const [devModeUnlockAnimals, setDevModeUnlockAnimals] = useState(false);
+  const [forceCreatureEncounters, setForceCreatureEncounters] = useState(false);
 
   const saveGame = useSaveGame();
+
+  // Mutation para forçar encontros com criaturas
+  const forceEncountersMutation = useMutation({
+    mutationFn: async (force: boolean) => {
+      const response = await fetch('/api/developer/force-creature-encounters', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: player.id, force }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to toggle creature encounters');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: forceCreatureEncounters ? "Encontros Forçados Ativados" : "Encontros Normais Restaurados",
+        description: forceCreatureEncounters ? "100% de chance de encontrar criaturas nas expedições!" : "Chance normal de encontros restaurada",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao Alterar Encontros",
+        description: error.message || "Não foi possível alterar a configuração de encontros",
+        variant: "destructive",
+      });
+      // Reverter o estado local em caso de erro
+      setForceCreatureEncounters(!forceCreatureEncounters);
+    },
+  });
 
   // Mutation para modo desenvolvedor - desbloquear todos os animais
   const devModeUnlockMutation = useMutation({
@@ -159,6 +191,11 @@ export default function PlayerSettings({ player, isOpen, onClose, isBlocked = fa
   const handleDevModeToggle = (checked: boolean) => {
     setDevModeUnlockAnimals(checked);
     devModeUnlockMutation.mutate(checked);
+  };
+
+  const handleForceEncountersToggle = (checked: boolean) => {
+    setForceCreatureEncounters(checked);
+    forceEncountersMutation.mutate(checked);
   };
 
   const handleSaveSettings = () => {
@@ -350,22 +387,39 @@ export default function PlayerSettings({ player, isOpen, onClose, isBlocked = fa
                 </div>
               </div>
               
-              <div className="flex items-center justify-between p-3 bg-white rounded border border-red-200">
-                <div className="flex items-center space-x-3">
-                  <span className="text-lg">🔓</span>
-                  <div>
-                    <p className="font-medium text-gray-800">Desbloquear Todos os Animais</p>
-                    <p className="text-sm text-gray-600">Para testes: mostra todos os animais como descobertos no bestiário</p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-white rounded border border-red-200">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-lg">🔓</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Desbloquear Todos os Animais</p>
+                      <p className="text-sm text-gray-600">Para testes: mostra todos os animais como descobertos no bestiário</p>
+                    </div>
                   </div>
+                  <Switch
+                    checked={devModeUnlockAnimals}
+                    onCheckedChange={handleDevModeToggle}
+                    disabled={isBlocked || devModeUnlockMutation.isPending}
+                  />
                 </div>
-                <Switch
-                  checked={devModeUnlockAnimals}
-                  onCheckedChange={handleDevModeToggle}
-                  disabled={isBlocked || devModeUnlockMutation.isPending}
-                />
+
+                <div className="flex items-center justify-between p-3 bg-white rounded border border-red-200">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-lg">🐾</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Forçar Encontros com Criaturas</p>
+                      <p className="text-sm text-gray-600">100% de chance de encontrar criaturas durante expedições</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={forceCreatureEncounters}
+                    onCheckedChange={handleForceEncountersToggle}
+                    disabled={isBlocked || forceEncountersMutation.isPending}
+                  />
+                </div>
               </div>
               
-              {devModeUnlockMutation.isPending && (
+              {(devModeUnlockMutation.isPending || forceEncountersMutation.isPending) && (
                 <div className="mt-2 text-sm text-red-600 flex items-center gap-2">
                   <Clock className="w-4 h-4 animate-spin" />
                   Aplicando alterações...

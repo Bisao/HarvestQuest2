@@ -393,9 +393,27 @@ export class NewExpeditionService {
   // ===================== BIOME DATA =====================
 
   private createBiomeData() {
-    // Import the biome data
-    const { createBiomeData } = require('../data/biomes');
-    return createBiomeData();
+    // Import the biome data using ES6 import syntax
+    try {
+      // Use dynamic import to avoid require issues
+      const biomeModule = import('../data/biomes');
+      return biomeModule.then(module => module.createBiomeData());
+    } catch (error) {
+      console.error('❌ EXPEDITION: Error importing biome data:', error);
+      // Fallback biome data
+      return [{
+        id: 'biome-floresta-001',
+        name: "Floresta",
+        emoji: "🌲",
+        requiredLevel: 1,
+        availableResources: [
+          'res-fibra-001',
+          'res-pedra-001',
+          'res-gravetos-001'
+        ],
+        availableCreatures: []
+      }];
+    }
   }
 
   // ===================== GESTÃO DE EXPEDIÇÕES =====================
@@ -479,10 +497,18 @@ export class NewExpeditionService {
     }
 
     // Verificar por encontros de combate durante a expedição
-    if (progress >= 25 && progress < 75) {
+    const player = await this.storage.getPlayer(expedition.playerId);
+    const forceEncounters = (player as any)?.developerSettings?.forceCreatureEncounters || false;
+    
+    // Check for encounters more frequently if forced encounters are enabled
+    const shouldCheckEncounter = forceEncounters ? 
+      (progress >= 20 && progress < 90) : // Check more often with forced encounters
+      (progress >= 25 && progress < 75);   // Normal encounter window
+    
+    if (shouldCheckEncounter) {
       const encounterId = await this.checkForCombatEncounter(expeditionId, expedition.playerId, expedition.biomeId);
       if (encounterId) {
-        console.log(`⚔️ EXPEDITION-ENCOUNTER: Combat encounter ${encounterId} triggered at ${Math.round(progress)}% progress`);
+        console.log(`⚔️ EXPEDITION-ENCOUNTER: Combat encounter ${encounterId} triggered at ${Math.round(progress)}% progress (forced: ${forceEncounters})`);
       }
     }
 
@@ -580,7 +606,7 @@ export class NewExpeditionService {
 
     // Se não há recursos coletados ou estão vazios, calcular novas recompensas
     if (!rewards || Object.keys(rewards).length === 0) {
-      rewards = this.calculateRewards(activeTemplate);
+      rewards = await this.calculateRewards(activeTemplate);
       console.log(`🎲 EXPEDITION-COMPLETE: Calculated new rewards since none existed:`, rewards);
     } else {
       console.log(`📦 EXPEDITION-COMPLETE: Using existing collected resources:`, rewards);
@@ -635,7 +661,7 @@ export class NewExpeditionService {
     };
   }
 
-  private calculateRewards(template: ExpeditionTemplate): Record<string, number> {
+  private async calculateRewards(template: ExpeditionTemplate): Promise<Record<string, number>> {
     const rewards: Record<string, number> = { ...template.rewards.guaranteed };
 
     // Calcular recompensas possíveis
@@ -646,14 +672,16 @@ export class NewExpeditionService {
     }
 
     // Adicionar drops de criaturas encontradas durante a expedição
-    this.addCreatureDropsToRewards(rewards, template.biomeId);
+    await this.addCreatureDropsToRewards(rewards, template.biomeId);
 
     return rewards;
   }
 
-  private addCreatureDropsToRewards(rewards: Record<string, number>, biomeId: string): void {
-    const biomes = this.createBiomeData();
-    const biome = biomes.find(b => b.id === biomeId);
+  private async addCreatureDropsToRewards(rewards: Record<string, number>, biomeId: string): Promise<void> {
+    try {
+      const { createBiomeData } = await import('../data/biomes');
+      const biomes = createBiomeData();
+      const biome = biomes.find(b => b.id === biomeId);
 
     if (!biome || !biome.availableCreatures) return;
 
@@ -673,6 +701,9 @@ export class NewExpeditionService {
         });
       }
     });
+    } catch (error) {
+      console.error('❌ EXPEDITION: Error adding creature drops:', error);
+    }
   }
 
   private async applyExpeditionCosts(playerId: string, template: ExpeditionTemplate): Promise<void> {
