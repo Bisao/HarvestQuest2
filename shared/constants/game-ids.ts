@@ -15,13 +15,13 @@ export const RESOURCE_IDS = {
   // Materiais Básicos
   FIBRA: "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890",
   PEDRA: "res-a2b3c4d5-e6f7-8901-bcde-f23456789012",
-  PEDRAS_SOLTAS: "res-b3c4d5e6-f7g8-9012-cdef-345678901234",
-  MADEIRA: "res-c4d5e6f7-g8h9-0123-def0-456789012345",
+  PEDRAS_SOLTAS: "res-c3d4e5f6-g7h8-9012-cdef-345678901234",
+  MADEIRA: "res-h9i0j1k2-l3m4-5678-1234-901234567890",
   GRAVETOS: "res-d5e6f7g8-h9i0-1234-ef01-567890123456",
-  BAMBU: "res-e6f7g8h9-i0j1-2345-f012-678901234567",
+  BAMBU: "res-g8h9i0j1-k2l3-4567-0123-890123456789",
   
   // Líquidos
-  AGUA_FRESCA: "res-f7g8h9i0-j1k2-3456-0123-789012345678",
+  AGUA_FRESCA: "res-e6f7g8h9-i0j1-2345-f012-678901234567",
   
   // Animais como recursos (drops de caça) - diferentes dos IDs de criaturas
   CARNE_COELHO: "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
@@ -35,16 +35,16 @@ export const RESOURCE_IDS = {
   PEIXE_GRELHADO: "res-g8h9i0j1-k2l3-4567-1234-890123456789",
   
   // Animais como recursos individuais (para recursos únicos de biomas)
-  COELHO: "res-a1b2c3d4-e5f6-7890-1234-567890abcdef",
-  VEADO: "res-b2c3d4e5-f6g7-8901-2345-678901bcdef0",
-  JAVALI: "res-c3d4e5f6-g7h8-9012-3456-789012cdef01",
-  PEIXE_PEQUENO: "res-d4e5f6g7-h8i9-0123-4567-890123def012",
-  PEIXE_GRANDE: "res-e5f6g7h8-i9j0-1234-5678-901234ef0123",
-  SALMAO: "res-f6g7h8i9-j0k1-2345-6789-012345f01234",
+  COELHO: "res-l2m3n4o5-p6q7-8901-5678-234567890123",
+  VEADO: "res-m3n4o5p6-q7r8-9012-6789-345678901234",
+  JAVALI: "res-n4o5p6q7-r8s9-0123-789a-456789012345",
+  PEIXE_PEQUENO: "res-o5p6q7r8-s9t0-1234-89ab-567890123456",
+  PEIXE_GRANDE: "res-p6q7r8s9-t0u1-2345-9abc-678901234567",
+  SALMAO: "res-q7r8s9t0-u1v2-3456-abcd-789012345678",
   
   // Plantas Silvestres
-  COGUMELOS: "res-h9i0j1k2-l3m4-5678-2345-901234567890",
-  FRUTAS_SILVESTRES: "res-i0j1k2l3-m4n5-6789-3456-012345678901",
+  COGUMELOS: "res-r8s9t0u1-v2w3-4567-bcde-890123456789",
+  FRUTAS_SILVESTRES: "res-s9t0u1v2-w3x4-5678-cdef-901234567890",
   COGUMELOS_ASSADOS: "res-j1k2l3m4-n5o6-7890-4567-123456789012",
   
   // Alimentos Processados
@@ -64,9 +64,9 @@ export const RESOURCE_IDS = {
   
   // Recursos Únicos de Biomas
   MADEIRA_FLORESTA: "res-t1u2v3w4-x5y6-7890-4567-123456789012",
-  AREIA: "res-u2v3w4x5-y6z7-8901-5678-234567890123",
-  CRISTAIS: "res-v3w4x5y6-z7a8-9012-6789-345678901234",
-  CONCHAS: "res-w4x5y6z7-a8b9-0123-7890-456789012345"
+  AREIA: "res-t0u1v2w3-x4y5-6789-def0-012345678901",
+  CRISTAIS: "res-u1v2w3x4-y5z6-789a-ef01-123456789012",
+  CONCHAS: "res-v2w3x4y5-z6a7-89bc-f012-234567890123"
 } as const;
 
 // ===================== EQUIPMENT IDs =====================
