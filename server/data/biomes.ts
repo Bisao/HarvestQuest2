@@ -1,6 +1,7 @@
 // Biome data management module
 import type { InsertBiome } from "@shared/types";
 import { RESOURCE_IDS, BIOME_IDS } from "@shared/constants/game-ids";
+import { CREATURE_IDS } from "@shared/constants/creature-ids";
 
 export interface BiomeConfig {
   name: string;
@@ -76,12 +77,13 @@ export function createBiomeData(): InsertBiome[] {
       emoji: "🏜️",
       requiredLevel: 20,
       availableResources: [
-        'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890', // Fibra
-        'res-a2b3c4d5-e6f7-8901-bcde-f23456789012', // Pedra
-        'res-c3d4e5f6-g7h8-9012-cdef-345678901234', // Pedras Soltas
-        'res-d5e6f7g8-h9i0-1234-ef01-567890123456', // Gravetos
-        'res-t0u1v2w3-x4y5-6789-def0-012345678901', // Areia
+        RESOURCE_IDS.FIBRA,
+        RESOURCE_IDS.PEDRA,
+        RESOURCE_IDS.PEDRAS_SOLTAS,
+        RESOURCE_IDS.GRAVETOS,
+        RESOURCE_IDS.AREIA,
       ],
+      availableCreatures: [],
     },
     {
       id: BIOME_IDS.MONTANHA,
@@ -89,12 +91,13 @@ export function createBiomeData(): InsertBiome[] {
       emoji: "🏔️",
       requiredLevel: 50,
       availableResources: [
-        'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890', // Fibra
-        'res-a2b3c4d5-e6f7-8901-bcde-f23456789012', // Pedra
-        'res-c3d4e5f6-g7h8-9012-cdef-345678901234', // Pedras Soltas
-        'res-d5e6f7g8-h9i0-1234-ef01-567890123456', // Gravetos
-        'res-u1v2w3x4-y5z6-789a-ef01-123456789012', // Cristais
+        RESOURCE_IDS.FIBRA,
+        RESOURCE_IDS.PEDRA,
+        RESOURCE_IDS.PEDRAS_SOLTAS,
+        RESOURCE_IDS.GRAVETOS,
+        RESOURCE_IDS.CRISTAIS,
       ],
+      availableCreatures: [],
     },
     {
       id: BIOME_IDS.OCEANO,
@@ -102,11 +105,16 @@ export function createBiomeData(): InsertBiome[] {
       emoji: "🌊",
       requiredLevel: 75,
       availableResources: [
-        'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890', // Fibra
-        'res-a2b3c4d5-e6f7-8901-bcde-f23456789012', // Pedra
-        'res-c3d4e5f6-g7h8-9012-cdef-345678901234', // Pedras Soltas
-        'res-d5e6f7g8-h9i0-1234-ef01-567890123456', // Gravetos
-        'res-v2w3x4y5-z6a7-89bc-f012-234567890123', // Conchas
+        RESOURCE_IDS.FIBRA,
+        RESOURCE_IDS.PEDRA,
+        RESOURCE_IDS.PEDRAS_SOLTAS,
+        RESOURCE_IDS.GRAVETOS,
+        RESOURCE_IDS.CONCHAS,
+      ],
+      availableCreatures: [
+        CREATURE_IDS.ATUM,
+        CREATURE_IDS.SARDINHA,
+        CREATURE_IDS.BACALHAU,
       ],
     },
   ];
