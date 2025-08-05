@@ -11,6 +11,8 @@ import { createNewExpeditionRoutes } from './routes/expedition-routes';
 import { QuestService } from "./services/quest-service";
 import { OfflineActivityService } from "./services/offline-activity-service";
 import { NewExpeditionService as ExpeditionService } from "./services/expedition-service";
+import { ErrorHandler } from "@shared/utils/error-handler";
+import { globalMemoryOptimizer, startAutoMemoryManagement } from "@shared/utils/memory-optimizer";
 import { randomUUID } from "crypto";
 import { registerHealthRoutes } from "./routes/health";
 import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
@@ -23,10 +25,16 @@ import animalRegistryRoutes from './routes/animal-registry-routes';
 import animalRoutes from './routes/animal-routes';
 import developerRoutes from './routes/developer-routes';
 import equipmentRoutes from './routes/equipment-routes';
+import { createAIAssistantRoutes } from './routes/ai-assistant-routes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Initialize game data
+  // Initialize game data first
   await storage.initializeGameData();
+  
+  // Initialize enhanced error handling (after routes)
+  
+  // Start auto memory management
+  startAutoMemoryManagement();
 
   // Initialize services
   const gameService = new GameService(storage);
@@ -1314,6 +1322,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Developer routes
   app.use('/api/developer', developerRoutes);
+
+  // AI Assistant routes
+  app.use('/api/ai', createAIAssistantRoutes(storage));
+
+  // Apply error handling middleware last
+  app.use(ErrorHandler.createExpressHandler());
 
   return httpServer;
 }

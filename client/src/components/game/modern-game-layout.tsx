@@ -26,7 +26,8 @@ import {
   User,
   Zap,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Brain
 } from 'lucide-react';
 // Import all tab components
 import UnifiedInventorySystem from './unified-inventory-system';
@@ -45,6 +46,7 @@ import NewInventoryInterface from '@/components/game/new-inventory-interface';
 // Import modals
 import { NewExpeditionModal } from './new-expedition-modal';
 import { OfflineActivityReportDialog } from './offline-activity-report';
+import AIAssistant from '@/components/ai/ai-assistant';
 
 import type { Player, Biome, Resource, Equipment, Recipe } from '@shared/types';
 
@@ -186,8 +188,15 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     label: 'Sistema',
     icon: Settings,
     color: 'text-gray-600',
-    count: 1,
+    count: 2,
     subTabs: [
+      {
+        id: 'ai-assistant',
+        label: 'Assistente IA',
+        icon: Brain,
+        color: 'text-blue-600',
+        description: 'Recomendações estratégicas inteligentes'
+      },
       {
         id: 'settings',
         label: 'Configurações',
@@ -350,6 +359,7 @@ export default function ModernGameLayout() {
   const [offlineReportOpen, setOfflineReportOpen] = useState(false);
   const [offlineReport, setOfflineReport] = useState<any>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
   const isMobile = useIsMobile();
   const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
 
@@ -384,6 +394,8 @@ export default function ModernGameLayout() {
   const handleTabChange = useCallback((tabId: string) => {
     if (tabId === 'settings') {
       setSettingsOpen(true);
+    } else if (tabId === 'ai-assistant') {
+      setAiAssistantOpen(true);
     } else {
       setActiveTab(tabId);
     }
@@ -732,6 +744,14 @@ export default function ModernGameLayout() {
         onClose={() => setSettingsOpen(false)}
         isBlocked={isBlocked}
       />
+
+      {aiAssistantOpen && player && (
+        <AIAssistant
+          isOpen={aiAssistantOpen}
+          onClose={() => setAiAssistantOpen(false)}
+          playerId={player.id}
+        />
+      )}
     </div>
   );
 }

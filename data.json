@@ -1,9 +1,9 @@
 {
   "players": [
     [
-      "196797ab-bcf4-4cb0-a537-9acc25a48d94",
+      "9933f817-9dc8-4d2c-8a19-f29ab0631732",
       {
-        "id": "196797ab-bcf4-4cb0-a537-9acc25a48d94",
+        "id": "9933f817-9dc8-4d2c-8a19-f29ab0631732",
         "username": "Bison",
         "level": 1,
         "experience": 0,
@@ -22,7 +22,7 @@
         "equippedBoots": null,
         "equippedWeapon": null,
         "equippedTool": null,
-        "autoCompleteQuests": false,
+        "autoCompleteQuests": true,
         "health": 100,
         "maxHealth": 100,
         "hunger": 100,
