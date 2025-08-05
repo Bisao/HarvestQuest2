@@ -23,15 +23,15 @@ export const RESOURCE_IDS = {
   // Líquidos
   AGUA_FRESCA: "res-f7g8h9i0-j1k2-3456-0123-789012345678",
   
-  // Animais (mantidos para compatibilidade)
-  COELHO: "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
-  VEADO: "res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3", 
-  JAVALI: "res-f7a1c9e5-3d8b-4e13-9a24-8c6e2f9b7de4",
+  // Animais como recursos (drops de caça) - diferentes dos IDs de criaturas
+  CARNE_COELHO: "res-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
+  CARNE_VEADO: "res-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3", 
+  CARNE_JAVALI: "res-f7a1c9e5-3d8b-4e13-9a24-8c6e2f9b7de4",
   
-  // Peixes
-  PEIXE_PEQUENO: "res-a1c9f7e5-8b3d-4e12-9a23-2c8e6f5b9df5",
-  PEIXE_GRANDE: "res-c9e5a1f7-3d8b-4e11-9a22-6c2e8f9b5de6",
-  SALMAO: "res-e5a1c9f7-8b3d-4e10-9a21-8c6e2f7b9df7",
+  // Peixes como recursos (capturados)
+  CARNE_PEIXE_PEQUENO: "res-a1c9f7e5-8b3d-4e12-9a23-2c8e6f5b9df5",
+  CARNE_PEIXE_GRANDE: "res-c9e5a1f7-3d8b-4e11-9a22-6c2e8f9b5de6",
+  CARNE_SALMAO: "res-e5a1c9f7-8b3d-4e10-9a21-8c6e2f7b9df7",
   PEIXE_GRELHADO: "res-g8h9i0j1-k2l3-4567-1234-890123456789",
   
   // Plantas Silvestres

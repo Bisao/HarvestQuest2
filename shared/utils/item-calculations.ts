@@ -12,82 +12,71 @@ export const RARITY_MULTIPLIERS: Record<RarityLevel, number> = {
 
 // Calculate actual weight from attributes
 export function calculateWeight(attributes: ItemAttributes): number {
-  return Math.round(attributes.density * attributes.volume * 10) / 10;
+  // Use base weight if available, otherwise calculate from efficiency
+  return attributes.baseValue ? Math.round(attributes.baseValue * 0.1) / 10 : 1.0;
 }
 
 // Calculate actual value from attributes and rarity
 export function calculateValue(attributes: ItemAttributes, rarity: RarityLevel): number {
   const rarityMultiplier = RARITY_MULTIPLIERS[rarity];
-  return Math.round(attributes.baseValue * rarityMultiplier);
+  const baseValue = attributes.baseValue || 10;
+  return Math.round(baseValue * rarityMultiplier);
 }
 
-// Calculate stack limit based on weight and size
-export function calculateMaxStack(attributes: ItemAttributes): number {
-  if (!attributes.stackable) return 1;
+// Calculate stack limit based on efficiency and durability
+export function calculateMaxStack(attributes: ItemAttributes, stackable: boolean = true): number {
+  if (!stackable) return 1;
   
-  // Heavier/larger items stack less
-  const weightFactor = Math.max(1, Math.floor(10 / attributes.volume));
-  const baseFactor = attributes.maxStack || 64;
+  // Items with higher efficiency stack less (they're more valuable/complex)
+  const efficiencyFactor = Math.max(1, Math.floor(100 / (attributes.efficiency + 1)));
+  const baseFactor = 64;
   
-  return Math.min(baseFactor, weightFactor);
+  return Math.min(baseFactor, efficiencyFactor);
 }
 
 // Calculate durability loss per use for tools/weapons
 export function calculateDurabilityLoss(attributes: ItemAttributes, useType: 'tool' | 'weapon'): number {
-  if (!attributes.durability) return 0;
+  if (attributes.durability <= 0) return 0;
   
   // Base durability loss is 1 point per use
   let baseLoss = 1;
   
-  // Tools with higher efficiency wear out faster
-  if (useType === 'tool' && attributes.toolEfficiency) {
-    baseLoss *= (attributes.toolEfficiency / 100 + 0.5);
-  }
-  
-  // Weapons with higher damage wear out faster  
-  if (useType === 'weapon' && attributes.weaponDamage) {
-    baseLoss *= (attributes.weaponDamage / 50 + 0.5);
-  }
+  // Higher efficiency items wear out faster
+  baseLoss *= (attributes.efficiency / 100 + 0.5);
   
   return Math.round(baseLoss * 10) / 10;
 }
 
-// Check if item is consumable
-export function isConsumable(attributes: ItemAttributes): boolean {
-  return !!attributes.consumeEffect;
+// Check if item is consumable (simplified version)
+export function isConsumable(item: any): boolean {
+  return !!(item.effects && item.effects.length > 0);
 }
 
-// Check if item is equipment
-export function isEquipment(attributes: ItemAttributes): boolean {
-  return !!(attributes.toolEfficiency || attributes.weaponDamage || attributes.armorProtection);
+// Check if item is equipment (simplified version) 
+export function isEquipment(item: any): boolean {
+  return !!(item.category === 'equipment' || item.slot);
 }
 
 // Create default attributes for basic resources
-export function createBasicResourceAttributes(baseValue: number, weight: number = 1): ItemAttributes {
+export function createBasicResourceAttributes(baseValue: number = 10): ItemAttributes {
   return {
-    stackable: true,
-    maxStack: 64,
+    durability: 100,
+    efficiency: 50,
+    rarity: 'common',
     baseValue,
-    rarityMultiplier: 1.0,
-    density: weight,
-    volume: 1,
   };
 }
 
 // Create default attributes for equipment  
 export function createEquipmentAttributes(
-  baseValue: number, 
-  weight: number, 
+  baseValue: number = 50, 
   durability: number = 100,
-  efficiency?: number
+  efficiency: number = 75
 ): ItemAttributes {
   return {
-    stackable: false,
-    baseValue,
-    rarityMultiplier: 1.0,
-    density: weight,
-    volume: 1,
     durability,
-    toolEfficiency: efficiency,
+    efficiency,
+    rarity: 'common',
+    baseValue,
   };
 }

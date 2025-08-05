@@ -1,71 +1,13 @@
-// Core Game Types - Imported from original types.ts
-// This ensures compatibility with existing imports
+// Core Game Types - Re-exports from main types.ts to avoid duplication
+// Import all types from the main types file to ensure consistency
 
-export interface Player {
-  id: string;
-  username: string;
-  level: number;
-  experience: number;
-  coins: number;
-  inventoryWeight: number;
-  maxInventoryWeight: number;
-  autoStorage: boolean;
-  craftedItemsDestination: "inventory" | "storage";
-  hungerDegradationMode: HungerDegradationMode;
-  waterStorage: number;
-  maxWaterStorage: number;
-  waterTanks: number;
-  equippedHelmet?: string | null;
-  equippedChestplate?: string | null;
-  equippedLeggings?: string | null;
-  equippedBoots?: string | null;
-  equippedWeapon?: string | null;
-  equippedTool?: string | null;
-  equippedFood?: string | null;
-  equippedDrink?: string | null;
-  autoCompleteQuests: boolean;
-  lastOnlineTime?: number;
-  onExpedition?: boolean;
-  expeditionEndTime?: number;
-  offlineActivityConfig?: OfflineActivityConfig;
-  autoConsume?: boolean;
-  selectedBiome?: string;
-  lastBiomeChange?: string;
-  discoveredAnimals?: string[];
-
-  // Enhanced Status System (Centralized)
-  health: number; // 1-100
-  maxHealth: number; // default 100
-  hunger: number; // 0-100
-  maxHunger: number; // default 100
-  thirst: number; // 0-100
-  maxThirst: number; // default 100
-  temperature: number; // -100 (frozen) to 100 (overheated), default 0
-  fatigue: number; // 0 (rested) to 100 (exhausted), default 0
-  morale: number; // 0 (depressed) to 100 (euphoric), default 50
-  hygiene: number; // 0 (filthy) to 100 (clean), default 100
-
-  // Disease System
-  diseases: any[]; // PlayerDisease[];
-  immunities: string[]; // disease IDs player is immune to
-  resistances: { [diseaseId: string]: number }; // resistance level 0-100
-
-  // Skill System
-  skills: { [skillId: string]: PlayerSkill };
-  skillPoints: number;
-  totalSkillPoints: number;
-  lastSkillReset?: number; // timestamp of last skill reset
-  skillAchievements: string[]; // unlocked achievement IDs
-}
-
-export interface PlayerSkill {
-  level: number;
-  experience: number;
-  unlocked: boolean;
-  unlockedAt?: number; // timestamp
-  totalUsageCount?: number; // how many times used
-  lastUsed?: number; // timestamp
-}
+export type { 
+  Player, 
+  PlayerSkill, 
+  InsertPlayer,
+  HungerDegradationMode,
+  OfflineActivityConfig 
+} from '../types';
 
 // Import types from skill-types.ts
 export type { PlayerDisease } from './skill-types';

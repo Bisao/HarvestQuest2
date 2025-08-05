@@ -1,4 +1,12 @@
-import type { Resource, Equipment, InventoryItem } from '../types';
+import type { Resource, Equipment } from '../types';
+
+export interface InventoryItem {
+  id: string;
+  resourceId: string;
+  quantity: number;
+  durability?: number;
+  slot?: string;
+}
 
 export interface EnhancedInventoryItem {
   item: InventoryItem;

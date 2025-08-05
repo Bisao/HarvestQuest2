@@ -8,10 +8,35 @@ export * from './item-calculations';
 export * from './item-finder';
 
 // === ID MANAGEMENT & VALIDATION ===
-export * from './id-validator-strict';
-export * from './id-resolver';
-export * from './id-validation';
-export * from './id-auto-correction';
+// Consolidated ID validation to avoid conflicts
+export { 
+  isValidGameId, 
+  validateAllGameData,
+  validateIdByCategory 
+} from './id-validator-strict';
+
+export { 
+  getAllMasterIds,
+  validateGameStartup,
+  ValidationResult 
+} from './id-resolver';
+
+export { 
+  isValidResourceId,
+  isValidEquipmentId,
+  isValidRecipeId,
+  isValidBiomeId,
+  isValidQuestId,
+  getItemType,
+  validateRecipeIngredients,
+  validateGameDataConsistency,
+  StandardizedItemReference 
+} from './id-validation';
+
+export { 
+  autoCorrectId,
+  autoCorrectRecipeIds 
+} from './id-auto-correction';
 
 // === GAME MECHANICS ===
 export * from './consumable-utils';
@@ -22,12 +47,4 @@ export * from './uuid-generator';
 export * from './uuid-enforcement';
 
 // === TYPE GUARDS & HELPERS ===
-export {
-  isValidResourceId,
-  isValidEquipmentId,
-  isValidRecipeId,
-  isValidBiomeId,
-  isValidQuestId,
-  validateGameObject,
-  sanitizeGameData
-} from './id-validator-strict';
+// Removed duplicate exports - all ID validation functions are exported above

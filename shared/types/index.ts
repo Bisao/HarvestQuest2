@@ -2,7 +2,7 @@
 // This centralizes all shared type exports for the entire application
 
 // === CORE TYPES ===
-export * from './types';
+export * from '../types'; // Main types file
 export * from './inventory-types';
 export * from './skill-types';
 export * from './time-types';
@@ -14,7 +14,7 @@ export type {
   ApiError,
   PaginatedResponse,
   FilterOptions
-} from './types';
+} from '../types';
 
 // === GAME-SPECIFIC TYPES ===
 export type {
@@ -27,7 +27,7 @@ export type {
   Biome,
   Workshop,
   CraftingProcess
-} from './types';
+} from '../types';
 
 // Import specific types from their dedicated files
 export type { StorageItem } from './storage-types';
@@ -39,11 +39,11 @@ export type {
   ConsumptionConfig,
   HungerDegradationMode,
   OfflineActivityConfig
-} from './types';
+} from '../types';
 
 // === VALIDATION SCHEMAS ===
 export {
   insertExpeditionSchema,
   updatePlayerSchema,
   playerIdParamSchema
-} from './types';
+} from '../types';

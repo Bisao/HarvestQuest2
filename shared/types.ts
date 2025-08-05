@@ -259,12 +259,7 @@ export interface InsertBiome {
   availableResources: string[];
 }
 
-export interface InventoryItem {
-  id: string;
-  playerId: string;
-  resourceId: string;
-  quantity: number;
-}
+// InventoryItem moved to shared/types/inventory-types.ts to avoid duplication
 
 export interface InsertInventoryItem {
   playerId: string;
