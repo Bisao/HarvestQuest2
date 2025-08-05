@@ -1,55 +1,48 @@
+import type { Resource, Equipment, InventoryItem } from '../types';
 
-/**
- * UNIFIED INVENTORY TYPES
- * Single source of truth for all inventory-related types
- */
-
-import type { Resource, Equipment } from '@shared/types';
-
-// Base item interface for consistency
-export interface BaseInventoryItem {
-  id: string;
-  resourceId: string; // Always use resourceId for consistency
-  quantity: number;
-  itemType?: 'resource' | 'equipment';
-}
-
-// Unified inventory item (replaces all variants)
-export interface InventoryItem extends BaseInventoryItem {
-  itemType: 'resource' | 'equipment';
-}
-
-// Unified storage item (replaces all variants)
-export interface StorageItem extends BaseInventoryItem {
-  playerId: string;
-  itemType: 'resource' | 'equipment';
-}
-
-// Enhanced item with data
-export interface EnhancedItem<T extends Resource | Equipment = Resource | Equipment> {
-  id: string;
-  resourceId: string;
-  quantity: number;
-  itemType: 'resource' | 'equipment';
-  itemData: T & { type: 'resource' | 'equipment' };
-  totalValue: number;
-  totalWeight: number;
-}
-
-// Standard item reference for all systems
-export interface ItemReference {
-  itemId: string;
+export interface EnhancedInventoryItem {
+  item: InventoryItem;
+  itemData: Resource | Equipment;
   type: 'resource' | 'equipment';
+  totalWeight: number;
+  totalValue: number;
+  isConsumable: boolean;
+  isEquipment: boolean;
+  canStack: boolean;
+  maxStackSize: number;
+  rarity?: string;
+}
+
+export interface InventoryStats {
+  totalItems: number;
+  totalWeight: number;
+  totalValue: number;
+  uniqueItems: number;
+}
+
+export interface InventoryFilters {
+  search: string;
+  type: 'all' | 'resources' | 'equipment' | 'consumables';
+  sortBy: 'name' | 'quantity' | 'weight' | 'value';
+  sortOrder: 'asc' | 'desc';
+}
+
+export interface EquipmentSlot {
+  key: string;
+  name: string;
+  emoji: string;
+  equippedItemId?: string | null;
+}
+
+export interface InventoryAction {
+  type: 'move_to_storage' | 'consume' | 'equip' | 'unequip' | 'drop';
+  itemId: string;
   quantity?: number;
+  slot?: string;
 }
 
-// Unified item operations interface
-export interface ItemOperations {
-  getById: (id: string) => (Resource | Equipment) | null;
-  getWithType: (id: string) => { item: Resource | Equipment; type: 'resource' | 'equipment' } | null;
-  isResource: (id: string) => boolean;
-  isEquipment: (id: string) => boolean;
+export interface InventoryActionResult {
+  success: boolean;
+  message: string;
+  error?: string;
 }
-
-// Export all legacy interfaces for backward compatibility
-export type { Resource, Equipment } from '@shared/types';

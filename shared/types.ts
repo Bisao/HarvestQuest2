@@ -34,6 +34,35 @@ export interface Player {
   expeditionEndTime?: number;
   offlineActivityConfig?: OfflineActivityConfig;
   autoConsume?: boolean;
+  
+  // NEW: Skill System
+  skills: { [skillId: string]: PlayerSkill };
+  skillPoints: number;
+  totalSkillPoints: number;
+  
+  // NEW: Enhanced Status System  
+  temperature: number; // -100 (frozen) to 100 (overheated), default 0
+  fatigue: number; // 0 (rested) to 100 (exhausted), default 0
+  morale: number; // 0 (depressed) to 100 (euphoric), default 50
+  hygiene: number; // 0 (filthy) to 100 (clean), default 100
+  
+  // NEW: Disease System
+  diseases: any[]; // Will be properly typed after skill-types import
+  immunities: string[]; // disease IDs player is immune to
+  resistances: { [diseaseId: string]: number }; // resistance level 0-100
+  
+  // NEW: Skill-related tracking
+  lastSkillReset?: number; // timestamp of last skill reset
+  skillAchievements: string[]; // unlocked achievement IDs
+}
+
+export interface PlayerSkill {
+  level: number;
+  experience: number;
+  unlocked: boolean;
+  unlockedAt?: number; // timestamp
+  totalUsageCount?: number; // how many times used
+  lastUsed?: number; // timestamp
 }
 
 export interface InsertPlayer {
