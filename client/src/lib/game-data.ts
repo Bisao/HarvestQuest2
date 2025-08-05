@@ -7,7 +7,7 @@
  * TODO: Remove this file completely once all components use server data
  */
 
-import { RESOURCE_IDS } from '@shared/constants/game-ids';
+import { RESOURCE_IDS, EQUIPMENT_IDS, BIOME_IDS } from '@shared/constants/game-ids';
 
 // Use proper IDs from game-ids.ts
 export const BASIC_RESOURCES = [
@@ -106,36 +106,36 @@ export const resources = [
 ];
 
 export const UNIQUE_RESOURCES = {
-  forest: { id: "madeira", name: "Madeira", emoji: "🌳", weight: 5, value: 8 },
-  desert: { id: "areia", name: "Areia", emoji: "⏳", weight: 2, value: 5 },
-  mountain: { id: "cristais", name: "Cristais", emoji: "💎", weight: 1, value: 20 },
-  ocean: { id: "conchas", name: "Conchas", emoji: "🐚", weight: 1, value: 12 },
+  forest: { id: RESOURCE_IDS.MADEIRA, name: "Madeira", emoji: "🌳", weight: 5, value: 8 },
+  desert: { id: RESOURCE_IDS.AREIA, name: "Areia", emoji: "⏳", weight: 2, value: 5 },
+  mountain: { id: RESOURCE_IDS.CRISTAIS, name: "Cristais", emoji: "💎", weight: 1, value: 20 },
+  ocean: { id: RESOURCE_IDS.CONCHAS, name: "Conchas", emoji: "🐚", weight: 1, value: 12 },
 };
 
 export const BIOMES = [
   {
-    id: "forest",
+    id: BIOME_IDS.FLORESTA,
     name: "Floresta",
     emoji: "🌲",
     requiredLevel: 1,
     resources: [...BASIC_RESOURCES, UNIQUE_RESOURCES.forest],
   },
   {
-    id: "desert",
+    id: BIOME_IDS.DESERTO,
     name: "Deserto",
     emoji: "🏜️",
     requiredLevel: 2,
     resources: [...BASIC_RESOURCES, UNIQUE_RESOURCES.desert],
   },
   {
-    id: "mountain",
+    id: BIOME_IDS.MONTANHA,
     name: "Montanha",
     emoji: "🏔️",
     requiredLevel: 5,
     resources: [...BASIC_RESOURCES, UNIQUE_RESOURCES.mountain],
   },
   {
-    id: "ocean",
+    id: BIOME_IDS.OCEANO,
     name: "Oceano",
     emoji: "🌊",
     requiredLevel: 8,
@@ -145,21 +145,21 @@ export const BIOMES = [
 
 export const EQUIPMENT = [
   {
-    id: "pickaxe",
+    id: EQUIPMENT_IDS.PICARETA,
     name: "Picareta",
     emoji: "⛏️",
     effect: "+20% pedra",
     bonus: { type: "resource_boost", resource: "pedra", multiplier: 1.2 },
   },
   {
-    id: "backpack",
+    id: EQUIPMENT_IDS.MOCHILA,
     name: "Mochila",
     emoji: "🎒",
     effect: "+15 kg peso",
     bonus: { type: "weight_boost", value: 15 },
   },
   {
-    id: "compass",
+    id: EQUIPMENT_IDS.BUSSOLA,
     name: "Bússola",
     emoji: "🧭",
     effect: "-20% tempo",
@@ -167,6 +167,7 @@ export const EQUIPMENT = [
   },
 ];
 
+// Note: Recipes should use RECIPE_IDS but keeping legacy format for compatibility
 export const RECIPES = [
   {
     id: "rope",

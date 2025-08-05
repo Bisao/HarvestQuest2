@@ -10,87 +10,87 @@ export const CREATURE_IDS = {
   // ===================== ANIMAIS TERRESTRES =====================
 
   // Pequenos Mamíferos
-  COELHO: "creature-a1e5c9f7-3b8d-4e15-9a26-2c8e6f1b9de2",
-  ESQUILO: "creature-b2f6d8e8-4c9e-5f25-ab37-3d9f7e2c8ef3",
-  RATO_SILVESTRE: "creature-c3g7e9f9-5d0f-6g36-bc48-4e0g8f3d9fg4",
+  COELHO: "cre-12345678-90ab-cdef-1234-567890abcdef",
+  ESQUILO: "cre-23456789-01bc-def2-3456-789012bcdef0",
+  RATO_SILVESTRE: "cre-34567890-12cd-ef34-5678-90123cdef012",
 
   // Médios Mamíferos
-  VEADO: "creature-c9f7a1e5-8d3b-4e14-9a25-6c2e8f7b1df3",
-  RAPOSA: "creature-d4h8f0g0-6e1g-7h47-cd59-5f1h9g4e0gh5",
-  LOBO: "creature-e5i9g1h1-7f2h-8i58-de6a-6g2i0h5f1hi6",
+  VEADO: "cre-45678901-23de-f456-789a-0234def01234",
+  RAPOSA: "cre-56789012-34ef-5678-9abc-3456ef012345",
+  LOBO: "cre-67890123-45f0-6789-abcd-4567f0123456",
 
   // Grandes Mamíferos  
-  JAVALI: "creature-f7a1c9e5-3d8b-4e13-9a24-8c6e2f9b7de4",
-  URSO_PARDO: "creature-f6j0h2i2-8g3i-9j69-ef7b-7h3j1i6g2ij7",
-  ALCE: "creature-g7k1i3j3-9h4j-0k7a-fg8c-8i4k2j7h3jk8",
+  JAVALI: "cre-78901234-5601-789a-bcde-5678012345678",
+  URSO_PARDO: "cre-89012345-6712-89ab-cdef-67890123456789",
+  ALCE: "cre-90123456-7823-9abc-def0-7890123456789a",
 
   // ===================== ANIMAIS AQUÁTICOS =====================
 
   // Peixes de Água Doce
-  PEIXE_PEQUENO: "creature-a1c9f7e5-8b3d-4e12-9a23-2c8e6f5b9df5",
-  PEIXE_GRANDE: "creature-c9e5a1f7-3d8b-4e11-9a22-6c2e8f9b5de6",
-  SALMAO: "creature-e5a1c9f7-8b3d-4e10-9a21-8c6e2f7b9df7",
-  TRUTA: "creature-h8l2j4k4-0i5k-1l8b-gh9d-9j5l3k8i4kl9",
-  CARPA: "creature-i9m3k5l5-1j6l-2m9c-hi0e-0k6m4l9j5lm0",
+  PEIXE_PEQUENO: "cre-01234567-8934-abcd-ef01-890123456789ab",
+  PEIXE_GRANDE: "cre-12345678-9045-bcde-f012-90123456789abc",
+  SALMAO: "cre-23456789-0156-cdef-0123-0123456789abcd",
+  TRUTA: "cre-34567890-1267-def0-1234-123456789abcde",
+  CARPA: "cre-45678901-2378-ef01-2345-23456789abcdef",
 
   // Peixes de Água Salgada
-  ATUM: "creature-j0n4l6m6-2k7m-3n0d-ij1f-1l7n5m0k6mn1",
-  SARDINHA: "creature-k1o5m7n7-3l8n-4o1e-jk2g-2m8o6n1l7no2",
-  BACALHAU: "creature-l2p6n8o8-4m9o-5p2f-kl3h-3n9p7o2m8op3",
+  ATUM: "cre-56789012-3489-f012-3456-3456789abcdef0",
+  SARDINHA: "cre-67890123-4590-0123-4567-456789abcdef01",
+  BACALHAU: "cre-78901234-5601-1234-5678-56789abcdef012",
 
   // ===================== AVES =====================
 
   // Aves Pequenas
-  PARDAL: "creature-m3q7o9p9-5n0p-6q3g-lm4i-4o0q8p3n9pq4",
-  BEIJA_FLOR: "creature-n4r8p0q0-6o1q-7r4h-mn5j-5p1r9q4o0qr5",
-  CANARIO: "creature-o5s9q1r1-7p2r-8s5i-no6k-6q2s0r5p1rs6",
+  PARDAL: "cre-89012345-6712-2345-6789-6789abcdef0123",
+  BEIJA_FLOR: "cre-90123456-7823-3456-7890-7890abcdef01234",
+  CANARIO: "cre-01234567-8934-4567-8901-8901abcdef012345",
 
   // Aves Médias
-  CORVO: "creature-p6t0r2s2-8q3s-9t6j-op7l-7r3t1s6q2st7",
-  POMBO: "creature-q7u1s3t3-9r4t-0u7k-pq8m-8s4u2t7r3tu8",
-  GALINHA_DANGOLA: "creature-r8v2t4u4-0s5u-1v8l-qr9n-9t5v3u8s4uv9",
+  CORVO: "cre-12345678-9045-5678-9012-9012abcdef0123456",
+  POMBO: "cre-23456789-0156-6789-0123-0123abcdef01234567",
+  GALINHA_DANGOLA: "cre-34567890-1267-7890-1234-1234abcdef012345678",
 
   // Aves Grandes
-  AGUIA: "creature-s9w3u5v5-1t6v-2w9m-rs0o-0u6w4v9t5vw0",
-  FALCAO: "creature-t0x4v6w6-2u7w-3x0n-st1p-1v7x5w0u6wx1",
-  CONDOR: "creature-u1y5w7x7-3v8x-4y1o-tu2q-2w8y6x1v7xy2",
+  AGUIA: "cre-45678901-2378-8901-2345-2345abcdef0123456789",
+  FALCAO: "cre-56789012-3489-9012-3456-3456abcdef0123456789a",
+  CONDOR: "cre-67890123-4590-0123-4567-4567abcdef0123456789ab",
 
   // ===================== RÉPTEIS =====================
 
   // Lagartos
-  LAGARTO_COMUM: "creature-v2z6x8y8-4w9y-5z2p-uv3r-3x9z7y2w8yz3",
-  IGUANA: "creature-w3a7y9z9-5x0z-6a3q-vw4s-4y0a8z3x9za4",
-  DRAGAO_BARBUDO: "creature-x4b8z0a0-6y1a-7b4r-wx5t-5z1b9a4y0ab5",
+  LAGARTO_COMUM: "cre-78901234-5601-1234-5678-5678abcdef0123456789ac",
+  IGUANA: "cre-89012345-6712-2345-6789-6789abcdef0123456789ad",
+  DRAGAO_BARBUDO: "cre-90123456-7823-3456-7890-7890abcdef0123456789ae",
 
   // Serpentes
-  COBRA_COMUM: "creature-y5c9a1b1-7z2b-8c5s-xy6u-6a2c0b5z1bc6",
-  JIBOIA: "creature-z6d0b2c2-8a3c-9d6t-yz7v-7b3d1c6a2cd7",
-  COBRA_VENENOSA: "creature-a7e1c3d3-9b4d-0e7u-za8w-8c4e2d7b3de8",
+  COBRA_COMUM: "cre-01234567-8934-4567-8901-8901abcdef0123456789af",
+  JIBOIA: "cre-12345678-9045-5678-9012-9012abcdef0123456789b0",
+  COBRA_VENENOSA: "cre-23456789-0156-6789-0123-0123abcdef0123456789b1",
 
   // ===================== INSETOS =====================
 
   // Insetos Comuns
-  ABELHA: "creature-b8f2d4e4-0c5e-1f8v-ab9x-9d5f3e8c4ef9",
-  BORBOLETA: "creature-c9g3e5f5-1d6f-2g9w-bc0y-0e6g4f9d5fg0",
-  GRILO: "creature-d0h4f6g6-2e7g-3h0x-cd1z-1f7h5g0e6gh1",
+  ABELHA: "cre-34567890-1267-7890-1234-1234abcdef0123456789b2",
+  BORBOLETA: "cre-45678901-2378-8901-2345-2345abcdef0123456789b3",
+  GRILO: "cre-56789012-3489-9012-3456-3456abcdef0123456789b4",
 
   // Insetos Úteis
-  MINHOCA: "creature-e1i5g7h7-3f8h-4i1y-de2a-2g8i6h1f7hi2",
-  JOANINHA: "creature-f2j6h8i8-4g9i-5j2z-ef3b-3h9j7i2g8ij3",
-  FORMIGA: "creature-g3k7i9j9-5h0j-6k3a-fg4c-4i0k8j3h9jk4",
+  MINHOCA: "cre-67890123-4590-0123-4567-4567abcdef0123456789b5",
+  JOANINHA: "cre-78901234-5601-1234-5678-5678abcdef0123456789b6",
+  FORMIGA: "cre-89012345-6712-2345-6789-6789abcdef0123456789b7",
 
   // ===================== CRIATURAS FANTÁSTICAS =====================
 
   // Bestas Mágicas (Para futuras expansões)
-  DRAGAO_MENOR: "creature-h4l8j0k0-6i1k-7l4b-gh5d-5j1l9k4i0kl5",
-  UNICORNIO: "creature-i5m9k1l1-7j2l-8m5c-hi6e-6k2m0l5j1lm6",
-  PHOENIX: "creature-j6n0l2m2-8k3m-9n6d-ij7f-7l3n1m6k2mn7",
+  DRAGAO_MENOR: "cre-90123456-7823-3456-7890-7890abcdef0123456789b8",
+  UNICORNIO: "cre-01234567-8934-4567-8901-8901abcdef0123456789b9",
+  PHOENIX: "cre-12345678-9045-5678-9012-9012abcdef0123456789ba",
 
   // Espíritos da Natureza
-  ELEMENTAL_TERRA: "creature-k7o1m3n3-9l4n-0o7e-jk8g-8m4o2n7l3no8",
-  ELEMENTAL_AGUA: "creature-l8p2n4o4-0m5o-1p8f-kl9h-9n5p3o8m4op9",
-  ELEMENTAL_FOGO: "creature-m9q3o5p5-1n6p-2q9g-lm0i-0o6q4p9n5pq0",
-  ELEMENTAL_AR: "creature-n0r4p6q6-2o7q-3r0h-mn1j-1p7r5q0o6qr1"
+  ELEMENTAL_TERRA: "cre-23456789-0156-6789-0123-0123abcdef0123456789bb",
+  ELEMENTAL_AGUA: "cre-34567890-1267-7890-1234-1234abcdef0123456789bc",
+  ELEMENTAL_FOGO: "cre-45678901-2378-8901-2345-2345abcdef0123456789bd",
+  ELEMENTAL_AR: "cre-56789012-3489-9012-3456-3456abcdef0123456789be"
 } as const;
 
 // ===================== CATEGORIAS DE CRIATURAS =====================
@@ -275,6 +275,6 @@ export function getCreatureIdsByCategory(category: string): string[] {
     mystical: CREATURE_CATEGORIES.CRIATURAS_FANTASTICAS,
     elementals: CREATURE_CATEGORIES.ELEMENTAIS
   };
-  
+
   return categoryMap[category] || [];
 }
