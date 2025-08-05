@@ -26,13 +26,7 @@ export function createResourcesWithIds(): InsertResource[] {
     { id: RESOURCE_IDS.PELO, name: "Pelo", emoji: "🧶", weight: 1, sellPrice: 3, buyPrice: 6, type: "basic", rarity: "common", experienceValue: 1 },
     { id: RESOURCE_IDS.BARBANTE, name: "Barbante", emoji: "🧵", weight: 1, sellPrice: 1, buyPrice: 2, type: "basic", rarity: "common", experienceValue: 1 },
 
-    // Animals
-    { id: RESOURCE_IDS.COELHO, name: "Coelho", emoji: "🐰", weight: 3, sellPrice: 15, buyPrice: 30, type: "unique", rarity: "common", requiredTool: "knife", experienceValue: 5 },
-    { id: RESOURCE_IDS.VEADO, name: "Veado", emoji: "🦌", weight: 8, sellPrice: 35, buyPrice: 70, type: "unique", rarity: "uncommon", requiredTool: "weapon_and_knife", experienceValue: 8 },
-    { id: RESOURCE_IDS.JAVALI, name: "Javali", emoji: "🐗", weight: 12, sellPrice: 50, buyPrice: 100, type: "unique", rarity: "rare", requiredTool: "weapon_and_knife", experienceValue: 12 },
-    { id: RESOURCE_IDS.PEIXE_PEQUENO, name: "Peixe Pequeno", emoji: "🐟", weight: 1, sellPrice: 8, buyPrice: 16, type: "unique", rarity: "common", requiredTool: "fishing_rod", experienceValue: 2 },
-    { id: RESOURCE_IDS.PEIXE_GRANDE, name: "Peixe Grande", emoji: "🐠", weight: 3, sellPrice: 18, buyPrice: 36, type: "unique", rarity: "uncommon", requiredTool: "fishing_rod", experienceValue: 4 },
-    { id: RESOURCE_IDS.SALMAO, name: "Salmão", emoji: "🍣", weight: 4, sellPrice: 25, buyPrice: 50, type: "unique", rarity: "rare", requiredTool: "fishing_rod", experienceValue: 6 },
+    // Note: Animals are now managed by the creature system, not as resources
     { id: RESOURCE_IDS.COGUMELOS, name: "Cogumelos", emoji: "🍄", weight: 1, sellPrice: 6, buyPrice: 12, type: "unique", rarity: "common", experienceValue: 2 },
     { id: RESOURCE_IDS.FRUTAS_SILVESTRES, name: "Frutas Silvestres", emoji: "🫐", weight: 1, sellPrice: 4, buyPrice: 8, type: "unique", rarity: "common", experienceValue: 1 },
 

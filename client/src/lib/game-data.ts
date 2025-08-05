@@ -106,12 +106,13 @@ export const resources = [
 ];
 
 export const UNIQUE_RESOURCES = {
-  forest: { id: "madeira", name: "Madeira", emoji: "🌳", weight: 5, value: 8 },
-  desert: { id: "areia", name: "Areia", emoji: "⏳", weight: 2, value: 5 },
-  mountain: { id: "cristais", name: "Cristais", emoji: "💎", weight: 1, value: 20 },
-  ocean: { id: "conchas", name: "Conchas", emoji: "🐚", weight: 1, value: 12 },
+  forest: { id: RESOURCE_IDS.MADEIRA, name: "Madeira", emoji: "🌳", weight: 5, value: 8 },
+  desert: { id: RESOURCE_IDS.AREIA, name: "Areia", emoji: "⏳", weight: 2, value: 5 },
+  mountain: { id: RESOURCE_IDS.CRISTAIS, name: "Cristais", emoji: "💎", weight: 1, value: 20 },
+  ocean: { id: RESOURCE_IDS.CONCHAS, name: "Conchas", emoji: "🐚", weight: 1, value: 12 },
 };
 
+// DEPRECATED: Use server APIs instead
 export const BIOMES = [
   {
     id: "forest",
@@ -119,6 +120,7 @@ export const BIOMES = [
     emoji: "🌲",
     requiredLevel: 1,
     resources: [...BASIC_RESOURCES, UNIQUE_RESOURCES.forest],
+    // Note: Creatures are now managed separately via the creature system
   },
   {
     id: "desert",
@@ -142,6 +144,9 @@ export const BIOMES = [
     resources: [...BASIC_RESOURCES, UNIQUE_RESOURCES.ocean],
   },
 ];
+
+// Import creature IDs for referencing creatures
+import { CREATURE_IDS } from '@shared/constants/creature-ids';
 
 export const EQUIPMENT = [
   {

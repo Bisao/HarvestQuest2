@@ -47,3 +47,12 @@ export {
   updatePlayerSchema,
   playerIdParamSchema
 } from '../types';
+
+export interface InsertBiome {
+  id: string;
+  name: string;
+  emoji: string;
+  requiredLevel: number;
+  availableResources: string[];
+  availableCreatures: string[];
+}

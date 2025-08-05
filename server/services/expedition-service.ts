@@ -11,6 +11,7 @@ import { CombatService } from './combat-service';
 import { v4 as uuidv4 } from 'uuid';
 import { RESOURCE_IDS } from '../../shared/constants/game-ids';
 import { CREATURE_IDS, migrateLegacyCreatureId, isValidCreatureId } from '../../shared/constants/creature-ids';
+import { ANIMAL_REGISTRY } from '../data/animal-registry';
 
 export class NewExpeditionService {
   private combatService: CombatService;
@@ -389,6 +390,14 @@ export class NewExpeditionService {
     return false;
   }
 
+  // ===================== BIOME DATA =====================
+
+  private createBiomeData() {
+    // Import the biome data
+    const { createBiomeData } = require('../data/biomes');
+    return createBiomeData();
+  }
+
   // ===================== GESTÃO DE EXPEDIÇÕES =====================
 
   async startExpedition(playerId: string, templateId: string): Promise<ActiveExpedition> {
@@ -636,7 +645,34 @@ export class NewExpeditionService {
       }
     }
 
+    // Adicionar drops de criaturas encontradas durante a expedição
+    this.addCreatureDropsToRewards(rewards, template.biomeId);
+
     return rewards;
+  }
+
+  private addCreatureDropsToRewards(rewards: Record<string, number>, biomeId: string): void {
+    const biomes = this.createBiomeData();
+    const biome = biomes.find(b => b.id === biomeId);
+    
+    if (!biome || !biome.availableCreatures) return;
+
+    // Para cada criatura disponível no bioma, chance de obter drops
+    biome.availableCreatures.forEach(creatureId => {
+      const animal = ANIMAL_REGISTRY.find(a => a.id === creatureId);
+      if (!animal) return;
+
+      // 30% de chance base de encontrar cada criatura
+      if (Math.random() < 0.3) {
+        // Adicionar drops da criatura
+        animal.drops?.forEach(drop => {
+          if (Math.random() < (drop.dropRate / 100)) {
+            const quantity = Math.floor(Math.random() * (drop.maxQuantity - drop.minQuantity + 1)) + drop.minQuantity;
+            rewards[drop.itemId] = (rewards[drop.itemId] || 0) + quantity;
+          }
+        });
+      }
+    });
   }
 
   private async applyExpeditionCosts(playerId: string, template: ExpeditionTemplate): Promise<void> {

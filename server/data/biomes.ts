@@ -48,23 +48,26 @@ export function createBiomeData(): InsertBiome[] {
       name: "Floresta",
       emoji: "🌲",
       requiredLevel: 1,
-      // Inclui recursos básicos + madeira + todos os novos recursos de caça/pesca
+      // Recursos disponíveis no bioma (apenas recursos, não animais)
       availableResources: [
-        'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890', // Fibra
-        'res-a2b3c4d5-e6f7-8901-bcde-f23456789012', // Pedra
-        'res-c3d4e5f6-g7h8-9012-cdef-345678901234', // Pedras Soltas
-        'res-d5e6f7g8-h9i0-1234-ef01-567890123456', // Gravetos
-        'res-e6f7g8h9-i0j1-2345-f012-678901234567', // Água Fresca
-        'res-g8h9i0j1-k2l3-4567-0123-890123456789', // Bambu
-        'res-h9i0j1k2-l3m4-5678-1234-901234567890', // Madeira
-        'res-l2m3n4o5-p6q7-8901-5678-234567890123', // Coelho
-        'res-m3n4o5p6-q7r8-9012-6789-345678901234', // Veado
-        'res-n4o5p6q7-r8s9-0123-789a-456789012345', // Javali
-        'res-o5p6q7r8-s9t0-1234-89ab-567890123456', // Peixe Pequeno
-        'res-p6q7r8s9-t0u1-2345-9abc-678901234567', // Peixe Grande
-        'res-q7r8s9t0-u1v2-3456-abcd-789012345678', // Salmão
-        'res-r8s9t0u1-v2w3-4567-bcde-890123456789', // Cogumelos
-        'res-s9t0u1v2-w3x4-5678-cdef-901234567890', // Frutas Silvestres
+        RESOURCE_IDS.FIBRA,
+        RESOURCE_IDS.PEDRA,
+        RESOURCE_IDS.PEDRAS_SOLTAS,
+        RESOURCE_IDS.GRAVETOS,
+        RESOURCE_IDS.AGUA_FRESCA,
+        RESOURCE_IDS.BAMBU,
+        RESOURCE_IDS.MADEIRA,
+        RESOURCE_IDS.COGUMELOS,
+        RESOURCE_IDS.FRUTAS_SILVESTRES,
+      ],
+      // Criaturas disponíveis neste bioma
+      availableCreatures: [
+        CREATURE_IDS.COELHO,
+        CREATURE_IDS.VEADO,
+        CREATURE_IDS.JAVALI,
+        CREATURE_IDS.PEIXE_PEQUENO,
+        CREATURE_IDS.PEIXE_GRANDE,
+        CREATURE_IDS.SALMAO,
       ],
     },
     {
