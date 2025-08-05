@@ -32,10 +32,10 @@ interface SimpleExpeditionSystemProps {
 interface ActiveExpedition {
   id: string;
   biomeId: string;
-  biomeName: string;
+  biomeName?: string;
   progress: number;
   startTime: number;
-  endTime: number;
+  endTime?: number;
   collectedResources: Record<string, number>;
   status: 'active' | 'completed';
 }
@@ -49,7 +49,8 @@ const BIOME_THEMES = {
   default: { icon: MapPin, color: 'from-gray-400 to-gray-500', bgColor: 'bg-gray-50' }
 };
 
-function getBiomeTheme(biomeName: string) {
+function getBiomeTheme(biomeName: string | undefined) {
+  if (!biomeName) return BIOME_THEMES.default;
   const normalizedName = biomeName.toLowerCase();
   for (const [key, theme] of Object.entries(BIOME_THEMES)) {
     if (normalizedName.includes(key)) return theme;
@@ -153,7 +154,8 @@ export default function SimpleExpeditionSystem({
   });
 
   // Formatar tempo restante
-  const formatTimeRemaining = (endTime: number) => {
+  const formatTimeRemaining = (endTime?: number) => {
+    if (!endTime) return "Calculando...";
     const remaining = Math.max(0, endTime - Date.now());
     const minutes = Math.floor(remaining / (1000 * 60));
     const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
@@ -171,7 +173,7 @@ export default function SimpleExpeditionSystem({
         completeExpeditionMutation.mutate(expedition.id);
       }
     });
-  }, [activeExpeditions]);
+  }, [activeExpeditions, completeExpeditionMutation]);
 
   if (!isVisible) return null;
 
@@ -189,6 +191,10 @@ export default function SimpleExpeditionSystem({
             const theme = getBiomeTheme(expedition.biomeName);
             const IconComponent = theme.icon;
             
+            // Encontrar o bioma correspondente
+            const biome = biomes.find(b => b.id === expedition.biomeId);
+            const biomeName = expedition.biomeName || biome?.name || 'Bioma Desconhecido';
+            
             return (
               <Card key={expedition.id} className="overflow-hidden">
                 <CardHeader className={`pb-3 ${theme.bgColor}`}>
@@ -198,7 +204,7 @@ export default function SimpleExpeditionSystem({
                         <IconComponent className="w-5 h-5" />
                       </div>
                       <div>
-                        <CardTitle className="text-base">{expedition.biomeName}</CardTitle>
+                        <CardTitle className="text-base">{biomeName}</CardTitle>
                         <p className="text-sm text-muted-foreground">
                           {formatTimeRemaining(expedition.endTime)} restantes
                         </p>
