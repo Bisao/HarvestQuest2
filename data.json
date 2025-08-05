@@ -6,7 +6,7 @@
         "id": "89aa8042-ec5e-418d-8bb3-b4657622b573",
         "username": "Bison",
         "level": 1,
-        "experience": 0,
+        "experience": 4330,
         "coins": 100,
         "inventoryWeight": 0,
         "maxInventoryWeight": 50000,
@@ -88,10 +88,14 @@
           "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890"
         ],
         "selectedEquipment": [],
-        "status": "in_progress",
+        "status": "completed",
         "startTime": 1754375869579,
-        "progress": 0,
-        "collectedResources": {}
+        "progress": 100,
+        "collectedResources": {
+          "res-f1b2c3d4-e5f6-7890-abcd-ef1234567890": 3,
+          "res-a2b3c4d5-e6f7-8901-bcde-f23456789012": 2,
+          "res-d5e6f7g8-h9i0-1234-ef01-567890123456": 4
+        }
       }
     ]
   ],
