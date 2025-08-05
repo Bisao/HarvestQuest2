@@ -42,6 +42,7 @@ import QuestsTab from './quests-tab';
 import PlayerSettings from './player-settings';
 import ExpeditionPanel from './expedition-panel';
 import NewInventoryInterface from '@/components/game/new-inventory-interface';
+import SimpleExpeditionSystem from './simple-expedition-system';
 
 // Import modals
 import { NewExpeditionModal } from './new-expedition-modal';
@@ -151,11 +152,11 @@ const createSidebarCategories = (player: Player, activeExpedition: ActiveExpedit
     count: 2,
     subTabs: [
       {
-        id: 'biomes',
+        id: 'expeditions',
         label: 'Expedições',
-        icon: TreePine,
-        color: 'text-emerald-600',
-        description: 'Explorar biomas e coletar recursos',
+        icon: MapPin,
+        color: 'text-blue-600',
+        description: 'Gerenciar expedições ativas e iniciar novas',
         hasNotification: !!activeExpedition
       },
       {
@@ -352,8 +353,8 @@ EquipmentIndicators.displayName = 'EquipmentIndicators';
 
 // Componente principal refatorado
 export default function ModernGameLayout() {
-  const [activeTab, setActiveTab] = useState('camp');
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['acampamento']);
+  const [activeTab, setActiveTab] = useState('expeditions');
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['exploracao']);
   const [expeditionModalOpen, setExpeditionModalOpen] = useState(false);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
   const [offlineReportOpen, setOfflineReportOpen] = useState(false);
@@ -652,13 +653,12 @@ export default function ModernGameLayout() {
               />
             )}
 
-            {activeTab === 'biomes' && (
-              <EnhancedBiomesTab
+            {activeTab === 'expeditions' && (
+              <SimpleExpeditionSystem
                 player={player}
                 biomes={biomes}
                 resources={resources}
-                equipment={equipment}
-                onExpeditionStart={handleExpeditionStart}
+                isVisible={true}
               />
             )}
 
