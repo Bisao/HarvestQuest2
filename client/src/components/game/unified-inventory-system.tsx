@@ -35,6 +35,11 @@ interface EnhancedItem {
   totalWeight: number;
 }
 
+// Helper function to check if an item is consumable
+const isItemConsumable = (item: Resource | Equipment): boolean => {
+  return 'consumable' in item && item.consumable === true;
+};
+
 export const UnifiedInventorySystem: React.FC<UnifiedInventorySystemProps> = ({
   playerId,
   resources,
@@ -59,7 +64,7 @@ export const UnifiedInventorySystem: React.FC<UnifiedInventorySystemProps> = ({
     },
     refetchInterval: 2000,
     staleTime: 0,
-    cacheTime: 0
+    gcTime: 0
   });
 
   // Fetch storage data with aggressive cache invalidation
@@ -72,7 +77,7 @@ export const UnifiedInventorySystem: React.FC<UnifiedInventorySystemProps> = ({
     },
     refetchInterval: 2000,
     staleTime: 0,
-    cacheTime: 0
+    gcTime: 0
   });
 
   // Combine and enhance inventory data
@@ -129,7 +134,7 @@ export const UnifiedInventorySystem: React.FC<UnifiedInventorySystemProps> = ({
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(item => 
         item.itemData.name.toLowerCase().includes(searchLower) ||
-        item.itemData.description?.toLowerCase().includes(searchLower)
+        ('description' in item.itemData && typeof item.itemData.description === 'string' ? item.itemData.description.toLowerCase().includes(searchLower) : false)
       );
     }
 
@@ -362,7 +367,11 @@ export const UnifiedInventorySystem: React.FC<UnifiedInventorySystemProps> = ({
                     </div>
                     <div>
                       <h3 className="font-medium">{itemData.name}</h3>
-                      <p className="text-sm text-gray-600">{itemData.description}</p>
+                      <p className="text-sm text-gray-600">
+                        {'description' in itemData && typeof itemData.description === 'string' 
+                          ? itemData.description 
+                          : 'No description'}
+                      </p>
                       <div className="flex items-center gap-4 mt-1">
                         {inventoryQuantity > 0 && (
                           <Badge variant="secondary">

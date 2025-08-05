@@ -1,101 +1,107 @@
 import { useQuery } from '@tanstack/react-query';
-import { CacheManager } from '@shared/utils/cache-manager';
-import type { Player, InventoryItem, StorageItem } from '@shared/types/inventory-types';
 
-interface UseGameDataOptions {
-  playerId: string | null;
-  enabled?: boolean;
-  pollInterval?: number;
-  staleTime?: number;
+interface UseGameDataProps {
+  playerId: string;
 }
 
 interface GameData {
-  player: Player | null;
-  inventory: InventoryItem[];
-  storage: StorageItem[];
-  isLoading: boolean;
-  error: Error | null;
-  isConnected: boolean;
+  player?: any;
+  inventory?: any[];
+  storage?: any[];
+  resources?: any[];
+  equipment?: any[];
+  biomes?: any[];
+  recipes?: any[];
 }
 
-export function useGameData({ 
-  playerId, 
-  enabled = true, 
-  pollInterval = 2000,
-  staleTime = 0
-}: UseGameDataOptions): GameData {
-
-  // Single player query
-  const playerQuery = useQuery({
-    queryKey: CacheManager.KEYS.PLAYER(playerId!),
+export function useGameData({ playerId }: UseGameDataProps): GameData {
+  // Fetch player data
+  const { data: player } = useQuery({
+    queryKey: [`/api/player/${playerId}`],
     queryFn: async () => {
-      if (!playerId) return null;
       const response = await fetch(`/api/player/${playerId}`);
-      if (!response.ok) throw new Error('Failed to fetch player data');
-      const data = await response.json();
-
-      // Ensure consistent number formatting
-      if (data) {
-        data.health = Math.round(data.health || 0);
-        data.hunger = Math.round(data.hunger || 0);
-        data.thirst = Math.round(data.thirst || 0);
-        data.temperature = Math.round(data.temperature || 20);
-        data.fatigue = Math.round(data.fatigue || 0);
-        data.morale = Math.round(data.morale || 50);
-        data.hygiene = Math.round(data.hygiene || 100);
-      }
-
-      return data;
+      if (!response.ok) throw new Error('Failed to fetch player');
+      return response.json();
     },
-    enabled: enabled && !!playerId,
-    refetchInterval: pollInterval,
-    refetchIntervalInBackground: true,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    staleTime: staleTime, // Reduced stale time for more real-time updates
+    refetchInterval: 2000,
+    staleTime: 0,
   });
 
-  // Single inventory query
-  const inventoryQuery = useQuery({
-    queryKey: CacheManager.KEYS.INVENTORY(playerId!),
+  // Fetch inventory data
+  const { data: inventory = [] } = useQuery({
+    queryKey: [`/api/inventory/${playerId}`],
     queryFn: async () => {
-      if (!playerId) return [];
       const response = await fetch(`/api/inventory/${playerId}`);
       if (!response.ok) throw new Error('Failed to fetch inventory');
       return response.json();
     },
-    enabled: enabled && !!playerId,
-    refetchInterval: pollInterval,
-    refetchIntervalInBackground: true,
-    staleTime: staleTime,
+    refetchInterval: 2000,
+    staleTime: 0,
   });
 
-  // Single storage query
-  const storageQuery = useQuery({
-    queryKey: CacheManager.KEYS.STORAGE(playerId!),
+  // Fetch storage data
+  const { data: storage = [] } = useQuery({
+    queryKey: [`/api/storage/${playerId}`],
     queryFn: async () => {
-      if (!playerId) return [];
       const response = await fetch(`/api/storage/${playerId}`);
       if (!response.ok) throw new Error('Failed to fetch storage');
       return response.json();
     },
-    enabled: enabled && !!playerId,
-    refetchInterval: pollInterval,
-    refetchIntervalInBackground: true,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    staleTime: staleTime, // Even faster for storage updates
+    refetchInterval: 2000,
+    staleTime: 0,
+  });
+
+  // Fetch resources data
+  const { data: resources = [] } = useQuery({
+    queryKey: ['/api/resources'],
+    queryFn: async () => {
+      const response = await fetch('/api/resources');
+      if (!response.ok) throw new Error('Failed to fetch resources');
+      return response.json();
+    },
+    staleTime: 300000, // 5 minutes
+  });
+
+  // Fetch equipment data
+  const { data: equipment = [] } = useQuery({
+    queryKey: ['/api/equipment'],
+    queryFn: async () => {
+      const response = await fetch('/api/equipment');
+      if (!response.ok) throw new Error('Failed to fetch equipment');
+      return response.json();
+    },
+    staleTime: 300000, // 5 minutes
+  });
+
+  // Fetch biomes data
+  const { data: biomes = [] } = useQuery({
+    queryKey: ['/api/biomes'],
+    queryFn: async () => {
+      const response = await fetch('/api/biomes');
+      if (!response.ok) throw new Error('Failed to fetch biomes');
+      return response.json();
+    },
+    staleTime: 300000, // 5 minutes
+  });
+
+  // Fetch recipes data
+  const { data: recipes = [] } = useQuery({
+    queryKey: ['/api/recipes'],
+    queryFn: async () => {
+      const response = await fetch('/api/recipes');
+      if (!response.ok) throw new Error('Failed to fetch recipes');
+      return response.json();
+    },
+    staleTime: 300000, // 5 minutes
   });
 
   return {
-    player: playerQuery.data || null,
-    inventory: inventoryQuery.data || [],
-    storage: storageQuery.data || [],
-    isLoading: playerQuery.isLoading || inventoryQuery.isLoading || storageQuery.isLoading,
-    error: playerQuery.error || inventoryQuery.error || storageQuery.error,
-    isConnected: true,
+    player,
+    inventory,
+    storage,
+    resources,
+    equipment,
+    biomes,
+    recipes,
   };
 }
-
-// Backward compatibility
-export { useGameData as useGamePolling };

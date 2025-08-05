@@ -1,29 +1,28 @@
-import * as React from "react"
-import { Button, ButtonProps } from "./button"
+import React from 'react';
+import { Button } from './button';
+import { cn } from '@/lib/utils';
 
-export interface SoundButtonProps extends ButtonProps {
-  soundType?: 'click' | 'success' | 'error' | 'collect' | 'craft'
-  enableSound?: boolean
+interface SoundButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+  children?: React.ReactNode;
 }
 
-const SoundButton = React.forwardRef<HTMLButtonElement, SoundButtonProps>(
-  ({ soundType, enableSound, onClick, ...props }, ref) => {
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      if (onClick) {
-        onClick(event);
-      }
-    };
-
-    return (
-      <Button
-        ref={ref}
-        onClick={handleClick}
-        {...props}
-      />
-    );
-  }
-)
-
-SoundButton.displayName = "SoundButton"
-
-export { SoundButton }
+export function SoundButton({ 
+  className, 
+  variant = 'default',
+  size = 'default',
+  children,
+  ...props 
+}: SoundButtonProps) {
+  return (
+    <Button
+      variant={variant}
+      size={size}
+      className={cn(className)}
+      {...props}
+    >
+      {children}
+    </Button>
+  );
+}
