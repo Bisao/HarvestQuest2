@@ -1,130 +1,135 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Player } from "@shared/types";
 import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
+import { Settings, Sun, Moon, Thermometer, Calendar } from "lucide-react";
 import PlayerSettings from "./player-settings";
-import { useGamePolling } from "@/hooks/useGamePolling";
+import { useGameTime } from "@/hooks/useGameTime";
 
 interface GameHeaderProps {
   player: Player;
 }
 
-const GameHeader = ({ player: initialPlayer }: GameHeaderProps) => {
+const GameHeader = ({ player }: GameHeaderProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  
+  // Usar hook de tempo do jogo
+  const { gameTime, temperature, isLoading, error } = useGameTime(player?.id);
+  
+  // Debug logs removidos para produção
 
-  // Use polling to get real-time updates
-  const { player: polledPlayer } = useGamePolling({
-    playerId: initialPlayer?.id || null,
-    enabled: !!initialPlayer?.id,
-    pollInterval: 1500 // 1.5 seconds for header updates
-  });
+  // Função para formatar hora
+  const formatTime = (hour: number, minute: number) => {
+    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  };
 
-  // Use polled data if available, fallback to initial player data
-  const currentPlayer = polledPlayer || initialPlayer;
+  // Função para formatar data
+  const formatDate = (day: number, month: number, year: number) => {
+    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+  };
 
-  // Ensure we have valid values for calculations
-  const currentHunger = Math.max(0, currentPlayer.hunger || 0);
-  const currentThirst = Math.max(0, currentPlayer.thirst || 0);
-  const maxHunger = currentPlayer.maxHunger || 100;
-  const maxThirst = currentPlayer.maxThirst || 100;
+  // Emoji baseado no período do dia
+  const getTimeEmoji = (timeOfDay: string) => {
+    switch (timeOfDay) {
+      case 'dawn': return '🌅';
+      case 'morning': return '☀️';
+      case 'afternoon': return '🌞';
+      case 'evening': return '🌇';
+      case 'night': return '🌙';
+      case 'midnight': return '🌚';
+      default: return '🕐';
+    }
+  };
 
-  // Calculate values directly to ensure real-time updates
-  const experiencePercentage = Math.min(((currentPlayer.experience % 100) / 100) * 100, 100);
-  const hungerPercentage = Math.min((currentHunger / maxHunger) * 100, 100);
-  const thirstPercentage = Math.min((currentThirst / maxThirst) * 100, 100);
+  // Emoji baseado na estação
+  const getSeasonEmoji = (season: string) => {
+    switch (season) {
+      case 'spring': return '🌸';
+      case 'summer': return '☀️';
+      case 'autumn': return '🍂';
+      case 'winter': return '❄️';
+      default: return '🌍';
+    }
+  };
+
+  // Cor da temperatura
+  const getTemperatureColor = (temp: number) => {
+    if (temp < -10) return 'text-blue-600';
+    if (temp < 5) return 'text-blue-400';
+    if (temp < 15) return 'text-green-600';
+    if (temp < 25) return 'text-yellow-600';
+    if (temp < 35) return 'text-orange-500';
+    return 'text-red-500';
+  };
 
   return (
     <>
-      <header className="bg-white shadow-md border-b-4 border-forest">
-        <div className="container mx-auto px-4 py-3 md:py-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0">
-            <div className="flex items-center space-x-2 md:space-x-3">
-              <span className="text-2xl md:text-3xl">🎮</span>
-              <h1 className="text-lg md:text-2xl font-bold text-gray-800">Coletor Adventures</h1>
-            </div>
-            <div className="flex items-center space-x-3 md:space-x-6 text-xs md:text-sm">
-              <div className="flex flex-col items-center space-y-1">
-                <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
-                  <span className="text-sm md:text-lg">⭐</span>
-                  <span className="font-semibold whitespace-nowrap">Nível {currentPlayer.level}</span>
-                </div>
-                <div className="w-full">
-                  <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div 
-                      className="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${experiencePercentage}%` 
-                      }}
-                    />
+      <header className="bg-white shadow-md border-b-4 border-forest sticky top-0 z-40">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3 md:py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 md:gap-0">
+            {/* Informações de Tempo e Data */}
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 text-xs sm:text-sm">
+                {isLoading && (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-500">Carregando tempo...</span>
                   </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-center space-y-1">
-                <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
-                  <span className="text-sm md:text-lg">🍖</span>
-                  <span className="font-semibold whitespace-nowrap">{currentHunger}/{maxHunger}</span>
-                </div>
-                <div className="w-full">
-                  <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div 
-                      className={`h-1.5 rounded-full transition-all duration-500 ${
-                        hungerPercentage <= 5 ? 'bg-red-600 animate-pulse' :
-                        hungerPercentage <= 20 ? 'bg-red-400' :
-                        hungerPercentage <= 50 ? 'bg-orange-500' :
-                        'bg-green-500'
-                      }`}
-                      style={{ 
-                        width: `${hungerPercentage}%` 
-                      }}
-                    />
+                )}
+                
+                {error && (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-red-500">Erro: {error.message}</span>
                   </div>
-                </div>
+                )}
+                
+                {gameTime && (
+                  <>
+                    {/* Data */}
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="w-5 h-5 text-gray-600" />
+                      <span className="font-semibold text-gray-800 text-base">
+                        {formatDate(gameTime.dayNumber, gameTime.monthNumber, gameTime.yearNumber)}
+                      </span>
+                    </div>
+
+                    {/* Hora */}
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xl">{getTimeEmoji(gameTime.timeOfDay)}</span>
+                      <span className="font-semibold text-gray-800 text-base">
+                        {formatTime(gameTime.hour, gameTime.minute)}
+                      </span>
+                    </div>
+
+                    {/* Estação */}
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xl">{getSeasonEmoji(gameTime.season)}</span>
+                      <span className="font-semibold text-gray-700 capitalize text-base">
+                        {gameTime.season === 'spring' ? 'Primavera' :
+                         gameTime.season === 'summer' ? 'Verão' :
+                         gameTime.season === 'autumn' ? 'Outono' : 'Inverno'}
+                      </span>
+                    </div>
+
+                    {/* Temperatura */}
+                    {temperature && (
+                      <div className="flex items-center space-x-2">
+                        <Thermometer className="w-5 h-5 text-gray-600" />
+                        <span className={`font-semibold text-base ${getTemperatureColor(temperature.current)}`}>
+                          {temperature.current}°C
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-              <div className="flex flex-col items-center space-y-1">
-                <div className="flex items-center space-x-1 md:space-x-2 min-w-0">
-                  <span className="text-sm md:text-lg">💧</span>
-                  <span className="font-semibold whitespace-nowrap">{currentThirst}/{maxThirst}</span>
-                </div>
-                <div className="w-full">
-                  <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div 
-                      className={`h-1.5 rounded-full transition-all duration-500 ${
-                        thirstPercentage <= 5 ? 'bg-red-600 animate-pulse' :
-                        thirstPercentage <= 20 ? 'bg-red-400' :
-                        thirstPercentage <= 50 ? 'bg-blue-400' :
-                        'bg-blue-500'
-                      }`}
-                      style={{ 
-                        width: `${thirstPercentage}%` 
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-1 md:space-x-2">
-                <span className="text-sm md:text-lg">💰</span>
-                <span className="font-semibold">{(currentPlayer.coins || 0).toLocaleString()}</span>
-              </div>
+
+              {/* Botão de Configurações */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setSettingsOpen(true)}
-                className="text-gray-600 hover:text-gray-800 p-1 md:p-2"
+                className="text-gray-600 hover:text-gray-800 p-2"
               >
-                <Settings className="w-3 h-3 md:w-4 md:h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  // This will need to be passed as a prop or use context
-                  if (window.openOfflineConfig) {
-                    window.openOfflineConfig();
-                  }
-                }}
-                className="text-purple-600 hover:text-purple-900"
-              >
-                💤 Atividade Offline
+                <Settings className="w-5 h-5" />
               </Button>
             </div>
           </div>
@@ -132,7 +137,7 @@ const GameHeader = ({ player: initialPlayer }: GameHeaderProps) => {
       </header>
 
       <PlayerSettings 
-        player={currentPlayer}
+        player={player}
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
       />

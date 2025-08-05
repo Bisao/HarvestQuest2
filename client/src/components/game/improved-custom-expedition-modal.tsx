@@ -255,60 +255,14 @@ export function ImprovedCustomExpeditionModal({
   };
 
   const handleStart = async () => {
-    if (selectedResources.length === 0 || !selectedBiome || !player) {
-      alert('Por favor, selecione recursos e certifique-se de que os dados do jogador estão carregados.');
-      return;
-    }
+    if (selectedResources.length === 0) return;
 
     setIsLoading(true);
     try {
-      console.log('🚀 Starting custom expedition with data:', {
-        playerId: player.id,
-        biomeId: selectedBiome.id,
-        selectedResources,
-        duration: duration * 60 * 1000
-      });
-
-      const response = await fetch('/api/expeditions/start-custom', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          playerId: player.id,
-          biomeId: selectedBiome.id,
-          selectedResources: selectedResources.map(sel => ({
-            resourceId: sel.resourceId,
-            targetQuantity: sel.quantity
-          })),
-          duration: duration * 60 * 1000, // Convert minutes to milliseconds
-          selectedEquipment: []
-        }),
-      });
-      
-      const responseText = await response.text();
-      console.log('🔍 Response received:', responseText);
-      
-      if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.error || errorData.message || errorMessage;
-        } catch (parseError) {
-          errorMessage = responseText || errorMessage;
-        }
-        throw new Error(errorMessage);
-      }
-      
-      const data = JSON.parse(responseText);
-      console.log('✅ Expedition started successfully:', data);
-      
-      // Call the parent callback
       await onStartExpedition(selectedResources, duration);
       onClose();
     } catch (error) {
-      console.error('❌ Erro ao iniciar expedição:', error);
-      alert(`Erro ao iniciar expedição: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      console.error('Erro ao iniciar expedição:', error);
     } finally {
       setIsLoading(false);
     }

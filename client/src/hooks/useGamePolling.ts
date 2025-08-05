@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { CacheManager } from '@shared/utils/cache-manager';
 import type { Player, InventoryItem, StorageItem } from '@shared/types/inventory-types';
@@ -7,6 +6,7 @@ interface UseGameDataOptions {
   playerId: string | null;
   enabled?: boolean;
   pollInterval?: number;
+  staleTime?: number;
 }
 
 interface GameData {
@@ -21,7 +21,8 @@ interface GameData {
 export function useGameData({ 
   playerId, 
   enabled = true, 
-  pollInterval = 2000 
+  pollInterval = 2000,
+  staleTime = 0
 }: UseGameDataOptions): GameData {
 
   // Single player query
@@ -31,12 +32,27 @@ export function useGameData({
       if (!playerId) return null;
       const response = await fetch(`/api/player/${playerId}`);
       if (!response.ok) throw new Error('Failed to fetch player data');
-      return response.json();
+      const data = await response.json();
+
+      // Ensure consistent number formatting
+      if (data) {
+        data.health = Math.round(data.health || 0);
+        data.hunger = Math.round(data.hunger || 0);
+        data.thirst = Math.round(data.thirst || 0);
+        data.temperature = Math.round(data.temperature || 20);
+        data.fatigue = Math.round(data.fatigue || 0);
+        data.morale = Math.round(data.morale || 50);
+        data.hygiene = Math.round(data.hygiene || 100);
+      }
+
+      return data;
     },
     enabled: enabled && !!playerId,
     refetchInterval: pollInterval,
     refetchIntervalInBackground: true,
-    staleTime: 1000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: staleTime, // Reduced stale time for more real-time updates
   });
 
   // Single inventory query
@@ -51,7 +67,7 @@ export function useGameData({
     enabled: enabled && !!playerId,
     refetchInterval: pollInterval,
     refetchIntervalInBackground: true,
-    staleTime: 500,
+    staleTime: staleTime,
   });
 
   // Single storage query
@@ -66,7 +82,9 @@ export function useGameData({
     enabled: enabled && !!playerId,
     refetchInterval: pollInterval,
     refetchIntervalInBackground: true,
-    staleTime: 500,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: staleTime, // Even faster for storage updates
   });
 
   return {

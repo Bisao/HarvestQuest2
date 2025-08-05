@@ -107,39 +107,27 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
   // Mutation para iniciar expedição
   const startExpeditionMutation = useMutation({
     mutationFn: async (templateId: string) => {
-      console.log('🚀 Frontend: Starting expedition with templateId:', templateId);
-      
       const response = await fetch('/api/expeditions/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerId: player.id, templateId })
       });
       
-      const responseData = await response.json();
-      console.log('📡 Frontend: API Response:', responseData);
-      
       if (!response.ok) {
-        console.error('❌ Frontend: API Error:', responseData);
-        throw new Error(responseData.message || responseData.error || 'Erro ao iniciar expedição');
+        const error = await response.json();
+        throw new Error(error.error || 'Erro ao iniciar expedição');
       }
       
-      return responseData;
+      return response.json();
     },
     onSuccess: async (data) => {
-      console.log('✅ Frontend: Expedition started successfully:', data);
-      
       toast({
         title: "Expedição Iniciada!",
         description: `${selectedTemplate?.name} começou com sucesso.`,
       });
       
-      // Check for combat encounter (optional, skip if error)
-      try {
-        await checkForEncounter(data.data.id, biome.id);
-      } catch (encounterError) {
-        console.warn('⚠️ Frontend: Combat check failed:', encounterError);
-        // Continue without blocking the success flow
-      }
+      // Check for combat encounter
+      await checkForEncounter(data.data.id, biome.id);
       
       // Invalidar caches relevantes
       queryClient.invalidateQueries({ queryKey: ['/api/expeditions/player', player.id] });
@@ -148,23 +136,16 @@ export function NewExpeditionModal({ isOpen, onClose, player, biome }: NewExpedi
       onClose();
     },
     onError: (error: any) => {
-      console.error('❌ Frontend: Expedition start failed:', error);
-      
       toast({
         title: "Erro ao Iniciar Expedição",
-        description: error.message || error.toString() || "Erro desconhecido",
+        description: error.message || "Erro desconhecido",
         variant: "destructive"
       });
     }
   });
 
   const handleStartExpedition = () => {
-    if (!selectedTemplate) {
-      console.warn('⚠️ Frontend: No template selected');
-      return;
-    }
-    
-    console.log('🎯 Frontend: Starting expedition with template:', selectedTemplate);
+    if (!selectedTemplate) return;
     startExpeditionMutation.mutate(selectedTemplate.id);
   };
 

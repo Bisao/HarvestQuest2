@@ -1,420 +1,263 @@
-// Painel minimizado de expedição no canto inferior esquerdo
-import { useState, useEffect, useRef } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronUp, ChevronDown } from "lucide-react";
-import type { Biome, Resource, Player } from "@shared/types";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
+import { Clock, CheckCircle, X, Minimize2, MapPin, Timer } from 'lucide-react';
+import type { Biome, Resource, Equipment } from '@shared/types';
+import { useQueryClient } from "@tanstack/react-query";
+import { useInventoryUpdates } from '@/hooks/use-inventory-updates';
+import { usePlayer } from '@/hooks/use-player';
 
-export interface ActiveExpedition {
+interface ActiveExpedition {
   id: string;
-  biomeId: string;
-  progress: number;
-  selectedResources: string[];
+  biome: string;
   startTime: number;
-  estimatedDuration: number;
-  collectedResources?: Record<string, number>;
+  endTime: number;
+  status: 'active' | 'completed';
+  selectedResources?: string[];
+  progress?: number;
 }
 
 interface ExpeditionPanelProps {
   expedition: ActiveExpedition;
+  onComplete: () => void;
+  onMinimize: () => void;
   biomes: Biome[];
   resources: Resource[];
-  onExpeditionComplete: (shouldKeepActive?: boolean) => void;
+  equipment: Equipment[];
 }
 
 export default function ExpeditionPanel({
   expedition,
+  onComplete,
+  onMinimize,
   biomes,
   resources,
-  onExpeditionComplete,
+  equipment
 }: ExpeditionPanelProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [currentProgress, setCurrentProgress] = useState(expedition.progress);
-  const [collectedResources, setCollectedResources] = useState<Record<string, number>>({});
-  const [isAutoRepeat, setIsAutoRepeat] = useState(false);
-  const [autoRepeatCountdown, setAutoRepeatCountdown] = useState(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [isMinimized, setIsMinimized] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { player } = usePlayer();
+  const playerId = player?.id
+  const { invalidateInventoryData } = useInventoryUpdates(playerId);
 
-  const biome = biomes.find(b => b.id === expedition.biomeId);
-  const isCompleted = currentProgress >= 100;
+  // Find expedition biome
+  const expeditionBiome = biomes.find(b => b.id === expedition.biome || b.name === expedition.biome);
 
-  // Query player data for real-time hunger/thirst monitoring
-  const { data: player } = useQuery<Player>({
-    queryKey: [`/api/player/${expedition.id.split('-')[0]}`], // Use expedition creator ID
-    refetchInterval: 2000, // Refetch every 2 seconds for real-time monitoring
-  });
+  useEffect(() => {
+    const updateTimer = () => {
+      const now = Date.now();
+      const remaining = Math.max(0, expedition.endTime - now);
+      const total = expedition.endTime - expedition.startTime;
+      const progressPercent = total > 0 ? ((total - remaining) / total) * 100 : 100;
 
-  // Complete expedition mutation  
-  const completeExpeditionMutation = useMutation({
-    mutationFn: async () => {
+      setTimeRemaining(remaining);
+      setProgress(progressPercent);
+
+      if (remaining <= 0 && expedition.status === 'active') {
+        handleExpeditionComplete();
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [expedition]);
+
+  const handleExpeditionComplete = async () => {
+    try {
       const response = await fetch(`/api/expeditions/${expedition.id}/complete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      if (!response.ok) {
-        throw new Error('Failed to complete expedition');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/player/${expedition.id.split('-')[0]}`] });
-      
-      if (isAutoRepeat) {
-        // Auto-repeat mode: restart expedition immediately
-        setTimeout(() => {
-          setCurrentProgress(0);
-          setCollectedResources({});
-          setAutoRepeatCountdown(0);
-          // Update expedition start time for new cycle
-          expedition.startTime = Date.now();
-        }, 500);
-        
+
+      if (response.ok) {
+        const result = await response.json();
         toast({
-          title: "Auto-Repetição",
-          description: "Nova expedição iniciada automaticamente!",
+          title: "🎉 Expedição Concluída!",
+          description: `Você coletou recursos com sucesso!`,
         });
+        onComplete();
       } else {
-        // Normal completion
-        toast({
-          title: "Expedição Concluída",
-          description: "Recursos coletados com sucesso!",
-        });
-        onExpeditionComplete(false);
+        throw new Error('Erro ao completar expedição');
       }
-    },
-    onError: (error: any) => {
+    } catch (error) {
+      console.error('Erro ao completar expedição:', error);
       toast({
-        title: "Erro",
-        description: error.message || "Erro ao finalizar expedição",
+        title: "❌ Erro",
+        description: "Não foi possível completar a expedição.",
         variant: "destructive",
       });
-    },
-  });
-
-  const handleCompleteExpedition = () => {
-    completeExpeditionMutation.mutate();
+    }
   };
 
-  // Progress simulation
-  useEffect(() => {
-    if (currentProgress >= 100) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
-    }
+  const handleCancel = async () => {
+    try {
+      const response = await fetch(`/api/expeditions/${expedition.id}/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    intervalRef.current = setInterval(() => {
-      const elapsed = Date.now() - expedition.startTime;
-      const progressPercent = Math.min((elapsed / expedition.estimatedDuration) * 100, 100);
-      
-      setCurrentProgress(progressPercent);
-      
-      // Simulate resource collection in real-time
-      if (progressPercent > 0) {
-        const newCollected: Record<string, number> = {};
-        expedition.selectedResources.forEach(resourceId => {
-          const baseAmount = Math.floor(Math.random() * 3) + 1; // 1-3 per resource
-          const collectedAmount = Math.floor((progressPercent / 100) * baseAmount);
-          if (collectedAmount > 0) {
-            newCollected[resourceId] = collectedAmount;
-          }
-        });
-        setCollectedResources(newCollected);
-      }
-      
-      if (progressPercent >= 100) {
-        clearInterval(intervalRef.current!);
-        intervalRef.current = null;
-        
-        // Handle auto-repeat - but check if player has sufficient hunger/thirst
-        if (isAutoRepeat) {
-          if (player && (player.hunger <= 0 || player.thirst <= 0)) {
-            // Auto-disable if player status is too low
-            setIsAutoRepeat(false);
-            toast({
-              title: "Auto-Repetição Desativada",
-              description: player.hunger <= 0 
-                ? "Fome muito baixa! Consuma alimentos antes de continuar." 
-                : "Sede muito baixa! Beba água antes de continuar.",
-              variant: "destructive",
-            });
-          } else {
-            setAutoRepeatCountdown(5);
-          }
-        }
-      }
-    }, 1000);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-      }
-    };
-  }, [expedition, currentProgress, isAutoRepeat]);
-
-  // Auto-repeat countdown effect
-  useEffect(() => {
-    if (autoRepeatCountdown > 0 && isAutoRepeat) {
-      countdownRef.current = setInterval(() => {
-        setAutoRepeatCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(countdownRef.current!);
-            countdownRef.current = null;
-            // Trigger completion
-            handleCompleteExpedition();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => {
-        if (countdownRef.current) {
-          clearInterval(countdownRef.current);
-        }
-      };
-    }
-  }, [autoRepeatCountdown, isAutoRepeat]);
-
-  // Monitor player hunger/thirst and disable auto-repeat if they reach 0
-  useEffect(() => {
-    if (player && isAutoRepeat) {
-      if (player.hunger <= 0 || player.thirst <= 0) {
-        setIsAutoRepeat(false);
-        setAutoRepeatCountdown(0);
-        
-        // Clear any active countdown
-        if (countdownRef.current) {
-          clearInterval(countdownRef.current);
-          countdownRef.current = null;
-        }
-        
+      if (response.ok) {
         toast({
-          title: "Auto-Repetição Desativada",
-          description: player.hunger <= 0 
-            ? "Fome muito baixa! Consuma alimentos antes de continuar." 
-            : "Sede muito baixa! Beba água antes de continuar.",
-          variant: "destructive",
+          title: "Expedição Cancelada",
+          description: "A expedição foi cancelada com sucesso.",
         });
+        onComplete();
+      } else {
+        throw new Error('Erro ao cancelar expedição');
       }
+    } catch (error) {
+      console.error('Erro ao cancelar expedição:', error);
+      toast({
+        title: "❌ Erro",
+        description: "Não foi possível cancelar a expedição.",
+        variant: "destructive",
+      });
     }
-  }, [player?.hunger, player?.thirst, isAutoRepeat, toast]);
-
-  // Get resource info for display
-  const getResourceInfo = (resourceId: string) => {
-    return resources.find(r => r.id === resourceId);
   };
 
-  const timeRemaining = Math.max(0, expedition.estimatedDuration - (Date.now() - expedition.startTime));
-  const timeRemainingMinutes = Math.ceil(timeRemaining / 1000 / 60);
+  const formatTime = (ms: number) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
 
-  return (
-    <div className="fixed bottom-4 left-4 bg-white rounded-lg shadow-lg border-2 border-blue-200 z-50 min-w-80">
-      {/* Minimized header */}
-      <div className="p-3 flex items-center justify-between bg-blue-50 rounded-t-lg">
-        <div className="flex items-center space-x-2">
-          <span className="font-medium text-sm">Expedição Ativa</span>
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">
-            {biome?.name}
-          </span>
-          <span className="text-lg">{biome?.emoji}</span>
-          <Button
-            onClick={() => {
-              setIsAutoRepeat(!isAutoRepeat);
-              if (isAutoRepeat) {
-                // If turning off auto-repeat, clear any active countdown
-                setAutoRepeatCountdown(0);
-                if (countdownRef.current) {
-                  clearInterval(countdownRef.current);
-                  countdownRef.current = null;
-                }
-              }
-            }}
-            className={`h-6 px-2 text-xs ${
-              isAutoRepeat 
-                ? 'bg-green-600 hover:bg-green-700 text-white' 
-                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-            }`}
-            size="sm"
-          >
-            🔄 {isAutoRepeat ? 'ON' : 'OFF'}
-          </Button>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="h-6 w-6 p-0"
-        >
-          {isExpanded ? (
-            <ChevronDown className="h-3 w-3" />
-          ) : (
-            <ChevronUp className="h-3 w-3" />
-          )}
-        </Button>
-      </div>
-
-      {/* Progress bar or finalize button when minimized */}
-      {!isExpanded && !isCompleted && (
-        <div className="px-3 pb-2">
-          <div className="flex justify-between text-xs mb-1">
-            <span>Progresso</span>
-            <span>{Math.round(currentProgress)}%</span>
-          </div>
-          <Progress value={currentProgress} className="h-2" />
-        </div>
-      )}
-      
-      {/* Auto-repeat countdown when completed and auto-repeat is on */}
-      {!isExpanded && isCompleted && autoRepeatCountdown > 0 && (
-        <div className="px-3 pb-2">
-          <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-center">
-            <div className="text-xs text-yellow-700 font-medium">
-              Repetindo em {autoRepeatCountdown}s...
+  if (isMinimized) {
+    return (
+      <Card className="w-64 bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
+        <CardContent className="p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <MapPin className="w-4 h-4" />
+              <span className="font-medium text-sm">
+                {expeditionBiome?.name || expedition.biome}
+              </span>
             </div>
             <Button
-              onClick={() => {
-                setIsAutoRepeat(false);
-                setAutoRepeatCountdown(0);
-                if (countdownRef.current) {
-                  clearInterval(countdownRef.current);
-                  countdownRef.current = null;
-                }
-              }}
-              variant="outline"
               size="sm"
-              className="mt-1 h-6 px-2 text-xs"
+              variant="ghost"
+              onClick={() => setIsMinimized(false)}
+              className="text-white hover:bg-white/20"
             >
-              Cancelar
+              <Timer className="w-4 h-4" />
+            </Button>
+          </div>
+          <Progress value={progress} className="mt-2 h-1" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="w-80 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200 shadow-lg">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg font-bold text-blue-800 flex items-center space-x-2">
+            <MapPin className="w-5 h-5" />
+            <span>Expedição Ativa</span>
+          </CardTitle>
+          <div className="flex space-x-1">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setIsMinimized(true)}
+              className="text-gray-500 hover:bg-gray-100"
+            >
+              <Minimize2 className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleCancel}
+              className="text-red-500 hover:bg-red-50"
+            >
+              <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
-      )}
-      
-      {/* Finalize button when completed and minimized */}
-      {!isExpanded && isCompleted && !autoRepeatCountdown && (
-        <div className="px-3 pb-2">
-          <Button
-            onClick={handleCompleteExpedition}
-            disabled={completeExpeditionMutation.isPending}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
-            size="sm"
-          >
-            {completeExpeditionMutation.isPending ? "Finalizando..." : "🎯 Finalizar Expedição"}
-          </Button>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Biome Info */}
+        <div className="bg-white rounded-lg p-3 border">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">
+                {expeditionBiome?.name || expedition.biome}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {expeditionBiome?.description || 'Explorando...'}
+              </p>
+            </div>
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              {expedition.status === 'active' ? 'Em Andamento' : 'Concluída'}
+            </Badge>
+          </div>
         </div>
-      )}
 
-      {/* Expanded content */}
-      {isExpanded && (
-        <div className="border-t border-gray-200 p-3 space-y-3">
-          {!isCompleted ? (
-            <>
-              {/* Time remaining */}
-              <div className="text-xs text-gray-600">
-                Tempo restante: {timeRemainingMinutes} min
-              </div>
+        {/* Progress */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700">Progresso</span>
+            <span className="text-sm text-gray-600">{Math.round(progress)}%</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
 
-              {/* Resources being collected */}
-              <div>
-                <h5 className="text-xs font-medium mb-2">Coletando:</h5>
-                <ScrollArea className="max-h-32">
-                  <div className="space-y-1">
-                    {expedition.selectedResources.map(resourceId => {
-                      const resource = getResourceInfo(resourceId);
-                      const collected = collectedResources[resourceId] || 0;
-                      return (
-                        <div key={resourceId} className="flex items-center justify-between text-xs">
-                          <div className="flex items-center space-x-1">
-                            <span>{resource?.emoji}</span>
-                            <span>{resource?.name}</span>
-                          </div>
-                          <span className="text-blue-600 font-medium">
-                            {collected > 0 ? `+${collected}` : "..."}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </ScrollArea>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Expedition completed */}
-              <div className="text-center">
-                <p className="text-sm font-medium text-green-600 mb-2">
-                  ✅ Expedição Concluída!
-                </p>
-                
-                {/* Final results */}
-                <div className="bg-green-50 rounded-lg p-2 mb-3">
-                  <h5 className="text-xs font-medium mb-1">Recursos Coletados:</h5>
-                  <div className="space-y-1">
-                    {Object.entries(collectedResources).map(([resourceId, amount]) => {
-                      const resource = getResourceInfo(resourceId);
-                      return (
-                        <div key={resourceId} className="flex items-center justify-between text-xs">
-                          <div className="flex items-center space-x-1">
-                            <span>{resource?.emoji}</span>
-                            <span>{resource?.name}</span>
-                          </div>
-                          <span className="text-green-600 font-medium">+{amount}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+        {/* Time Remaining */}
+        <div className="flex items-center justify-between bg-white rounded-lg p-3 border">
+          <div className="flex items-center space-x-2">
+            <Clock className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-medium text-gray-700">Tempo Restante</span>
+          </div>
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            {timeRemaining > 0 ? formatTime(timeRemaining) : 'Concluído!'}
+          </Badge>
+        </div>
 
-                {autoRepeatCountdown > 0 ? (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-center mb-2">
-                    <div className="text-sm text-yellow-700 font-medium mb-2">
-                      Repetindo em {autoRepeatCountdown}s...
-                    </div>
-                    <Button
-                      onClick={() => {
-                        setIsAutoRepeat(false);
-                        setAutoRepeatCountdown(0);
-                        if (countdownRef.current) {
-                          clearInterval(countdownRef.current);
-                          countdownRef.current = null;
-                        }
-                      }}
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                    >
-                      Cancelar Auto-Repetição
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={handleCompleteExpedition}
-                    disabled={completeExpeditionMutation.isPending}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white"
-                    size="sm"
+        {/* Selected Resources */}
+        {expedition.selectedResources && expedition.selectedResources.length > 0 && (
+          <div className="space-y-2">
+            <span className="text-sm font-medium text-gray-700">Recursos Alvo</span>
+            <div className="flex flex-wrap gap-1">
+              {expedition.selectedResources.map((resourceId) => {
+                const resource = resources.find(r => r.id === resourceId);
+                return (
+                  <Badge
+                    key={resourceId}
+                    variant="secondary"
+                    className="text-xs bg-green-50 text-green-700 border-green-200"
                   >
-                    {completeExpeditionMutation.isPending ? "Finalizando..." : "Finalizar Expedição"}
-                  </Button>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      )}
-    </div>
+                    {resource?.emoji} {resource?.name || resourceId}
+                  </Badge>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Action Button */}
+        {timeRemaining <= 0 && expedition.status === 'active' && (
+          <Button
+            onClick={handleExpeditionComplete}
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
+          >
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Coletar Recompensas
+          </Button>
+        )}
+      </CardContent>
+    </Card>
   );
 }

@@ -23,9 +23,6 @@ import {
   Sun,
   CheckCircle
 } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
 import type { Biome, Resource, Equipment, Player } from '@shared/types';
 import { NewExpeditionModal } from './new-expedition-modal';
 import { ImprovedCustomExpeditionModal } from './improved-custom-expedition-modal';
@@ -76,42 +73,6 @@ export default function EnhancedBiomesTab({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Create expedition mutation
-  const startExpedition = useMutation({
-    mutationFn: async (expeditionData: { biomeId: string; selectedResources: string[]; duration: number }) => {
-      return apiRequest('/api/expeditions/custom/start', {
-        method: 'POST',
-        body: JSON.stringify({
-          playerId: player.id,
-          biomeId: expeditionData.biomeId,
-          selectedResources: expeditionData.selectedResources,
-          duration: expeditionData.duration,
-          selectedEquipment: []
-        })
-      });
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Expedição Iniciada!",
-        description: `Expedição ${data.data.id} iniciada com sucesso.`,
-      });
-      // Invalidate relevant queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/expeditions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/player'] });
-    },
-    onError: (error: any) => {
-      console.error('Erro ao iniciar expedição:', error);
-      toast({
-        title: "Erro ao Iniciar Expedição",
-        description: error.message || "Ocorreu um erro inesperado.",
-        variant: "destructive"
-      });
-    }
-  });
 
   // Sistema robusto de categorização de recursos
   const categorizeResource = (resource: Resource): string => {
