@@ -1,6 +1,6 @@
 // Modern unified item system - combines resources, equipment, and consumables
 import type { Resource, Equipment } from "@shared/types";
-import { RESOURCE_IDS, EQUIPMENT_IDS } from "@shared/constants/game-ids";
+import { RESOURCE_IDS, EQUIPMENT_IDS, RECIPE_IDS, BIOME_IDS } from "@shared/constants/game-ids";
 
 // Helper function to create timestamp
 const now = () => new Date().toISOString();

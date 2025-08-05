@@ -17,14 +17,13 @@ import {
 import { usernameParamSchema, playerIdParamSchema, idParamSchema } from "../middleware/validation";
 import type { IStorage } from "../storage";
 import { GameService } from "../services/game-service";
-import { ExpeditionService } from "../services/expedition-service";
+// ExpeditionService removido - usando novo sistema
 import { RESOURCE_IDS, EQUIPMENT_IDS, BIOME_IDS, RECIPE_IDS } from "@shared/constants/game-ids";
 
 export function registerEnhancedGameRoutes(
   app: Express, 
   storage: IStorage,
-  gameService: GameService,
-  expeditionService: ExpeditionService
+  gameService: GameService
 ) {
 
   // Enhanced player routes with validation and caching

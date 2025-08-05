@@ -133,7 +133,7 @@ export function createModernRecipeData(): InsertRecipe[] {
 
     // ARMAS
     {
-      id: "rec-arco-flecha-001",
+      id: RECIPE_IDS.ARCO_FLECHA,
       name: "Arco e Flecha",
       emoji: "🏹",
       category: "weapons",
@@ -154,7 +154,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-lanca-001", 
+      id: RECIPE_IDS.LANCA, 
       name: "Lança",
       emoji: "🗡️",
       category: "weapons",
@@ -176,7 +176,7 @@ export function createModernRecipeData(): InsertRecipe[] {
 
     // CONTAINERS/UTENSILS
     {
-      id: "rec-balde-madeira-001",
+      id: RECIPE_IDS.BALDE_MADEIRA,
       name: "Balde de Madeira",
       emoji: "🪣",
       category: "containers",
@@ -196,7 +196,7 @@ export function createModernRecipeData(): InsertRecipe[] {
     },
 
     {
-      id: "rec-garrafa-bambu-001",
+      id: RECIPE_IDS.GARRAFA_BAMBU,
       name: "Garrafa de Bambu",
       emoji: "🧴",
       category: "containers",

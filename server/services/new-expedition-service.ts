@@ -436,97 +436,71 @@ export class NewExpeditionService {
   }
 
   async updateExpeditionProgress(expeditionId: string): Promise<ActiveExpedition | null> {
-    try {
-      const expedition = await this.storage.getExpedition(expeditionId);
-      if (!expedition || expedition.status !== 'in_progress') {
-        console.log(`📈 EXPEDITION-PROGRESS: Expedition ${expeditionId} not found or not in progress`);
-        return null;
-      }
+    const expedition = await this.storage.getExpedition(expeditionId);
+    if (!expedition || expedition.status !== 'in_progress') return null;
 
-      const currentTime = Date.now();
-      // Fix: startTime is stored in seconds, but we need milliseconds for calculation
-      let startTimeMs: number;
-      if (expedition.startTime) {
-        // If startTime looks like it's in seconds (reasonable timestamp), convert to ms
-        startTimeMs = expedition.startTime < 2000000000 ? expedition.startTime * 1000 : expedition.startTime;
-      } else {
-        startTimeMs = currentTime; // Fallback to current time
-      }
-
-      // Use expedition's duration if available, otherwise default to 30 minutes
-      const expeditionDuration = expedition.duration || (30 * 60 * 1000);
-      const elapsed = currentTime - startTimeMs;
-      const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
-
-      console.log(`📈 EXPEDITION-PROGRESS: ${expeditionId} - elapsed: ${elapsed}ms, duration: ${expeditionDuration}ms, progress: ${Math.round(progress)}%`);
-
-      // Gradually collect resources as expedition progresses
-      let collectedResources = expedition.collectedResources || {};
-
-      if (progress > 50 && Object.keys(collectedResources).length === 0) {
-        // Start collecting basic resources at 50% progress based on selected resources
-        if (expedition.selectedResources && expedition.selectedResources.length > 0) {
-          // For custom expeditions, collect some of the selected resources
-          for (const resourceId of expedition.selectedResources.slice(0, 3)) {
-            const quantity = Math.floor(Math.random() * 3) + 1; // 1-3 random quantity
-            collectedResources[resourceId] = quantity;
-          }
-        } else {
-          // Fallback to template-based rewards
-          const templates = this.getTemplatesForBiome(expedition.biomeId);
-          const template = templates.length > 0 ? templates[0] : this.getTemplateById('gathering-basic');
-          if (template) {
-            const rewards = this.calculateRewards(template);
-            collectedResources = rewards;
-          }
-        }
-        console.log(`📦 EXPEDITION-PROGRESS: Resources collected at ${Math.round(progress)}%:`, collectedResources);
-      }
-
-      // Verificar por encontros de combate durante a expedição (apenas uma vez entre 25% e 75%)
-      if (progress >= 25 && progress < 75 && !expedition.combatEncounterChecked) {
-        try {
-          const encounterId = await this.checkForCombatEncounter(expeditionId, expedition.playerId, expedition.biomeId);
-          if (encounterId) {
-            console.log(`⚔️ EXPEDITION-ENCOUNTER: Combat encounter ${encounterId} triggered at ${Math.round(progress)}% progress`);
-            // Mark that we've checked for combat to avoid repeated checks
-            await this.storage.updateExpedition(expeditionId, { 
-              combatEncounterChecked: true 
-            });
-          }
-        } catch (encounterError) {
-          console.warn(`⚠️ EXPEDITION-PROGRESS: Combat encounter check failed:`, encounterError);
-        }
-      }
-
-      // Se completou, processar recompensas
-      if (progress >= 100) {
-        return await this.completeExpedition(expeditionId);
-      }
-
-      // Atualizar progresso e recursos coletados
-      await this.storage.updateExpedition(expeditionId, { 
-        progress,
-        collectedResources
-      });
-
-      return {
-        id: expedition.id,
-        playerId: expedition.playerId,
-        planId: expedition.biomeId,
-        startTime: startTimeMs,
-        estimatedEndTime: startTimeMs + expeditionDuration,
-        currentPhase: this.getPhaseFromProgress(progress),
-        progress,
-        completedTargets: [],
-        collectedResources,
-        events: [],
-        status: 'active'
-      };
-    } catch (error) {
-      console.error(`❌ EXPEDITION-PROGRESS: Error updating progress for ${expeditionId}:`, error);
-      return null;
+    const currentTime = Date.now();
+    // Fix: startTime is stored in seconds, but we need milliseconds for calculation
+    let startTimeMs: number;
+    if (expedition.startTime) {
+      // If startTime looks like it's in seconds (reasonable timestamp), convert to ms
+      startTimeMs = expedition.startTime < 2000000000 ? expedition.startTime * 1000 : expedition.startTime;
+    } else {
+      startTimeMs = currentTime; // Fallback to current time
     }
+
+    const elapsed = currentTime - startTimeMs;
+    const expeditionDuration = expedition.duration || (30 * 60 * 1000); // Use expedition.duration or default
+    const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
+
+    console.log(`📈 EXPEDITION-PROGRESS: ${expeditionId} - elapsed: ${elapsed}ms, progress: ${Math.round(progress)}%`);
+
+    // Gradually collect resources as expedition progresses
+    let collectedResources = expedition.collectedResources || {};
+
+    if (progress > 50 && Object.keys(collectedResources).length === 0) {
+      // Start collecting resources at 50% progress
+      const templates = this.getTemplatesForBiome(expedition.biomeId);
+      const template = templates.length > 0 ? templates[0] : this.getTemplateById('gathering-basic');
+      if (template) {
+        const rewards = this.calculateRewards(template);
+        collectedResources = rewards;
+        console.log(`📦 EXPEDITION-PROGRESS: Resources collected at ${Math.round(progress)}%:`, rewards);
+      }
+    }
+
+    // Verificar por encontros de combate durante a expedição
+    if (progress >= 25 && progress < 75) {
+      const encounterId = await this.checkForCombatEncounter(expeditionId, expedition.playerId, expedition.biomeId);
+      if (encounterId) {
+        console.log(`⚔️ EXPEDITION-ENCOUNTER: Combat encounter ${encounterId} triggered at ${Math.round(progress)}% progress`);
+      }
+    }
+
+    // Se completou, processar recompensas
+    if (progress >= 100) {
+      return await this.completeExpedition(expeditionId);
+    }
+
+    // Atualizar progresso e recursos coletados
+    await this.storage.updateExpedition(expeditionId, { 
+      progress,
+      collectedResources
+    });
+
+    return {
+      id: expedition.id,
+      playerId: expedition.playerId,
+      planId: expedition.biomeId,
+      startTime: startTimeMs,
+      estimatedEndTime: startTimeMs + expeditionDuration,
+      currentPhase: this.getPhaseFromProgress(progress),
+      progress,
+      completedTargets: [],
+      collectedResources,
+      events: [],
+      status: 'active'
+    };
   }
 
   private getPhaseFromProgress(progress: number): ActiveExpedition['currentPhase'] {
@@ -597,19 +571,8 @@ export class NewExpeditionService {
 
     // Se não há recursos coletados ou estão vazios, calcular novas recompensas
     if (!rewards || Object.keys(rewards).length === 0) {
-      if (expedition.selectedResources && expedition.selectedResources.length > 0) {
-        // For custom expeditions, give some of the selected resources
-        rewards = {};
-        for (const resourceId of expedition.selectedResources) {
-          const quantity = Math.floor(Math.random() * 5) + 1; // 1-5 random quantity
-          rewards[resourceId] = quantity;
-        }
-        console.log(`🎲 EXPEDITION-COMPLETE: Calculated custom expedition rewards:`, rewards);
-      } else {
-        // Template-based rewards
-        rewards = this.calculateRewards(activeTemplate);
-        console.log(`🎲 EXPEDITION-COMPLETE: Calculated template rewards:`, rewards);
-      }
+      rewards = this.calculateRewards(activeTemplate);
+      console.log(`🎲 EXPEDITION-COMPLETE: Calculated new rewards since none existed:`, rewards);
     } else {
       console.log(`📦 EXPEDITION-COMPLETE: Using existing collected resources:`, rewards);
     }
@@ -619,8 +582,8 @@ export class NewExpeditionService {
       console.log(`⚠️ EXPEDITION-COMPLETE: No valid rewards to apply, creating basic rewards`);
       // Garantir que pelo menos alguns recursos básicos sejam dados
       rewards = {
-        'res-f1b2c3d4-e5f6-7890-abcd-ef1234567890': 2, // Fibra
-        'res-a2b3c4d5-e6f7-8901-bcde-f23456789012': 1  // Pedra
+        'res-fibra-001': 2, // Fibra
+        'res-pedra-001': 1  // Pedra
       };
     }
 
@@ -646,7 +609,7 @@ export class NewExpeditionService {
     console.log(`🎁 FINAL REWARDS: ${JSON.stringify(rewards)}`);
 
     const startTime = expedition.startTime ?? Date.now();
-    const expeditionDuration = (30 * 60 * 1000); // Default expedition duration: 30 minutes
+    const expeditionDuration = expedition.duration || (30 * 60 * 1000); // Use expedition.duration or default
 
     return {
       id: expedition.id,
@@ -693,10 +656,7 @@ export class NewExpeditionService {
 
   private async applyRewards(playerId: string, rewards: Record<string, number>, experience: number): Promise<void> {
     const player = await this.storage.getPlayer(playerId);
-    if (!player) {
-      console.error(`❌ EXPEDITION-REWARDS: Player ${playerId} not found`);
-      return;
-    }
+    if (!player) return;
 
     console.log(`💰 EXPEDITION-REWARDS: Applying rewards to player ${playerId}:`, rewards);
 
@@ -706,32 +666,12 @@ export class NewExpeditionService {
       return;
     }
 
-    // Validate that all reward resources exist in the database
-    const allResources = await this.storage.getAllResources();
-    const validRewards: Record<string, number> = {};
-
-    for (const [resourceId, quantity] of Object.entries(rewards)) {
-      const resource = allResources.find(r => r.id === resourceId);
-      if (resource && quantity > 0) {
-        validRewards[resourceId] = quantity;
-      } else {
-        console.warn(`⚠️ EXPEDITION-REWARDS: Invalid resource ${resourceId} or quantity ${quantity}, skipping`);
-      }
-    }
-
-    if (Object.keys(validRewards).length === 0) {
-      console.log(`⚠️ EXPEDITION-REWARDS: No valid resources to apply after validation`);
-      return;
-    }
-
-    console.log(`✅ EXPEDITION-REWARDS: Valid rewards to apply:`, validRewards);
-
     // Import GameService to use addResourceToPlayer method
     const { GameService } = await import('./game-service');
     const gameService = new GameService(this.storage);
 
     // Adicionar recursos ao inventário (tenta inventário primeiro, depois storage)
-    for (const [resourceId, quantity] of Object.entries(validRewards)) {
+    for (const [resourceId, quantity] of Object.entries(rewards)) {
       if (quantity <= 0) {
         console.log(`⚠️ EXPEDITION-REWARD: Skipping ${resourceId} with quantity ${quantity}`);
         continue;
@@ -801,58 +741,51 @@ export class NewExpeditionService {
   // ===================== CONSULTAS =====================
 
   async getPlayerActiveExpeditions(playerId: string): Promise<ActiveExpedition[]> {
-    try {
-      const expeditions = await this.storage.getPlayerExpeditions(playerId);
-      console.log(`🔍 EXPEDITION-SERVICE: Found ${expeditions.length} total expeditions for player ${playerId}`);
+    const expeditions = await this.storage.getPlayerExpeditions(playerId);
+    console.log(`🔍 EXPEDITION-SERVICE: Found ${expeditions.length} total expeditions for player ${playerId}`);
 
-      const activeExpeditions = expeditions
-        .filter(exp => exp.status === 'in_progress')
-        .map(exp => {
-          const currentTime = Date.now();
-          // Fix: Handle startTime conversion properly
-          let startTimeMs: number;
-          if (exp.startTime) {
-            // If startTime looks like it's in seconds (reasonable timestamp), convert to ms
-            startTimeMs = exp.startTime < 2000000000 ? exp.startTime * 1000 : exp.startTime;
-          } else {
-            startTimeMs = currentTime; // Fallback to current time
-          }
+    const activeExpeditions = expeditions
+      .filter(exp => exp.status === 'in_progress')
+      .map(exp => {
+        const currentTime = Date.now();
+        // Fix: Handle startTime conversion properly
+        let startTimeMs: number;
+        if (exp.startTime) {
+          // If startTime looks like it's in seconds (reasonable timestamp), convert to ms
+          startTimeMs = exp.startTime < 2000000000 ? exp.startTime * 1000 : exp.startTime;
+        } else {
+          startTimeMs = currentTime; // Fallback to current time
+        }
 
-          // Use the expedition's duration if available, otherwise use default
-          const expeditionDuration = exp.duration || (30 * 60 * 1000); // Default: 30 minutes
-          const elapsed = currentTime - startTimeMs;
-          const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
+        const expeditionDuration = exp.duration || (5 * 60 * 1000); // Use expedition.duration or default to 5 minutes
+        const elapsed = currentTime - startTimeMs;
+        const progress = Math.min(100, Math.max(0, (elapsed / expeditionDuration) * 100));
 
-          console.log(`🎯 EXPEDITION-SERVICE: Processing expedition ${exp.id}:`, {
-            originalStartTime: exp.startTime,
-            startTimeMs,
-            elapsed,
-            duration: expeditionDuration,
-            progress: Math.round(progress),
-            collectedResources: exp.collectedResources
-          });
-
-          return {
-            id: exp.id,
-            playerId: exp.playerId,
-            planId: exp.biomeId,
-            startTime: startTimeMs,
-            estimatedEndTime: startTimeMs + expeditionDuration,
-            currentPhase: this.getPhaseFromProgress(progress),
-            progress: progress,
-            completedTargets: [],
-            collectedResources: exp.collectedResources || {},
-            events: [],
-            status: 'active' as const
-          };
+        console.log(`🎯 EXPEDITION-SERVICE: Processing expedition ${exp.id}:`, {
+          originalStartTime: exp.startTime,
+          startTimeMs,
+          elapsed,
+          progress: Math.round(progress),
+          collectedResources: exp.collectedResources
         });
 
-      console.log(`✅ EXPEDITION-SERVICE: Returning ${activeExpeditions.length} active expeditions`);
-      return activeExpeditions;
-    } catch (error) {
-      console.error(`❌ EXPEDITION-SERVICE: Error getting active expeditions for player ${playerId}:`, error);
-      return [];
-    }
+        return {
+          id: exp.id,
+          playerId: exp.playerId,
+          planId: exp.biomeId,
+          startTime: startTimeMs,
+          estimatedEndTime: startTimeMs + expeditionDuration,
+          currentPhase: this.getPhaseFromProgress(progress),
+          progress: progress,
+          completedTargets: [],
+          collectedResources: exp.collectedResources || {},
+          events: [],
+          status: 'active' as const
+        };
+      });
+
+    console.log(`✅ EXPEDITION-SERVICE: Returning ${activeExpeditions.length} active expeditions`);
+    return activeExpeditions;
   }
 
   async getExpeditionHistory(playerId: string): Promise<ActiveExpedition[]> {
@@ -861,7 +794,7 @@ export class NewExpeditionService {
       .filter(exp => exp.status === 'completed')
       .map(exp => {
         const startTime = exp.startTime ?? Date.now();
-        const expeditionDuration = (5 * 60 * 1000); // Default expedition duration: 5 minutes
+        const expeditionDuration = exp.duration || (5 * 60 * 1000); // Use expedition.duration or default to 5 minutes
         return {
           id: exp.id,
           playerId: exp.playerId,
@@ -887,7 +820,7 @@ export class NewExpeditionService {
       const encounter = await this.combatService.tryGenerateEncounter(expeditionId, playerId, biomeId);
       
       if (encounter) {
-        console.log(`⚔️ EXPEDITION-COMBAT: Generated encounter ${encounter.id} with ${encounter.animalId}`);
+        console.log(`⚔️ EXPEDITION-COMBAT: Generated encounter ${encounter.id} with ${encounter.animal.commonName}`);
         return encounter.id;
       }
       

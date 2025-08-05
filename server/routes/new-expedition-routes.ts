@@ -6,8 +6,8 @@ import { validateParams, validateBody } from '../middleware/validation';
 import { successResponse, errorResponse } from '../utils/response-helpers';
 import { migrateLegacyCreatureId } from '../../shared/constants/creature-ids';
 
-// Schemas de validação  
-const startExpeditionTemplateSchema = z.object({
+// Schemas de validação
+const startExpeditionSchema = z.object({
   playerId: z.string().min(1, "Player ID é obrigatório"),
   templateId: z.string().min(1, "Template ID é obrigatório")
 });
@@ -70,7 +70,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
 
   // Validar se jogador pode iniciar expedição
   router.post('/validate', 
-    validateBody(startExpeditionTemplateSchema),
+    validateBody(startExpeditionSchema),
     async (req: Request, res: Response) => {
       try {
         const { playerId, templateId } = req.body;
@@ -100,48 +100,19 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
     selectedEquipment: z.array(z.string()).optional().default([])
   });
 
-  // Iniciar expedição customizada - rota corrigida
-  router.post('/start-custom',
+  // Iniciar expedição customizada
+  router.post('/custom/start',
     validateBody(customExpeditionSchema),
     async (req: Request, res: Response) => {
       try {
         const { playerId, biomeId, selectedResources, duration, selectedEquipment } = req.body;
         console.log(`🚀 CUSTOM-EXPEDITION-START: Starting for player ${playerId}, biome ${biomeId}`);
-        console.log(`📋 CUSTOM-EXPEDITION-START: Request data:`, { 
-          playerId, 
-          biomeId, 
-          selectedResourcesCount: selectedResources?.length,
-          duration,
-          selectedEquipmentCount: selectedEquipment?.length
-        });
-
-        // Validar se playerId está presente
-        if (!playerId) {
-          console.error(`❌ CUSTOM-EXPEDITION-START: Missing playerId`);
-          return errorResponse(res, 400, 'Player ID é obrigatório');
-        }
-
-        // Validar se selectedResources está presente e é um array válido
-        if (!selectedResources || !Array.isArray(selectedResources) || selectedResources.length === 0) {
-          console.error(`❌ CUSTOM-EXPEDITION-START: Invalid selectedResources:`, selectedResources);
-          return errorResponse(res, 400, 'Recursos selecionados são obrigatórios');
-        }
 
         // Get player using ID directly 
         const player = await storage.getPlayer(playerId);
         if (!player) {
           console.error(`❌ CUSTOM-EXPEDITION-START: Player not found: ${playerId}`);
           return errorResponse(res, 404, 'Jogador não encontrado');
-        }
-
-        console.log(`✅ CUSTOM-EXPEDITION-START: Player found: ${player.username} (Level ${player.level})`);
-        console.log(`📊 CUSTOM-EXPEDITION-START: Player status - Hunger: ${player.hunger}%, Thirst: ${player.thirst}%, Health: ${player.health}%`);
-
-        // Verificar se já tem expedição ativa
-        const activeExpeditions = await storage.getPlayerExpeditions(playerId);
-        const hasActive = activeExpeditions.some(exp => exp.status === 'in_progress');
-        if (hasActive) {
-          return errorResponse(res, 400, 'Você já tem uma expedição ativa');
         }
 
         // Validate biome exists
@@ -196,30 +167,11 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
           collectedResources: {}
         };
 
-        console.log(`🔧 CUSTOM-EXPEDITION: Creating expedition with data:`, expeditionData);
-
         const expedition = await storage.createExpedition(expeditionData);
-
-        if (!expedition || !expedition.id) {
-          console.error(`❌ CUSTOM-EXPEDITION: Failed to create expedition`);
-          return errorResponse(res, 500, 'Falha ao criar expedição');
-        }
 
         console.log(`✅ CUSTOM-EXPEDITION: Started expedition ${expedition.id} for player ${player.username}`);
 
-        // Return expedition data in the expected format
-        const responseData = {
-          id: expedition.id,
-          playerId: expedition.playerId,
-          biomeId: expedition.biomeId,
-          startTime: expedition.startTime,
-          duration: expedition.duration,
-          status: expedition.status,
-          progress: expedition.progress || 0,
-          collectedResources: expedition.collectedResources || {}
-        };
-
-        return successResponse(res, responseData, 'Expedição customizada iniciada com sucesso');
+        return successResponse(res, expedition, 'Expedição customizada iniciada com sucesso');
       } catch (error: any) {
         console.error('❌ CUSTOM-EXPEDITION-START: Error:', error.message);
         console.error('❌ CUSTOM-EXPEDITION-START: Stack:', error.stack);
@@ -230,7 +182,7 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
 
   // Iniciar nova expedição
   router.post('/start',
-    validateBody(startExpeditionTemplateSchema),
+    validateBody(startExpeditionSchema),
     async (req: Request, res: Response) => {
       try {
         const { playerId, templateId } = req.body;
@@ -464,52 +416,6 @@ export function createNewExpeditionRoutes(storage: IStorage): Router {
       res.status(500).json({ 
         success: false, 
         message: error instanceof Error ? error.message : 'Failed to complete expedition' 
-      });
-    }
-  });
-
-  // Debug route to check expedition status
-  router.get('/debug/:expeditionId', async (req, res) => {
-    try {
-      const { expeditionId } = req.params;
-      
-      const expedition = await storage.getExpedition(expeditionId);
-      
-      if (!expedition) {
-        return res.status(404).json({
-          success: false,
-          message: 'Expedition not found'
-        });
-      }
-
-      const currentTime = Date.now();
-      const startTimeMs = expedition.startTime < 2000000000 ? expedition.startTime * 1000 : expedition.startTime;
-      const duration = expedition.duration || (30 * 60 * 1000);
-      const elapsed = currentTime - startTimeMs;
-      const progress = Math.min(100, Math.max(0, (elapsed / duration) * 100));
-
-      res.json({
-        success: true,
-        data: {
-          expedition,
-          debug: {
-            currentTime,
-            startTimeMs,
-            duration,
-            elapsed,
-            progress: Math.round(progress),
-            isComplete: progress >= 100,
-            timeUntilComplete: duration - elapsed,
-            combatChecked: expedition.combatEncounterChecked || false
-          }
-        }
-      });
-
-    } catch (error) {
-      console.error('❌ ROUTE: Debug expedition error:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: error instanceof Error ? error.message : 'Failed to debug expedition' 
       });
     }
   });

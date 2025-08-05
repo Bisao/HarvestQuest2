@@ -84,6 +84,9 @@ export interface IStorage {
   createPlayerQuest(playerQuest: InsertPlayerQuest): Promise<PlayerQuest>;
   updatePlayerQuest(id: string, updates: Partial<PlayerQuest>): Promise<PlayerQuest>;
 
+  // Resource management methods
+  addPlayerResource(playerId: string, resourceId: string, quantity: number): Promise<void>;
+
   // Game initialization
   initializeGameData(): Promise<void>;
 
@@ -325,10 +328,6 @@ export class MemStorage implements IStorage {
       username: insertPlayer.username.trim(),
       level: insertPlayer.level ?? 1,
       experience: insertPlayer.experience ?? 0,
-      hunger: insertPlayer.hunger ?? 100,
-      maxHunger: insertPlayer.maxHunger ?? 100,
-      thirst: insertPlayer.thirst ?? 100,
-      maxThirst: insertPlayer.maxThirst ?? 100,
       coins: insertPlayer.coins ?? 0,
       inventoryWeight: insertPlayer.inventoryWeight ?? 0,
       maxInventoryWeight: insertPlayer.maxInventoryWeight ?? 50000,
@@ -344,9 +343,30 @@ export class MemStorage implements IStorage {
       equippedBoots: insertPlayer.equippedBoots || null,
       equippedWeapon: insertPlayer.equippedWeapon || null,
       equippedTool: insertPlayer.equippedTool || null,
-      equippedFood: null,
-      equippedDrink: null,
       autoCompleteQuests: insertPlayer.autoCompleteQuests ?? true,
+
+      // Enhanced Status System - Initialize with default values
+      health: insertPlayer.health ?? 100,
+      maxHealth: 100,
+      hunger: insertPlayer.hunger ?? 100,
+      maxHunger: 100,
+      thirst: insertPlayer.thirst ?? 100,
+      maxThirst: 100,
+      temperature: 0,
+      fatigue: 0,
+      morale: 50,
+      hygiene: 100,
+
+      // Disease System
+      diseases: [],
+      immunities: [],
+      resistances: {},
+
+      // Skill System
+      skills: {},
+      skillPoints: 0,
+      totalSkillPoints: 0,
+      skillAchievements: [],
     };
 
     this.players.set(id, player);
@@ -588,19 +608,19 @@ export class MemStorage implements IStorage {
     return this.expeditions.get(id);
   }
 
-  async createExpedition(insertExpedition: InsertExpedition): Promise<Expedition> {
+  async createExpedition(expeditionData: InsertExpedition): Promise<Expedition> {
     const id = randomUUID();
     const expedition: Expedition = {
       id,
-      playerId: insertExpedition.playerId,
-      biomeId: insertExpedition.biomeId,
+      playerId: expeditionData.playerId,
+      biomeId: expeditionData.biomeId,
+      selectedResources: expeditionData.selectedResources,
+      selectedEquipment: expeditionData.selectedEquipment,
       status: "in_progress",
-      selectedResources: insertExpedition.selectedResources,
-      selectedEquipment: insertExpedition.selectedEquipment,
-      collectedResources: {},
       startTime: Date.now(),
-      endTime: null,
       progress: 0,
+      collectedResources: {},
+      duration: expeditionData.duration
     };
 
     console.log('Storing expedition with ID:', id);
@@ -755,6 +775,29 @@ export class MemStorage implements IStorage {
     this.playerQuests.set(id, updated);
     await this.saveData();
     return updated;
+  }
+
+  // Resource management methods
+  async addPlayerResource(playerId: string, resourceId: string, quantity: number): Promise<void> {
+    // First check if player has existing storage item
+    const existingItems = Array.from(this.storageItems.values()).filter(
+      item => item.playerId === playerId && item.resourceId === resourceId
+    );
+
+    if (existingItems.length > 0) {
+      // Update existing item
+      const existingItem = existingItems[0];
+      await this.updateStorageItem(existingItem.id, {
+        quantity: existingItem.quantity + quantity
+      });
+    } else {
+      // Create new storage item
+      await this.addStorageItem({
+        playerId,
+        resourceId,
+        quantity
+      });
+    }
   }
 }
 
