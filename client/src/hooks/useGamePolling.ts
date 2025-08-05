@@ -52,15 +52,18 @@ export function useGameData({ playerId }: UseGameDataProps): GameData {
   });
 
   // Fetch resources data
-  const { data: resources = [] } = useQuery({
-    queryKey: ['/api/resources'],
+  const { data: resourcesResponse } = useQuery({
+    queryKey: ['/api/items'],
     queryFn: async () => {
-      const response = await fetch('/api/resources');
-      if (!response.ok) throw new Error('Failed to fetch resources');
+      const response = await fetch('/api/items');
+      if (!response.ok) throw new Error('Failed to fetch items');
       return response.json();
     },
     staleTime: 300000, // 5 minutes
   });
+  
+  // Extract resources from response (items include both resources and equipment)
+  const resources = resourcesResponse?.data?.filter((item: any) => item.type === 'unique' || item.type === 'basic') || [];
 
   // Fetch equipment data
   const { data: equipment = [] } = useQuery({

@@ -1,7 +1,7 @@
 
 import { Router } from 'express';
-// Items consolidated in equipment.ts
 import { successResponse, errorResponse } from '../utils/response-helpers';
+import { ALL_MODERN_ITEMS, getItemById } from '../data/equipment';
 
 const router = Router();
 

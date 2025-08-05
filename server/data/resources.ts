@@ -42,6 +42,10 @@ export function createResourcesWithIds(): InsertResource[] {
     { id: RESOURCE_IDS.CRISTAIS, name: "Cristais", emoji: "💎", weight: 1, sellPrice: 20, buyPrice: 40, type: "unique", rarity: "rare", requiredTool: "pickaxe", experienceValue: 10 },
     { id: RESOURCE_IDS.CONCHAS, name: "Conchas", emoji: "🐚", weight: 1, sellPrice: 12, buyPrice: 24, type: "unique", rarity: "uncommon", experienceValue: 4 },
 
+    // Additional crafting materials
+    { id: RESOURCE_IDS.OSSOS, name: "Ossos", emoji: "🦴", weight: 1, sellPrice: 5, buyPrice: 10, type: "basic", rarity: "common", experienceValue: 2 },
+    { id: RESOURCE_IDS.PELO, name: "Pelo", emoji: "🧶", weight: 1, sellPrice: 3, buyPrice: 6, type: "basic", rarity: "common", experienceValue: 1 },
+
     // Food resources (consumables)
     { id: RESOURCE_IDS.SUCO_FRUTAS, name: "Suco de Frutas", emoji: "🧃", weight: 1, sellPrice: 5, buyPrice: 10, type: "basic", rarity: "common", experienceValue: 2 },
     { id: RESOURCE_IDS.COGUMELOS_ASSADOS, name: "Cogumelos Assados", emoji: "🍄‍🟫", weight: 1, sellPrice: 6, buyPrice: 12, type: "basic", rarity: "common", experienceValue: 3 },

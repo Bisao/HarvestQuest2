@@ -34,6 +34,14 @@ export const RESOURCE_IDS = {
   CARNE_SALMAO: "res-e5a1c9f7-8b3d-4e10-9a21-8c6e2f7b9df7",
   PEIXE_GRELHADO: "res-g8h9i0j1-k2l3-4567-1234-890123456789",
   
+  // Animais como recursos individuais (para recursos únicos de biomas)
+  COELHO: "res-a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  VEADO: "res-b2c3d4e5-f6g7-8901-2345-678901bcdef0",
+  JAVALI: "res-c3d4e5f6-g7h8-9012-3456-789012cdef01",
+  PEIXE_PEQUENO: "res-d4e5f6g7-h8i9-0123-4567-890123def012",
+  PEIXE_GRANDE: "res-e5f6g7h8-i9j0-1234-5678-901234ef0123",
+  SALMAO: "res-f6g7h8i9-j0k1-2345-6789-012345f01234",
+  
   // Plantas Silvestres
   COGUMELOS: "res-h9i0j1k2-l3m4-5678-2345-901234567890",
   FRUTAS_SILVESTRES: "res-i0j1k2l3-m4n5-6789-3456-012345678901",
@@ -48,9 +56,17 @@ export const RESOURCE_IDS = {
   BARBANTE: "res-n5o6p7q8-r9s0-1234-8901-567890123456",
   FERRO_FUNDIDO: "res-o6p7q8r9-s0t1-2345-9012-678901234567",
   CARNE: "res-p7q8r9s0-t1u2-3456-0123-789012345678",
-  COURO: "res-q8r9s0t1-u2v3-4567-1234-890123456789",
+  COURO: "res-q8r9s0t1-u2v3-4567-1234-890123456789",  
+  OSSOS: "res-a9b8c7d6-e5f4-3210-9876-543210987654",
+  PELO: "res-b8c7d6e5-f4g3-2109-8765-432109876543",
   ISCA_PESCA: "res-r9s0t1u2-v3w4-5678-2345-901234567890",
-  ARGILA: "res-s0t1u2v3-w4x5-6789-3456-012345678901"
+  ARGILA: "res-s0t1u2v3-w4x5-6789-3456-012345678901",
+  
+  // Recursos Únicos de Biomas
+  MADEIRA_FLORESTA: "res-t1u2v3w4-x5y6-7890-4567-123456789012",
+  AREIA: "res-u2v3w4x5-y6z7-8901-5678-234567890123",
+  CRISTAIS: "res-v3w4x5y6-z7a8-9012-6789-345678901234",
+  CONCHAS: "res-w4x5y6z7-a8b9-0123-7890-456789012345"
 } as const;
 
 // ===================== EQUIPMENT IDs =====================
@@ -137,7 +153,9 @@ export const RECIPE_IDS = {
 // ===================== BIOME IDs =====================
 export const BIOME_IDS = {
   FLORESTA: "biome-floresta-001",
+  DESERTO: "biome-deserto-001",
   MONTANHA: "biome-montanha-001", 
+  OCEANO: "biome-oceano-001",
   PRAIA: "biome-praia-001",
   LAGO: "biome-lago-001",
   CAVERNA: "biome-caverna-001",
