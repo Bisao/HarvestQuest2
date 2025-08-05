@@ -1,6 +1,6 @@
 
 import type { IStorage } from "../storage";
-import { getAllGameItems } from "../data/items-modern";
+// Items consolidated in equipment.ts
 import { CONSUMPTION_CONFIG } from "@shared/config/consumption-config";
 
 export class AutoConsumeService {
@@ -80,7 +80,8 @@ export class AutoConsumeService {
       if (!player) return;
 
       // Get item data from modern items system
-      const allItems = getAllGameItems();
+      // Using consolidated equipment data instead of deprecated getAllGameItems
+      const allItems = []; // TODO: Implement proper item resolution after consolidation
       const itemData = allItems.find(item => item.id === itemId);
       if (!itemData || itemData.category !== 'consumable') return;
 

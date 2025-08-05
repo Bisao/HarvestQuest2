@@ -4,13 +4,13 @@
 import type { Express } from "express";
 import type { IStorage } from "../storage";
 import { GameService } from "../services/game-service";
-import { NewExpeditionService } from "../services/new-expedition-service";
+import { NewExpeditionService as ExpeditionService } from "../services/expedition-service";
 
 // Route registrations
 export { registerHealthRoutes } from "./health";
 export { registerEnhancedGameRoutes } from "./enhanced-game-routes";
 export { registerAdminRoutes } from "./admin";
-export { registerStorageRoutes } from "./storage-routes";
+export { registerEnhancedStorageRoutes as registerStorageRoutes } from "./enhanced-storage-routes";
 export { createConsumptionRoutes } from "./consumption";
 import { createTimeRoutes } from './time-routes';
 import { createCombatRoutes } from './combat-routes';

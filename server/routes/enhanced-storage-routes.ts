@@ -1,16 +1,17 @@
 
 /**
- * ENHANCED STORAGE API ROUTES
- * Modern storage endpoints with improved validation and performance
+ * UNIFIED STORAGE API ROUTES
+ * Consolidated storage endpoints with enhanced features
+ * (Replaces both storage-routes.ts and enhanced-storage-routes.ts)
  */
 
 import type { Express } from "express";
 import type { IStorage } from "../storage";
-import { EnhancedStorageService } from "../services/enhanced-storage-service";
+import { EnhancedStorageService as StorageService } from "../services/storage-service";
 import type { BatchStorageOperation } from "@shared/types/storage-types";
 
 export function registerEnhancedStorageRoutes(app: Express, storage: IStorage) {
-  const storageService = new EnhancedStorageService(storage);
+  const storageService = new StorageService(storage);
 
   // Initialize the service
   storageService.initialize();

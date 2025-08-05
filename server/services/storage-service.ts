@@ -1,129 +1,250 @@
-// Enhanced Storage Service - Clean, unified storage management
-// Handles all storage operations with real-time synchronization
+
+/**
+ * ENHANCED STORAGE SERVICE
+ * Modern storage service with improved performance and features
+ */
 
 import type { IStorage } from "../storage";
-import type { StorageItem, Resource, Equipment, Player } from "@shared/types";
+import type { 
+  StorageItem, 
+  EnhancedStorageItem,
+  StorageOperation,
+  StorageOperationResult,
+  StorageStats,
+  StorageConstraints,
+  BatchStorageOperation,
+  BatchOperationResult
+} from "@shared/types/storage-types";
+import type { Resource, Equipment, Player } from "@shared/types";
+import { storageManager } from "@shared/utils/storage-manager";
 
-export class StorageService {
+export class EnhancedStorageService {
   constructor(private storage: IStorage) {}
 
-  // Core Storage Operations
-  async getPlayerStorage(playerId: string): Promise<StorageItem[]> {
-    return this.storage.getPlayerStorage(playerId);
+  // Initialize the storage manager
+  async initialize(): Promise<void> {
+    const resources = await this.storage.getAllResources();
+    const equipment = await this.storage.getAllEquipment();
+    storageManager.initialize(resources, equipment);
   }
 
+  // Get enhanced storage data for a player
+  async getEnhancedStorageData(playerId: string): Promise<{
+    items: EnhancedStorageItem[];
+    stats: StorageStats;
+    constraints: StorageConstraints;
+  }> {
+    const rawItems = await this.storage.getPlayerStorage(playerId);
+    const enhancedItems = storageManager.processStorageItems(rawItems);
+    const stats = storageManager.calculateStorageStats(enhancedItems);
+    const constraints = storageManager.checkStorageConstraints(enhancedItems);
+
+    return { items: enhancedItems, stats, constraints };
+  }
+
+  // Add item to storage with validation
   async addItemToStorage(
-    playerId: string, 
-    resourceId: string, 
-    quantity: number, 
+    playerId: string,
+    resourceId: string,
+    quantity: number,
     itemType: 'resource' | 'equipment' = 'resource'
-  ): Promise<StorageItem> {
-    // Check if item already exists in storage
-    const existingItems = await this.storage.getPlayerStorage(playerId);
-    const existingItem = existingItems.find(item => 
-      item.resourceId === resourceId && item.itemType === itemType
-    );
-
-    if (existingItem) {
-      // Update existing item quantity
-      return this.storage.updateStorageItem(existingItem.id, {
-        quantity: existingItem.quantity + quantity
-      });
-    } else {
-      // Add new item to storage
-      return this.storage.addStorageItem({
-        playerId,
-        resourceId,
+  ): Promise<StorageOperationResult> {
+    try {
+      const { items, constraints } = await this.getEnhancedStorageData(playerId);
+      
+      const operation: StorageOperation = {
+        itemId: resourceId,
         quantity,
-        itemType
-      });
+        operation: 'add'
+      };
+
+      const validation = storageManager.validateStorageOperation(items, operation, constraints);
+      if (!validation.success) {
+        return validation;
+      }
+
+      // Check if item already exists
+      const existingItems = await this.storage.getPlayerStorage(playerId);
+      const existingItem = existingItems.find(item => 
+        item.resourceId === resourceId && item.itemType === itemType
+      );
+
+      let result: StorageItem;
+
+      if (existingItem) {
+        result = await this.storage.updateStorageItem(existingItem.id, {
+          quantity: existingItem.quantity + quantity,
+          lastModified: Date.now()
+        });
+      } else {
+        result = await this.storage.addStorageItem({
+          playerId,
+          resourceId,
+          quantity,
+          itemType,
+          createdAt: Date.now(),
+          lastModified: Date.now()
+        });
+      }
+
+      return {
+        success: true,
+        message: `${quantity} itens adicionados ao armazém`,
+        data: result
+      };
+
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erro ao adicionar item ao armazém",
+        error: error instanceof Error ? error.message : "Erro desconhecido"
+      };
     }
   }
 
+  // Remove item from storage with validation
   async removeItemFromStorage(
-    playerId: string, 
-    resourceId: string, 
-    quantity: number, 
+    playerId: string,
+    resourceId: string,
+    quantity: number,
     itemType: 'resource' | 'equipment' = 'resource'
-  ): Promise<boolean> {
-    const existingItems = await this.storage.getPlayerStorage(playerId);
-    const existingItem = existingItems.find(item => 
-      item.resourceId === resourceId && item.itemType === itemType
-    );
+  ): Promise<StorageOperationResult> {
+    try {
+      const { items } = await this.getEnhancedStorageData(playerId);
+      
+      const operation: StorageOperation = {
+        itemId: resourceId,
+        quantity,
+        operation: 'remove'
+      };
 
-    if (!existingItem || existingItem.quantity < quantity) {
-      throw new Error("Not enough items in storage");
-    }
-
-    const newQuantity = existingItem.quantity - quantity;
-    
-    if (newQuantity <= 0) {
-      // Remove item completely
-      await this.storage.removeStorageItem(existingItem.id);
-    } else {
-      // Update quantity
-      await this.storage.updateStorageItem(existingItem.id, {
-        quantity: newQuantity
+      const validation = storageManager.validateStorageOperation(items, operation, {
+        maxItems: 1000,
+        maxWeight: 10000,
+        currentItems: items.length,
+        currentWeight: items.reduce((sum, item) => sum + item.totalWeight, 0),
+        canAddItems: true,
+        availableSlots: 1000 - items.length
       });
-    }
 
-    return true;
+      if (!validation.success) {
+        return validation;
+      }
+
+      const existingItems = await this.storage.getPlayerStorage(playerId);
+      const existingItem = existingItems.find(item => 
+        item.resourceId === resourceId && item.itemType === itemType
+      );
+
+      if (!existingItem) {
+        return {
+          success: false,
+          message: "Item não encontrado no armazém",
+          error: "ITEM_NOT_FOUND"
+        };
+      }
+
+      const newQuantity = existingItem.quantity - quantity;
+
+      if (newQuantity <= 0) {
+        await this.storage.removeStorageItem(existingItem.id);
+      } else {
+        await this.storage.updateStorageItem(existingItem.id, {
+          quantity: newQuantity,
+          lastModified: Date.now()
+        });
+      }
+
+      return {
+        success: true,
+        message: `${quantity} itens removidos do armazém`,
+        data: { removedQuantity: quantity, remainingQuantity: Math.max(0, newQuantity) }
+      };
+
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erro ao remover item do armazém",
+        error: error instanceof Error ? error.message : "Erro desconhecido"
+      };
+    }
   }
 
+  // Transfer item from storage to inventory
   async transferToInventory(
-    playerId: string, 
-    storageItemId: string, 
+    playerId: string,
+    storageItemId: string,
     quantity: number
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<StorageOperationResult> {
     try {
       // Get storage item
       const storageItems = await this.storage.getPlayerStorage(playerId);
       const storageItem = storageItems.find(item => item.id === storageItemId);
       
       if (!storageItem) {
-        return { success: false, message: "Item not found in storage" };
+        return {
+          success: false,
+          message: "Item não encontrado no armazém",
+          error: "ITEM_NOT_FOUND"
+        };
       }
 
-      if (storageItem.quantity < quantity) {
-        return { success: false, message: "Not enough items in storage" };
+      // Validate with storage manager
+      const { items, constraints } = await this.getEnhancedStorageData(playerId);
+      const operation: StorageOperation = {
+        itemId: storageItem.resourceId,
+        quantity,
+        operation: 'transfer',
+        sourceLocation: 'storage',
+        targetLocation: 'inventory'
+      };
+
+      const validation = storageManager.validateStorageOperation(items, operation, constraints);
+      if (!validation.success) {
+        return validation;
       }
 
-      // Check if it's equipment (can't be withdrawn to inventory)
-      if (storageItem.itemType === 'equipment') {
-        return { success: false, message: "Equipment can only be equipped, not withdrawn to inventory" };
-      }
-
-      // Get player to check inventory capacity
+      // Get player for inventory validation
       const player = await this.storage.getPlayer(playerId);
       if (!player) {
-        return { success: false, message: "Player not found" };
+        return {
+          success: false,
+          message: "Jogador não encontrado",
+          error: "PLAYER_NOT_FOUND"
+        };
       }
 
-      // Get resource data to calculate weight
+      // Get resource data for weight calculation
       const resource = await this.storage.getResource(storageItem.resourceId);
       if (!resource) {
-        return { success: false, message: "Resource data not found" };
+        return {
+          success: false,
+          message: "Dados do recurso não encontrados",
+          error: "RESOURCE_NOT_FOUND"
+        };
       }
 
       const totalWeight = resource.weight * quantity;
       
       if (player.inventoryWeight + totalWeight > player.maxInventoryWeight) {
-        return { success: false, message: "Not enough space in inventory" };
+        return {
+          success: false,
+          message: "Espaço insuficiente no inventário",
+          error: "INVENTORY_WEIGHT_EXCEEDED"
+        };
       }
 
-      // Check if item already exists in inventory
+      // Perform the transfer
       const inventoryItems = await this.storage.getPlayerInventory(playerId);
       const existingInventoryItem = inventoryItems.find(item => 
         item.resourceId === storageItem.resourceId
       );
 
       if (existingInventoryItem) {
-        // Update existing inventory item
         await this.storage.updateInventoryItem(existingInventoryItem.id, {
           quantity: existingInventoryItem.quantity + quantity
         });
       } else {
-        // Add new inventory item
         await this.storage.addInventoryItem({
           playerId,
           resourceId: storageItem.resourceId,
@@ -137,7 +258,8 @@ export class StorageService {
         await this.storage.removeStorageItem(storageItem.id);
       } else {
         await this.storage.updateStorageItem(storageItem.id, {
-          quantity: newStorageQuantity
+          quantity: newStorageQuantity,
+          lastModified: Date.now()
         });
       }
 
@@ -146,158 +268,186 @@ export class StorageService {
         inventoryWeight: player.inventoryWeight + totalWeight
       });
 
-      return { success: true, message: "Items transferred to inventory successfully" };
-    } catch (error) {
-      console.error("Transfer to inventory error:", error);
-      return { success: false, message: error instanceof Error ? error.message : "Transfer failed" };
-    }
-  }
-
-  // Enhanced item data retrieval with proper type handling
-  async getEnhancedStorageData(playerId: string): Promise<{
-    items: Array<StorageItem & { 
-      itemData: (Resource | Equipment) & { type: 'resource' | 'equipment' };
-      totalValue: number;
-    }>;
-    stats: {
-      totalItems: number;
-      totalValue: number;
-      uniqueTypes: number;
-      totalWeight: number;
-    };
-  }> {
-    const storageItems = await this.storage.getPlayerStorage(playerId);
-    const resources = await this.storage.getAllResources();
-    const equipment = await this.storage.getAllEquipment();
-
-    const enhancedItems = [];
-    let totalItems = 0;
-    let totalValue = 0;
-    let totalWeight = 0;
-
-    for (const item of storageItems) {
-      let itemData: (Resource | Equipment) & { type: 'resource' | 'equipment' } | null = null;
-
-      if (item.itemType === 'equipment') {
-        const equipData = equipment.find(e => e.id === item.resourceId);
-        if (equipData) {
-          itemData = { ...equipData, type: 'equipment' as const };
-        }
-      } else {
-        const resourceData = resources.find(r => r.id === item.resourceId);
-        if (resourceData) {
-          itemData = { ...resourceData, type: 'resource' as const };
-        }
-      }
-
-      if (itemData) {
-        const itemValue = itemData.value * item.quantity;
-        const itemWeight = itemData.weight * item.quantity;
-        
-        enhancedItems.push({
-          ...item,
-          itemData,
-          totalValue: itemValue
-        });
-
-        totalItems += item.quantity;
-        totalValue += itemValue;
-        totalWeight += itemWeight;
-      }
-    }
-
-    return {
-      items: enhancedItems,
-      stats: {
-        totalItems,
-        totalValue,
-        uniqueTypes: enhancedItems.length,
-        totalWeight
-      }
-    };
-  }
-
-  // Batch operations for efficiency
-  async batchAddItems(
-    playerId: string, 
-    items: Array<{ resourceId: string; quantity: number; itemType?: 'resource' | 'equipment' }>
-  ): Promise<StorageItem[]> {
-    const results: StorageItem[] = [];
-    
-    for (const item of items) {
-      const result = await this.addItemToStorage(
-        playerId, 
-        item.resourceId, 
-        item.quantity, 
-        item.itemType || 'resource'
-      );
-      results.push(result);
-    }
-    
-    return results;
-  }
-
-  // Water storage operations (special handling)
-  async addWaterToPlayer(playerId: string, quantity: number): Promise<Player> {
-    return this.storage.addWaterToPlayer(playerId, quantity);
-  }
-
-  async consumeWaterFromPlayer(playerId: string, quantity: number): Promise<Player> {
-    return this.storage.consumeWaterFromPlayer(playerId, quantity);
-  }
-
-  // Storage validation and cleanup
-  async validateStorage(playerId: string): Promise<{
-    valid: boolean;
-    issues: string[];
-    fixed: boolean;
-  }> {
-    const issues: string[] = [];
-    let fixed = false;
-
-    try {
-      const storageItems = await this.storage.getPlayerStorage(playerId);
-      const resources = await this.storage.getAllResources();
-      const equipment = await this.storage.getAllEquipment();
-
-      for (const item of storageItems) {
-        // Check if referenced item exists
-        const resourceExists = resources.some(r => r.id === item.resourceId);
-        const equipmentExists = equipment.some(e => e.id === item.resourceId);
-
-        if (!resourceExists && !equipmentExists) {
-          issues.push(`Invalid item reference: ${item.resourceId}`);
-          // Remove invalid item
-          await this.storage.removeStorageItem(item.id);
-          fixed = true;
-        }
-
-        // Check quantity validity
-        if (item.quantity <= 0) {
-          issues.push(`Invalid quantity for item: ${item.resourceId}`);
-          await this.storage.removeStorageItem(item.id);
-          fixed = true;
-        }
-
-        // Check itemType consistency
-        if (item.itemType === 'equipment' && !equipmentExists) {
-          issues.push(`Equipment item type mismatch: ${item.resourceId}`);
-        }
-        if (item.itemType === 'resource' && !resourceExists) {
-          issues.push(`Resource item type mismatch: ${item.resourceId}`);
-        }
-      }
-
       return {
-        valid: issues.length === 0,
-        issues,
-        fixed
+        success: true,
+        message: `${quantity} itens transferidos para o inventário`,
+        data: {
+          transferredQuantity: quantity,
+          remainingInStorage: Math.max(0, newStorageQuantity),
+          newInventoryWeight: player.inventoryWeight + totalWeight
+        }
       };
+
     } catch (error) {
       return {
-        valid: false,
-        issues: [error instanceof Error ? error.message : "Validation failed"],
-        fixed: false
+        success: false,
+        message: "Erro na transferência",
+        error: error instanceof Error ? error.message : "Erro desconhecido"
+      };
+    }
+  }
+
+  // Batch operations
+  async processBatchOperation(batchOperation: BatchStorageOperation): Promise<BatchOperationResult> {
+    try {
+      const { items, constraints } = await this.getEnhancedStorageData(batchOperation.playerId);
+      
+      // Validate batch operation
+      const validation = storageManager.validateBatchOperation(items, batchOperation, constraints);
+      
+      if (batchOperation.validateOnly) {
+        return validation;
+      }
+
+      if (!validation.success && validation.totalFailed > 0) {
+        return validation;
+      }
+
+      // Execute operations
+      const results: StorageOperationResult[] = [];
+      
+      for (const operation of batchOperation.operations) {
+        let result: StorageOperationResult;
+        
+        switch (operation.operation) {
+          case 'add':
+            result = await this.addItemToStorage(
+              batchOperation.playerId,
+              operation.itemId,
+              operation.quantity
+            );
+            break;
+          case 'remove':
+            result = await this.removeItemFromStorage(
+              batchOperation.playerId,
+              operation.itemId,
+              operation.quantity
+            );
+            break;
+          default:
+            result = {
+              success: false,
+              message: "Operação não suportada em lote",
+              error: "UNSUPPORTED_BATCH_OPERATION"
+            };
+        }
+        
+        results.push(result);
+      }
+
+      const successful = results.filter(r => r.success).length;
+      const failed = results.length - successful;
+
+      return {
+        success: failed === 0,
+        message: failed === 0 ? 
+          `Todas as ${successful} operações executadas com sucesso` :
+          `${successful} operações bem-sucedidas, ${failed} falharam`,
+        results,
+        totalProcessed: successful,
+        totalFailed: failed
+      };
+
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erro na operação em lote",
+        results: [],
+        totalProcessed: 0,
+        totalFailed: batchOperation.operations.length
+      };
+    }
+  }
+
+  // Storage analytics and optimization
+  async getStorageAnalytics(playerId: string): Promise<{
+    stats: StorageStats;
+    recommendations: string[];
+    optimization: {
+      duplicateItems: number;
+      lowValueItems: number;
+      heavyItems: number;
+      suggestions: string[];
+    };
+  }> {
+    const { items, stats } = await this.getEnhancedStorageData(playerId);
+    
+    const recommendations: string[] = [];
+    const optimization = {
+      duplicateItems: 0,
+      lowValueItems: 0,
+      heavyItems: 0,
+      suggestions: [] as string[]
+    };
+
+    // Analyze storage efficiency
+    if (stats.storageCapacity.percentage > 80) {
+      recommendations.push("Armazém quase cheio - considere vender ou usar itens");
+    }
+
+    if (stats.totalWeight > 8000) {
+      recommendations.push("Peso alto no armazém - organize itens pesados");
+    }
+
+    // Find optimization opportunities
+    items.forEach(item => {
+      if (item.totalValue < 10 && item.quantity > 50) {
+        optimization.lowValueItems++;
+      }
+      
+      if (item.totalWeight > 100) {
+        optimization.heavyItems++;
+      }
+    });
+
+    if (optimization.lowValueItems > 0) {
+      optimization.suggestions.push(`${optimization.lowValueItems} tipos de itens de baixo valor podem ser vendidos`);
+    }
+
+    if (optimization.heavyItems > 0) {
+      optimization.suggestions.push(`${optimization.heavyItems} tipos de itens pesados ocupam muito espaço`);
+    }
+
+    return { stats, recommendations, optimization };
+  }
+
+  // Cleanup and maintenance
+  async cleanupStorage(playerId: string): Promise<StorageOperationResult> {
+    try {
+      const items = await this.storage.getPlayerStorage(playerId);
+      let cleaned = 0;
+
+      for (const item of items) {
+        // Remove items with 0 quantity
+        if (item.quantity <= 0) {
+          await this.storage.removeStorageItem(item.id);
+          cleaned++;
+        }
+        
+        // Validate item references
+        const itemData = await (item.itemType === 'equipment' ? 
+          this.storage.getEquipment(item.resourceId) : 
+          this.storage.getResource(item.resourceId));
+        
+        if (!itemData) {
+          await this.storage.removeStorageItem(item.id);
+          cleaned++;
+        }
+      }
+
+      return {
+        success: true,
+        message: cleaned > 0 ? 
+          `Armazém limpo - ${cleaned} itens inválidos removidos` :
+          "Armazém já está limpo",
+        data: { itemsRemoved: cleaned }
+      };
+
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erro na limpeza do armazém",
+        error: error instanceof Error ? error.message : "Erro desconhecido"
       };
     }
   }

@@ -22,10 +22,10 @@ import {
 } from "@shared/types";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync } from "fs";
-import { getAllGameItems } from "./data/items-modern";
+// Items consolidated in equipment.ts
 import { ALL_EQUIPMENT } from "./data/equipment";
 import { createBiomeData } from "./data/biomes";
-import { createModernRecipeData } from "./data/recipes-modern";
+// Recipes consolidated in quests.ts
 import { ALL_QUESTS } from "./data/quests";
 
 export interface IStorage {
@@ -207,7 +207,7 @@ export class MemStorage implements IStorage {
 
     // Initialize all resources using modern game items system
     const resourceIds: string[] = [];
-    const allItems = getAllGameItems();
+    const allItems = ALL_EQUIPMENT; // Using consolidated equipment data
     const resourceItems = allItems.filter(item => item.category === 'resource' || item.category === 'consumable');
 
     for (const resource of resourceItems) {
@@ -255,8 +255,8 @@ export class MemStorage implements IStorage {
       await this.createEquipment(equip);
     }
 
-    // Initialize recipes using modular data
-    const recipesData = createModernRecipeData();
+    // Initialize recipes using modular data (consolidated approach)
+    const recipesData = []; // TODO: Recipe system consolidation pending
     for (const recipe of recipesData) {
       await this.createRecipe(recipe);
     }

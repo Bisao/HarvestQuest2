@@ -7,15 +7,15 @@ import { z } from "zod";
 import type { Player, HungerDegradationMode } from "@shared/types";
 import { validateParams, playerIdParamSchema } from "./middleware/validation";
 import { GameService } from "./services/game-service";
-import { createNewExpeditionRoutes } from './routes/new-expedition-routes';
+import { createNewExpeditionRoutes } from './routes/expedition-routes';
 import { QuestService } from "./services/quest-service";
 import { OfflineActivityService } from "./services/offline-activity-service";
-import { NewExpeditionService } from "./services/new-expedition-service";
+import { NewExpeditionService as ExpeditionService } from "./services/expedition-service";
 import { randomUUID } from "crypto";
 import { registerHealthRoutes } from "./routes/health";
 import { registerEnhancedGameRoutes } from "./routes/enhanced-game-routes";
 import { registerAdminRoutes } from "./routes/admin";
-import { registerStorageRoutes } from "./routes/storage-routes";
+import { registerEnhancedStorageRoutes as registerStorageRoutes } from "./routes/enhanced-storage-routes";
 import { createConsumptionRoutes } from "./routes/consumption";
 import { createSkillRoutes } from "./routes/skill-routes";
 import savesRouter from "./routes/saves";
@@ -32,7 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gameService = new GameService(storage);
   const questService = new QuestService(storage);
   const offlineActivityService = new OfflineActivityService(storage);
-  const expeditionService = new NewExpeditionService(storage);
+  const expeditionService = new ExpeditionService(storage);
 
   // Register health and monitoring routes
   registerHealthRoutes(app);

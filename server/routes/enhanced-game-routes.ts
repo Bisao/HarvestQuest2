@@ -17,7 +17,7 @@ import {
 import { usernameParamSchema, playerIdParamSchema, idParamSchema } from "../middleware/validation";
 import type { IStorage } from "../storage";
 import { GameService } from "../services/game-service";
-// ExpeditionService removido - usando novo sistema
+import { NewExpeditionService as ExpeditionService } from "../services/expedition-service";
 import { RESOURCE_IDS, EQUIPMENT_IDS, BIOME_IDS, RECIPE_IDS } from "@shared/constants/game-ids";
 
 export function registerEnhancedGameRoutes(

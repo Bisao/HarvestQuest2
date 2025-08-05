@@ -7,8 +7,7 @@ import { GameData, Player, Item, Recipe, Equipment, Quest, Biome, Resource, Biom
 import { Storage } from '../storage';
 import { v4 as uuidv4 } from 'uuid';
 import { biomes } from '../data/biomes';
-import { recipes } from '../data/recipes-modern';
-import { items } from '../data/items-modern';
+// Data consolidated in equipment.ts and quests.ts
 import { equipment } from '../data/equipment';
 import { quests } from '../data/quests';
 import { resources } from '../data/resources';

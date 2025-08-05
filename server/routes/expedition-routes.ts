@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import type { IStorage } from '../storage';
-import { NewExpeditionService } from '../services/new-expedition-service';
+import { NewExpeditionService as ExpeditionService } from '../services/expedition-service';
 import { validateParams, validateBody } from '../middleware/validation';
 import { successResponse, errorResponse } from '../utils/response-helpers';
 import { migrateLegacyCreatureId } from '../../shared/constants/creature-ids';
@@ -22,7 +22,7 @@ const playerParamSchema = z.object({
 
 export function createNewExpeditionRoutes(storage: IStorage): Router {
   const router = Router();
-  const expeditionService = new NewExpeditionService(storage);
+  const expeditionService = new ExpeditionService(storage);
 
   // ===================== TEMPLATES =====================
 

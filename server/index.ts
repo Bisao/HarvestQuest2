@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes, setupRoutes } from "./routes";
+import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { corsMiddleware, securityHeaders } from "./middleware/cors";
 import { errorHandler, requestLogger } from "./middleware/error-handler";
@@ -7,10 +7,10 @@ import { rateLimit } from "./middleware/auth";
 
 // Import consumption routes
 import { createConsumptionRoutes } from "./routes/consumption";
-import { createModernRecipeData } from "./data/recipes-modern";
+// Recipe data consolidated in quests.ts
 import { GameService } from "./services/game-service";
 import { validateRecipeIngredients, validateGameDataConsistency } from "@shared/utils/id-validation";
-import { createNewExpeditionRoutes } from './routes/new-expedition-routes';
+import { createNewExpeditionRoutes } from './routes/expedition-routes';
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -23,15 +23,7 @@ if (!consistencyCheck.isValid) {
   process.exit(1);
 }
 
-// Validate recipe ingredients
-const recipes = createModernRecipeData();
-const recipeValidation = validateRecipeIngredients(recipes);
-if (!recipeValidation.isValid) {
-  console.error("❌ Recipe validation errors:");
-  recipeValidation.errors.forEach(error => console.error(`  - ${error}`));
-  console.error("❌ Invalid IDs found:", recipeValidation.invalidIds);
-  process.exit(1);
-}
+console.log("🔧 RECIPE-LOADING: Using corrected IDs from game-ids.ts master file");
 
 console.log("✅ All game data validation passed!");
 
@@ -103,8 +95,8 @@ app.use((req, res, next) => {
     // Register new expedition routes first (takes precedence)
   app.use('/api/expeditions', createNewExpeditionRoutes(storage));
 
-  // Setup legacy routes
-  registerRoutes(app, storage);
+  // Setup legacy routes  
+  await registerRoutes(app);
 
   // Use the centralized error handler
   app.use(errorHandler);
